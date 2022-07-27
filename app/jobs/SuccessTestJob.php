@@ -31,7 +31,7 @@ class SuccessTestJob extends AbstractJob {
         ]);
         // TODO: Specify the time at which the process will run at.
         // You can use one of the following methods to specifiy the time:
-        //$this->dailyAt(4, 30)
+        $this->dailyAt(4, 30);
         //$this->everyHour();
         //$this->everyMonthOn(1, '00:00');
         //$this->onMonth('jan', 15, '13:00');
@@ -42,7 +42,8 @@ class SuccessTestJob extends AbstractJob {
      * Execute the process.
      */
     public function execute() {
-        //TODO: Write the code that represents the process.
+        $this->getCommand()->println('Start: '.$this->getArgValue('start'));
+        $this->getCommand()->println('End: '.$this->getArgValue('end'));
     }
     /**
      * Execute a set of instructions when the job failed to complete without errors.

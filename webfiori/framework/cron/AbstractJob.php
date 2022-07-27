@@ -14,6 +14,7 @@ use Throwable;
 use webfiori\collections\Queue;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
+use webfiori\framework\Util;
 use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
@@ -1511,23 +1512,18 @@ abstract class AbstractJob implements JsonI {
     private function _logExeException(\Throwable $ex, $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
                 .'The output of the job might be not as expected.');
-        Cron::log('Exception class: "'.get_class($ex).'"');
-        Cron::log('Exception message: "'.$ex->getMessage().'"');
-        Cron::log('Thrown in file: "'.$ex->getFile().'"');
-        Cron::log('Line: "'.$ex->getLine().'"');
+        Cron::log('Exception class: '.get_class($ex).'');
+        Cron::log('Exception message: '.$ex->getMessage().'');
+        Cron::log('Thrown in: '. Util::extractClassName($ex->getFile()).'');
+        Cron::log('Line: '.$ex->getLine().'');
         
-        $trace = $ex->getTrace();
-        Cron::log('Stack Trace:');
         
-        foreach ($trace as $traceArr) {
-            $file = isset($traceArr['file']) ? $traceArr['file'] : 'X_FILE';
-            $line = isset($traceArr['line']) ? $traceArr['line'] : 'X_LINE';
-            Cron::log('File: '.$file.', Line '.$line);
-        }
         if ($meth == 'execute') {
             $this->isSuccess = false;
         }
     }
+    
+
     private function _weeklyOn($day,$time) {
         $timeSplit = explode(':', $time);
 

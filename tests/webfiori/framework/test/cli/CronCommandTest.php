@@ -1,10 +1,9 @@
 <?php
 
 namespace webfiori\framework\test\cli;
-use webfiori\framework\WebFioriApp;
-use webfiori\file\File;
-use webfiori\framework\cli\commands\CreateCommand;
+
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of CronCommandTest
  *
@@ -41,10 +40,9 @@ class CronCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Total number of jobs: 5\n",
-            "Executed Jobs: 5\n",
+            "Executed Jobs: 4\n",
             "Successfully finished jobs:\n",
             "    Success Every Minute\n",
-            "    Success 1\n",
             "Failed jobs:\n",
             "    Fail 1\n",
             "    Fail 2\n",
@@ -179,6 +177,42 @@ class CronCommandTest extends TestCase {
             "    <NONE>\n",
             "Failed jobs:\n",
             "    Fail 2\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test06() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            'N'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--force',
+            '--show-log',
+            '--job-name' => 'Success 1',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Would you like to customize execution arguments?(y/N)\n",
+            "Running job(s) check...\n",
+            "Forceing job 'Success 1' to execute...\n",
+            "Active job: \"Success 1\" ...\n",
+            "Calling the method app\jobs\SuccessTestJob::execute()\n",
+            "Start: \n",
+            "End: \n",
+            "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
+            "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
+            "Check finished.\n",
+            "Total number of jobs: 5\n",
+            "Executed Jobs: 1\n",
+            "Successfully finished jobs:\n",
+            "    Success 1\n",
+            "Failed jobs:\n",
+            "    <NONE>\n"
         ], $runner->getOutput());
     }
 }

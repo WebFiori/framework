@@ -31,6 +31,7 @@ class JobArgument implements JsonI {
      */
     private $argName;
     private $argVal;
+    private $default;
     /**
      * 
      * @var string
@@ -55,6 +56,28 @@ class JobArgument implements JsonI {
         if (!$this->setDescription($desc)) {
             $this->setDescription('NO DESCRIPTION');
         }
+    }
+    /**
+     * Sets a default value for the argument to use in case it was not
+     * provided.
+     * 
+     * @param string $default A string that represents the default value
+     * of the argument.
+     */
+    public function setDefault(string $default) {
+        $this->default = $default;
+    }
+    /**
+     * Returns the default value of the argument.
+     * 
+     * The default value is usually used if the argument has no value
+     * provided.
+     * 
+     * @return string|null If default value is set, its returned as string.
+     * Other than that, null is returned.
+     */
+    public function getDefault() {
+        return $this->default;
     }
     /**
      * Returns argument description.
@@ -153,7 +176,8 @@ class JobArgument implements JsonI {
     public function toJSON() : Json {
         $json = new Json([
             'name' => $this->getName(),
-            'description' => $this->getDescription()
+            'description' => $this->getDescription(),
+            'default' => $this->getDefault()
         ]);
         $json->setPropsStyle('snake');
 

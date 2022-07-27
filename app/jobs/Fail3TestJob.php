@@ -33,7 +33,7 @@ class Fail3TestJob extends AbstractJob {
      * Execute the process.
      */
     public function execute() {
-        $x = $y;
+        $x = $argv[88];
     }
     /**
      * Execute a set of instructions when the job failed to complete without errors.

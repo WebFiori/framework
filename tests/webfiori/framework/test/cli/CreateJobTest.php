@@ -166,11 +166,13 @@ class CreateJobTest extends CreateTestCase {
             'y',
             'start',
             'Start date of the report.',
+            '',
             'y',
             'end?',
             'y',
             'end',
             'End date of the report.',
+            '2021-07-07',
             'n'
         ]);
         
@@ -183,12 +185,14 @@ class CreateJobTest extends CreateTestCase {
             "Would you like to add arguments to the job?(y/N)\n",
             "Enter argument name:\n",
             "Descripe the use of the argument: Enter = ''\n",
+            "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
             "Enter argument name:\n",
             "Error: Invalid argument name: end?\n",
             "Would you like to add more arguments?(y/N)\n",
             "Enter argument name:\n",
             "Descripe the use of the argument: Enter = ''\n",
+            "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
             "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
         ], $runner->getOutput());
@@ -202,7 +206,10 @@ class CreateJobTest extends CreateTestCase {
         $this->assertEquals(2, count($job->getArguments()));
         $arg1 = $job->getArgument('start');
         $this->assertEquals('Start date of the report.', $arg1->getDescription());
+        $this->assertNull($arg1->getDefault());
+        
         $arg2 = $job->getArgument('end');
         $this->assertEquals('End date of the report.', $arg2->getDescription());
+        $this->assertEquals('2021-07-07', $arg2->getDefault());
     }
 }

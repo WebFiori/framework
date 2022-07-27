@@ -41,11 +41,14 @@ class CronCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Total number of jobs: 5\n",
-            "Executed Jobs: 0\n",
+            "Executed Jobs: 5\n",
             "Successfully finished jobs:\n",
-            "    <NONE>\n",
+            "    Success Every Minute\n",
+            "    Success 1\n",
             "Failed jobs:\n",
-            "    <NONE>\n",
+            "    Fail 1\n",
+            "    Fail 2\n",
+            "    Fail 3\n",
         ], $runner->getOutput());
     }
     /**

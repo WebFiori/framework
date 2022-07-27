@@ -32,7 +32,7 @@ class CreateCommand extends CLICommand {
         parent::__construct('create', [
             '--c' => [
                 'optional' => true,
-                'description' => 'What will be created. Possible values: table'
+                'description' => 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.'
             ]
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
@@ -96,7 +96,7 @@ class CreateCommand extends CLICommand {
            'table' => 'Database table class.',
            'entity' => 'Entity class from table.',
            'web-service' => 'Web service.',
-           'background-job' => 'Background job.',
+           'job' => 'Background job.',
            'middleware' => 'Middleware.',
            'command' => 'CLI Command.',
            'theme' => 'Theme.',

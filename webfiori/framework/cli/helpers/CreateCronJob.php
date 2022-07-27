@@ -51,6 +51,8 @@ class CreateCronJob extends CreateClassHelper {
             try {
                 $argObj = new JobArgument($this->getInput('Enter argument name:'));
                 $argObj->setDescription($this->getInput('Descripe the use of the argument:', ''));
+                $argObj->setDefault($this->getInput('Default value:', ''));
+                
                 $this->getWriter()->addArgument($argObj);
             } catch (\InvalidArgumentException $ex) {
                 $this->error($ex->getMessage());

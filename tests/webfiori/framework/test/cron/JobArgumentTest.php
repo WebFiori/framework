@@ -2,6 +2,7 @@
 
 namespace webfiori\framework\test\cron;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cron\JobArgument;
 /**
@@ -26,7 +27,7 @@ class JobArgumentTest extends TestCase {
      * @test
      */
     public function test01() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid argument name: <empty string>");
         $arg = new JobArgument('');
     }
@@ -34,7 +35,7 @@ class JobArgumentTest extends TestCase {
      * @test
      */
     public function test02() {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid argument name: Super#Arg");
         $arg = new JobArgument('Super#Arg');
     }

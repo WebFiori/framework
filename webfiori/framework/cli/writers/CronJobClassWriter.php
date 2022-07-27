@@ -10,9 +10,12 @@
  */
 namespace webfiori\framework\cli\writers;
 
-use webfiori\framework\writers\ClassWriter;
+use webfiori\framework\cron\AbstractJob;
+use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\CronEmail;
 use webfiori\framework\cron\CronJob;
 use webfiori\framework\cron\JobArgument;
+use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to write cron jobs classes.
  *
@@ -45,9 +48,9 @@ class CronJobClassWriter extends ClassWriter {
         }
         $this->setSuffix('Job');
         $this->addUseStatement([
-            "webfiori\\framework\\cron\\AbstractJob",
-            "webfiori\\framework\\cron\\CronEmail",
-            "webfiori\\framework\\cron\\Cron",
+            AbstractJob::class,
+            CronEmail::class,
+            Cron::class,
         ]);
     }
     /**
@@ -129,7 +132,10 @@ class CronJobClassWriter extends ClassWriter {
 
             foreach ($jobArgs as $argObj) {
                 $this->append("'".$argObj->getName()."' => [", 3);
-                $this->append("'description' => '".str_replace('\'', '\\\'', $argObj->getDescription())."'", 4);
+                $this->append("'description' => '".str_replace('\'', '\\\'', $argObj->getDescription())."',", 4);
+                if ($argObj->getDefault() !== null) {
+                    $this->append("'default' => '".str_replace('\'', '\\\'', $argObj->getDefault())."',", 4);
+                }
                 $this->append("],", 3);
             }
             $this->append(']);', 2);
@@ -137,7 +143,7 @@ class CronJobClassWriter extends ClassWriter {
         $this->append([
             '// TODO: Specify the time at which the process will run at.',
             '// You can use one of the following methods to specifiy the time:',
-            '//$this->dailyAt(4, 30)',
+            '//$this->dailyAt(4, 30);',
             '//$this->everyHour();',
             '//$this->everyMonthOn(1, \'00:00\');',
             "//\$this->onMonth('jan', 15, '13:00');",

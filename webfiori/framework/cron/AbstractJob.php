@@ -224,6 +224,9 @@ abstract class AbstractJob implements JsonI {
                 if (isset($argParamsOrName['description'])) {
                     $argObj->setDescription($argParamsOrName['description']);
                 }
+                if (isset($argParamsOrName['default'])) {
+                    $argObj->setDefault($argParamsOrName['default']);
+                }
                 $this->addExecutionArg($argObj);
                 continue;
             }
@@ -467,19 +470,16 @@ abstract class AbstractJob implements JsonI {
         if ($argObj === null) {
             
             return null;
-        }
-
-        $val = $argObj->getValue();
-        
-        if ($val !== null) {
-            
-            return $val;
-        }
+        }      
         
         $val = $this->getArgValFromRequest($name);
         
         if ($val === null) {
             $val = $this->getArgValFromTerminal($name);
+        }
+        
+        if ($val === null) {
+            $val = $argObj->getDefault();
         }
         
         if ($val !== null) {

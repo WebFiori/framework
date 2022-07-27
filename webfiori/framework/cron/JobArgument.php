@@ -65,6 +65,9 @@ class JobArgument implements JsonI {
      * of the argument.
      */
     public function setDefault(string $default) {
+        if (strlen($default) == 0) {
+            return;
+        }
         $this->default = $default;
     }
     /**

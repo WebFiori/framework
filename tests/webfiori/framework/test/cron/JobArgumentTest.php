@@ -19,6 +19,8 @@ class JobArgumentTest extends TestCase {
         $this->assertEquals('NO DESCRIPTION', $arg->getDescription());
         $this->assertNull($arg->getValue());
         $this->assertEquals('{"name":"Super Arg","description":"NO DESCRIPTION"}', $arg->toJSON().'');
+        $arg->setValue('Cool');
+        $this->assertEquals('Cool',$arg->getValue());
     }
     /**
      * @test

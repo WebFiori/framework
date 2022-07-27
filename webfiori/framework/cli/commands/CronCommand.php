@@ -54,7 +54,7 @@ class CronCommand extends CLICommand {
             '--job-name' => [
                 'optional' => true,
                 'description' => 'The name of the job that will be forced to '
-                .'execute.'
+                .'execute or to show its arguments.'
             ],
             '--show-job-args' => [
                 'optional' => true,
@@ -113,7 +113,7 @@ class CronCommand extends CLICommand {
         $job = Cron::getJob($jobName);
         $args = $job->getExecArgsNames();
 
-        if (count($args) != 0 && $this->confirm('Would you like to supply custom execution arguments?', false)) {
+        if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {
             $this->_setArgs($args);
         }
     }

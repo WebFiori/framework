@@ -1,0 +1,14 @@
+<?php
+namespace webfiori\framework\test\cli;
+
+use PHPUnit\Framework\TestCase;
+use webfiori\file\File;
+
+class CreateTestCase extends TestCase {
+
+    public function removeClass($classPath) {
+        $file = new File(ROOT_DIR.$classPath.'.php');
+        $file->remove();
+    }
+
+}

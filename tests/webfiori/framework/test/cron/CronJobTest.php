@@ -3,6 +3,7 @@ namespace webfiori\framework\test\cron;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\cron\Cron;
 use webfiori\framework\cron\CronJob;
 use webfiori\framework\cron\JobArgument;
 /**
@@ -821,5 +822,118 @@ class CronJobTest extends TestCase {
         $this->assertFalse($job->weeklyOn('0','23:60'));
         $this->assertFalse($job->weeklyOn('0','24:00'));
         $this->assertTrue($job->weeklyOn('0','00:00'));
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth00() {
+        $job = new CronJob();
+        $job->everyMonthOn(1);
+        Cron::setDayOfMonth(1);
+        $this->assertTrue($job->isDayOfMonth());
+        for ($x = 2 ; $x < 31 ; $x++) {
+            Cron::setDayOfMonth($x);
+            $this->assertFalse($job->isDayOfMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth01() {
+        $job = new CronJob('5 4 1-10,25-29 * *');
+
+        $this->assertTrue($job->isDayOfMonth());
+        for ($x = 1 ; $x <= 10 ; $x++) {
+            Cron::setDayOfMonth($x);
+            $this->assertTrue($job->isDayOfMonth());
+        }
+        for ($x = 11 ; $x <= 24 ; $x++) {
+            Cron::setDayOfMonth($x);
+            $this->assertFalse($job->isDayOfMonth());
+        }
+        for ($x = 25 ; $x <= 29 ; $x++) {
+            Cron::setDayOfMonth($x);
+            $this->assertTrue($job->isDayOfMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth02() {
+        $job = new CronJob('5 4 1,3,4,10,29 * *');
+
+        Cron::setDayOfMonth(1);
+        $this->assertTrue($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(3);
+        $this->assertTrue($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(4);
+        $this->assertTrue($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(10);
+        $this->assertTrue($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(29);
+        $this->assertTrue($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(11);
+        $this->assertFalse($job->isDayOfMonth());
+        
+        Cron::setDayOfMonth(2);
+        $this->assertFalse($job->isDayOfMonth());
+    }
+    
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek00() {
+        $job = new CronJob();
+        $job->weeklyOn('sun');
+        Cron::setDayOfWeek(0);
+        $this->assertTrue($job->isDayOfWeek());
+        for ($x = 1 ; $x < 7 ; $x++) {
+            Cron::setDayOfWeek($x);
+            $this->assertFalse($job->isDayOfWeek());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek01() {
+        $job = new CronJob('5 4 * * 0-3,5-6');
+
+        for ($x = 0 ; $x <= 3 ; $x++) {
+            Cron::setDayOfWeek($x);
+            $this->assertTrue($job->isDayOfWeek());
+        }
+        Cron::setDayOfWeek(4);
+        $this->assertFalse($job->isDayOfWeek());
+        
+        Cron::setDayOfWeek(5);
+        $this->assertTrue($job->isDayOfWeek());
+        Cron::setDayOfWeek(6);
+        $this->assertTrue($job->isDayOfWeek());
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek02() {
+        $job = new CronJob('5 4 * * 0,3,6');
+
+        Cron::setDayOfWeek(0);
+        $this->assertTrue($job->isDayOfWeek());
+        
+        Cron::setDayOfWeek(3);
+        $this->assertTrue($job->isDayOfWeek());
+        
+        Cron::setDayOfWeek(6);
+        $this->assertTrue($job->isDayOfWeek());
+        
+        Cron::setDayOfWeek(1);
+        $this->assertFalse($job->isDayOfWeek());
+        
+        Cron::setDayOfWeek(5);
+        $this->assertFalse($job->isDayOfWeek());
     }
 }

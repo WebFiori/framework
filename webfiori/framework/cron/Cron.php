@@ -641,7 +641,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setHour(int $hour) {
+    public static function setHour(int $hour) {
 
         if ($hour >= 1 && $hour <= 23) {
             self::_get()->timestamp['hour'] = $hour;
@@ -659,9 +659,9 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setMinute(int $minute) {
+    public static function setMinute(int $minute) {
 
-        if ($minute >= 1 && $minute <= 59) {
+        if ($minute >= 0 && $minute <= 59) {
             self::_get()->timestamp['minute'] = $minute;
         }
     }

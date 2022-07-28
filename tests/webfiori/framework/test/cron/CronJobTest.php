@@ -936,4 +936,74 @@ class CronJobTest extends TestCase {
         Cron::setDayOfWeek(5);
         $this->assertFalse($job->isDayOfWeek());
     }
+    
+     
+    /**
+     * @test
+     */
+    public function testIsMinute00() {
+        $job = new CronJob();
+        $job->dailyAt(0, 25);
+        Cron::setMinute(25);
+        $this->assertTrue($job->isMinute());
+        for ($x = 0 ; $x < 25 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+        for ($x = 26 ; $x < 59 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMinute01() {
+        $job = new CronJob('5-10,20-40 4 * * 0-3,5-6');
+
+        for ($x = 0 ; $x <= 4 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+        for ($x = 5 ; $x <= 10 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertTrue($job->isMinute());
+        }
+        for ($x = 11 ; $x <= 19 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+        for ($x = 20 ; $x <= 40 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertTrue($job->isMinute());
+        }
+        for ($x = 41 ; $x <= 59 ; $x++) {
+            Cron::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMinute02() {
+        $job = new CronJob('5,20,40,59 4 * * 0,3,6');
+
+        Cron::setMinute(5);
+        $this->assertTrue($job->isMinute());
+        
+        Cron::setMinute(20);
+        $this->assertTrue($job->isMinute());
+        
+        Cron::setMinute(40);
+        $this->assertTrue($job->isMinute());
+        
+        Cron::setMinute(59);
+        $this->assertTrue($job->isMinute());
+        
+        Cron::setMinute(0);
+        $this->assertFalse($job->isMinute());
+        
+        Cron::setMinute(1);
+        $this->assertFalse($job->isMinute());
+    }
 }

@@ -643,7 +643,7 @@ class Cron {
      */
     public static function setHour(int $hour) {
 
-        if ($hour >= 1 && $hour <= 23) {
+        if ($hour >= 0 && $hour <= 23) {
             self::_get()->timestamp['hour'] = $hour;
         }
     }

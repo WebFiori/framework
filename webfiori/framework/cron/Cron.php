@@ -605,11 +605,10 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setDayOfMonth(int $dayOfMonth) {
-        $asInt = intval($dayOfMonth);
+    public static function setDayOfMonth(int $dayOfMonth) {
 
-        if ($asInt >= 1 && $asInt <= 31) {
-            self::_get()->timestamp['month-day'] = $asInt;
+        if ($dayOfMonth >= 1 && $dayOfMonth <= 31) {
+            self::_get()->timestamp['month-day'] = $dayOfMonth;
         }
     }
     /**
@@ -625,10 +624,9 @@ class Cron {
      * @since 1.1.1
      */
     public static function setDayOfWeek(int $val) {
-        $asInt = intval($val);
 
-        if ($asInt >= 0 && $asInt <= 6) {
-            self::_get()->timestamp['week-day'] = $asInt;
+        if ($val >= 0 && $val <= 6) {
+            self::_get()->timestamp['week-day'] = $val;
         }
     }
     /**
@@ -644,10 +642,9 @@ class Cron {
      * @since 1.1.1
      */
     public function setHour(int $hour) {
-        $asInt = intval($hour);
 
-        if ($asInt >= 1 && $asInt <= 23) {
-            self::_get()->timestamp['hour'] = $asInt;
+        if ($hour >= 1 && $hour <= 23) {
+            self::_get()->timestamp['hour'] = $hour;
         }
     }
     /**
@@ -663,10 +660,9 @@ class Cron {
      * @since 1.1.1
      */
     public function setMinute(int $minute) {
-        $asInt = intval($minute);
 
-        if ($asInt >= 1 && $asInt <= 59) {
-            self::_get()->timestamp['minute'] = $asInt;
+        if ($minute >= 1 && $minute <= 59) {
+            self::_get()->timestamp['minute'] = $minute;
         }
     }
     /**
@@ -682,10 +678,9 @@ class Cron {
      * @since 1.1.1
      */
     public function setMonth(int $month) {
-        $asInt = intval($month);
 
-        if ($asInt >= 1 && $asInt <= 31) {
-            self::_get()->timestamp['month'] = $asInt;
+        if ($month >= 1 && $month <= 31) {
+            self::_get()->timestamp['month'] = $month;
         }
     }
     /**

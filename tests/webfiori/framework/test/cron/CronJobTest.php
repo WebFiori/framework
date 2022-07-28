@@ -842,7 +842,6 @@ class CronJobTest extends TestCase {
     public function testIsDayOfMonth01() {
         $job = new CronJob('5 4 1-10,25-29 * *');
 
-        $this->assertTrue($job->isDayOfMonth());
         for ($x = 1 ; $x <= 10 ; $x++) {
             Cron::setDayOfMonth($x);
             $this->assertTrue($job->isDayOfMonth());

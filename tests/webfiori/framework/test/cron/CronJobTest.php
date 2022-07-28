@@ -1006,4 +1006,66 @@ class CronJobTest extends TestCase {
         Cron::setMinute(1);
         $this->assertFalse($job->isMinute());
     }
+    /**
+     * @test
+     */
+    public function testtestIsHour00() {
+        $job = new CronJob();
+        $job->everyHour(1);
+
+        for ($x = 0 ; $x < 24 ; $x++) {
+            Cron::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testtestIsHour01() {
+        $job = new CronJob('5 0-2,12-19 1-10,25-29 * *');
+
+        for ($x = 0 ; $x <= 2 ; $x++) {
+            Cron::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+        for ($x = 3 ; $x <= 11 ; $x++) {
+            Cron::setHour($x);
+            $this->assertFalse($job->isHour());
+        }
+        for ($x = 12 ; $x <= 19 ; $x++) {
+            Cron::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+        for ($x = 20 ; $x <= 23 ; $x++) {
+            Cron::setHour($x);
+            $this->assertFalse($job->isHour());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsHour02() {
+        $job = new CronJob('5 4,8,9,13,16 1,3,4,10,29 * *');
+
+        Cron::setHour(4);
+        $this->assertTrue($job->isHour());
+        
+        Cron::setHour(8);
+        $this->assertTrue($job->isHour());
+        
+        Cron::setHour(9);
+        $this->assertTrue($job->isHour());
+        
+        Cron::setHour(13);
+        $this->assertTrue($job->isHour());
+        
+        Cron::setHour(16);
+        $this->assertTrue($job->isHour());
+        
+        Cron::setHour(11);
+        $this->assertFalse($job->isHour());
+        
+        Cron::setHour(2);
+        $this->assertFalse($job->isHour());
+    }
 }

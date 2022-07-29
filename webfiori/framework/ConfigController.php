@@ -1617,11 +1617,11 @@ class ConfigController {
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'apis');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'sessions');
         $this->_mkdir(ROOT_DIR.$DS.'public');
-        $this->_mkdir(ROOT_DIR.$DS.'themes');
     }
 }

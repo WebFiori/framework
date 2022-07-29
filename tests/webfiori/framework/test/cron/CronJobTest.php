@@ -1008,7 +1008,7 @@ class CronJobTest extends TestCase {
     /**
      * @test
      */
-    public function testtestIsHour00() {
+    public function testIsHour00() {
         $job = new CronJob();
         $job->everyHour(1);
 
@@ -1020,7 +1020,7 @@ class CronJobTest extends TestCase {
     /**
      * @test
      */
-    public function testtestIsHour01() {
+    public function testIsHour01() {
         $job = new CronJob('5 0-2,12-19 1-10,25-29 * *');
 
         for ($x = 0 ; $x <= 2 ; $x++) {
@@ -1066,5 +1066,68 @@ class CronJobTest extends TestCase {
         
         Cron::setHour(2);
         $this->assertFalse($job->isHour());
+    }
+    
+    /**
+     * @test
+     */
+    public function testIsMonth00() {
+        $job = new CronJob();
+        $job->onMonth(5);
+        Cron::setMonth(5);
+        $this->assertTrue($job->isMonth());
+        
+        for ($x = 1 ; $x < 4 ; $x++) {
+            Cron::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+        for ($x = 6 ; $x < 13 ; $x++) {
+            Cron::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth01() {
+        $job = new CronJob('* 4 * 1-3,9-12 *');
+
+        for ($x = 1 ; $x <= 3 ; $x++) {
+            Cron::setMonth($x);
+            $this->assertTrue($job->isMonth());
+        }
+        for ($x = 4 ; $x <= 8 ; $x++) {
+            Cron::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+        for ($x = 9 ; $x <= 12 ; $x++) {
+            Cron::setMonth($x);
+            $this->assertTrue($job->isMonth());
+        }
+        
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth02() {
+        $job = new CronJob('5,20,40,59 4 * 1,5,8,4,12 0,3,6');
+
+        Cron::setMonth(1);
+        $this->assertTrue($job->isMonth());
+        
+        Cron::setMonth(5);
+        $this->assertTrue($job->isMonth());
+        
+        Cron::setMonth(8);
+        $this->assertTrue($job->isMonth());
+        
+        Cron::setMonth(4);
+        $this->assertTrue($job->isMonth());
+        
+        Cron::setMonth(12);
+        $this->assertTrue($job->isMonth());
+        
+        Cron::setMinute(1);
+        $this->assertFalse($job->isMinute());
     }
 }

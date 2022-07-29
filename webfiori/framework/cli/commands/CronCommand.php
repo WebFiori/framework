@@ -119,7 +119,7 @@ class CronCommand extends CLICommand {
     }
     private function _force() {
         $jobName = $this->getArgValue('--job-name');
-        $cPass = $this->getArgValue('p');
+        $cPass = $this->getArgValue('p').'';
         $retVal = -1;
         $jobsNamesArr = Cron::getJobsNames();
         $jobsNamesArr[] = 'Cancel';

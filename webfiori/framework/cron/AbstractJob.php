@@ -790,7 +790,7 @@ abstract class AbstractJob implements JsonI {
         
         if ($monthsArr['every-month'] !== true) {
             $retVal = false;
-            $current = intval(date('m'));
+            $current = Cron::month();
             $ranges = $monthsArr['at-range'];
 
             foreach ($ranges as $range) {

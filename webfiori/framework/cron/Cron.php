@@ -677,9 +677,9 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setMonth(int $month) {
+    public static function setMonth(int $month) {
 
-        if ($month >= 1 && $month <= 31) {
+        if ($month >= 1 && $month <= 12) {
             self::_get()->timestamp['month'] = $month;
         }
     }

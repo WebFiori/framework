@@ -3,6 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\cron\Cron;
 use webfiori\framework\WebFioriApp;
 /**
  * Description of CronCommandTest
@@ -204,6 +205,7 @@ class CronCommandTest extends TestCase {
             "Calling the method app\jobs\SuccessTestJob::execute()\n",
             "Start: 2021-07-08\n",
             "End: \n",
+            "The job was forced.\n",
             "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
             "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
             "Check finished.\n",
@@ -220,6 +222,7 @@ class CronCommandTest extends TestCase {
      */
     public function test07() {
         $runner = WebFioriApp::getRunner();
+        Cron::execLog(true);
         $runner->setInput([
             'N'
         ]);
@@ -242,6 +245,7 @@ class CronCommandTest extends TestCase {
             "Calling the method app\jobs\SuccessTestJob::execute()\n",
             "Start: 2021\n",
             "End: 2022\n",
+            "The job was forced.\n",
             "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
             "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
             "Check finished.\n",
@@ -252,5 +256,36 @@ class CronCommandTest extends TestCase {
             "Failed jobs:\n",
             "    <NONE>\n"
         ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test08() {
+        $runner = WebFioriApp::getRunner();
+        Cron::reset();
+        Cron::execLog(true);
+        Cron::password('1234567');
+        Cron::registerJobs();
+        
+        $runner->setInput([
+            'N'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--force',
+            '--job-name' => 'Success 1',
+            //'p' => '1234'
+        ]);
+        $this->assertEquals(-1, $runner->start());
+        $this->assertEquals([
+            "Would you like to customize execution arguments?(y/N)\n",
+            "Error: Provided password is incorrect.\n",
+        ], $runner->getOutput());
+        $this->assertEquals([
+            "Running job(s) check...",
+            "Error: Given password is incorrect.",
+            "Check finished.",
+        ], Cron::getLogArray());
     }
 }

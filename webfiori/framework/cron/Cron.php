@@ -125,6 +125,20 @@ class Cron {
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
     }
+    public static function reset() {
+        self::_get()->timestamp = [
+            'month' => intval(date('m')),
+            'month-day' => intval(date('d')),
+            'week-day' => intval(date('w')),
+            'hour' => intval(date('H')),
+            'minute' => intval(date('i'))
+        ];
+        self::_get()->jobsNamesArr = [];
+        self::_get()->logsArray = [];
+        self::_get()->isLogEnabled = false;
+        self::_get()->cronJobsQueue = new Queue();
+        self::_get()->_setPassword('');
+    }
     /**
      * Returns an object that represents the job which is currently being executed.
      * 
@@ -904,17 +918,15 @@ class Cron {
             self::log('Active job: "'.$job->getJobName().'" ...');
         }
     }
-    private function _setLogEnabled($bool) {
-        $this->isLogEnabled = $bool === true;
+    private function _setLogEnabled(bool $bool) {
+        $this->isLogEnabled = $bool;
     }
     /**
      * 
      * @param type $pass
      * @since 1.0
      */
-    private function _setPassword($pass) {
-        if (gettype($pass) == 'string') {
-            $this->accessPass = $pass;
-        }
+    private function _setPassword(string $pass) {
+        $this->accessPass = $pass;
     }
 }

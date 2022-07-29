@@ -45,6 +45,10 @@ class SuccessTestJob extends AbstractJob {
     public function execute() {
         $this->getCommand()->println('Start: '.$this->getArgValue('start'));
         $this->getCommand()->println('End: '.$this->getArgValue('end'));
+        
+        if ($this->isForced()) {
+            $this->getCommand()->println('The job was forced.');
+        }
     }
     /**
      * Execute a set of instructions when the job failed to complete without errors.

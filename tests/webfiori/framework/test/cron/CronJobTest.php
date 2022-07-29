@@ -456,6 +456,54 @@ class CronJobTest extends TestCase {
     /**
      * @test
      */
+    public function testCron14() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
+        $cron = new CronJob('40-30 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testCron15() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
+        $cron = new CronJob('40-30 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testCron16() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 1,2,7,8\'.');
+        $cron = new CronJob('* * * * 1,2,7,8');
+    }
+    /**
+     * @test
+     */
+    public function testCron17() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 23-8 * * *\'.');
+        $cron = new CronJob('* 23-8 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testCron18() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13,14,24 * * *\'.');
+        $cron = new CronJob('* 0-13,14,24 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testCron19() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13 * 5,6,13 *\'.');
+        $cron = new CronJob('* 0-13 * 5,6,13 *');
+    }
+    /**
+     * @test
+     */
     public function testDailyAt00() {
         $job = new CronJob();
         $this->assertTrue($job->dailyAt());
@@ -683,7 +731,7 @@ class CronJobTest extends TestCase {
     public function testOnMonth01() {
         $job = new CronJob();
         $this->assertFalse($job->onMonth(0, 3));
-        $this->assertTrue($job->onMonth(1, 3));
+        $this->assertTrue($job->onMonth('jan', 3));
         $this->assertEquals('0 0 3 1 *',$job->getExpression());
         $this->assertTrue($job->onMonth(2, 3));
         $this->assertEquals('0 0 3 2 *',$job->getExpression());
@@ -691,13 +739,13 @@ class CronJobTest extends TestCase {
         $this->assertEquals('0 0 3 3 *',$job->getExpression());
         $this->assertTrue($job->onMonth(4, 3));
         $this->assertEquals('0 0 3 4 *',$job->getExpression());
-        $this->assertTrue($job->onMonth(5, 3));
+        $this->assertTrue($job->onMonth(5, '3'));
         $this->assertEquals('0 0 3 5 *',$job->getExpression());
         $this->assertTrue($job->onMonth(6, 3));
         $this->assertEquals('0 0 3 6 *',$job->getExpression());
         $this->assertTrue($job->onMonth(7, 3));
         $this->assertEquals('0 0 3 7 *',$job->getExpression());
-        $this->assertTrue($job->onMonth(8, 3));
+        $this->assertTrue($job->onMonth(8, '3'));
         $this->assertEquals('0 0 3 8 *',$job->getExpression());
         $this->assertTrue($job->onMonth(9, 3));
         $this->assertEquals('0 0 3 9 *',$job->getExpression());
@@ -705,7 +753,7 @@ class CronJobTest extends TestCase {
         $this->assertEquals('0 0 3 10 *',$job->getExpression());
         $this->assertTrue($job->onMonth(11, 3));
         $this->assertEquals('0 0 3 11 *',$job->getExpression());
-        $this->assertTrue($job->onMonth(12, 3));
+        $this->assertTrue($job->onMonth('dec', '3'));
         $this->assertEquals('0 0 3 12 *',$job->getExpression());
         $this->assertFalse($job->onMonth(13, 3));
         $this->assertEquals('0 0 3 12 *',$job->getExpression());

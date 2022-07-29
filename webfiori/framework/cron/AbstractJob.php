@@ -1060,11 +1060,10 @@ abstract class AbstractJob implements JsonI {
             if (gettype($dayNameOrNum) == 'string') {
                 $trimmed = trim($dayNameOrNum);
 
-                if (in_array($trimmed, ['0','1','2','3','4','5','6'])) {
-                    $dayNameOrNum = intval($trimmed);
-                } else {
+                if (!in_array($trimmed, ['0','1','2','3','4','5','6'])) {
                     return false;
                 }
+                $dayNameOrNum = intval($trimmed);
             }
 
             if ($dayNameOrNum >= 0 && $dayNameOrNum <= 6) {
@@ -1125,22 +1124,19 @@ abstract class AbstractJob implements JsonI {
                 $start = in_array(strtoupper($range[0]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[0])] : intval($range[0]);
                 $end = in_array(strtoupper($range[1]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[1])] : intval($range[1]);
 
-                if ($start < $end) {
-                    if ($start >= 0 && $start < 6) {
-                        if ($end >= 0 && $end <= 6) {
-                            $dayAttrs['at-range'][] = [$start,$end];
-                        } else {
-                            $isValidExpr = false;
-                            break;
-                        }
-                    } else {
-                        $isValidExpr = false;
-                        break;
-                    }
-                } else {
+                if (!($start < $end)) {
                     $isValidExpr = false;
                     break;
                 }
+                if (!($start >= 0 && $start < 6)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                if (!($end >= 0 && $end <= 6)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                $dayAttrs['at-range'][] = [$start,$end];
             } else if ($exprType == self::STEP_VAL) {
                 $isValidExpr = false;
             } else if ($exprType == self::SPECIFIC_VAL) {
@@ -1190,45 +1186,39 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if ($start < $end) {
-                    if ($start >= 0 && $start < 24) {
-                        if ($end >= 0 && $end < 24) {
-                            $hoursAttrs['at-range'][] = [$start,$end];
-                        } else {
-                            $isValidExpr = false;
-                            break;
-                        }
-                    } else {
-                        $isValidExpr = false;
-                        break;
-                    }
-                } else {
+                if (!($start < $end)) {
                     $isValidExpr = false;
                     break;
                 }
+                if (!($start >= 0 && $start < 24)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                if (!($end >= 0 && $end < 24)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                $hoursAttrs['at-range'][] = [$start,$end];
             } else if ($exprType == self::STEP_VAL) {
                 $stepVal = intval(explode('/', $subExpr)[1]);
 
-                if ($stepVal >= 0 && $stepVal < 24) {
-                    $hoursAttrs['every-x-hours'][] = $stepVal;
-                } else {
+                if (!($stepVal >= 0 && $stepVal < 24)) {
                     $isValidExpr = false;
                     break;
                 }
+                $hoursAttrs['every-x-hours'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if ($this->_isNumber($subExpr)) {
-                    $value = intval($subExpr);
-                } else {
+                if (!$this->_isNumber($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
-
-                if ($value >= 0 && $value <= 23) {
-                    $hoursAttrs['at-every-x-hour'][] = $value;
-                } else {
+                $value = intval($subExpr);
+                
+                if (!($value >= 0 && $value <= 23)) {
                     $isValidExpr = false;
                     break;
                 }
+                $hoursAttrs['at-every-x-hour'][] = $value;
             }
         }
 
@@ -1268,45 +1258,39 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if ($start < $end) {
-                    if ($start >= 0 && $start <= 59) {
-                        if ($end >= 0 && $end <= 59) {
-                            $minuteAttrs['at-range'][] = [$start,$end];
-                        } else {
-                            $isValidExpr = false;
-                            break;
-                        }
-                    } else {
-                        $isValidExpr = false;
-                        break;
-                    }
-                } else {
+                if (!($start < $end)) {
                     $isValidExpr = false;
                     break;
                 }
+                if (!($start >= 0 && $start <= 59)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                if (!($end >= 0 && $end <= 59)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                $minuteAttrs['at-range'][] = [$start,$end];
             } else if ($exprType == self::STEP_VAL) {
                 $stepVal = intval(explode('/', $subExpr)[1]);
 
-                if ($stepVal >= 0 && $stepVal <= 59) {
-                    $minuteAttrs['every-x-minutes'][] = $stepVal;
-                } else {
+                if (!($stepVal >= 0 && $stepVal <= 59)) {
                     $isValidExpr = false;
                     break;
                 }
+                $minuteAttrs['every-x-minutes'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if ($this->_isNumber($subExpr)) {
-                    $value = intval($subExpr);
-                } else {
+                if (!$this->_isNumber($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
-
-                if ($value >= 0 && $value <= 59) {
-                    $minuteAttrs['at-every-x-minute'][] = $value;
-                } else {
+                $value = intval($subExpr);
+                
+                if (!($value >= 0 && $value <= 59)) {
                     $isValidExpr = false;
                     break;
                 }
+                $minuteAttrs['at-every-x-minute'][] = $value;
             }
         }
 
@@ -1344,34 +1328,30 @@ abstract class AbstractJob implements JsonI {
                 $start = in_array(strtoupper($range[0]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[0])] : intval($range[0]);
                 $end = in_array(strtoupper($range[1]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[1])] : intval($range[1]);
 
-                if ($start < $end) {
-                    if ($start >= 1 && $start < 13) {
-                        if ($end >= 1 && $end < 13) {
-                            $monthAttrs['at-range'][] = [$start,$end];
-                        } else {
-                            $isValidExpr = false;
-                            break;
-                        }
-                    } else {
-                        $isValidExpr = false;
-                        break;
-                    }
-                } else {
+                if (!($start < $end)) {
                     $isValidExpr = false;
                     break;
                 }
+                if (!($start >= 1 && $start < 13)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                if (!($end >= 1 && $end < 13)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                $monthAttrs['at-range'][] = [$start,$end];
             } else if ($exprType == self::STEP_VAL) {
                 $isValidExpr = false;
             } else if ($exprType == self::SPECIFIC_VAL) {
                 $subExpr = strtoupper($subExpr);
                 $value = in_array($subExpr, array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[$subExpr] : intval($subExpr);
 
-                if ($value >= 1 && $value <= 12) {
-                    $monthAttrs['at-x-month'][] = $value;
-                } else {
+                if (!($value >= 1 && $value <= 12)) {
                     $isValidExpr = false;
                     break;
                 }
+                $monthAttrs['at-x-month'][] = $value;
             }
         }
 
@@ -1409,31 +1389,27 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if ($start < $end) {
-                    if ($start >= 1 && $start < 32) {
-                        if ($end >= 1 && $end < 32) {
-                            $monthDaysAttrs['at-range'][] = [$start,$end];
-                        } else {
-                            $isValidExpr = false;
-                            break;
-                        }
-                    } else {
-                        $isValidExpr = false;
-                        break;
-                    }
-                } else {
+                if (!($start < $end)) {
                     $isValidExpr = false;
                     break;
                 }
+                if (!($start >= 1 && $start < 32)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                if (!($end >= 1 && $end < 32)) {
+                    $isValidExpr = false;
+                    break;
+                }
+                $monthDaysAttrs['at-range'][] = [$start,$end];
             } else if ($exprType == self::SPECIFIC_VAL) {
                 $value = intval($subExpr);
 
-                if ($value >= 1 && $value <= 31) {
-                    $monthDaysAttrs['at-every-x-day'][] = $value;
-                } else {
+                if (!($value >= 1 && $value <= 31)) {
                     $isValidExpr = false;
                     break;
                 }
+                $monthDaysAttrs['at-every-x-day'][] = $value;
             }
         }
 
@@ -1456,30 +1432,29 @@ abstract class AbstractJob implements JsonI {
             $split = explode('/', $expr);
             $count = count($split);
 
-            if ($count == 2) {
-                if (strlen($split[0]) != 0 && strlen($split[1]) != 0) {
-                    $retVal = self::STEP_VAL;
-                } else {
-                    $retVal = self::INV_VAL;
-                }
-            } else {
+            if (!($count == 2)) {
                 $split = explode('-', $expr);
                 $count = count($split);
 
-                if ($count == 2) {
-                    if (strlen($split[0]) != 0 && strlen($split[1]) != 0) {
-                        $retVal = self::RANGE_VAL;
-                    } else {
-                        $retVal = self::INV_VAL;
-                    }
-                } else {
+                if (!($count == 2)) {
+                    $retVal = self::SPECIFIC_VAL;
                     //it can be invalid value
-                    if (strlen($expr) != 0) {
-                        $retVal = self::SPECIFIC_VAL;
-                    } else {
+                    if (!(strlen($expr) != 0)) {
                         $retVal = self::INV_VAL;
                     }
+                    return $retVal;
                 }
+                $retVal = self::RANGE_VAL;
+
+                if (!(strlen($split[0]) != 0 && strlen($split[1]) != 0)) {
+                    $retVal = self::INV_VAL;
+                }
+                return $retVal;
+            }
+            $retVal = self::INV_VAL;
+                
+            if (!(strlen($split[0]) != 0 && strlen($split[1]) != 0)) {
+                $retVal = self::STEP_VAL;
             }
         }
 
@@ -1575,11 +1550,10 @@ abstract class AbstractJob implements JsonI {
     private function onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum) {
         $trimmed = trim($monthNameOrNum);
 
-        if (in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
-            $monthNameOrNum = intval($trimmed);
-        } else {
+        if (!in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
             return false;
         }
+        $monthNameOrNum = intval($trimmed);
 
         if ($monthNameOrNum >= 1 && $monthNameOrNum <= 12) {
             return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');

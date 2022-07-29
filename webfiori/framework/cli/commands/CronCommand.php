@@ -103,6 +103,7 @@ class CronCommand extends CLICommand {
             $retVal = $this->_force();
         } else if ($this->isArgProvided('--show-job-args')) {
             $this->_showJobArgs();
+            $retVal = 0;
         } else {
             $this->info("At least one of the options '--check', '--force' or '--show-job-args' must be provided.");
         }
@@ -197,14 +198,14 @@ class CronCommand extends CLICommand {
         $job = Cron::getJob($jobName);
 
         $this->println("Job Args:");
-        $customArgs = $job->getExecArgsNames();
+        $customArgs = $job->getArguments();
 
         if (count($customArgs) != 0) {
-            foreach ($customArgs as $argName) {
-                $this->println("$argName");
+            foreach ($customArgs as $argObj) {
+                $this->println("    %s: %s", $argObj->getName(), $argObj->getDescription());
             }
         } else {
-            $this->println("<NO ARGS>");
+            $this->println("    <NO ARGS>");
         }
     }
 }

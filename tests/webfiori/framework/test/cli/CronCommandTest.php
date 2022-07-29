@@ -264,7 +264,7 @@ class CronCommandTest extends TestCase {
         $runner = WebFioriApp::getRunner();
         Cron::reset();
         Cron::execLog(true);
-        Cron::password('1234567');
+        Cron::password('123456');
         Cron::registerJobs();
         
         $runner->setInput([
@@ -287,5 +287,53 @@ class CronCommandTest extends TestCase {
             "Error: Given password is incorrect.",
             "Check finished.",
         ], Cron::getLogArray());
+    }
+    /**
+     * @test
+     */
+    public function test09() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--job-name' => 'Success 1',
+            '--show-job-args',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Job Args:\n",
+            "    start: Start date of the report.\n",
+            "    end: End date of the report.\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test10() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            '0'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--show-job-args',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select one of the scheduled jobs to show supported args:\n",
+            "0: Fail 1\n",
+            "1: Fail 2\n",
+            "2: Fail 3\n",
+            "3: Success Every Minute\n",
+            "4: Success 1\n",
+            "Job Args:\n",
+            "    <NO ARGS>\n",
+        ], $runner->getOutput());
     }
 }

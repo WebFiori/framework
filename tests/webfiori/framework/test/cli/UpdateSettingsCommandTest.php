@@ -2,9 +2,10 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\cli\Runner;
 use webfiori\framework\cli\commands\UpdateSettingsCommand;
 use webfiori\framework\ConfigController;
-use webfiori\cli\Runner;
+use webfiori\framework\WebFioriApp;
 
 /**
  * Description of TestUpdateSettingsCommand
@@ -16,31 +17,30 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateVersion00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'version'
+        ]);
         $runner->setInput([
-            '0',
             '2.0.1',
             'Beta',
+            '99',
+            '99-99-99',
             ''
         ]);
         
         
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
-            "Application version: Enter = '1.0'\n",
-            "Application version type: Enter = 'Stable'\n",
+            
+            "Application version: Enter = '".WebFioriApp::getAppConfig()->getVersion()."'\n",
+            "Application version type: Enter = '".WebFioriApp::getAppConfig()->getVersionType()."'\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
+            "Error: Invalid input is given. Try again.\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Version information successfully updated.\n"
         ], $runner->getOutput());
@@ -50,6 +50,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals('Beta', $version['version-type']);
         $this->assertEquals(date('Y-m-d'), $version['release-date']);
     }
+
     /**
      * @test
      */

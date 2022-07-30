@@ -10,14 +10,13 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use Error;
-use Exception;
+use Throwable;
 use webfiori\cli\CLICommand;
+use webfiori\cli\InputValidator;
 use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
 use webfiori\framework\WebFioriApp;
-use webfiori\cli\InputValidator;
 /**
  * This class implements a CLI command which is used to update the settings which are 
  * stored in the class 'AppConfing' of the application.
@@ -38,20 +37,22 @@ class UpdateSettingsCommand extends CLICommand {
             ]
         ], 'Update application settings which are stored in the class "AppConfig".');
     }
+    private function addOption(&$optArr, $key, $txt) {
+        $optArr[$key] = $txt;
+    }
     public function exec() : int {
-        $options = [
-            'version' => 'Update application version info.',
-            'app-name' => 'Update application name.',
-            'cron-pass' => 'Update CRON password.',
-            'page-title' => 'Update default page title.',
-            'page-description' => 'Update default page description.',
-            'primary-lang' => 'Change primary language.',
-            'title-sep' => 'Change title separator.',
-            'home-page' => 'Set home page.',
-            'primary-theme' => 'Set primay theme.',
-            'admin-theme' => 'Set admin theme.',
-            'Quit.'
-        ];
+        $options = [];
+        $this->addOption($options,'version', 'Update application version info.');
+        $this->addOption($options,'app-name', 'Update application name.');
+        $this->addOption($options,'cron-pass', 'Update CRON password.');
+        $this->addOption($options,'page-title', 'Update default page title.');
+        $this->addOption($options,'page-description', 'Update default page description.');
+        $this->addOption($options,'primary-lang', 'Change primary language.');
+        $this->addOption($options,'title-sep', 'Change title separator.');
+        $this->addOption($options,'home-page', 'Set home page.');
+        $this->addOption($options,'primary-theme', 'Set primay theme.');
+        $this->addOption($options,'admin-theme', 'Set admin theme.');
+        $this->addOption($options,'q', 'Quit.');
         
         $what = $this->getArgValue('--w');
         $answer = null;
@@ -91,8 +92,6 @@ class UpdateSettingsCommand extends CLICommand {
             $this->_setHome();
         } else if ($answer == 'Update application version info.') {
             $this->_updateVersionInfo();
-        } else {
-            $this->println('Not implemented yet.');
         }
 
         return 0;
@@ -234,9 +233,7 @@ class UpdateSettingsCommand extends CLICommand {
                 if ($instance instanceof Theme) {
                     return true;
                 }
-            } catch (Exception $exc) {
-                return false;
-            } catch (Error $exc) {
+            } catch (Throwable $exc) {
                 return false;
             }
         }));

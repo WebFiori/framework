@@ -62,7 +62,7 @@
             <directory>./tests/webfiori/framework/test/langs/</directory>
         </testsuite>
         <testsuite name="Core Tests">
-            <directory>./tests/webfiori/framework/test</directory>
+            <directory>./tests/webfiori/framework/test/</directory>
         </testsuite>
         <testsuite name="Router Tests">
             <directory>./tests/webfiori/framework/test/router/</directory>

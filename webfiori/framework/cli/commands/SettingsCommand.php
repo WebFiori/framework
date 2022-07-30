@@ -35,18 +35,15 @@ class SettingsCommand extends CLICommand {
     public function exec() : int {
         $spaces = 25;
         $C = WebFioriApp::getAppConfig();
-        $this->println("Framework Version Settings:", [
-            'color' => 'yellow',
-            'bold' => true
-        ]);
+        $format = [];
+        $format['color'] = 'yellow';
+        $format['bold'] = true;
+        $this->println("Framework Version Settings:", $format);
         $this->println("    Framework Version %".($spaces - strlen('Framework Version'))."s %s",':',WF_VERSION);
         $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',WF_VERSION_TYPE);
         $this->println("    Release Date %".($spaces - strlen('Release Date'))."s %s",':',WF_RELEASE_DATE);
 
-        $this->println("AppConfig.php Settings:", [
-            'color' => 'yellow',
-            'bold' => true
-        ]);
+        $this->println("AppConfig.php Settings:", $format);
         $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',ROOT_DIR.DS.APP_DIR_NAME);
         $this->println("    Application Version %".($spaces - strlen('Application Version'))."s %s",':',$C->getVersion());
         $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());

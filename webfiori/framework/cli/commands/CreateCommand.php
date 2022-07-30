@@ -36,7 +36,31 @@ class CreateCommand extends CLICommand {
             ]
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-
+    private function getWhat() {
+        $options = [
+           'table' => 'Database table class.',
+           'entity' => 'Entity class from table.',
+           'web-service' => 'Web service.',
+           'job' => 'Background job.',
+           'middleware' => 'Middleware.',
+           'command' => 'CLI Command.',
+           'theme' => 'Theme.',
+           'Quit.'
+        ];
+        $what = $this->getArgValue('--c');
+        $answer = null;
+        if ($what !== null) {
+            $answer = isset($options[$what]) ? $options[$what] : null;
+            
+            if ($answer === null) {
+                $this->warning('The argument --c has invalid value.');
+            }
+        }
+        if ($answer === null) {
+            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+        }
+        return $answer;
+    }
     public function _createEntityFromQuery() {
         $tableClassNameValidity = false;
         $tableClassName = $this->getArgValue('--table-class');
@@ -92,28 +116,8 @@ class CreateCommand extends CLICommand {
         return 0;
     }
     public function exec() : int {
-        $options = [
-           'table' => 'Database table class.',
-           'entity' => 'Entity class from table.',
-           'web-service' => 'Web service.',
-           'job' => 'Background job.',
-           'middleware' => 'Middleware.',
-           'command' => 'CLI Command.',
-           'theme' => 'Theme.',
-           'Quit.'
-        ];
-        $what = $this->getArgValue('--c');
-        $answer = null;
-        if ($what !== null) {
-            $answer = isset($options[$what]) ? $options[$what] : null;
-            
-            if ($answer === null) {
-                $this->warning('The argument --c has invalid value.');
-            }
-        }
-        if ($answer === null) {
-            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-        }
+        
+        $answer = $this->getWhat();
         
         if ($answer == 'Quit.') {
         } else if ($answer == 'Database table class.') {

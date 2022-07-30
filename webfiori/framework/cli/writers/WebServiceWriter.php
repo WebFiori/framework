@@ -145,7 +145,7 @@ class WebServiceWriter extends ClassWriter {
             " *",
             " * @return boolean If the client is authorized, the method will return true.",
             " */",
-            "public function isAuthorized() {",
+            $this->f('isAuthorized'),
         ], 1);
         $this->append([
             '// TODO: Check if the client is authorized to call the service \''.$name.'\'.',
@@ -160,7 +160,7 @@ class WebServiceWriter extends ClassWriter {
             "/**",
             " * Process the request.",
             " */",
-            "public function processRequest() {",
+            $this->f('processRequest'),
         ], 1);
         $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
         $this->append('$this->getManager()->serviceNotImplemented();', 2);
@@ -172,7 +172,7 @@ class WebServiceWriter extends ClassWriter {
             "/**",
             " * Creates new instance of the class.",
             " */",
-            'public function __construct(){',
+            $this->f('__construct'),
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);

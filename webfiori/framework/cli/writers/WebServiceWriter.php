@@ -123,7 +123,7 @@ class WebServiceWriter extends ClassWriter {
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
                 $toAppend = "'default' => '".$param->getDefault()."',";
             } else if ($param->getType() == 'boolean') {
-                $toAppend = $param->getDefault() === true ? "'default' => false" : "'default' => false";
+                $toAppend = $param->getDefault() === true ? "'default' => false," : "'default' => false,";
             }
             $this->append($toAppend, 4);
         }

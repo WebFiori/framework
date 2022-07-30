@@ -119,18 +119,13 @@ class WebServiceWriter extends ClassWriter {
         }
 
         if ($param->getDefault() !== null) {
-
+            $toAppend = "'default' => ".$param->getDefault().",";
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
-                $this->append("'default' => '".$param->getDefault()."',", 4);
+                $toAppend = "'default' => '".$param->getDefault()."',";
             } else if ($param->getType() == 'boolean') {
-                if ($param->getDefault() === true) {
-                    $this->append("'default' => true,", 4);
-                } else {
-                    $this->append("'default' => false,", 4);
-                }
-            } else {
-                $this->append("'default' => ".$param->getDefault().",", 4);
+                $toAppend = $param->getDefault() === true ? "'default' => false" : "'default' => false";
             }
+            $this->append($toAppend, 4);
         }
 
         if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {

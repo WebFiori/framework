@@ -336,4 +336,35 @@ class CronCommandTest extends TestCase {
             "    <NO ARGS>\n",
         ], $runner->getOutput());
     }
+    /**
+     * @test
+     */
+    public function test11() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput();
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--list'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Number Of Jobs: 5\n",
+            "--------- Job #01 ---------\n",
+            "Job Name          : Fail 1\n",
+            "Cron Expression   : * * * * *\n",
+            "--------- Job #02 ---------\n",
+            "Job Name          : Fail 2\n",
+            "Cron Expression   : * * * * *\n",
+            "--------- Job #03 ---------\n",
+            "Job Name          : Fail 3\n",
+            "Cron Expression   : * * * * *\n",
+            "--------- Job #04 ---------\n",
+            "Job Name          : Success Every Minute\n",
+            "Cron Expression   : * * * * *\n",
+            "--------- Job #05 ---------\n",
+            "Job Name          : Success 1\n",
+            "Cron Expression   : 30 4 * * *\n",
+        ], $runner->getOutput());
+    }
 }

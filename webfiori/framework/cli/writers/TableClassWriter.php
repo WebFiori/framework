@@ -73,11 +73,11 @@ class TableClassWriter extends ClassWriter {
     public function __construct($tableObj = null) {
         parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR_NAME.DS.'database', APP_DIR_NAME.'\\database');
         $this->setSuffix('Table');
-        if ($tableObj !== null) {
-            $this->setTable($tableObj);
-        } else {
+        if ($tableObj === null) {
             $this->setTableType('mysql');
+            return;
         }
+        $this->setTable($tableObj);
     }
     /**
      * Returns the table object which was associated with the writer.
@@ -191,10 +191,9 @@ class TableClassWriter extends ClassWriter {
         foreach ($fks as $fkObj) {
             $refTableNs = get_class($fkObj->getSource());
             $cName = $this->getNamespace().'\\'.$this->getName();
-
-            if ($cName == $refTableNs) {
-                $refTableClassName = '$this';
-            } else {
+            $refTableClassName = '$this';
+            
+            if ($cName != $refTableNs) {
                 $nsSplit = explode('\\', $refTableNs);
                 $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
             }
@@ -248,15 +247,11 @@ class TableClassWriter extends ClassWriter {
         }
 
         if ($colObj->getDefault() !== null) {
+            $defaultVal = "'default' => '".$colObj->getDefault()."',";
             if ($dataType == 'bool' || $dataType == 'boolean') {
-                if ($colObj->getDefault() === true) {
-                    $this->append("'default' => true,", 4);
-                } else {
-                    $this->append("'default' => false,", 4);
-                }
-            } else {
-                $this->append("'default' => '".$colObj->getDefault()."',", 4);
-            }
+                $defaultVal = $colObj->getDefault() === true ? "'default' => true," : "'default' => false,";
+            } 
+            $this->append($defaultVal, 4);
         }
 
         if ($colObj->isNull()) {
@@ -273,7 +268,7 @@ class TableClassWriter extends ClassWriter {
             "/**",
             " * Creates new instance of the class.",
             " */",
-            'public function __construct() {',
+            $this->f('__construct'),
         ], 1);
         $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
 

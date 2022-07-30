@@ -171,6 +171,7 @@ class CronJobTest extends TestCase {
      * @test
      */
     public function testConstructor07() {
+        Cron::setMinute(33);
         $cron = new CronJob('15 8 * jan-mar 0,mon,3-6');
         $this->assertEquals('15 8 * jan-mar 0,mon,3-6',$cron->getExpression());
         $this->assertequals('{'

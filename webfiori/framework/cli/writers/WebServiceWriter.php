@@ -10,10 +10,10 @@
  */
 namespace webfiori\framework\cli\writers;
 
-use InvalidArgumentException;
+use webfiori\framework\EAbstractWebService;
+use webfiori\framework\writers\ClassWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
-use webfiori\framework\writers\ClassWriter;
 
 /**
  * A writer class which is used to create new web service class.
@@ -46,14 +46,15 @@ class WebServiceWriter extends ClassWriter {
      */
     public function __construct($webServicesObj = null) {
         parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
-
-        if (!($webServicesObj instanceof AbstractWebService)) {
-            $this->servicesObj = new ServiceHolder();
-        } else {
-            $this->servicesObj = $webServicesObj;
-        }
+        
         $this->setSuffix('Service');
-        $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
+        $this->addUseStatement(EAbstractWebService::class);
+        $this->servicesObj = new ServiceHolder();
+        
+        if (($webServicesObj instanceof AbstractWebService)) {
+            $this->servicesObj = $webServicesObj;
+            
+        }
     }
     /**
      * Adds new request parameter.

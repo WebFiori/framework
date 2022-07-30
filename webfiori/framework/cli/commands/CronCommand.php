@@ -42,6 +42,10 @@ class CronCommand extends CLICommand {
                 'description' => 'CRON password. If it is set in CRON, then it must be '
                 .'provided here.'
             ],
+            '--list' => [
+                'optional' => true,
+                'description' => 'List all scheduled CRON jobs.'
+            ],
             '--check' => [
                 'optional' => true,
                 'description' => 'Run a check aginst all jobs to check if '
@@ -83,8 +87,11 @@ class CronCommand extends CLICommand {
      */
     public function exec() : int {
         $retVal = -1;
-
-        if ($this->isArgProvided('--check')) {
+        
+        if ($this->isArgProvided('--list')) {
+            $this->listJobs();
+            $retVal = 0;
+        } else if ($this->isArgProvided('--check')) {
             $pass = $this->getArgValue('p');
 
             if ($pass !== null) {
@@ -206,6 +213,22 @@ class CronCommand extends CLICommand {
             }
         } else {
             $this->println("    <NO ARGS>");
+        }
+    }
+    public function listJobs() {
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
+
+        while ($job = $jobs->dequeue()) {
+            $num = $i < 10 ? '0'.$i : $i;
+            $this->println("--------- Job #$num ---------", [
+                'color' => 'light-blue',
+                'bold' => true
+            ]);
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
         }
     }
 }

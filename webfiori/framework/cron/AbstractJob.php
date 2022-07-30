@@ -801,7 +801,7 @@ abstract class AbstractJob implements JsonI {
             }
 
             if ($retVal === false) {
-                $months = $monthsArr['at-x-month'];
+                $months = $monthsArr['every-x-month'];
                 $retVal = in_array($current, $months);
             }
         }
@@ -1157,6 +1157,20 @@ abstract class AbstractJob implements JsonI {
 
         return $dayAttrs;
     }
+    private function isValidRange($start, $end, $min, $max) {
+        $isValidExpr = true;
+        
+        if (!($start < $end)) {
+            $isValidExpr = false;
+        }
+        if (!($start >= $min && $start <= $max)) {
+            $isValidExpr = false;
+        }
+        if (!($end >= $min && $end <= $max)) {
+            $isValidExpr = false;
+        }
+        return $isValidExpr;
+    }
     /**
      * 
      * @param type $hoursField
@@ -1166,12 +1180,7 @@ abstract class AbstractJob implements JsonI {
     private function _checkHours($hoursField) {
         $isValidExpr = true;
         $split = explode(',', $hoursField);
-        $hoursAttrs = [
-            'every-hour' => false,
-            'every-x-hours' => [],
-            'at-every-x-hour' => [],
-            'at-range' => []
-        ];
+        $hoursAttrs = $this->createAttrs('hour');
 
         foreach ($split as $subExpr) {
             $exprType = $this->_getSubExprType($subExpr);
@@ -1186,15 +1195,7 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if (!($start < $end)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($start >= 0 && $start < 24)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($end >= 0 && $end < 24)) {
+                if (!$this->isValidRange($start, $end, 0, 23)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1206,7 +1207,7 @@ abstract class AbstractJob implements JsonI {
                     $isValidExpr = false;
                     break;
                 }
-                $hoursAttrs['every-x-hours'][] = $stepVal;
+                $hoursAttrs['every-x-hour'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
                 if (!$this->_isNumber($subExpr)) {
                     $isValidExpr = false;
@@ -1228,7 +1229,14 @@ abstract class AbstractJob implements JsonI {
 
         return $hoursAttrs;
     }
-
+    private function createAttrs($suffix) {
+        return [
+            'every-'.$suffix => false,
+            'every-x-'.$suffix => [],
+            'at-every-x-'.$suffix => [],
+            'at-range' => []
+        ];
+    }
     /**
      * 
      * @param type $minutesField
@@ -1238,12 +1246,7 @@ abstract class AbstractJob implements JsonI {
     private function _checkMinutes($minutesField) {
         $isValidExpr = true;
         $split = explode(',', $minutesField);
-        $minuteAttrs = [
-            'every-minute' => false,
-            'every-x-minutes' => [],
-            'at-every-x-minute' => [],
-            'at-range' => []
-        ];
+        $minuteAttrs = $this->createAttrs('minute');
 
         foreach ($split as $subExpr) {
             $exprType = $this->_getSubExprType($subExpr);
@@ -1258,15 +1261,7 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if (!($start < $end)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($start >= 0 && $start <= 59)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($end >= 0 && $end <= 59)) {
+                if (!$this->isValidRange($start, $end, 0, 59)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1278,7 +1273,7 @@ abstract class AbstractJob implements JsonI {
                     $isValidExpr = false;
                     break;
                 }
-                $minuteAttrs['every-x-minutes'][] = $stepVal;
+                $minuteAttrs['every-x-minute'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
                 if (!$this->_isNumber($subExpr)) {
                     $isValidExpr = false;
@@ -1309,11 +1304,7 @@ abstract class AbstractJob implements JsonI {
     private function _checkMonth($monthField) {
         $isValidExpr = true;
         $split = explode(',', $monthField);
-        $monthAttrs = [
-            'every-month' => false,
-            'at-x-month' => [],
-            'at-range' => []
-        ];
+        $monthAttrs = $this->createAttrs('month');
 
         foreach ($split as $subExpr) {
             $exprType = $this->_getSubExprType($subExpr);
@@ -1328,15 +1319,7 @@ abstract class AbstractJob implements JsonI {
                 $start = in_array(strtoupper($range[0]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[0])] : intval($range[0]);
                 $end = in_array(strtoupper($range[1]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[1])] : intval($range[1]);
 
-                if (!($start < $end)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($start >= 1 && $start < 13)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($end >= 1 && $end < 13)) {
+                if (!$this->isValidRange($start, $end, 1, 12)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1351,7 +1334,7 @@ abstract class AbstractJob implements JsonI {
                     $isValidExpr = false;
                     break;
                 }
-                $monthAttrs['at-x-month'][] = $value;
+                $monthAttrs['every-x-month'][] = $value;
             }
         }
 
@@ -1370,11 +1353,7 @@ abstract class AbstractJob implements JsonI {
     private function _dayOfMonth($dayOfMonthField) {
         $isValidExpr = true;
         $split = explode(',', $dayOfMonthField);
-        $monthDaysAttrs = [
-            'every-day' => false,
-            'at-every-x-day' => [],
-            'at-range' => []
-        ];
+        $monthDaysAttrs = $this->createAttrs('day');
 
         foreach ($split as $subExpr) {
             $exprType = $this->_getSubExprType($subExpr);
@@ -1389,15 +1368,7 @@ abstract class AbstractJob implements JsonI {
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
-                if (!($start < $end)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($start >= 1 && $start < 32)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($end >= 1 && $end < 32)) {
+                if (!$this->isValidRange($start, $end, 1, 31)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1518,7 +1489,7 @@ abstract class AbstractJob implements JsonI {
         $retVal = in_array($current, $hours);
 
         if ($retVal === false) {
-            $hours = $hoursArr['every-x-hours'];
+            $hours = $hoursArr['every-x-hour'];
 
             foreach ($hours as $hour) {
                 if ($current % $hour == 0) {
@@ -1535,7 +1506,7 @@ abstract class AbstractJob implements JsonI {
         $retVal = in_array($current, $minutes);
 
         if ($retVal === false) {
-            $minutes = $minuteArr['every-x-minutes'];
+            $minutes = $minuteArr['every-x-minute'];
 
             foreach ($minutes as $min) {
                 if ($current % $min == 0) {

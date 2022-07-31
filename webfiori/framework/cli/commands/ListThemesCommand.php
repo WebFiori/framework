@@ -32,8 +32,7 @@ class ListThemesCommand extends CLICommand {
         parent::__construct('list-themes', [
             '--theme-name' => [
                 'optional' => true,
-                'description' => 'An optional theme name. If provided, only given '
-                .'theme information will be shown.'
+                'description' => 'An optional theme name. If provided, only given theme information will be shown.'
             ]
         ], 'List all registered themes.');
     }
@@ -51,15 +50,7 @@ class ListThemesCommand extends CLICommand {
 
         $index = 1;
 
-        if ($themeName !== null) {
-            if (isset($themesArr[$themeName])) {
-                $this->_printThemeObj($themesArr[$themeName]);
-            } else {
-                $this->error("No theme was registered which has the name '$themeName'.");
-
-                return -1;
-            }
-        } else {
+        if ($themeName === null) {
             $this->println("Total Number of Themes: $themsCount .");
 
             foreach ($themesArr as $themeObj) {
@@ -72,7 +63,14 @@ class ListThemesCommand extends CLICommand {
                 $this->_printThemeObj($themeObj);
                 $index++;
             }
+            return 0;
         }
+        if (!isset($themesArr[$themeName])) {
+            $this->error("No theme was registered which has the name '$themeName'.");
+
+            return -1;
+        }
+        $this->_printThemeObj($themesArr[$themeName]);
         return 0;
     }
 

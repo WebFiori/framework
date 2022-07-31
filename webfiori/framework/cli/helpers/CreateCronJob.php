@@ -10,10 +10,11 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\CronJobClassWriter;
+use webfiori\framework\cron\CronJob;
 use webfiori\framework\cron\JobArgument;
-use webfiori\cli\InputValidator;
 /**
  * A helper class which is used to help in creating cron jobs classes using CLI.
  *
@@ -47,16 +48,15 @@ class CreateCronJob extends CreateClassHelper {
         $addToMore = true;
 
         while ($addToMore) {
-            $argObj = new JobArgument($this->getInput('Enter argument name:'));
-            $argObj->setDescription($this->getInput('Enter argument description:', 'No Description.', new InputValidator(function ($val)
-            {
-                if (strlen($val) > 0) {
-                    return true;
-                }
-
-                return false;
-            })));
-            $this->getWriter()->addArgument($argObj);
+            try {
+                $argObj = new JobArgument($this->getInput('Enter argument name:'));
+                $argObj->setDescription($this->getInput('Descripe the use of the argument:', ''));
+                $argObj->setDefault($this->getInput('Default value:', ''));
+                
+                $this->getWriter()->addArgument($argObj);
+            } catch (\InvalidArgumentException $ex) {
+                $this->error($ex->getMessage());
+            }
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
     }
@@ -73,11 +73,13 @@ class CreateCronJob extends CreateClassHelper {
     private function _getJobName() {
         return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
         {
-            if (strlen($val) > 0) {
+            $temp = new CronJob();
+            
+            if ($temp->setJobName($val)) {
                 return true;
             }
 
             return false;
-        }));
+        }, 'Provided name is invalid!'));
     }
 }

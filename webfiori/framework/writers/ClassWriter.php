@@ -99,17 +99,15 @@ abstract class ClassWriter {
     }
     private function fixClassName($className) {
         $suffix = $this->getSuffix();
-        if ($suffix != '') {
-            $subSuffix = substr($className, strlen($className) - strlen($suffix));
-
-            if ($subSuffix != $suffix) {
-                return $className;
-            } else {
-                return substr($className, 0, -strlen($suffix));
-            }
-        } else {
+        if ($suffix == '') {
             return $className;
         }
+        $subSuffix = substr($className, strlen($className) - strlen($suffix));
+
+        if ($subSuffix == $suffix) {
+            return substr($className, 0, -strlen($suffix));
+        }
+        return $className;
     }
 
     /**
@@ -215,13 +213,28 @@ abstract class ClassWriter {
      * @since 1.0
      */
     public function append($strOrArr, $tabsCount = 0) {
-        if (gettype($strOrArr) == 'array') {
-            foreach ($strOrArr as $str) {
-                $this->_a($str, $tabsCount);
-            }
-        } else {
+        if (gettype($strOrArr) != 'array') {
             $this->_a($strOrArr, $tabsCount);
+            return;
         }
+        foreach ($strOrArr as $str) {
+            $this->_a($str, $tabsCount);
+        }
+    }
+    public function f($funcName, $argsArr = [], $returns = null) {
+        $argsPart = '(';
+        foreach ($argsArr as $argType => $argName) {
+            if (strlen($argsPart) != 1) {
+                $argsPart .= ', '.$argType.' '.$argName;
+                continue;
+            }
+            $argsPart .= $argType.' '.$argName;
+        }
+        $argsPart .= ')';
+        if ($returns !== null) {
+            $argsPart .= ' : '.$returns;
+        }
+        return 'public function '.$funcName.$argsPart.' {';
     }
     /**
      * Writes the top section of the class that contains class comment.
@@ -262,10 +275,8 @@ abstract class ClassWriter {
                     $this->useArr[] = $class;
                 }
             }
-        } else {
-            if (!in_array($classesToUse, $this->useArr)) {
-                $this->useArr[] = $classesToUse;
-            }
+        } else if (!in_array($classesToUse, $this->useArr)) {
+            $this->useArr[] = $classesToUse;
         }
     }
     /**

@@ -127,7 +127,7 @@ class CLICommandClassWriter extends ClassWriter {
             '/**',
             ' * Creates new instance of the class.',
             ' */',
-            'public function __construct(){'
+            $this->f('__construct')
         ], 1);
 
         if (count($this->args) > 0) {
@@ -166,7 +166,7 @@ class CLICommandClassWriter extends ClassWriter {
             '/**',
             ' * Execute the command.',
             ' */',
-            'public function exec() : int {',
+            $this->f('exec', [], 'int'),
         ], 1);
         $this->append([
             '//TODO: Write the logic of the command.',

@@ -46,7 +46,7 @@ class LangClassWriter extends ClassWriter {
             "/**",
             " * Creates new instance of the class.",
             " */",
-            'public function __construct() {'
+            $this->f('__construct'),
         ], 1);
 
         $this->append([

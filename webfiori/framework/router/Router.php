@@ -958,7 +958,14 @@ class Router {
                 }
             }
         }
-
+        if (isset($options['route-to'])) {
+            $sub = [
+                'path' => $options['path'],
+                'route-to' => $options['route-to']
+            ];
+            $this->_copyOptionsToSub($options, $sub);
+            $routesToAddArr[] = $sub;
+        }
         return $routesToAddArr;
     }
     /**

@@ -10,10 +10,10 @@
  */
 namespace webfiori\framework\cli\writers;
 
-use InvalidArgumentException;
+use webfiori\framework\EAbstractWebService;
+use webfiori\framework\writers\ClassWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
-use webfiori\framework\writers\ClassWriter;
 
 /**
  * A writer class which is used to create new web service class.
@@ -46,14 +46,15 @@ class WebServiceWriter extends ClassWriter {
      */
     public function __construct($webServicesObj = null) {
         parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
-
-        if (!($webServicesObj instanceof AbstractWebService)) {
-            $this->servicesObj = new ServiceHolder();
-        } else {
-            $this->servicesObj = $webServicesObj;
-        }
+        
         $this->setSuffix('Service');
-        $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
+        $this->addUseStatement(EAbstractWebService::class);
+        $this->servicesObj = new ServiceHolder();
+        
+        if ($webServicesObj instanceof AbstractWebService) {
+            $this->servicesObj = $webServicesObj;
+            
+        }
     }
     /**
      * Adds new request parameter.
@@ -118,18 +119,13 @@ class WebServiceWriter extends ClassWriter {
         }
 
         if ($param->getDefault() !== null) {
-
+            $toAppend = "'default' => ".$param->getDefault().",";
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
-                $this->append("'default' => '".$param->getDefault()."',", 4);
+                $toAppend = "'default' => '".$param->getDefault()."',";
             } else if ($param->getType() == 'boolean') {
-                if ($param->getDefault() === true) {
-                    $this->append("'default' => true,", 4);
-                } else {
-                    $this->append("'default' => false,", 4);
-                }
-            } else {
-                $this->append("'default' => ".$param->getDefault().",", 4);
+                $toAppend = $param->getDefault() === true ? "'default' => true," : "'default' => false,";
             }
+            $this->append($toAppend, 4);
         }
 
         if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
@@ -149,7 +145,7 @@ class WebServiceWriter extends ClassWriter {
             " *",
             " * @return boolean If the client is authorized, the method will return true.",
             " */",
-            "public function isAuthorized() {",
+            $this->f('isAuthorized'),
         ], 1);
         $this->append([
             '// TODO: Check if the client is authorized to call the service \''.$name.'\'.',
@@ -164,7 +160,7 @@ class WebServiceWriter extends ClassWriter {
             "/**",
             " * Process the request.",
             " */",
-            "public function processRequest() {",
+            $this->f('processRequest'),
         ], 1);
         $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
         $this->append('$this->getManager()->serviceNotImplemented();', 2);
@@ -176,7 +172,7 @@ class WebServiceWriter extends ClassWriter {
             "/**",
             " * Creates new instance of the class.",
             " */",
-            'public function __construct(){',
+            $this->f('__construct'),
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);

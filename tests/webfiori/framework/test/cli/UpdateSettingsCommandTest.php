@@ -2,9 +2,10 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\cli\Runner;
 use webfiori\framework\cli\commands\UpdateSettingsCommand;
 use webfiori\framework\ConfigController;
-use webfiori\cli\Runner;
+use webfiori\framework\WebFioriApp;
 
 /**
  * Description of TestUpdateSettingsCommand
@@ -16,31 +17,30 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateVersion00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'version'
+        ]);
         $runner->setInput([
-            '0',
             '2.0.1',
             'Beta',
+            '99',
+            '99-99-99',
             ''
         ]);
         
         
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
-            "Application version: Enter = '1.0'\n",
-            "Application version type: Enter = 'Stable'\n",
+            
+            "Application version: Enter = '".WebFioriApp::getAppConfig()->getVersion()."'\n",
+            "Application version type: Enter = '".WebFioriApp::getAppConfig()->getVersionType()."'\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
+            "Error: Invalid input is given. Try again.\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Version information successfully updated.\n"
         ], $runner->getOutput());
@@ -50,20 +50,23 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals('Beta', $version['version-type']);
         $this->assertEquals(date('Y-m-d'), $version['release-date']);
     }
+
     /**
      * @test
      */
     public function testUpdateAppName00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'EN',
             'Super App',
         ]);
-        
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'app-name'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -78,7 +81,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '',
             'XC',
@@ -86,10 +89,13 @@ class UpdateSettingsCommandTest extends TestCase {
             'Super App',
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'app-name'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -110,7 +116,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName02() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '0',
             '',
@@ -118,10 +124,14 @@ class UpdateSettingsCommandTest extends TestCase {
             '  Super App X '
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'app-name'
-        ]));
+        ]);
+        
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -140,15 +150,18 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateCronPass00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '123456'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'cron-pass'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
@@ -159,15 +172,18 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateCronPass01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             ''
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'cron-pass'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
@@ -178,16 +194,19 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePageTitle00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'EN',
             'NEW PAGE'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'page-title'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -202,16 +221,19 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePageDescription00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'EN',
             'NEW PAGE DESCRIPTION'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'page-description'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -226,16 +248,18 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryLang00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'EN',
             'NEW PAGE DESCRIPTION'
         ]);
-        
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'page-description'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
             "0: EN\n",
@@ -249,15 +273,21 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateTitleSep00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '6',
             '+-+'
         ]);
         
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'xyz'
+        ]);
         
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
+            "Warning: The argument --w has invalid value.\n",
             "What would you like to update?\n",
             "0: Update application version info.\n",
             "1: Update application name.\n",
@@ -279,15 +309,16 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateHomePage00() {
-        $runner = new Runner();
-        $runner->setInput([
-            
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput();
+        
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'home-page'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
-            '--w' => 'home-page'
-        ]));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Info: Router has no routes. Nothing to change.\n",
         ], $runner->getOutput());
@@ -296,15 +327,18 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryTheme00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'primary-theme'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Success: Primary theme successfully updated.\n"
@@ -316,17 +350,19 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryTheme01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'themes\\greeny\\NotATheme',
             '',
             'themes\\fioriTheme2\\NewTestTheme2'
         ]);
-        
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'primary-theme'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Error: Invalid input is given. Try again.\n",
@@ -342,15 +378,17 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'themes\\fioriTheme\\NewFTestTheme'
         ]);
-        
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'admin-theme'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
@@ -361,17 +399,20 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'themes\\greeny\\NotATheme',
             '',
             'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
-        
-        $this->assertEquals(0, $runner->runCommand(new UpdateSettingsCommand(), [
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
             '--w' => 'admin-theme'
-        ]));
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Error: Invalid input is given. Try again.\n",

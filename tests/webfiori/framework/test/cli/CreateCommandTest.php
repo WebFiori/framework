@@ -55,42 +55,6 @@ class CreateCommandTest extends TestCase {
             "7: Quit. <--\n",
         ], $runner->getOutput());
     }
-    /**
-     * @test
-     */
-    public function testCreateBackgroundJob00() {
-        $runner = new Runner();
-        $runner->setInput([
-            '3',
-            'SuperCoolJob',
-            'app\jobs',
-            'The Greatest Job',
-            'The job will do nothing.',
-            'N',
-            '',
-        ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
-        $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: CLI Command.\n",
-            "6: Theme.\n",
-            "7: Quit. <--\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
-            "Enter a name for the job:\n",
-            "Provide short description of what does the job will do:\n",
-            "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
-        ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
-        $this->removeClass('\\app\\jobs\\SuperCoolJob');
-    }
     
     
     /**

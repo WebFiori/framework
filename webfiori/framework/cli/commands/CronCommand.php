@@ -42,6 +42,10 @@ class CronCommand extends CLICommand {
                 'description' => 'CRON password. If it is set in CRON, then it must be '
                 .'provided here.'
             ],
+            '--list' => [
+                'optional' => true,
+                'description' => 'List all scheduled CRON jobs.'
+            ],
             '--check' => [
                 'optional' => true,
                 'description' => 'Run a check aginst all jobs to check if '
@@ -54,7 +58,7 @@ class CronCommand extends CLICommand {
             '--job-name' => [
                 'optional' => true,
                 'description' => 'The name of the job that will be forced to '
-                .'execute.'
+                .'execute or to show its arguments.'
             ],
             '--show-job-args' => [
                 'optional' => true,
@@ -83,8 +87,11 @@ class CronCommand extends CLICommand {
      */
     public function exec() : int {
         $retVal = -1;
-
-        if ($this->isArgProvided('--check')) {
+        
+        if ($this->isArgProvided('--list')) {
+            $this->listJobs();
+            $retVal = 0;
+        } else if ($this->isArgProvided('--check')) {
             $pass = $this->getArgValue('p');
 
             if ($pass !== null) {
@@ -103,6 +110,7 @@ class CronCommand extends CLICommand {
             $retVal = $this->_force();
         } else if ($this->isArgProvided('--show-job-args')) {
             $this->_showJobArgs();
+            $retVal = 0;
         } else {
             $this->info("At least one of the options '--check', '--force' or '--show-job-args' must be provided.");
         }
@@ -113,13 +121,13 @@ class CronCommand extends CLICommand {
         $job = Cron::getJob($jobName);
         $args = $job->getExecArgsNames();
 
-        if (count($args) != 0 && $this->confirm('Would you like to supply custom execution arguments?', false)) {
+        if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {
             $this->_setArgs($args);
         }
     }
     private function _force() {
         $jobName = $this->getArgValue('--job-name');
-        $cPass = $this->getArgValue('p');
+        $cPass = $this->getArgValue('p').'';
         $retVal = -1;
         $jobsNamesArr = Cron::getJobsNames();
         $jobsNamesArr[] = 'Cancel';
@@ -197,14 +205,30 @@ class CronCommand extends CLICommand {
         $job = Cron::getJob($jobName);
 
         $this->println("Job Args:");
-        $customArgs = $job->getExecArgsNames();
+        $customArgs = $job->getArguments();
 
         if (count($customArgs) != 0) {
-            foreach ($customArgs as $argName) {
-                $this->println("$argName");
+            foreach ($customArgs as $argObj) {
+                $this->println("    %s: %s", $argObj->getName(), $argObj->getDescription());
             }
         } else {
-            $this->println("<NO ARGS>");
+            $this->println("    <NO ARGS>");
+        }
+    }
+    public function listJobs() {
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
+
+        while ($job = $jobs->dequeue()) {
+            $num = $i < 10 ? '0'.$i : $i;
+            $this->println("--------- Job #$num ---------", [
+                'color' => 'light-blue',
+                'bold' => true
+            ]);
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
         }
     }
 }

@@ -13,7 +13,6 @@ namespace webfiori\framework\cron;
 use InvalidArgumentException;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\http\Request;
 /**
  * A class that represents execution argument of a job.
  *
@@ -31,6 +30,8 @@ class JobArgument implements JsonI {
      * @since 1.0
      */
     private $argName;
+    private $argVal;
+    private $default;
     /**
      * 
      * @var string
@@ -57,6 +58,31 @@ class JobArgument implements JsonI {
         }
     }
     /**
+     * Sets a default value for the argument to use in case it was not
+     * provided.
+     * 
+     * @param string $default A string that represents the default value
+     * of the argument.
+     */
+    public function setDefault(string $default) {
+        if (strlen($default) == 0) {
+            return;
+        }
+        $this->default = $default;
+    }
+    /**
+     * Returns the default value of the argument.
+     * 
+     * The default value is usually used if the argument has no value
+     * provided.
+     * 
+     * @return string|null If default value is set, its returned as string.
+     * Other than that, null is returned.
+     */
+    public function getDefault() {
+        return $this->default;
+    }
+    /**
      * Returns argument description.
      * 
      * @return string A string that describes how the argument will affect job 
@@ -64,7 +90,7 @@ class JobArgument implements JsonI {
      *  
      * @since 1.0
      */
-    public function getDescription() {
+    public function getDescription() : string {
         return $this->description;
     }
     /**
@@ -74,14 +100,12 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->argName;
     }
     /**
      * Returns the value of job argument.
      * 
-     * The method will search for the value of the argument in the array $_POST. 
-     * Note that the index that will be checked is the name of the argument.
      * 
      * @return string|null If the value of the argument is set, it will be returned 
      * as string. Other than that, null is returned.
@@ -89,22 +113,7 @@ class JobArgument implements JsonI {
      * @since 1.0
      */
     public function getValue() {
-        $name = $this->getName();
-        $uName = str_replace(' ', '_', $name);
-        $retVal = null;
-        $filtered = false;
-        
-        $filtered = Request::getParam($name);
-        
-        if ($filtered === null) {
-            $filtered = Request::getParam($uName);
-        }
-
-        if ($filtered !== false) {
-            $retVal = $filtered;
-        }
-
-        return $retVal;
+        return $this->argVal;
     }
     /**
      * Sets a description for the argument.
@@ -117,7 +126,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDescription($desc) {
+    public function setDescription(string $desc) {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {
@@ -136,10 +145,10 @@ class JobArgument implements JsonI {
      * 
      * @throws InvalidArgumentException If the name of the argument is invalid.
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $nTrim = trim($name);
 
-        if (!$this->_validateName($nTrim)) {
+        if (!AbstractJob::isNameValid($nTrim)) {
             if (strlen($nTrim) == 0) {
                 throw new InvalidArgumentException('Invalid argument name: <empty string>');
             } else {
@@ -147,6 +156,14 @@ class JobArgument implements JsonI {
             }
         }
         $this->argName = $nTrim;
+    }
+    /**
+     * Sets the value of the argument.
+     * 
+     * @param string $val A string that represents the value of the argument.
+     */
+    public function setValue(string $val) {
+        $this->argVal = $val;
     }
     /**
      * Returns an object that represents the argument in JSON.
@@ -162,32 +179,11 @@ class JobArgument implements JsonI {
     public function toJSON() : Json {
         $json = new Json([
             'name' => $this->getName(),
-            'description' => $this->getDescription()
+            'description' => $this->getDescription(),
+            'default' => $this->getDefault()
         ]);
         $json->setPropsStyle('snake');
 
         return $json;
-    }
-    /**
-     * 
-     * @param type $val
-     * @return boolean
-     */
-    private function _validateName($val) {
-        $len = strlen($val);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $val[$x];
-
-                if ($char == '=' || $char == '&' || $char == '#' || $char == '?') {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

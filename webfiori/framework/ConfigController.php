@@ -1213,7 +1213,12 @@ class ConfigController {
     }
     private function _mkdir($dir) {
         if (!is_dir($dir)) {
+            set_error_handler(function (int $errno, string $errstr) {
+                http_response_code(500);
+                die('Unable to create one or more of application directories due to an error: "Code: '.$errno.', Message: '.$errstr.'"');
+            });
             mkdir($dir);
+            restore_error_handler();
         }
     }
     private function _writeAppConfigAttrs(&$cFile) {
@@ -1612,11 +1617,11 @@ class ConfigController {
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'apis');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'sessions');
         $this->_mkdir(ROOT_DIR.$DS.'public');
-        $this->_mkdir(ROOT_DIR.$DS.'themes');
     }
 }

@@ -75,7 +75,7 @@ class CreateClassHelper {
      * Other than that, false is returned.
      */
     public function setNamespace($ns) : bool {
-        $this->getWriter()->setNamespace($ns);
+        return $this->getWriter()->setNamespace($ns);
     }
     /**
      * Sets the name of the class will be created on.

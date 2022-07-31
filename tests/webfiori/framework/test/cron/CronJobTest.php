@@ -31,6 +31,7 @@ class CronJobTest extends TestCase {
         $this->assertEquals(1,count($job->getArgsValues()));
         $job->addExecutionArg('Hello');
         $this->assertEquals(2,count($job->getArgsValues()));
+        $this->assertNull($job->getArgValue('not-exist'));
     }
     /**
      * @test
@@ -694,6 +695,14 @@ class CronJobTest extends TestCase {
         });
         $job->exec();
         $this->assertFalse($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testSetName00() {
+        $job = new CronJob();
+        Cron::registerJobs();
+        $this->assertFalse($job->setJobName('Fail 1 '));
     }
     /**
      * @test

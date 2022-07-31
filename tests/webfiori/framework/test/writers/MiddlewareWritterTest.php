@@ -20,7 +20,7 @@ class MiddlewareWritterTest extends TestCase {
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\SessionsManager",
+            "webfiori\\framework\\session\\SessionsManager",
             "webfiori\\http\\Request",
             "webfiori\\http\\Response",
         ], $writter->getUseStatements());
@@ -44,7 +44,7 @@ class MiddlewareWritterTest extends TestCase {
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\SessionsManager",
+            "webfiori\\framework\\session\\SessionsManager",
             "webfiori\\http\\Request",
             "webfiori\\http\\Response",
         ], $writter->getUseStatements());

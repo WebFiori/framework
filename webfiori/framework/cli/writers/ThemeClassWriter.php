@@ -10,7 +10,9 @@
  */
 namespace webfiori\framework\cli\writers;
 
+use webfiori\framework\Theme;
 use webfiori\framework\writers\ClassWriter;
+use webfiori\ui\HeadNode;
 /**
  * A class which is used to create basic theme skeleton.
  *
@@ -21,11 +23,11 @@ class ThemeClassWriter extends ClassWriter {
     public function writeUseStatements() {
         parent::writeUseStatements();
         $this->addUseStatement([
-            'webfiori\\framework\\Theme',
+                Theme::class
         ]);
         if (PHP_VERSION_ID <= 70333) {
             $this->addUseStatement([
-                'webfiori\\ui\\HeadNode',
+                    HeadNode::class
             ]);
         }
         $this->addUseStatement([
@@ -96,7 +98,7 @@ class ThemeClassWriter extends ClassWriter {
             "/**",
             " * Creates new instance of the class.",
             " */",
-            'public function __construct() {'
+            $this->f('__construct')
         ], 1);
         $this->append([
             "parent::__construct('".$this->name."');",
@@ -120,7 +122,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside",
             ' * section, the method might return null.',
             ' */',
-            'public function getAsideNode() : HTMLNode {', 
+            $this->f('getAsideNode', [], 'HTMLNode'), 
         ], 1);
         $this->append('return new AsideSection();', 2);
         $this->append('}', 1);
@@ -133,7 +135,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer",
             ' * section, the method might return null.',
             ' */',
-            'public function getFooterNode() : HTMLNode {',
+            $this->f('getFooterNode', [], 'HTMLNode'),
         ], 1);
         $this->append('return new FooterSection();', 2);
         $this->append('}', 1);
@@ -150,13 +152,13 @@ class ThemeClassWriter extends ClassWriter {
             $this->append([
                 " * @return HeadNode",
                 ' */',
-                'public function getHeadNode() : HeadNode {',
+                $this->f('getHeadNode', [], 'HeadNode'),
             ], 1);
         } else {
             $this->append([
                 " * @return HeadSection",
                 ' */',
-                'public function getHeadNode() : HeadSection {',
+                $this->f('getHeadNode', [], 'HeadSection'),
             ], 1);
         }
         $this->append('return new HeadSection();', 2);
@@ -170,7 +172,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header",
             ' * section, the method might return null.',
             ' */',
-            'public function getHeaderNode() : HTMLNode {',
+            $this->f('getHeaderNode', [], 'HTMLNode'),
         ], 1);
         $this->append('return new HeaderSection();', 2);
         $this->append('}', 1);

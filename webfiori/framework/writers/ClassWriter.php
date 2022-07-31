@@ -225,7 +225,7 @@ abstract class ClassWriter {
         $argsPart = '(';
         foreach ($argsArr as $argType => $argName) {
             if (strlen($argsPart) != 1) {
-                $argsPart .= ', '.$argType.' '.$argName;
+                $argsPart .= ', '.$argType.' $'.$argName;
                 continue;
             }
             $argsPart .= $argType.' '.$argName;

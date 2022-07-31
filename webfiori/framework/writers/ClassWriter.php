@@ -228,7 +228,7 @@ abstract class ClassWriter {
                 $argsPart .= ', '.$argType.' $'.$argName;
                 continue;
             }
-            $argsPart .= $argType.' '.$argName;
+            $argsPart .= $argType.' $'.$argName;
         }
         $argsPart .= ')';
         if ($returns !== null) {

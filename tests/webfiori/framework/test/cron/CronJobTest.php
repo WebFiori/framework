@@ -701,6 +701,7 @@ class CronJobTest extends TestCase {
      */
     public function testSetName00() {
         $job = new CronJob();
+        Cron::registerJobs();
         $this->assertFalse($job->setJobName('Fail 1 '));
     }
     /**

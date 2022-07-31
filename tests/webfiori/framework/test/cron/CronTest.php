@@ -40,7 +40,6 @@ class CronTest extends TestCase {
      * @test
      */
     public function testTimestamp00() {
-        $this->assertEquals(date('m-d H:i'), Cron::timestamp());
         Cron::setDayOfMonth(15);
         Cron::setHour(23);
         Cron::setMonth(5);
@@ -82,6 +81,7 @@ class CronTest extends TestCase {
      * @test
      */
     public function testWeeklyJob03() {
+        Cron::password('');
         $this->assertTrue(Cron::weeklyJob('sun-23:00', 'Job Ok', function(Cron $cron, TestCase $c)
         {
             $c->assertEquals('Job Ok', $cron->activeJob()->getJobName());

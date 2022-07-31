@@ -693,7 +693,7 @@ abstract class AbstractJob implements JsonI {
             }
 
             if ($retVal === false) {
-                $days = $daysArr['at-x-day'];
+                $days = $daysArr['at-every-x-day'];
                 $retVal = in_array($current, $days);
             }
         }
@@ -869,16 +869,6 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function onMonth($monthNameOrNum = 'jan', int $dayNum = 1, string $time = '00:00') {
-        if (gettype($dayNum) == 'string') {
-            $trimmed = trim($dayNum);
-
-            if (!in_array($trimmed, ['0','1','2','3','4','5','6','7','8','9',
-                '10','11','12','13','14','15','16','17','18','19',
-                '20','21','22','23','24','25','26','27','28','29','30','31'])) {
-                return false;
-            }
-            $dayNum = intval($trimmed);
-        }
 
         if ($dayNum >= 1 && $dayNum <= 31) {
             $timeSplit = explode(':', $time);
@@ -1093,8 +1083,6 @@ abstract class AbstractJob implements JsonI {
 
             return false;
         }
-
-        return null;
     }
     /**
      * 
@@ -1105,11 +1093,7 @@ abstract class AbstractJob implements JsonI {
     private function _checkDayOfWeek($dayOfWeekField) {
         $isValidExpr = true;
         $split = explode(',', $dayOfWeekField);
-        $dayAttrs = [
-            'every-day' => false,
-            'at-x-day' => [],
-            'at-range' => []
-        ];
+        $dayAttrs = $this->createAttrs('day');
 
         foreach ($split as $subExpr) {
             $exprType = $this->_getSubExprType($subExpr);
@@ -1124,15 +1108,7 @@ abstract class AbstractJob implements JsonI {
                 $start = in_array(strtoupper($range[0]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[0])] : intval($range[0]);
                 $end = in_array(strtoupper($range[1]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[1])] : intval($range[1]);
 
-                if (!($start < $end)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($start >= 0 && $start < 6)) {
-                    $isValidExpr = false;
-                    break;
-                }
-                if (!($end >= 0 && $end <= 6)) {
+                if (!$this->isValidRange($start, $end, 0, 6)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1147,7 +1123,7 @@ abstract class AbstractJob implements JsonI {
                     $isValidExpr = false;
                     break;
                 }
-                $dayAttrs['at-x-day'][] = $value;
+                $dayAttrs['at-every-x-day'][] = $value;
             }
         }
 
@@ -1231,8 +1207,11 @@ abstract class AbstractJob implements JsonI {
     }
     private function createAttrs($suffix) {
         return [
+            // *
             'every-'.$suffix => false,
+            // Steps
             'every-x-'.$suffix => [],
+            // Exact 
             'at-every-x-'.$suffix => [],
             'at-range' => []
         ];

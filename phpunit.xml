@@ -58,20 +58,8 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
-        <testsuite name="Language Tests">
-            <directory>./tests/webfiori/framework/test/langs/</directory>
-        </testsuite>
-        <testsuite name="Core Tests">
-            <directory>./tests/webfiori/framework/test/</directory>
-        </testsuite>
-        <testsuite name="Router Tests">
-            <directory>./tests/webfiori/framework/test/router/</directory>
-        </testsuite>
-        <testsuite name="Session Management Tests">
-            <directory>./tests/webfiori/framework/test/session/</directory>
-        </testsuite>
-        <testsuite name="CLI Tests">
-            <directory>./tests/webfiori/framework/test/cli/</directory>
+        <testsuite name="Tests">
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

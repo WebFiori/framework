@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\MiddlewareClassWriter;
+use webfiori\framework\writers\MiddlewareClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\middleware\AbstractMiddleware;
 /**

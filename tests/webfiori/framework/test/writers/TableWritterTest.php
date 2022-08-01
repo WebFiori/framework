@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\TableClassWriter;
+use webfiori\framework\writers\TableClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;

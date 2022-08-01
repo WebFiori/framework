@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\writers\ThemeClassWriter;
+use webfiori\framework\writers\ThemeClassWriter;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 /**
  * Description of CreateTheme

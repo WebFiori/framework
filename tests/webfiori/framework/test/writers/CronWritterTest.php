@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\CronJobClassWriter;
+use webfiori\framework\writers\CronJobClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cron\JobArgument;
 use webfiori\framework\cron\AbstractJob;

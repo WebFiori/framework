@@ -18,7 +18,7 @@ use webfiori\framework\DB;
 use webfiori\email\SMTPAccount;
 use webfiori\email\SMTPServer;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\writers\LangClassWriter;
+use webfiori\framework\writers\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.

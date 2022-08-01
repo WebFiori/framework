@@ -11,7 +11,7 @@
 namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\cli\writers\LangClassWriter;
+use webfiori\framework\writers\LangClassWriter;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\email\SMTPAccount;
 use webfiori\file\File;

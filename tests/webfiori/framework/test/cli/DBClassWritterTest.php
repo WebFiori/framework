@@ -3,7 +3,7 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use tables\UserInfoTable;
-use webfiori\framework\cli\writers\DBClassWriter;
+use webfiori\framework\writers\DBClassWriter;
 
 /**
  * Description of DBClassWritterTest

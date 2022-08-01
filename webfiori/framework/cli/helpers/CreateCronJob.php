@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\writers\CronJobClassWriter;
+use webfiori\framework\writers\CronJobClassWriter;
 use webfiori\framework\cron\CronJob;
 use webfiori\framework\cron\JobArgument;
 /**

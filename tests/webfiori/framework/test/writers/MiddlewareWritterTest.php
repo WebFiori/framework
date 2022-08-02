@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\MiddlewareClassWriter;
-use PHPUnit\Framework\TestCase;
 use webfiori\framework\middleware\AbstractMiddleware;
+use webfiori\framework\test\cli\CreateTestCase;
+use webfiori\framework\writers\MiddlewareClassWriter;
 /**
  * Description of CronWritterTest
  *
  * @author Ibrahim
  */
-class MiddlewareWritterTest extends TestCase {
+class MiddlewareWritterTest extends CreateTestCase {
     /**
      * @test
      */

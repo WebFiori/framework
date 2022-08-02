@@ -29,6 +29,7 @@ class DBClassWriter extends ClassWriter {
     private $entityName;
     private $whereArr;
     private $paramsArr;
+    private $connName;
     /**
      * 
      * @return Table
@@ -36,6 +37,39 @@ class DBClassWriter extends ClassWriter {
     public function getTable() : Table {
         return $this->associatedTable;
     }
+    /**
+     * Sets the name of the connection at which the generated class will use to connect
+     * to database.
+     * 
+     * @param string $connName The name of the connection as it was set in the
+     * class 'AppConfig' of the application.
+     */
+    public function setConnection(string $connName) {
+        $trimmed = trim($connName);
+        
+        if (strlen($trimmed) != 0) {
+            $this->connName = $trimmed;
+        }
+    }
+    /**
+     * Returns the name of the connection at which the generated class will use to connect
+     * to database.
+     * 
+     * @return string|null The name of the connection. If not set, null is returned.
+     */
+    public function getConnectionName() {
+        return $this->connName;
+    }
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param string $className The name of the class that will be created.
+     * 
+     * @param string $ns The namespace at which the class will belong to.
+     * 
+     * @param Table $table The table instance at which the class will build
+     * database operations based on.
+     */
     public function __construct($className, $ns, Table $table) {
         parent::__construct($className, $ns, $ns);
         $this->associatedTable = $table;
@@ -45,10 +79,40 @@ class DBClassWriter extends ClassWriter {
         $this->addUseStatement($mapper->getNamespace().'\\'.$mapper->getEntityName());
         $this->createParamsAndWhereArr();
     }
+    /**
+     * Returns the name of the entity at which the class will use to map records.
+     * 
+     * The name of the entity is taken from entity mapper which is associated
+     * with the table at which database operations are based on.
+     * 
+     * @return string Class name of the entity.
+     */
     public function getEntityName() : string {
         return $this->entityName;
     }
+    /**
+     * Writes the body of the class.
+     */
     public function writeClassBody() {
+        
+        $this->append([
+            'private static $instance;',
+            '/**',
+            ' * Returns an instance of the class.',
+            ' * ',
+            ' * Calling this method multiple times will return same instance.',
+            ' * ',
+            ' * @return '.$this->getName().' An instance of the class.',
+            ' */',
+            'public static function get() : '.$this->getName().' {'
+        ], 1);
+        $this->append('');
+        $this->append('if (self::$instance === null) {', 2);
+        $this->append('self::$instance = new '.$this->getName().'();', 3);
+        $this->append('}', 2);
+        $this->append('');
+        $this->append('return self::$instance;', 2);
+        $this->append('}', 1);
         $this->append([
             "/**",
             " * Creates new instance of the class.",
@@ -56,9 +120,16 @@ class DBClassWriter extends ClassWriter {
             $this->f('__construct')
         ], 1);
 
-        $this->append([
-            'parent::__construct();',
-        ], 2);
+        if ($this->getConnectionName() !== null) {
+            $this->append([
+                "parent::__construct('".$this->getConnectionName()."');",
+            ], 2);
+        } else {
+            $this->append([
+                '//TODO: Specify the name of database connection to use in performing operations.',
+                "parent::__construct('');",
+            ], 2);
+        }
         $this->append('}', 1);
         
         $this->writeAddRecord();

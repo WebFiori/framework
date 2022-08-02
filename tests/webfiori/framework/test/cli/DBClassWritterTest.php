@@ -23,7 +23,7 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('UserDBClass', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        $this->removeClass($writter->getName(true));
+        //$this->removeClass($writter->getName(true));
     }
     /**
      * @test
@@ -36,7 +36,7 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('EmployeeDB', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        $this->removeClass($writter->getName(true));
+        //$this->removeClass($writter->getName(true));
     }
     /**
      * @test
@@ -49,6 +49,20 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('PositionDB', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        $this->removeClass($writter->getName(true));
+        //$this->removeClass($writter->getName(true));
+    }
+    /**
+     * @test
+     */
+    public function test03() {
+        $table = new PositionInfoTable();
+        $writter = new DBClassWriter('PositionDB2', 'webfiori\\db', $table);
+        $writter->setConnection('  ');
+        $this->assertNull($writter->getConnectionName());
+        $writter->setConnection('ok-connection');
+        $this->assertEquals('ok-connection', $writter->getConnectionName());
+        $writter->writeClass();
+        $this->assertTrue(class_exists($writter->getName(true)));
+        //$this->removeClass($writter->getName(true));
     }
 }

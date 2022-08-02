@@ -34,13 +34,14 @@
             <file>./webfiori/framework/cli/commands/UpdateSettingsCommand.php</file>
             <file>./webfiori/framework/cli/commands/UpdateTableCommand.php</file>
             <file>./webfiori/framework/cli/commands/VersionCommand.php</file>
-            <file>./webfiori/framework/cli/writers/ClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/CronJobClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/LangClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/MiddlewareClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/TableClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/ThemeClassWriter.php</file>
-            <file>./webfiori/framework/cli/writers/WebServiceWriter.php</file>
+            <file>./webfiori/framework/writers/ClassWriter.php</file>
+            <file>./webfiori/framework/writers/CronJobClassWriter.php</file>
+            <file>./webfiori/framework/writers/LangClassWriter.php</file>
+            <file>./webfiori/framework/writers/MiddlewareClassWriter.php</file>
+            <file>./webfiori/framework/writers/TableClassWriter.php</file>
+            <file>./webfiori/framework/writers/ThemeClassWriter.php</file>
+            <file>./webfiori/framework/writers/WebServiceWriter.php</file>
+            <file>./webfiori/framework/writers/DBClassWriter.php</file>
             <file>./webfiori/framework/cli/helpers/ClassInfoReader.php</file>
             <file>./webfiori/framework/cli/helpers/CreateCLIClassHelper.php</file>
             <file>./webfiori/framework/cli/helpers/CreateClassHelper.php</file>

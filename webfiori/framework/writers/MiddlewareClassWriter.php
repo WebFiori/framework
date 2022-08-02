@@ -151,7 +151,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions before accessing the application.',
             ' */',
-            $this->f('before', ['Request' => 'request', 'Response' => 'response']),
+            $this->f('before', ['request' => 'Request', 'response' => 'Response']),
             
         ], 1);
         $this->append('//TODO: Implement the action to perform before processing the request.', 2);
@@ -160,7 +160,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions after processing the request and before sending back the response.',
             ' */',
-            $this->f('after', ['Request' => 'request', 'Response' => 'response']),
+            $this->f('after', ['request' => 'Request', 'response' => 'Response']),
         ], 1);
         $this->append('//TODO: Implement the action to perform after processing the request.', 2);
         $this->append([
@@ -168,7 +168,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions after sending the response.',
             ' */',
-            $this->f('afterSend', ['Request' => 'request', 'Response' => 'response']),
+            $this->f('afterSend', ['request' => 'Request', 'response' => 'Response']),
         ], 1);
         $this->append('//TODO: Implement the action to perform after sending the request.', 2);
         $this->append('}', 1);

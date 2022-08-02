@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\writers;
 
+use webfiori\database\Column;
 use webfiori\database\EntityMapper;
 use webfiori\database\Table;
 use webfiori\framework\DB;
@@ -66,6 +67,7 @@ class DBClassWriter extends ClassWriter {
         $this->writeGetRecord();
         $this->writeGetRecords();
         $this->writeUpdateRecord();
+        $this->writeUpdateRecordMethods();
         
         $this->append('}', 0);
     }
@@ -75,7 +77,6 @@ class DBClassWriter extends ClassWriter {
             " * Adds new record to the table '".$this->getTable()->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds record information.',
-            " *",
             " */",
             $this->f('add'.$this->getEntityName(), ['entity' => $this->getEntityName()])
         ], 1);
@@ -102,6 +103,90 @@ class DBClassWriter extends ClassWriter {
                     : "->andWhere('$key', '=', $".$colObj->getNormalName().")";
         }
     }
+    private function writeColUpdate(Column $colObj, $key) {
+        $phpType = $colObj->getPHPType();
+        
+        $this->append([
+            "/**",
+            " * Updates the value of the column '".$colObj->getNormalName()."' on the table '".$this->getTable()->getNormalName()."'.",
+        ], 1);
+        if (count($this->paramsArr) != 0) {
+            foreach ($this->paramsArr as $name => $type) {
+                $paramsComment[] = ' *';
+                $paramsComment[] = " * @param $type \$$name One of the values which are used in 'where' condition.";
+            }
+        }
+
+        $firstParamName = $colObj->isNull() ? 'newVal = null' : 'newVal';
+        $paramsComment[] = ' *';
+        $paramsComment[] = " * @param $phpType \$newVal The new value for the column.";
+        $this->append($paramsComment, 1);
+        
+        $this->append([
+            " */",
+            
+            $this->f(self::toMethodName($key, 'update'), array_merge(
+                $this->paramsArr,
+                [$firstParamName => trim($phpType, '|null')]
+            ))
+        ], 1);
+        $this->append("\$this->table('".$this->getTable()->getNormalName()."')->update([", 2);
+        $this->append("'$key' => \$newVal", 4);
+        
+        if (count($this->whereArr) == 0) {
+            $this->append("])->execute();", 3);
+            $this->append("//TODO: Specify conditions for updating the value of the record '".$colObj->getNormalName()."'", 3);
+        } else {
+            $this->append("])", 3);
+            $this->append($this->whereArr, 3);
+            $this->append('->execute();', 3);
+        }
+        
+        $this->append('}', 1);
+    }
+    /**
+     * Maps key name to entity method name.
+     * 
+     * @param string $colKey The name of column key such as 'user-id'.
+     * 
+     * @param string $prefix The type of the method. This one can have only two values, 
+     * 's' for setter method and 'g' for getter method. Default is 'g'.
+     * 
+     * @return string The name of the mapped method name. If the passed column 
+     * key is empty string, the method will return empty string.
+     * 
+     * @since 1.0
+     */
+    public static function toMethodName(string $colKey, $prefix = 'g') {
+        $trimmed = trim($colKey);
+
+
+        $split = explode('-', $trimmed);
+        $methodName = '';
+
+        foreach ($split as $namePart) {
+            if (strlen($namePart) == 1) {
+                $methodName .= strtoupper($namePart);
+            } else {
+                $firstChar = $namePart[0];
+                $methodName .= strtoupper($firstChar).substr($namePart, 1);
+            }
+        }
+
+        return $prefix.$methodName;
+    }
+    private function writeUpdateRecordMethods() {
+        
+        $uniqueKeys = $this->getUniqueColsKeys();
+        $whereCols = [];
+
+        foreach ($this->getTable()->getCols() as $key => $colObj) {
+            if (!in_array($key, $uniqueKeys)) {
+                $this->writeColUpdate($colObj, $key);
+            }
+        }
+        
+    }
     private function writeUpdateRecord() {
         
         $this->append([
@@ -109,7 +194,6 @@ class DBClassWriter extends ClassWriter {
             " * Updates a record on the table '".$this->getTable()->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds updated record information.',
-            " *",
             " */",
             $this->f('update'.$this->getEntityName(), ['entity' => $this->getEntityName()])
         ], 1);
@@ -152,7 +236,6 @@ class DBClassWriter extends ClassWriter {
             " * Deletes a record from the table '".$this->getTable()->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds record information.',
-            " *",
             " */",
             $this->f('delete'.$this->getEntityName(), ['entity' => $this->getEntityName()]),
         ], 1);
@@ -218,12 +301,11 @@ class DBClassWriter extends ClassWriter {
             " * @param int \$pageSize Number of records per page. Default is 10.",
             " *",
             " * @return array An array that holds all table records as objects",
-            " *",
             " */",
             $this->f('get'.$this->getEntityName().'s', [
                 'pageNum = 0' => 'int',
                 'pageSize = 10' => 'int'
-            ])
+            ], 'array')
         ], 1);
         $this->append("return \$this->table('".$this->getTable()->getNormalName()."')", 2);
         $this->append("->select()", 3);

@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
 use tables\UserInfoTable;
 use webfiori\framework\writers\DBClassWriter;
 
@@ -10,7 +9,7 @@ use webfiori\framework\writers\DBClassWriter;
  *
  * @author Ibrahim
  */
-class DBClassWritterTest extends TestCase {
+class DBClassWritterTest extends CreateTestCase {
     /**
      * @test
      */
@@ -21,7 +20,8 @@ class DBClassWritterTest extends TestCase {
         $mapper->setNamespace('webfiori\\entity');
         $writter = new DBClassWriter('UserDBClass', 'webfiori\\db', $table);
         $writter->writeClass();
-        $this->assertTrue(true);
+        $this->assertTrue(class_exists($writter->getName(true)));
+        $this->removeClass($writter->getName(true));
     }
 
 }

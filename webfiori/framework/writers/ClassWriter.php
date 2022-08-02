@@ -325,7 +325,7 @@ abstract class ClassWriter {
         $retVal = $this->className.$this->getSuffix();
         
         if ($withNs) {
-            return $this->getNamespace().'\\'.$retVal;
+            return '\\'.$this->getNamespace().'\\'.$retVal;
              
         }
         return $retVal;

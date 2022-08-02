@@ -31,6 +31,8 @@ class DBClassWriter extends ClassWriter {
     private $paramsArr;
     private $connName;
     /**
+     * Returns the table instance at which the class will build
+     * database operations based on.
      * 
      * @return Table
      */
@@ -362,7 +364,7 @@ class DBClassWriter extends ClassWriter {
         $this->append('}', 2);
         $this->append('}', 1);
     }
-    public function writeGetRecords() {
+    private function writeGetRecords() {
         $this->append([
             "/**",
             " * Returns all the records from the table '".$this->getTable()->getNormalName()."'.",
@@ -400,7 +402,9 @@ class DBClassWriter extends ClassWriter {
         } 
         return $recordUniqueCols;
     }
-
+    /**
+     * Writes the comment that will appear at the top of the class.
+     */
     public function writeClassComment() {
         $this->append([
             "/**",
@@ -408,7 +412,9 @@ class DBClassWriter extends ClassWriter {
             " */"
         ]);
     }
-
+    /**
+     * Writes the string that represent class declaration.
+     */
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends DB {');
     }

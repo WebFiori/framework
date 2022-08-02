@@ -223,7 +223,7 @@ abstract class ClassWriter {
     }
     public function f($funcName, $argsArr = [], $returns = null) {
         $argsPart = '(';
-        foreach ($argsArr as $argType => $argName) {
+        foreach ($argsArr as $argName => $argType) {
             if (strlen($argsPart) != 1) {
                 $argsPart .= ', '.$argType.' $'.$argName;
                 continue;

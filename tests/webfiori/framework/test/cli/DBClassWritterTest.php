@@ -23,7 +23,7 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('UserDBClass', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        //$this->removeClass($writter->getName(true));
+        $this->removeClass($writter->getName(true));
     }
     /**
      * @test
@@ -36,7 +36,7 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('EmployeeDB', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        //$this->removeClass($writter->getName(true));
+        $this->removeClass($writter->getName(true));
     }
     /**
      * @test
@@ -49,7 +49,7 @@ class DBClassWritterTest extends CreateTestCase {
         $writter = new DBClassWriter('PositionDB', 'webfiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        //$this->removeClass($writter->getName(true));
+        $this->removeClass($writter->getName(true));
     }
     /**
      * @test
@@ -64,6 +64,6 @@ class DBClassWritterTest extends CreateTestCase {
         $writter->includeColumnsUpdate();
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
-        //$this->removeClass($writter->getName(true));
+        $this->removeClass($writter->getName(true));
     }
 }

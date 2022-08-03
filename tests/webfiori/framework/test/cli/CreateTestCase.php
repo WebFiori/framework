@@ -7,7 +7,7 @@ use webfiori\file\File;
 class CreateTestCase extends TestCase {
 
     public function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
+        $file = new File(ROOT_DIR.DS.trim($classPath,'\\').'.php');
         $file->remove();
     }
 

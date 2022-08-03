@@ -1,18 +1,17 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\TableClassWriter;
-use PHPUnit\Framework\TestCase;
 use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\framework\test\cli\CreateTestCase;
+use webfiori\framework\writers\TableClassWriter;
 /**
  * Description of CronWritterTest
  *
  * @author Ibrahim
  */
-class TableWritterTest extends TestCase {
+class TableWritterTest extends CreateTestCase {
     /**
      * @test
      */
@@ -56,6 +55,7 @@ class TableWritterTest extends TestCase {
         $this->assertTrue($clazzObj instanceof MySQLTable);
         $this->assertEquals('`new_table`', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
+        $this->removeClass('app\\entity\\MyEntity');
     }
     /**
      * @test
@@ -77,6 +77,7 @@ class TableWritterTest extends TestCase {
         $this->assertTrue($clazzObj instanceof MSSQLTable);
         $this->assertEquals('[new_table]', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
+        $this->removeClass('app\\entity\\MyEntity');
     }
     /**
      * @test

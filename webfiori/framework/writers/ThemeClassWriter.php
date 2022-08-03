@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\writers;
 
+use webfiori\file\File;
 use webfiori\framework\Theme;
 use webfiori\framework\writers\ClassWriter;
 use webfiori\ui\HeadNode;
@@ -42,6 +43,21 @@ class ThemeClassWriter extends ClassWriter {
             $useArr[] = 'use '.$className.';';
         }
         $this->append($useArr);
+    }
+    /**
+     * Removes the 4 classes that represents the components of the theme.
+     */
+    public function removeComponents() {
+        $components = [
+            $this->getNamespace().'\\AsideSection.php',
+            $this->getNamespace().'\\FooterSection.php',
+            $this->getNamespace().'\\HeadSection.php',
+            $this->getNamespace().'\\HeaderSection.php',
+        ];
+        foreach ($components as $c) {
+            $classFile = new File(ROOT_DIR.'\\'.$c);
+            $classFile->remove();
+        }
     }
     /**
      * Creates new instance of the class.

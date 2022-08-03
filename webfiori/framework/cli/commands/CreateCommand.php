@@ -15,6 +15,7 @@ use webfiori\database\Table;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
+use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
 use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
@@ -47,6 +48,7 @@ class CreateCommand extends CLICommand {
            'command' => 'CLI Command.',
            'theme' => 'Theme.',
            'db' => 'Database access class based on table.',
+           'rest' => 'Complete REST backend (Database table, entity, database access and web services).',
            'Quit.'
         ];
         $what = $this->getArgValue('--c');
@@ -140,6 +142,8 @@ class CreateCommand extends CLICommand {
             $create = new CreateThemeHelper($this);
         } else if ($answer == 'Database access class based on table.') {
             $create = new CreateDBAccessHelper($this);
+        } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
+            $create = new CreateFullRESTHelper($this);
         }
         
         return 0;

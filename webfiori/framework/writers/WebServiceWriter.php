@@ -27,6 +27,7 @@ class WebServiceWriter extends ClassWriter {
      * @var AbstractWebService
      */
     private $servicesObj;
+    private $processCode;
     /**
      * Creates new instance of the class.
      * 
@@ -55,6 +56,7 @@ class WebServiceWriter extends ClassWriter {
             $this->servicesObj = $webServicesObj;
             
         }
+        $this->processCode = [];
     }
     /**
      * Adds new request parameter.
@@ -162,11 +164,29 @@ class WebServiceWriter extends ClassWriter {
             " */",
             $this->f('processRequest'),
         ], 1);
-        $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
-        $this->append('$this->getManager()->serviceNotImplemented();', 2);
+        if (count($this->processCode) == 0) {
+            $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
+            $this->append('$this->getManager()->serviceNotImplemented();', 2);
+        } else {
+            foreach ($this->processCode as $arr) {
+                $this->append($arr['lines'], $arr['tab-size']);
+            }
+        }
         $this->append('}', 1);
     }
-
+    public function addProcessCode($lineOrLines, $tab = 2) {
+        $arrToAdd = [
+            'tab-size' => $tab,
+            'lines' => []
+        ];
+        if (gettype($lineOrLines) == 'array') {
+            foreach ($lineOrLines as $l) {
+                $arrToAdd['lines'][] = $l;
+            }
+        } else {
+            $arrToAdd['lines'][] = $lineOrLines;
+        }
+    }
     private function _writeConstructor() {
         $this->append([
             "/**",

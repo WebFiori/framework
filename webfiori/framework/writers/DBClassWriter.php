@@ -42,6 +42,15 @@ class DBClassWriter extends ClassWriter {
         return $this->associatedTable;
     }
     /**
+     * Checks if each non-unique table column will have its own update method.
+     * 
+     * @return bool If each column will have its own update method, true is
+     * returned. False otherwise.
+     */
+    public function isColumnUpdateIncluded() : bool {
+        return $this->includeUpdate;
+    }
+    /**
      * Sets the name of the connection at which the generated class will use to connect
      * to database.
      * 

@@ -1,26 +1,27 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\file\File;
-use webfiori\cli\Runner;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of TestCreateCommand
  *
  * @author Ibrahim
  */
-class CreateCommandTest extends TestCase {
+class CreateCommandTest extends CreateTestCase {
     /**
      * @test
      */
     public function testCreate00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
-            '7',
+            '8',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -38,12 +39,15 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreate01() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -63,7 +67,11 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateMiddleware00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
         $runner->setInput([
             '4',
             'NewCoolMd',
@@ -74,7 +82,7 @@ class CreateCommandTest extends TestCase {
             '',
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -100,7 +108,11 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateCommand00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
         $runner->setInput([
             '5',
             'NewCLI',
@@ -111,7 +123,7 @@ class CreateCommandTest extends TestCase {
             '',
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -137,7 +149,7 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateWebService00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '2',
             'NewWeb',
@@ -151,8 +163,11 @@ class CreateCommandTest extends TestCase {
             'n',
             '',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -197,9 +212,5 @@ class CreateCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\apis\\NewWebService'));
         $this->removeClass('\\app\\apis\\NewWebService');
-    }
-    private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
-        $file->remove();
     }
 }

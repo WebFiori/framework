@@ -30,13 +30,15 @@ class DBClassWriter extends ClassWriter {
     private $whereArr;
     private $paramsArr;
     private $connName;
+    private $includeUpdate;
     /**
      * Returns the table instance at which the class will build
      * database operations based on.
      * 
-     * @return Table
+     * @return Table|null If the table is set, it will be returned as an object.
+     * If not set, null is returned.
      */
-    public function getTable() : Table {
+    public function getTable() {
         return $this->associatedTable;
     }
     /**
@@ -72,11 +74,28 @@ class DBClassWriter extends ClassWriter {
      * @param Table $table The table instance at which the class will build
      * database operations based on.
      */
-    public function __construct($className, $ns, Table $table) {
+    public function __construct($className = 'NewDBOperationsClass', $ns = '\\', Table $table = null ) {
         parent::__construct($className, $ns, $ns);
-        $this->associatedTable = $table;
+        if ($table !== null) {
+            $this->setTable($table);
+        }
         $this->addUseStatement(DB::class);
-        $mapper = $this->getTable()->getEntityMapper();
+        
+    }
+    /**
+     * Sets the table at which the class will create logic to perform operations
+     * on.
+     * 
+     * @param Table $t
+     */
+    public function setTable(Table $t) {
+        $temp = $this->getTable();
+        
+        if ($temp !== null) {
+            $this->removeUseStatement($temp->getEntityMapper()->getEntityName(true));
+        }
+        $this->associatedTable = $t;
+        $mapper = $t->getEntityMapper();
         $this->entityName = $mapper->getEntityName();
         $this->addUseStatement($mapper->getNamespace().'\\'.$mapper->getEntityName());
         $this->createParamsAndWhereArr();
@@ -140,25 +159,41 @@ class DBClassWriter extends ClassWriter {
         $this->writeGetRecord();
         $this->writeGetRecords();
         $this->writeUpdateRecord();
-        $this->writeUpdateRecordMethods();
+        if ($this->includeUpdate) {
+            $this->writeUpdateRecordMethods();
+        }
         
         $this->append('}', 0);
     }
+    /**
+     * Include update methods for each single column in the table that
+     * is not unique.
+     * 
+     * If this method is called, the writer will write one method for every
+     * column in the table to update its value.
+     */
+    public function includeColumnsUpdate() {
+        $this->includeUpdate = true;
+    }
     private function writeAddRecord() {
+        $t = $this->getTable();
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * Adds new record to the table '".$this->getTable()->getNormalName()."'.",
+            " * Adds new record to the table '".$t->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds record information.',
             " */",
             $this->f('add'.$this->getEntityName(), ['entity' => $this->getEntityName()])
         ], 1);
         $recordsArr = [];
-        foreach ($this->getTable()->getEntityMapper()->getGettersMap(true) as $methName => $col) {
+        foreach ($t->getEntityMapper()->getGettersMap(true) as $methName => $col) {
             $recordsArr[] = "'$col' => \$entity->$methName(),";
         }
         $this->append([
-            "\$this->table('".$this->getTable()->getNormalName()."')->insert(["
+            "\$this->table('".$t->getNormalName()."')->insert(["
         ], 2);
         $this->append($recordsArr, 3);
         $this->append('])->execute();', 2);
@@ -166,11 +201,16 @@ class DBClassWriter extends ClassWriter {
         $this->append('}', 1);
     }
     private function createParamsAndWhereArr() {
+        $t = $this->getTable();
+        
+        if ($t === null) {
+            return;
+        }
         $cols = $this->getUniqueColsKeys();
         $this->paramsArr = [];
         $this->whereArr = [];
         foreach ($cols as $key) {
-            $colObj = $this->getTable()->getColByKey($key);
+            $colObj = $t->getColByKey($key);
             $this->paramsArr[$colObj->getNormalName()] = $colObj->getPHPType();
             $this->whereArr[] = count($this->whereArr) == 0 ? "->where('$key', '=', $".$colObj->getNormalName().")"
                     : "->andWhere('$key', '=', $".$colObj->getNormalName().")";
@@ -178,10 +218,10 @@ class DBClassWriter extends ClassWriter {
     }
     private function writeColUpdate(Column $colObj, $key) {
         $phpType = $colObj->getPHPType();
-        
+        $t = $this->getTable();
         $this->append([
             "/**",
-            " * Updates the value of the column '".$colObj->getNormalName()."' on the table '".$this->getTable()->getNormalName()."'.",
+            " * Updates the value of the column '".$colObj->getNormalName()."' on the table '".$t->getNormalName()."'.",
         ], 1);
         if (count($this->paramsArr) != 0) {
             foreach ($this->paramsArr as $name => $type) {
@@ -203,7 +243,7 @@ class DBClassWriter extends ClassWriter {
                 [$firstParamName => trim($phpType, '|null')]
             ))
         ], 1);
-        $this->append("\$this->table('".$this->getTable()->getNormalName()."')->update([", 2);
+        $this->append("\$this->table('".$t->getNormalName()."')->update([", 2);
         $this->append("'$key' => \$newVal", 4);
         
         if (count($this->whereArr) == 0) {
@@ -249,11 +289,14 @@ class DBClassWriter extends ClassWriter {
         return $prefix.$methodName;
     }
     private function writeUpdateRecordMethods() {
-        
+        $t = $this->getTable();
+        if ($t === null) {
+            return;
+        }
         $uniqueKeys = $this->getUniqueColsKeys();
         $whereCols = [];
 
-        foreach ($this->getTable()->getCols() as $key => $colObj) {
+        foreach ($t->getCols() as $key => $colObj) {
             if (!in_array($key, $uniqueKeys)) {
                 $this->writeColUpdate($colObj, $key);
             }
@@ -261,18 +304,22 @@ class DBClassWriter extends ClassWriter {
         
     }
     private function writeUpdateRecord() {
+        $t = $this->getTable();
         
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * Updates a record on the table '".$this->getTable()->getNormalName()."'.",
+            " * Updates a record on the table '".$t->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds updated record information.',
             " */",
             $this->f('update'.$this->getEntityName(), ['entity' => $this->getEntityName()])
         ], 1);
-        $this->append("\$this->table('".$this->getTable()->getNormalName()."')", 2);
+        $this->append("\$this->table('".$t->getNormalName()."')", 2);
         $this->append("->update([", 3);
-        $keys = $this->getTable()->getColsKeys();
+        $keys = $t->getColsKeys();
         
         if (count($this->paramsArr) != 0) {
             $updateCols = [];
@@ -303,16 +350,20 @@ class DBClassWriter extends ClassWriter {
         $this->append('}', 1);
     }
     private function writeDeleteRecord() {
+        $t = $this->getTable();
         
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * Deletes a record from the table '".$this->getTable()->getNormalName()."'.",
+            " * Deletes a record from the table '".$t->getNormalName()."'.",
             " *",
             " * @param ".$this->getEntityName().' $entity An object that holds record information.',
             " */",
             $this->f('delete'.$this->getEntityName(), ['entity' => $this->getEntityName()]),
         ], 1);
-        $this->append("\$this->table('".$this->getTable()->getNormalName()."')", 2);
+        $this->append("\$this->table('".$t->getNormalName()."')", 2);
         
         if (count($this->paramsArr) != 0) {
             $this->append("->delete()", 3);
@@ -332,10 +383,14 @@ class DBClassWriter extends ClassWriter {
     }
 
     private function writeGetRecord() {
+        $t = $this->getTable();
         
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * Returns the information of a record from the table '".$this->getTable()->getNormalName()."'.",
+            " * Returns the information of a record from the table '".$t->getNormalName()."'.",
             " *",
             " * @return ".$this->getEntityName().'|null If a record with given information exist,',
             " * The method will return an object which holds all record information.",
@@ -343,7 +398,7 @@ class DBClassWriter extends ClassWriter {
             " */",
             $this->f('get'.$this->getEntityName(), $this->paramsArr)
         ], 1);
-        $this->append("\$mappedRecords = \$this->table('".$this->getTable()->getNormalName()."')", 2);
+        $this->append("\$mappedRecords = \$this->table('".$t->getNormalName()."')", 2);
         $this->append("->select()", 3);
         if (count($this->paramsArr) != 0) {
             
@@ -365,9 +420,14 @@ class DBClassWriter extends ClassWriter {
         $this->append('}', 1);
     }
     private function writeGetRecords() {
+        $t = $this->getTable();
+        
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * Returns all the records from the table '".$this->getTable()->getNormalName()."'.",
+            " * Returns all the records from the table '".$t->getNormalName()."'.",
             " *",
             " * @param int \$pageNum The number of page to fetch. Default is 0.",
             " *",
@@ -380,7 +440,7 @@ class DBClassWriter extends ClassWriter {
                 'pageSize = 10' => 'int'
             ], 'array')
         ], 1);
-        $this->append("return \$this->table('".$this->getTable()->getNormalName()."')", 2);
+        $this->append("return \$this->table('".$t->getNormalName()."')", 2);
         $this->append("->select()", 3);
         $this->append('->page($pageNum, $pageSize)', 3);
         $this->append("->execute()", 3);
@@ -406,9 +466,14 @@ class DBClassWriter extends ClassWriter {
      * Writes the comment that will appear at the top of the class.
      */
     public function writeClassComment() {
+        $t = $this->getTable();
+        
+        if ($t === null) {
+            return;
+        }
         $this->append([
             "/**",
-            " * A class which is used to perform operations on the table '".$this->getTable()->getNormalName()."'",
+            " * A class which is used to perform operations on the table '".$t->getNormalName()."'",
             " */"
         ]);
     }

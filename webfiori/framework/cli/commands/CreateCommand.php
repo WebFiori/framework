@@ -10,10 +10,11 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\database\Table;
 use webfiori\cli\CLICommand;
+use webfiori\database\Table;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
 use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
@@ -40,6 +41,7 @@ class CreateCommand extends CLICommand {
         $options = [
            'table' => 'Database table class.',
            'entity' => 'Entity class from table.',
+           'db' => 'Database access class based on table.',
            'web-service' => 'Web service.',
            'job' => 'Background job.',
            'middleware' => 'Middleware.',
@@ -136,8 +138,8 @@ class CreateCommand extends CLICommand {
             $create = new CreateCronJob($this);
         } else if ($answer == 'Theme.') {
             $create = new CreateThemeHelper($this);
-        } else {
-            $this->info('Not implemented yet.');
+        } else if ($answer == 'Database access class based on table.') {
+            $create = new CreateDBAccessHelper($this);
         }
         
         return 0;

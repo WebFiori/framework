@@ -8,7 +8,7 @@ use webfiori\framework\WebFioriApp;
 /**
  * Description of CreateJobTest
  *
- * @author i.binalshikh
+ * @author Ibrahim
  */
 class CreateJobTest extends CreateTestCase {
     /**

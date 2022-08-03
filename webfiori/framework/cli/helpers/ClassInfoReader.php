@@ -115,33 +115,52 @@ class ClassInfoReader {
      * will be added to.
      */
     public function getNamespace($defaultNs) {
+        return self::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
+    }
+    /**
+     * Reads and validates class namespace.
+     * 
+     * @param CLICommand $c The command that will be used to read the input from.
+     * 
+     * @param string $defaultNs An optional string that will be used as default
+     * namespace if no input is provided.
+     * 
+     * @param string $prompt The text that will be shown to the user as prompt for
+     * the namespace.
+     * 
+     * @return string A validated string that represents a namespace.
+     */
+    public static function readNamespace(CLICommand $c, string $defaultNs = '\\', $prompt = 'Enter class namespace:') : string {
         $isNameValid = false;
 
         do {
-            $ns = str_replace('/','\\',trim($this->getOwner()->getInput('Enter an optional namespace for the class:', $defaultNs)));
-            $isNameValid = $this->_validateNamespace($ns);
+            $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));
+            $isNameValid = ClassWriter::isValidNamespace($ns);
 
             if (!$isNameValid) {
-                $this->getOwner()->error('Invalid namespace is given.');
+                $c->error('Invalid namespace is given.');
             }
         } while (!$isNameValid);
 
         return trim($ns,'\\');
     }
     /**
-     * Reads and returns a string that represents the name of the class that will be created.
+     * Reads and validates class name.
      * 
-     * @param string|null $suffix An optional string to append to the name of the class
-     * if it does not exist. For example, If the user input is 'Users' and the
-     * value of the suffix is 'Table', the returned value will be 'UsersTable'.
+     * @param CLICommand $c The command that will be used to read the input from.
      * 
-     * @return string A string that represents the name of the class.
+     * @param string|null $suffix An optional string to append to class name.
+     * 
+     * @param string $prompt The text that will be shown to the user as prompt for
+     * class name.
+     * 
+     * @return string A string that represents a valid class name.
      */
-    public function getName($suffix = null) {
+    public static function readName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:') : string {
         $isNameValid = false;
 
         do {
-            $className = trim($this->getOwner()->getInput('Enter a name for the new class:'));
+            $className = trim($c->getInput($prompt));
             
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));
@@ -154,55 +173,22 @@ class ClassInfoReader {
             $isNameValid = ClassWriter::isValidClassName($className);
 
             if (!$isNameValid) {
-                $this->getOwner()->error('Invalid class name is given.');
+                $c->error('Invalid class name is given.');
             }
         } while (!$isNameValid);
 
         return $className;
     }
-    private function _validateClassName($name) {
-        $len = strlen($name);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $name[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-    private function _validateNamespace($ns) {
-        if ($ns == '\\') {
-            return true;
-        }
-        $split = explode('\\', $ns);
-
-        foreach ($split as $subNs) {
-            $len = strlen($subNs);
-
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $subNs[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+    /**
+     * Reads and returns a string that represents the name of the class that will be created.
+     * 
+     * @param string|null $suffix An optional string to append to the name of the class
+     * if it does not exist. For example, If the user input is 'Users' and the
+     * value of the suffix is 'Table', the returned value will be 'UsersTable'.
+     * 
+     * @return string A string that represents the name of the class.
+     */
+    public function getName($suffix = null) {
+        return self::readName($this->getOwner(), $suffix, 'Enter a name for the new class:');
     }
 }

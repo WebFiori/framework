@@ -61,6 +61,7 @@ class DBClassWritterTest extends CreateTestCase {
         $this->assertNull($writter->getConnectionName());
         $writter->setConnection('ok-connection');
         $this->assertEquals('ok-connection', $writter->getConnectionName());
+        $writter->includeColumnsUpdate();
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         //$this->removeClass($writter->getName(true));

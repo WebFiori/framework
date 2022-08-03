@@ -30,7 +30,8 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Quit. <--\n",
         ], $runner->getOutput());
     }
     /**
@@ -52,7 +53,8 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Quit. <--\n",
         ], $runner->getOutput());
     }
     
@@ -82,7 +84,8 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
             "Enter a name for the middleware:\n",
@@ -118,7 +121,8 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\commands'\n",
             "Enter a name for the command:\n",
@@ -158,7 +162,8 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
             "Enter a name for the new web service:\n",

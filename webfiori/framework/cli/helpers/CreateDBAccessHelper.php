@@ -12,6 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\Table;
 use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\writers\DBClassWriter;
 
 /**
@@ -47,8 +48,23 @@ class CreateDBAccessHelper extends CreateClassHelper {
         $this->getWriter()->setNamespace($info['namespace']);
         $this->getWriter()->setPath($info['namespace']);
         $this->getWriter()->setClassName($info['name']);
+        $this->getWriter()->setConnection($this->getConnection());
     }
-
+    private function getConnection() {
+        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+        
+        if (count($dbConnections) != 0) {
+            $dbConnections[] = 'None';
+            $conn = $this->select('Select database connecion to use with the class:', $dbConnections, count($dbConnections) - 1);
+            
+            if ($conn != 'None') {
+                return $conn;
+            }
+        } else {
+            $this->warning('No database connections were found. Make sure to specify connection later inside the class.');
+        }
+        return '';
+    }
     private function setEntityProps(Table $t) {
         $this->println('We need from you to give us entity class information.');
         $m = $t->getEntityMapper();

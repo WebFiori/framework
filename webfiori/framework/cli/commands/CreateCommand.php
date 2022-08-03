@@ -41,12 +41,12 @@ class CreateCommand extends CLICommand {
         $options = [
            'table' => 'Database table class.',
            'entity' => 'Entity class from table.',
-           'db' => 'Database access class based on table.',
            'web-service' => 'Web service.',
            'job' => 'Background job.',
            'middleware' => 'Middleware.',
            'command' => 'CLI Command.',
            'theme' => 'Theme.',
+           'db' => 'Database access class based on table.',
            'Quit.'
         ];
         $what = $this->getArgValue('--c');

@@ -15,7 +15,7 @@ class CreateCommandTest extends CreateTestCase {
     public function testCreate00() {
         $runner = WebFioriApp::getRunner();
         $runner->setInput([
-            '8',
+            '9',
         ]);
         $runner->setArgsVector([
             'webfiori',
@@ -32,7 +32,8 @@ class CreateCommandTest extends CreateTestCase {
             "5: CLI Command.\n",
             "6: Theme.\n",
             "7: Database access class based on table.\n",
-            "8: Quit. <--\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
         ], $runner->getOutput());
     }
     /**
@@ -58,7 +59,8 @@ class CreateCommandTest extends CreateTestCase {
             "5: CLI Command.\n",
             "6: Theme.\n",
             "7: Database access class based on table.\n",
-            "8: Quit. <--\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
         ], $runner->getOutput());
     }
     
@@ -93,7 +95,8 @@ class CreateCommandTest extends CreateTestCase {
             "5: CLI Command.\n",
             "6: Theme.\n",
             "7: Database access class based on table.\n",
-            "8: Quit. <--\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
             "Enter a name for the middleware:\n",
@@ -134,7 +137,8 @@ class CreateCommandTest extends CreateTestCase {
             "5: CLI Command.\n",
             "6: Theme.\n",
             "7: Database access class based on table.\n",
-            "8: Quit. <--\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\commands'\n",
             "Enter a name for the command:\n",
@@ -178,7 +182,8 @@ class CreateCommandTest extends CreateTestCase {
             "5: CLI Command.\n",
             "6: Theme.\n",
             "7: Database access class based on table.\n",
-            "8: Quit. <--\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
             "Enter a name for the new web service:\n",

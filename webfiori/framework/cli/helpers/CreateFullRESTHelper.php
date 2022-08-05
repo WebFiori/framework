@@ -16,6 +16,7 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
+use webfiori\framework\writers\DBClassWriter;
 use webfiori\framework\writers\TableClassWriter;
 /**
  * A helper class for creating database tables classes.
@@ -28,6 +29,11 @@ class CreateFullRESTHelper extends CreateClassHelper {
      * @var TableClassWriter
      */
     private $tableObjWriter;
+    /**
+     * 
+     * @var CreateDBAccessHelper
+     */
+    private $dbObjWritter;
     /**
      * Creates new instance of the class.
      * 
@@ -52,8 +58,20 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->readTableInfo();
         $this->createEntity();
         $this->createTableClass();
+        $this->createDbClass();
         $this->println("Done.");
     }
+    private function createDbClass() {
+        $this->println("Creating database access class...");
+        $t = $this->tableObjWriter->getTable();
+        $t->getEntityMapper()->setEntityName($this->tableObjWriter->getEntityName());
+        $t->getEntityMapper()->setNamespace($this->tableObjWriter->getEntityNamespace());
+        $t->getEntityMapper()->setPath($this->tableObjWriter->getEntityPath());
+        $writter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
+        
+        $writter->writeClass();
+    }
+
     private function createTableClass() {
         $this->println("Creating database table class...");
         $this->tableObjWriter->writeClass();

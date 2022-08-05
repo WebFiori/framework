@@ -33,6 +33,7 @@ class CreateRESTTest extends CreateTestCase {
             "int",
             "11",
             "y",
+            "y",
             "The unique ID of the super user.",
             "n",
             "n"
@@ -53,15 +54,46 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             "Enter a name for column key:\n",
-            "Column data type:",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
+            "Is this column auto increment?(y/N)\n",
             "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Creating entity class...\n",
             "Creating database table class...\n",
+            "Creating database access class...\n",
             "Done.\n"
         ], $runner->getOutput());
+        $tableClazz = '\\app\\database\\SuperUserTable';
+        $entityClazz = '\\app\\entity\\SuperUser';
+        $dbClazz = "\\app\\database\\SuperUserDB";
+        
+        $this->assertTrue(class_exists($tableClazz));
+        $this->assertTrue(class_exists($entityClazz));
+        $this->assertTrue(class_exists($dbClazz));
+        
+//        $this->removeClass($tableClazz);
+//        $this->removeClass($entityClazz);
+//        $this->removeClass($dbClazz);
     }
 }

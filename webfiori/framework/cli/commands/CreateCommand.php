@@ -142,6 +142,13 @@ class CreateCommand extends CLICommand {
             $create = new CreateThemeHelper($this);
         } else if ($answer == 'Database access class based on table.') {
             $create = new CreateDBAccessHelper($this);
+            $create->readTable();
+            $this->println('We need from you to give us class information.');
+            $create->readDbClassInfo();
+            $this->println('We need from you to give us entity class information.');
+            $create->readEntityInfo();
+            $create->confirnIncludeColsUpdate();
+            $create->writeClass();
         } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
             $create = new CreateFullRESTHelper($this);
         }

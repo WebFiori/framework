@@ -67,7 +67,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Now, time to collect database table information.");
         $ns = ClassInfoReader::readNamespace($this->getCommand(), APP_DIR_NAME.'\\database', 'Provide us with a namespace for table class:');
         $this->tableObjWriter->setNamespace($ns);
-        $tableHelper = new TableObjHelper(new CreateClassHelper($this->getCommand()), $this->tableObjWriter->getTable());
+        $tableHelper = new TableObjHelper(new CreateClassHelper($this->getCommand(), $this->tableObjWriter), $this->tableObjWriter->getTable());
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
         $this->println('Now you have to add columns to the table.');

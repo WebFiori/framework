@@ -17,7 +17,9 @@ use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\DBClassWriter;
+use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\TableClassWriter;
+use webfiori\framework\writers\WebServiceWriter;
 /**
  * A helper class for creating database tables classes.
  *
@@ -34,6 +36,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
      * @var CreateDBAccessHelper
      */
     private $dbObjWritter;
+    private $apisNs;
     /**
      * Creates new instance of the class.
      * 
@@ -56,20 +59,92 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $entityName = $this->tableObjWriter->getEntityName();
         $this->tableObjWriter->setClassName($entityName.'Table');
         $this->readTableInfo();
-        $this->createEntity();
-        $this->createTableClass();
-        $this->createDbClass();
-        $this->println("Done.");
-    }
-    private function createDbClass() {
-        $this->println("Creating database access class...");
+        
         $t = $this->tableObjWriter->getTable();
         $t->getEntityMapper()->setEntityName($this->tableObjWriter->getEntityName());
         $t->getEntityMapper()->setNamespace($this->tableObjWriter->getEntityNamespace());
         $t->getEntityMapper()->setPath($this->tableObjWriter->getEntityPath());
-        $writter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
-        
-        $writter->writeClass();
+        $this->dbObjWritter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
+        if ($this->confirm('Would you like to have update methods for every single column?', false)) {
+            $this->dbObjWritter->includeColumnsUpdate();
+        }
+        $this->readAPIInfo();
+        $this->createEntity();
+        $this->createTableClass();
+        $this->createDbClass();
+        $this->writeServices();
+        $this->println("Done.");
+    }
+    public function getEntityName() : string {
+        return $this->tableObjWriter->getEntityName();
+    }
+    private function getServiceSuffix($entityName) {
+        $suffix = '';
+        for ($x = 0 ; $x < strlen($entityName) ; $x++) {
+            $ch = $entityName[$x];
+            if ($x != 0 && $ch >= 'A' && $ch <= 'Z') {
+                $suffix .= '-'.strtolower($ch);
+                continue;
+            } 
+            $suffix .= $ch;
+        }
+        return $suffix;
+    }
+
+    private function writeServices() {
+        $this->println("Writing web services...");
+        $entityName = $this->getEntityName();
+        $suffix = $this->getServiceSuffix($entityName);
+        $servicesPrefix = [
+            'Add'.$entityName => [
+                'name' => 'add-'.$suffix,
+                'method' => 'post'
+            ],
+            'Update'.$entityName => [
+                'name' => 'update-'.$suffix,
+                'method' => 'post'
+            ],
+            'Delete'.$entityName => [
+                'name' => 'delete-'.$suffix,
+                'method' => 'delete'
+            ],
+            'Get'.$entityName => [
+                'name' => 'get-'.$suffix,
+                'method' => 'get' 
+            ]
+        ];
+        $w = $this->dbObjWritter;
+        $w instanceof DBClassWriter;
+        if ($w->isColumnUpdateIncluded()) {
+            $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
+            $colsKeys = $this->tableObjWriter->getTable()->getColsKeys();
+            
+            foreach ($colsKeys as $colKey) {
+                if (!in_array($colKey, $uniqueCols)) {
+                    $servicesPrefix['Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName]
+                             = [ 
+                                 'name' => 'update-'.$colKey.'-of-'.$suffix,
+                                 'method' => 'post'
+                             ];
+                }
+            }
+        }
+        foreach ($servicesPrefix as $sName => $serviceProps) {
+            $service = new ServiceHolder($serviceProps['name']);
+            $service->addRequestMethod($serviceProps['method']);
+            $writer = new WebServiceWriter($service);
+            $writer->setNamespace($this->apisNs);
+            $writer->setClassName($sName);
+            $writer->writeClass();
+        }
+    }
+
+    private function readAPIInfo() {
+        $this->apisNs = ClassInfoReader::readNamespace($this->getCommand(), APP_DIR_NAME.'\\apis',"Last thing needed is to provide us with namespace for web services:");
+    }
+    private function createDbClass() {
+        $this->println("Creating database access class...");
+        $this->dbObjWritter->writeClass();
     }
 
     private function createTableClass() {

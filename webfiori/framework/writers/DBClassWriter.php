@@ -462,7 +462,7 @@ class DBClassWriter extends ClassWriter {
         $this->append("});", 3);
         $this->append('}', 1);
     }
-    private function getUniqueColsKeys() {
+    public function getUniqueColsKeys() {
         $table = $this->getTable();
         $recordUniqueCols  = $table->getPrimaryKeyColsKeys();
         

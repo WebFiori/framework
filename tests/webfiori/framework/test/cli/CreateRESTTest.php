@@ -36,7 +36,9 @@ class CreateRESTTest extends CreateTestCase {
             "y",
             "The unique ID of the super user.",
             "n",
-            "n"
+            "n",
+            'n',
+            "app\\apis"
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
@@ -79,9 +81,12 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to have update methods for every single column?(y/N)\n",
+            "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
             "Creating entity class...\n",
             "Creating database table class...\n",
             "Creating database access class...\n",
+            "Writing web services...\n",
             "Done.\n"
         ], $runner->getOutput());
         $tableClazz = '\\app\\database\\SuperUserTable';

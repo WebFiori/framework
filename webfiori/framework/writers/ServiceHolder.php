@@ -23,7 +23,7 @@ use webfiori\http\AbstractWebService;
  * @version 1.0
  */
 class ServiceHolder extends AbstractWebService {
-    public function __construct() {
+    public function __construct(string $name = '') {
         parent::__construct('');
     }
     /**

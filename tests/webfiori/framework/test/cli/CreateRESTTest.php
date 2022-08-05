@@ -2,6 +2,8 @@
 
 namespace webfiori\framework\test\cli;
 
+use webfiori\framework\WebFioriApp;
+
 /**
  * Description of CreateRESTTest
  *
@@ -12,7 +14,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        $runner = \webfiori\framework\WebFioriApp::getRunner();
+        $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -26,7 +28,14 @@ class CreateRESTTest extends CreateTestCase {
             'n',
             "app\\database",
             "super_users",
-            "A table to hold super users information."
+            "A table to hold super users information.",
+            "id",
+            "int",
+            "11",
+            "y",
+            "The unique ID of the super user.",
+            "n",
+            "n"
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
@@ -42,7 +51,17 @@ class CreateRESTTest extends CreateTestCase {
             "Provide us with a namespace for table class: Enter = 'app\database'\n",
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
-            
+            "Now you have to add columns to the table.\n",
+            "Enter a name for column key:\n",
+            "Column data type:",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Creating entity class...\n",
+            "Creating database table class...\n",
+            "Done.\n"
         ], $runner->getOutput());
     }
 }

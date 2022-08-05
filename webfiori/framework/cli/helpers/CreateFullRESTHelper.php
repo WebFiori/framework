@@ -50,6 +50,18 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $entityName = $this->tableObjWriter->getEntityName();
         $this->tableObjWriter->setClassName($entityName.'Table');
         $this->readTableInfo();
+        $this->createEntity();
+        $this->createTableClass();
+        $this->println("Done.");
+    }
+    private function createTableClass() {
+        $this->println("Creating database table class...");
+        $this->tableObjWriter->writeClass();
+    }
+
+    private function createEntity() {
+        $this->println("Creating entity class...");
+        $this->tableObjWriter->getTable()->getEntityMapper()->create();
     }
     private function readTableInfo() {
         $this->println("Now, time to collect database table information.");
@@ -58,6 +70,12 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $tableHelper = new TableObjHelper(new CreateClassHelper($this->getCommand()), $this->tableObjWriter->getTable());
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
+        $this->println('Now you have to add columns to the table.');
+        $tableHelper->addColumns();
+        
+        if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
+            $tableHelper->addForeignKeys();
+        }
     }
     private function readEntityInfo() {
         $this->println("First thing, we need entity class information.");

@@ -33,7 +33,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
     private $tableObjWriter;
     /**
      * 
-     * @var CreateDBAccessHelper
+     * @var DBClassWriter
      */
     private $dbObjWritter;
     private $apisNs;

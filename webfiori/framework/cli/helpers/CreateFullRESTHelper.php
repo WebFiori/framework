@@ -11,6 +11,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\ConnectionInfo;
+use webfiori\database\EntityMapper;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
@@ -97,46 +98,106 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $suffix = $this->getServiceSuffix($entityName);
         $servicesPrefix = [
             'Add'.$entityName => [
+                'type' => 'Add',
                 'name' => 'add-'.$suffix,
-                'method' => 'post'
+                'method' => 'post',
             ],
             'Update'.$entityName => [
+                'type' => 'Update',
                 'name' => 'update-'.$suffix,
                 'method' => 'post'
             ],
             'Delete'.$entityName => [
+                'type' => 'Delete',
                 'name' => 'delete-'.$suffix,
                 'method' => 'delete'
             ],
             'Get'.$entityName => [
+                'type' => 'GetSingle',
                 'name' => 'get-'.$suffix,
+                'method' => 'get' 
+            ],
+            'GetAll'.$entityName.'s' => [
+                'type' => 'GetAll',
+                'name' => 'get-all-'.$suffix.'s',
                 'method' => 'get' 
             ]
         ];
         $w = $this->dbObjWritter;
         $w instanceof DBClassWriter;
-        if ($w->isColumnUpdateIncluded()) {
-            $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
-            $colsKeys = $this->tableObjWriter->getTable()->getColsKeys();
-            
-            foreach ($colsKeys as $colKey) {
-                if (!in_array($colKey, $uniqueCols)) {
-                    $servicesPrefix['Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName]
-                             = [ 
-                                 'name' => 'update-'.$colKey.'-of-'.$suffix,
-                                 'method' => 'post'
-                             ];
-                }
-            }
-        }
+//        if ($w->isColumnUpdateIncluded()) {
+//            $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
+//            $colsKeys = $this->tableObjWriter->getTable()->getColsKeys();
+//            
+//            foreach ($colsKeys as $colKey) {
+//                if (!in_array($colKey, $uniqueCols)) {
+//                    $servicesPrefix['Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName]
+//                             = [ 
+//                                 'name' => 'update-'.$colKey.'-of-'.$suffix,
+//                                 'method' => 'post'
+//                             ];
+//                }
+//            }
+//        }
         foreach ($servicesPrefix as $sName => $serviceProps) {
             $service = new ServiceHolder($serviceProps['name']);
             $service->addRequestMethod($serviceProps['method']);
+            $t = $this->getTable();
+            foreach($t->getColsKeys() as $paramName) {
+                $colObj = $t->getColByKey($paramName);
+                $paramArr = [
+                    'name' => $paramName,
+                    'type' => $this->getAPIParamType($colObj->getDatatype()),
+                ];
+                if ($colObj->getDefault() !== null) {
+                    $paramArr['default'] = $colObj->getDefault();
+                }
+                if ($colObj->isNull()) {
+                    $paramArr['optional'] = true;
+                }
+                $service->addParameter($paramArr);
+            }
             $writer = new WebServiceWriter($service);
             $writer->setNamespace($this->apisNs);
             $writer->setClassName($sName);
+            if ($serviceProps['type'] == 'Add' || $serviceProps['type'] == 'Update') {
+                $writer->addUseStatement($this->dbObjWritter->getName(true));
+                $writer->addUseStatement($t->getEntityMapper()->getEntityName(true));
+                $this->IncludeAPISetProps($writer, $serviceProps['type']);
+            }
             $writer->writeClass();
         }
+    }
+    private function IncludeAPISetProps(WebServiceWriter $w, $type) {
+        $t = $this->getTable();
+        $w->addProcessCode('$entity = new '.$t->getEntityMapper()->getEntityName().'();', 2);
+        foreach($t->getColsKeys() as $paramName) {
+            $w->addProcessCode('$entity->'.EntityMapper::mapToMethodName($paramName, 's').'($this->getParamVal(\''.$paramName.'\'));', 2);
+        }
+        $dbClassName = $this->dbObjWritter->getName();
+        $entityName = $this->dbObjWritter->getEntityName();
+        $w->addProcessCode("");
+        if ($type == 'Add') {
+            
+            $w->addProcessCode("$dbClassName::get()->add$entityName(\$entity);");
+            $w->addProcessCode("\$this->sendResponse('Record Created.');");
+        } else if ($type == 'Update') {
+            
+            $w->addProcessCode("$dbClassName::get()->update$entityName(\$entity);");
+            $w->addProcessCode("\$this->sendResponse('Record Updated.');");
+        }
+    }
+    private function getAPIParamType($colDatatype) {
+        if ($colDatatype == 'int') {
+            return 'int';
+        }
+        if ($colDatatype == 'bool' || $colDatatype == 'boolean') {
+            return 'boolean';
+        }
+        if ($colDatatype == 'decimal' || $colDatatype == 'money') {
+            return 'double';
+        }
+        return 'string';
     }
 
     private function readAPIInfo() {
@@ -151,7 +212,13 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Creating database table class...");
         $this->tableObjWriter->writeClass();
     }
-
+    /**
+     * 
+     * @return Table|null
+     */
+    public function getTable() {
+        return $this->tableObjWriter->getTable();
+    }
     private function createEntity() {
         $this->println("Creating entity class...");
         $this->tableObjWriter->getTable()->getEntityMapper()->create();

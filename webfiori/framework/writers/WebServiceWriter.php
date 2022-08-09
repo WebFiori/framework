@@ -186,6 +186,7 @@ class WebServiceWriter extends ClassWriter {
         } else {
             $arrToAdd['lines'][] = $lineOrLines;
         }
+        $this->processCode[] = $arrToAdd;
     }
     private function _writeConstructor() {
         $this->append([

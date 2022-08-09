@@ -92,7 +92,15 @@ class CreateRESTTest extends CreateTestCase {
         $tableClazz = '\\app\\database\\SuperUserTable';
         $entityClazz = '\\app\\entity\\SuperUser';
         $dbClazz = "\\app\\database\\SuperUserDB";
-        
+        $apiClazzes = [
+            '\\app\\apis\\AddSuperUserService',
+            '\\app\\apis\\DeleteSuperUserService',
+            '\\app\\apis\\GetAllSuperUsersService',
+            '\\app\\apis\\GetSuperUserService'
+        ];
+        foreach ($apiClazzes as $clazz) {
+            $this->assertTrue(class_exists($clazz));
+        }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));

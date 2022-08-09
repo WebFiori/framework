@@ -89,7 +89,7 @@ class DBClassWriter extends ClassWriter {
             $this->setTable($table);
         }
         $this->addUseStatement(DB::class);
-        
+        $this->includeUpdate = false;
     }
     /**
      * Sets the table at which the class will create logic to perform operations

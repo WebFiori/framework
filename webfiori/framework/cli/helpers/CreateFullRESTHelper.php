@@ -21,6 +21,7 @@ use webfiori\framework\writers\DBClassWriter;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\TableClassWriter;
 use webfiori\framework\writers\WebServiceWriter;
+use webfiori\json\Json;
 /**
  * A helper class for creating database tables classes.
  *
@@ -87,7 +88,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
                 $suffix .= '-'.strtolower($ch);
                 continue;
             } 
-            $suffix .= $ch;
+            $suffix .= strtolower($ch);
         }
         return $suffix;
     }
@@ -143,29 +144,106 @@ class CreateFullRESTHelper extends CreateClassHelper {
             $service = new ServiceHolder($serviceProps['name']);
             $service->addRequestMethod($serviceProps['method']);
             $t = $this->getTable();
-            foreach($t->getColsKeys() as $paramName) {
-                $colObj = $t->getColByKey($paramName);
-                $paramArr = [
-                    'name' => $paramName,
-                    'type' => $this->getAPIParamType($colObj->getDatatype()),
-                ];
-                if ($colObj->getDefault() !== null) {
-                    $paramArr['default'] = $colObj->getDefault();
-                }
-                if ($colObj->isNull()) {
-                    $paramArr['optional'] = true;
-                }
-                $service->addParameter($paramArr);
-            }
+
+            
             $writer = new WebServiceWriter($service);
+            $writer->addUseStatement($this->dbObjWritter->getName(true));
+            $writer->addUseStatement($t->getEntityMapper()->getEntityName(true));
+            $writer->addUseStatement(Json::class);
             $writer->setNamespace($this->apisNs);
+            $writer->setPath($this->apisNs);
             $writer->setClassName($sName);
             if ($serviceProps['type'] == 'Add' || $serviceProps['type'] == 'Update') {
-                $writer->addUseStatement($this->dbObjWritter->getName(true));
-                $writer->addUseStatement($t->getEntityMapper()->getEntityName(true));
                 $this->IncludeAPISetProps($writer, $serviceProps['type']);
+                
+                foreach($t->getColsKeys() as $paramName) {
+                    $colObj = $t->getColByKey($paramName);
+                    $paramArr = [
+                        'name' => $paramName,
+                        'type' => $this->getAPIParamType($colObj->getDatatype()),
+                    ];
+                    if ($colObj->getDefault() !== null) {
+                        $paramArr['default'] = $colObj->getDefault();
+                    }
+                    if ($colObj->isNull()) {
+                        $paramArr['optional'] = true;
+                    }
+                    $service->addParameter($paramArr);
+                }
+            } else if ($serviceProps['type'] == 'GetSingle' || $serviceProps['type'] == 'Delete') {
+                $uniqueParams = [];
+                foreach($t->getColsKeys() as $paramName) {
+                    $colObj = $t->getColByKey($paramName);
+                    if ($colObj->isUnique()) {
+                        $uniqueParams[] = $paramName;
+                        $paramArr = [
+                            'name' => $paramName,
+                            'type' => $this->getAPIParamType($colObj->getDatatype()),
+                        ];
+                        if ($colObj->getDefault() !== null) {
+                            $paramArr['default'] = $colObj->getDefault();
+                        }
+                        if ($colObj->isNull()) {
+                            $paramArr['optional'] = true;
+                        }
+                        $service->addParameter($paramArr);
+                    }
+                }
+                if (count($uniqueParams) != 0) {
+                    $this->addDeleteGetProcessCode($writer, $uniqueParams, $serviceProps['type']);
+                }
+            } else if ($serviceProps['type'] == 'GetAll') {
+                $service->addParameters([
+                    'page' => [
+                        'type' => 'int',
+                        'default' => 1
+                    ],
+                    'size' => [
+                        'type' => 'int',
+                        'default' => 10
+                    ]
+                ]);
+                $dbClassName = $this->dbObjWritter->getName();
+                $entityName = $this->dbObjWritter->getEntityName();
+                $writer->addProcessCode([
+                    '$data = '.$dbClassName.'::get()->get'.$entityName.'s($this->getparamVal(\'page\'), $this->getParamVal(\'size\'));',
+                    "\$this->send('application/json', new Json(["
+                ]);
+                $writer->addProcessCode([
+                    "'data' => \$data"
+                ], 3);
+                $writer->addProcessCode([
+                    ']));'
+                ]);
             }
             $writer->writeClass();
+        }
+    }
+    private function addDeleteGetProcessCode(WebServiceWriter $w, $uniqueParams, $type) {
+        $dbClassName = $this->dbObjWritter->getName();
+        $entityName = $this->dbObjWritter->getEntityName();
+        $paramsStrArr = [];
+        foreach ($uniqueParams as $p) {
+            $paramsStrArr[] = "\$this->getParamVal('$p')";
+        }
+        $paramsStr = implode(', ', $paramsStrArr);
+        if ($type == 'GetSingle') {
+            $w->addProcessCode([
+                '$entity = '.$dbClassName.'::get()->get'.$entityName.'('.$paramsStr.');',
+                "\$this->send('application/json', new Json(["
+            ]);
+            $w->addProcessCode([
+                "'data' => \$entity"
+            ], 3);
+            $w->addProcessCode([
+                ']));'
+            ]);
+        } else if ($type == 'Delete') {
+            $w->addProcessCode([
+                '$entity = '.$dbClassName.'::get()->get'.$entityName.'('.$paramsStr.');',
+                $dbClassName.'::get()->delete'.$entityName.'($entity);',
+                "\$this->sendResponse('Record Removed.');"
+            ]);
         }
     }
     private function IncludeAPISetProps(WebServiceWriter $w, $type) {
@@ -227,6 +305,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Now, time to collect database table information.");
         $ns = ClassInfoReader::readNamespace($this->getCommand(), APP_DIR_NAME.'\\database', 'Provide us with a namespace for table class:');
         $this->tableObjWriter->setNamespace($ns);
+        $this->tableObjWriter->setPath($ns);
         $tableHelper = new TableObjHelper(new CreateClassHelper($this->getCommand(), $this->tableObjWriter), $this->tableObjWriter->getTable());
         $tableHelper->setTableName();
         $tableHelper->setTableComment();

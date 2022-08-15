@@ -23,10 +23,10 @@ class CreateRESTTest extends CreateTestCase {
         $runner->setInput([
             '0',
             'SuperUser',
-            'app\\entity',
+            'app\\entity\\super',
             'y',
             'n',
-            "app\\database",
+            "app\\database\\super",
             "super_users",
             "A table to hold super users information.",
             "id",
@@ -35,10 +35,26 @@ class CreateRESTTest extends CreateTestCase {
             "y",
             "y",
             "The unique ID of the super user.",
-            "n",
+            "y",
+            'first-name',
+            'varchar',//type
+            '50',
+            'n',//primary
+            'n',//unique
+            '',//default
+            'n',//null,
+            'No Comment.',//optional comments
+            "y",
+            'is-happy',
+            'bool',//type
+            'n',
+            'true',//default
+            'n',//null,
+            'Check if the hero is happy or not.',//optional comment
             "n",
             'n',
-            "app\\apis"
+            "n",
+            "app\\apis\\super"
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
@@ -80,6 +96,58 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column unique?(y/N)\n",
+            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Is this column primary?(y/N)\n",
+            "Enter default value (true or false) (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
@@ -89,14 +157,14 @@ class CreateRESTTest extends CreateTestCase {
             "Writing web services...\n",
             "Done.\n"
         ], $runner->getOutput());
-        $tableClazz = '\\app\\database\\SuperUserTable';
-        $entityClazz = '\\app\\entity\\SuperUser';
-        $dbClazz = "\\app\\database\\SuperUserDB";
+        $tableClazz = '\\app\\database\\super\\SuperUserTable';
+        $entityClazz = '\\app\\entity\\super\\SuperUser';
+        $dbClazz = "\\app\\database\\super\\SuperUserDB";
         $apiClazzes = [
-            '\\app\\apis\\AddSuperUserService',
-            '\\app\\apis\\DeleteSuperUserService',
-            '\\app\\apis\\GetAllSuperUsersService',
-            '\\app\\apis\\GetSuperUserService'
+            '\\app\\apis\\super\\AddSuperUserService',
+            '\\app\\apis\\super\\DeleteSuperUserService',
+            '\\app\\apis\\super\\GetAllSuperUsersService',
+            '\\app\\apis\\super\\GetSuperUserService'
         ];
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));

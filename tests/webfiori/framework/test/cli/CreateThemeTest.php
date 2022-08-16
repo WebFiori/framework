@@ -39,7 +39,7 @@ class CreateThemeTest extends CreateTestCase {
             "6: Theme.\n",
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
-            "8: Quit. <--\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'themes'\n",
             'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",

@@ -75,7 +75,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
         $tableObj = null;
         
         do {
-            if ($tableClassName !== null && strlen($tableClassName) == 0) {
+            if ($tableClassName === null || strlen($tableClassName) == 0) {
                 $tableClassName = $this->getCommand()->getInput('Enter database table class name (include namespace):');
             }
 

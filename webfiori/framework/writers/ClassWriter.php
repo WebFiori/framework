@@ -305,11 +305,11 @@ abstract class ClassWriter {
         if (gettype($classesToUse) == 'array') {
             foreach ($classesToUse as $class) {
                 if (!in_array($class, $this->useArr)) {
-                    $this->useArr[] = $class;
+                    $this->useArr[] = trim($class,'\\');
                 }
             }
         } else if (!in_array($classesToUse, $this->useArr)) {
-            $this->useArr[] = $classesToUse;
+            $this->useArr[] = trim($classesToUse,'\\');
         }
     }
     /**

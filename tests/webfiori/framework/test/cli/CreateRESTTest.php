@@ -53,7 +53,7 @@ class CreateRESTTest extends CreateTestCase {
             'Check if the hero is happy or not.',//optional comment
             "n",
             'n',
-            "n",
+            "y",
             "app\\apis\\super"
         ]);
         $this->assertEquals(0, $runner->start());
@@ -164,7 +164,10 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\AddSuperUserService',
             '\\app\\apis\\super\\DeleteSuperUserService',
             '\\app\\apis\\super\\GetAllSuperUsersService',
-            '\\app\\apis\\super\\GetSuperUserService'
+            '\\app\\apis\\super\\GetSuperUserService',
+            '\\app\\apis\\super\\UpdateSuperUserService',
+            '\\app\\apis\\super\\UpdateFirstNameOfSuperUserService',
+            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserService'
         ];
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
@@ -173,6 +176,9 @@ class CreateRESTTest extends CreateTestCase {
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));
         
+        foreach ($apiClazzes as $clazz) {
+            $this->removeClass($clazz);
+        }
         $this->removeClass($tableClazz);
         $this->removeClass($entityClazz);
         $this->removeClass($dbClazz);

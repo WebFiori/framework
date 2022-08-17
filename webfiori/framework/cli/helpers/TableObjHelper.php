@@ -87,7 +87,7 @@ class TableObjHelper {
             while ($addExtra) {
 
                 if ($this->getTable()->getEntityMapper()->addAttribute($this->getInput('Enter attribute name:'))) {
-                    
+                    $helper->success('Attribute added.');
                 } else {
                     $helper->warning('Unable to add attribute.');
                 }
@@ -312,7 +312,7 @@ class TableObjHelper {
 
             if (count($dbConnections) == 0) {
                 $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
-                return;
+                return null;
             }
             $dbConn = $this->select('Select database connection:', $dbConnections, 0);
 

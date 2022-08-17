@@ -115,7 +115,7 @@ class RunSQLQueryCommand extends CLICommand {
             'color' => 'blue'
         ]);
 
-        if ($this->confirm('Continue?')) {
+        if ($this->confirm('Continue?', true)) {
             $this->info('Executing the query...');
             try {
                 $schema->execute();

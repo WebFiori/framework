@@ -303,7 +303,6 @@ class DBClassWriter extends ClassWriter {
             return;
         }
         $uniqueKeys = $this->getUniqueColsKeys();
-        $whereCols = [];
 
         foreach ($t->getCols() as $key => $colObj) {
             if (!in_array($key, $uniqueKeys)) {

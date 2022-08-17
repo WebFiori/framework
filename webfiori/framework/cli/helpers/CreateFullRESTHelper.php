@@ -355,7 +355,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
             while ($addExtra) {
 
                 if ($this->tableObjWriter->getTable()->getEntityMapper()->addAttribute($this->getInput('Enter attribute name:'))) {
-                    
+                    $this->success('Attribute added.');
                 } else {
                     $this->warning('Unable to add attribute.');
                 }

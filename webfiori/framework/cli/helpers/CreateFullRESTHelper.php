@@ -97,6 +97,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Writing web services...");
         $entityName = $this->getEntityName();
         $suffix = $this->getServiceSuffix($entityName);
+        $uniqueParams = $this->getUniqueAPIParams();
+        $t = $this->getTable();
+        
         $servicesPrefix = [
             'Add'.$entityName => [
                 'type' => 'Add',
@@ -125,21 +128,29 @@ class CreateFullRESTHelper extends CreateClassHelper {
             ]
         ];
         $w = $this->dbObjWritter;
-        $w instanceof DBClassWriter;
-//        if ($w->isColumnUpdateIncluded()) {
-//            $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
-//            $colsKeys = $this->tableObjWriter->getTable()->getColsKeys();
-//            
-//            foreach ($colsKeys as $colKey) {
-//                if (!in_array($colKey, $uniqueCols)) {
-//                    $servicesPrefix['Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName]
-//                             = [ 
-//                                 'name' => 'update-'.$colKey.'-of-'.$suffix,
-//                                 'method' => 'post'
-//                             ];
-//                }
-//            }
-//        }
+        
+        if ($w->isColumnUpdateIncluded()) {
+            $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
+            $colsKeys = $this->tableObjWriter->getTable()->getColsKeys();
+            
+            foreach ($colsKeys as $colKey) {
+                if (!in_array($colKey, $uniqueCols)) {
+                    $colObj = $t->getColByKey($colKey);
+                    $paramProps = [
+                        'name' => $colKey,
+                        'type' => $this->getAPIParamType($colObj->getDatatype())
+                    ];
+                    $idxName = 'Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName;
+                    $servicesPrefix[$idxName]= [ 
+                        'name' => 'update-'.$colKey.'-of-'.$suffix,
+                        'method' => 'post',
+                        'type' => 'SingleUpdate',
+                        'params' => array_merge([$paramProps], $uniqueParams)
+                    ];
+                }
+            }
+        }
+        
         foreach ($servicesPrefix as $sName => $serviceProps) {
             $service = new ServiceHolder($serviceProps['name']);
             $service->addRequestMethod($serviceProps['method']);
@@ -153,8 +164,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
             $writer->setNamespace($this->apisNs);
             $writer->setPath($this->apisNs);
             $writer->setClassName($sName);
-            if ($serviceProps['type'] == 'Add' || $serviceProps['type'] == 'Update') {
-                $this->IncludeAPISetProps($writer, $serviceProps['type']);
+            $apiType = $serviceProps['type'];
+            if ($apiType == 'Add' || $apiType == 'Update') {
+                $this->IncludeAPISetProps($writer, $apiType);
                 
                 foreach($t->getColsKeys() as $paramName) {
                     $colObj = $t->getColByKey($paramName);
@@ -170,29 +182,20 @@ class CreateFullRESTHelper extends CreateClassHelper {
                     }
                     $service->addParameter($paramArr);
                 }
-            } else if ($serviceProps['type'] == 'GetSingle' || $serviceProps['type'] == 'Delete') {
-                $uniqueParams = [];
-                foreach($t->getColsKeys() as $paramName) {
-                    $colObj = $t->getColByKey($paramName);
-                    if ($colObj->isUnique()) {
-                        $uniqueParams[] = $paramName;
-                        $paramArr = [
-                            'name' => $paramName,
-                            'type' => $this->getAPIParamType($colObj->getDatatype()),
-                        ];
-                        if ($colObj->getDefault() !== null) {
-                            $paramArr['default'] = $colObj->getDefault();
-                        }
-                        if ($colObj->isNull()) {
-                            $paramArr['optional'] = true;
-                        }
-                        $service->addParameter($paramArr);
-                    }
+            } else if ($apiType == 'SingleUpdate') {
+                foreach ($serviceProps['params'] as $p) {
+                    $service->addParameter($p);
                 }
+                $this->addSingleUpdateCode();
+            } else if ($apiType == 'GetSingle' || $apiType == 'Delete') {
+                
                 if (count($uniqueParams) != 0) {
-                    $this->addDeleteGetProcessCode($writer, $uniqueParams, $serviceProps['type']);
+                    foreach ($uniqueParams as $p) {
+                        $service->addParameter($p);
+                    }
+                    $this->addDeleteGetProcessCode($writer, $uniqueParams, $apiType);
                 }
-            } else if ($serviceProps['type'] == 'GetAll') {
+            } else if ($apiType == 'GetAll') {
                 $service->addParameters([
                     'page' => [
                         'type' => 'int',
@@ -219,14 +222,38 @@ class CreateFullRESTHelper extends CreateClassHelper {
             $writer->writeClass();
         }
     }
-    private function addDeleteGetProcessCode(WebServiceWriter $w, $uniqueParams, $type) {
+    private function addSingleUpdateCode() {
+        
+    }
+    private function getUniqueAPIParams() : array {
+        $params = [];
+        $t = $this->getTable();
+        foreach($t->getColsKeys() as $paramName) {
+            $colObj = $t->getColByKey($paramName);
+            if ($colObj->isUnique()) {
+                $paramArr = [
+                    'name' => $paramName,
+                    'type' => $this->getAPIParamType($colObj->getDatatype()),
+                ];
+                if ($colObj->getDefault() !== null) {
+                    $paramArr['default'] = $colObj->getDefault();
+                }
+                if ($colObj->isNull()) {
+                    $paramArr['optional'] = true;
+                }
+                $params[] = $paramArr;
+            }
+        }
+        return $params;
+    }
+    private function addDeleteGetProcessCode(WebServiceWriter $w, $uniqueParamsArr, $type) {
         $dbClassName = $this->dbObjWritter->getName();
         $entityName = $this->dbObjWritter->getEntityName();
         $paramsStrArr = [];
-        foreach ($uniqueParams as $p) {
-            $paramsStrArr[] = "\$this->getParamVal('$p')";
+        foreach ($uniqueParamsArr as $p) {
+            $paramsStrArr[] = "\$this->getParamVal(".$p['name'].")";
         }
-        $paramsStr = implode(', ', $paramsStrArr);
+        $paramsStr = implode(", ", $paramsStrArr);
         if ($type == 'GetSingle') {
             $w->addProcessCode([
                 '$entity = '.$dbClassName.'::get()->get'.$entityName.'('.$paramsStr.');',

@@ -173,8 +173,8 @@ class CreateRESTTest extends CreateTestCase {
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));
         
-//        $this->removeClass($tableClazz);
-//        $this->removeClass($entityClazz);
-//        $this->removeClass($dbClazz);
+        $this->removeClass($tableClazz);
+        $this->removeClass($entityClazz);
+        $this->removeClass($dbClazz);
     }
 }

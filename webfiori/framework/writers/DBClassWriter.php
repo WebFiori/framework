@@ -168,7 +168,7 @@ class DBClassWriter extends ClassWriter {
         $this->writeGetRecord();
         $this->writeGetRecords();
         $this->writeUpdateRecord();
-        if ($this->includeUpdate) {
+        if ($this->isColumnUpdateIncluded()) {
             $this->writeUpdateRecordMethods();
         }
         
@@ -243,13 +243,15 @@ class DBClassWriter extends ClassWriter {
         $paramsComment[] = ' *';
         $paramsComment[] = " * @param $phpType \$newVal The new value for the column.";
         $this->append($paramsComment, 1);
-        
+        if (strpos($phpType, '|null') !== false) {
+            $phpType = substr($phpType, -1*strlen('|null'));
+        }
         $this->append([
             " */",
             
             $this->f(self::toMethodName($key, 'update'), array_merge(
                 $this->paramsArr,
-                [$firstParamName => trim($phpType, '|null')]
+                [$firstParamName => $phpType]
             ))
         ], 1);
         $this->append("\$this->table('".$t->getNormalName()."')->update([", 2);

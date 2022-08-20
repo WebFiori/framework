@@ -416,6 +416,14 @@ class AppConfig implements Config {
         return $this->webSiteNames;
     }
     /**
+     * Removes all stored database connections.
+     * 
+     * 
+     */
+    public function removeDBConnections() {
+        $this->dbConnections = [];
+    }
+    /**
      * @since 1.0
      */
     private function initDbConnections() {

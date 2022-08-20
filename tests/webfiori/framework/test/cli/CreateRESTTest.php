@@ -15,7 +15,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        ConfigController::get()->removeAllDBConnections();
+        WebFioriApp::getAppConfig()->removeDBConnections();
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -191,7 +191,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test01() {
-        ConfigController::get()->removeAllDBConnections();
+        WebFioriApp::getAppConfig()->removeDBConnections();
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',

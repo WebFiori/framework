@@ -48,7 +48,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command);
         
-        $connection = CLIUtils::getConnectionName($this);
+        $connection = CLIUtils::getConnectionName($command);
         
         if ($connection === null) {
             $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);

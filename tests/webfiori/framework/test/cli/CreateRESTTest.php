@@ -2,7 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\ConfigController;
+use webfiori\database\ConnectionInfo;
 use webfiori\framework\WebFioriApp;
 
 /**
@@ -351,6 +351,187 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\UpdateSuperUserXService',
             '\\app\\apis\\super\\UpdateFirstNameOfSuperUserXService',
             '\\app\\apis\\super\\UpdateIsHappyOfSuperUserXService'
+        ];
+        foreach ($apiClazzes as $clazz) {
+            $this->assertTrue(class_exists($clazz));
+        }
+        $this->assertTrue(class_exists($tableClazz));
+        $this->assertTrue(class_exists($entityClazz));
+        $this->assertTrue(class_exists($dbClazz));
+        
+        foreach ($apiClazzes as $clazz) {
+            $this->removeClass($clazz);
+        }
+        $this->removeClass($tableClazz);
+        $this->removeClass($entityClazz);
+        $this->removeClass($dbClazz);
+    }
+    /**
+     * @test
+     */
+    public function test02() {
+        WebFioriApp::getAppConfig()->removeDBConnections();
+        $conn = new ConnectionInfo('mysql','root', '123456', 'testing_db', '127.0.0.1', 3306, [
+            'connection-name' => 'Super Connection'
+        ]);
+        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'rest',
+        ]);
+        $runner->setInput([
+            'Super Connection',
+            'SuperUserX9',
+            'app\\entity\\super',
+            'y',
+            'n',
+            "app\\database\\super",
+            "super_users",
+            "A table to hold super users information.",
+            "id",
+            "int",
+            "11",
+            "n",
+            'n',//unique
+            '',//default
+            'n',//null,
+            "The unique ID of the super user.",
+            "y",
+            'first-name',
+            'varchar',//type
+            '50',
+            'n',//primary
+            'n',//unique
+            '',//default
+            'n',//null,
+            'No Comment.',//optional comments
+            "y",
+            'is-happy',
+            'bool',//type
+            'n',
+            'true',//default
+            'n',//null,
+            'Check if the hero is happy or not.',//optional comment
+            "n",
+            'n',
+            "y",
+            "app\\apis\\super"
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select database connection:\n",
+            "0: Super Connection <--\n",
+            "First thing, we need entity class information.\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
+            "Would you like to add extra attributes to the entity?(y/N)\n",
+            "Now, time to collect database table information.\n",
+            "Provide us with a namespace for table class: Enter = 'app\database'\n",
+            "Enter database table name:\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column unique?(y/N)\n",
+            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column unique?(y/N)\n",
+            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Is this column primary?(y/N)\n",
+            "Enter default value (true or false) (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to have update methods for every single column?(y/N)\n",
+            "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
+            "Creating entity class...\n",
+            "Creating database table class...\n",
+            "Creating database access class...\n",
+            "Writing web services...\n",
+            "Done.\n"
+        ], $runner->getOutput());
+        $tableClazz = '\\app\\database\\super\\SuperUserX9Table';
+        $entityClazz = '\\app\\entity\\super\\SuperUserX9';
+        $dbClazz = "\\app\\database\\super\\SuperUserX9DB";
+        $apiClazzes = [
+            '\\app\\apis\\super\\AddSuperUserX9Service',
+            '\\app\\apis\\super\\DeleteSuperUserX9Service',
+            '\\app\\apis\\super\\GetAllSuperUserX9sService',
+            '\\app\\apis\\super\\GetSuperUserX9Service',
+            '\\app\\apis\\super\\UpdateSuperUserX9Service',
+            '\\app\\apis\\super\\UpdateFirstNameOfSuperUserX9Service',
+            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service'
         ];
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));

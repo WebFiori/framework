@@ -143,7 +143,7 @@ class CLIUtils {
         
         if (in_array($connName, $dbConnections)) {
             return $connName;
-        } else {
+        } else if ($connName !== null) {
             $c->error('No connection with name "'.$connName.'" was found!');
         }
         

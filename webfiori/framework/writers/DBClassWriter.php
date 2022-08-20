@@ -244,7 +244,7 @@ class DBClassWriter extends ClassWriter {
         $paramsComment[] = " * @param $phpType \$newVal The new value for the column.";
         $this->append($paramsComment, 1);
         if (strpos($phpType, '|null') !== false) {
-            $phpType = substr($phpType, -1*strlen('|null'));
+            $phpType = substr($phpType,0, strlen($phpType) - strlen('|null') );
         }
         $this->append([
             " */",

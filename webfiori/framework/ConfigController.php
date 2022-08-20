@@ -1208,6 +1208,12 @@ class ConfigController {
         $this->a($cFile, "        return \$this->webSiteNames;");
         $this->a($cFile, $this->blockEnd, 1);
         
+        $this->writeFuncHeader($cFile, 
+                'public function removeDBConnections()', 
+                'Removes all stored database connections.');
+        $this->a($cFile, "        \$this->dbConnections = [];");
+        $this->a($cFile, $this->blockEnd, 1);
+        
         $this->_writeDbCon($cFile);
         $this->_writeSiteInfo($cFile);
         $this->_writeSmtpConn($cFile);

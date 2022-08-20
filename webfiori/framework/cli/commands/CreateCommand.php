@@ -12,6 +12,7 @@ namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
 use webfiori\database\Table;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
@@ -142,7 +143,7 @@ class CreateCommand extends CLICommand {
             $create = new CreateThemeHelper($this);
         } else if ($answer == 'Database access class based on table.') {
             $create = new CreateDBAccessHelper($this);
-            $create->readTable();
+            $create->setTable(CLIUtils::readTable($this));
             $this->println('We need from you to give us class information.');
             $create->readDbClassInfo();
             $this->println('We need from you to give us entity class information.');

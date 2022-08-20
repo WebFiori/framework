@@ -11,6 +11,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\Table;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\writers\DBClassWriter;
@@ -63,8 +64,8 @@ class CreateDBAccessHelper extends CreateClassHelper {
     public function readEntityInfo() {
         $t = $this->getTable();
         $m = $t->getEntityMapper();
-        $m->setEntityName(ClassInfoReader::readName($this->getCommand(), null, 'Entity class name:'));
-        $m->setNamespace(ClassInfoReader::readNamespace($this->getCommand(), APP_DIR_NAME.'\\entity', 'Entity namespace:'));
+        $m->setEntityName(CLIUtils::readName($this->getCommand(), null, 'Entity class name:'));
+        $m->setNamespace(CLIUtils::readNamespace($this->getCommand(), APP_DIR_NAME.'\\entity', 'Entity namespace:'));
     }
     public function getTable() : Table {
         return $this->getWriter()->getTable();

@@ -10,7 +10,9 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use InvalidArgumentException;
 use webfiori\cli\CLICommand;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\Util;
 use webfiori\framework\writers\ClassWriter;
 /**
@@ -48,7 +50,7 @@ class ClassInfoReader {
     private function getPath($default) {
         $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
         if (!Util::isDirectory($fixedPath, true)) {
-            throw new \InvalidArgumentException("Unable to create class at $default");
+            throw new InvalidArgumentException("Unable to create class at $default");
         }
         return $fixedPath;
     }
@@ -115,70 +117,9 @@ class ClassInfoReader {
      * will be added to.
      */
     public function getNamespace($defaultNs) {
-        return self::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
+        return CLIUtils::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
     }
-    /**
-     * Reads and validates class namespace.
-     * 
-     * @param CLICommand $c The command that will be used to read the input from.
-     * 
-     * @param string $defaultNs An optional string that will be used as default
-     * namespace if no input is provided.
-     * 
-     * @param string $prompt The text that will be shown to the user as prompt for
-     * the namespace.
-     * 
-     * @return string A validated string that represents a namespace.
-     */
-    public static function readNamespace(CLICommand $c, string $defaultNs = '\\', $prompt = 'Enter class namespace:') : string {
-        $isNameValid = false;
-
-        do {
-            $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));
-            $isNameValid = ClassWriter::isValidNamespace($ns);
-
-            if (!$isNameValid) {
-                $c->error('Invalid namespace is given.');
-            }
-        } while (!$isNameValid);
-
-        return trim($ns,'\\');
-    }
-    /**
-     * Reads and validates class name.
-     * 
-     * @param CLICommand $c The command that will be used to read the input from.
-     * 
-     * @param string|null $suffix An optional string to append to class name.
-     * 
-     * @param string $prompt The text that will be shown to the user as prompt for
-     * class name.
-     * 
-     * @return string A string that represents a valid class name.
-     */
-    public static function readName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:') : string {
-        $isNameValid = false;
-
-        do {
-            $className = trim($c->getInput($prompt));
-            
-            if ($suffix !== null) {
-                $subSuffix = substr($className, strlen($className) - strlen($suffix));
-                
-                if ($subSuffix != $suffix) {
-                    $className .= $suffix;
-                }
-            }
-            
-            $isNameValid = ClassWriter::isValidClassName($className);
-
-            if (!$isNameValid) {
-                $c->error('Invalid class name is given.');
-            }
-        } while (!$isNameValid);
-
-        return $className;
-    }
+    
     /**
      * Reads and returns a string that represents the name of the class that will be created.
      * 
@@ -189,6 +130,6 @@ class ClassInfoReader {
      * @return string A string that represents the name of the class.
      */
     public function getName($suffix = null) {
-        return self::readName($this->getOwner(), $suffix, 'Enter a name for the new class:');
+        return CLIUtils::readName($this->getOwner(), $suffix, 'Enter a name for the new class:');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 
+use webfiori\framework\ConfigController;
 use webfiori\framework\WebFioriApp;
 
 /**
@@ -14,6 +15,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test00() {
+        ConfigController::get()->removeAllDBConnections();
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -189,6 +191,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test01() {
+        ConfigController::get()->removeAllDBConnections();
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',

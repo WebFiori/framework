@@ -68,6 +68,13 @@ class ConfigController {
             'titles' => $cfg->getTitles(),
         ];
     }
+    /**
+     * Removes all stored database connections from the class 'AppConfig'.
+     */
+    public function removeAllDBConnections() {
+        $this->configVars['database-connections'] = [];
+        $this->writeAppConfig();
+    }
     private function __construct() {
         $this->since10 = " * @since 1.0";
         $this->since101 = " * @since 1.0.1";

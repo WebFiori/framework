@@ -59,7 +59,7 @@ class CreateRESTTest extends CreateTestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Warning: No database connections found in the class \"app\AppConfig\"!\n",
-            
+            "Info: Run the command \"add\" to add connections.\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -236,7 +236,7 @@ class CreateRESTTest extends CreateTestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Warning: No database connections found in the class \"app\AppConfig\"!\n",
-            "Database type:\n",
+            "Info: Run the command \"add\" to add connections.\n","Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
             "First thing, we need entity class information.\n",

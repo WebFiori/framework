@@ -562,7 +562,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2022-07-26');
+        define('WF_RELEASE_DATE', '2022-08-21');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {

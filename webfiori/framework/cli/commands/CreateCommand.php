@@ -10,10 +10,13 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\database\Table;
 use webfiori\cli\CLICommand;
+use webfiori\database\Table;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateDBAccessHelper;
+use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
 use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
@@ -45,6 +48,8 @@ class CreateCommand extends CLICommand {
            'middleware' => 'Middleware.',
            'command' => 'CLI Command.',
            'theme' => 'Theme.',
+           'db' => 'Database access class based on table.',
+           'rest' => 'Complete REST backend (Database table, entity, database access and web services).',
            'Quit.'
         ];
         $what = $this->getArgValue('--c');
@@ -62,28 +67,7 @@ class CreateCommand extends CLICommand {
         return $answer;
     }
     public function _createEntityFromQuery() {
-        $tableClassNameValidity = false;
-        $tableClassName = $this->getArgValue('--table-class');
-
-        do {
-            if (strlen($tableClassName) == 0) {
-                $tableClassName = $this->getInput('Enter table class name (include namespace):');
-            }
-
-            if (!class_exists($tableClassName)) {
-                $this->error('Class not found.');
-                $tableClassName = null;
-                continue;
-            }
-            $tableObj = new $tableClassName();
-
-            if (!$tableObj instanceof Table) {
-                $this->error('The given class is not a child of the class "webfiori\database\Table".');
-                $tableClassName = '';
-                continue;
-            }
-            $tableClassNameValidity = true;
-        } while (!$tableClassNameValidity);
+        $tableObj = CLIUtils::readTable($this);
         $this->println('We need from you to give us entity class information.');
         $classInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
@@ -136,8 +120,17 @@ class CreateCommand extends CLICommand {
             $create = new CreateCronJob($this);
         } else if ($answer == 'Theme.') {
             $create = new CreateThemeHelper($this);
-        } else {
-            $this->info('Not implemented yet.');
+        } else if ($answer == 'Database access class based on table.') {
+            $create = new CreateDBAccessHelper($this);
+            $create->setTable(CLIUtils::readTable($this));
+            $this->println('We need from you to give us class information.');
+            $create->readDbClassInfo();
+            $this->println('We need from you to give us entity class information.');
+            $create->readEntityInfo();
+            $create->confirnIncludeColsUpdate();
+            $create->writeClass();
+        } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
+            $create = new CreateFullRESTHelper($this);
         }
         
         return 0;

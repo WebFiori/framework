@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
-use webfiori\framework\cli\writers\MiddlewareClassWriter;
+use webfiori\framework\writers\MiddlewareClassWriter;
 use webfiori\cli\InputValidator;
 /**
  * A helper class that works with the create command to create a middleware.

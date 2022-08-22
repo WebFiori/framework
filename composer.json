@@ -15,13 +15,13 @@
     "require": {
         "php": ">=7.0",
         "webfiori/err":"v1.0.3",
-        "webfiori/cli":"v1.0.5",
+        "webfiori/cli":"v1.0.6",
         "webfiori/file":"v1.2.1",
         "webfiori/collections":"v1.1.1",
         "webfiori/ui":"v2.3.4",
         "webfiori/jsonx":"v3.1.4",
-        "webfiori/database":"v0.4.5",
-        "webfiori/http":"v3.2.14",
+        "webfiori/database":"v0.4.9",
+        "webfiori/http":"v3.2.16",
         "webfiori/mailer":"v1.0.2"
     },
     "require-dev": {

@@ -10,13 +10,14 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\file\File;
 use webfiori\cli\Runner;
+use webfiori\file\File;
+use webfiori\framework\exceptions\SessionException;
 /**
  * The default sessions storage engine.
  *
  * This storage engine will store session state as a file in the folder 
- * 'app/storage/sessions'. The name of the file that contains session state 
+ * 'app/sto/sessions'. The name of the file that contains session state 
  * will be the ID of the session.
  * 
  * @author Ibrahim
@@ -38,7 +39,9 @@ class DefaultSessionStorage implements SessionStorage {
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
-            set_error_handler(null);
+            set_error_handler(function (int $errno) {
+                throw new SessionException('Unable to create sessions storage folder.', $errno);
+            });
             if (!is_dir($sessionsStoragePath)) {
                 mkdir($sessionsStoragePath);
             }

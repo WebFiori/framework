@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cli\writers;
+namespace webfiori\framework\writers;
 
 use webfiori\framework\cron\AbstractJob;
 use webfiori\framework\cron\Cron;
@@ -119,7 +119,7 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * Creates new instance of the class.',
             ' */',
-            'public function __construct(){'
+            $this->f('__construct')
         ], 1);
         $this->append([
             "parent::__construct('".$this->getJobName()."');",
@@ -159,7 +159,7 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * Execute the process.',
             ' */',
-            'public function execute() {'
+            $this->f('execute')
         ], 1);
         
         $this->append('//TODO: Write the code that represents the process.', 2);
@@ -168,7 +168,7 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions when the job failed to complete without errors.',
             ' */',
-            'public function onFail() {'
+            $this->f('onFail')
         ], 1);
         $this->append('//TODO: Implement the action to perform when the job fails to complete without errors.', 2);
         $this->append([
@@ -176,7 +176,7 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions when the job completed without errors.',
             ' */',
-            'public function onSuccess() {',
+            $this->f('onSuccess'),
         ], 1);
 
         $this->append('//TODO: Implement the action to perform when the job executes without errors.', 2);
@@ -185,7 +185,7 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions after the job has finished to execute.',
             ' */',
-            'public function afterExec() {',
+            $this->f('afterExec'),
         ], 1);
 
         $this->append('//TODO: Implement the action to perform when the job finishes to execute.', 2);

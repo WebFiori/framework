@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cli\writers;
+namespace webfiori\framework\writers;
 
 use InvalidArgumentException;
 use webfiori\database\EntityMapper;

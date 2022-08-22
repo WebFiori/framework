@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\ThemeClassWriter;
+use webfiori\framework\writers\ThemeClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Theme;
 /**
@@ -44,5 +44,7 @@ class ThemeWritterTest extends TestCase {
         $clazzObj = new $clazz();
         $this->assertTrue($clazzObj instanceof Theme);
         $this->assertEquals('Cool Theme', $clazzObj->getName());
+        $writter->removeClass();
+        $writter->removeComponents();
     }
 }

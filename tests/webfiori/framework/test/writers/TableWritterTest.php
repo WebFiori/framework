@@ -1,18 +1,17 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\TableClassWriter;
-use PHPUnit\Framework\TestCase;
 use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\framework\test\cli\CreateTestCase;
+use webfiori\framework\writers\TableClassWriter;
 /**
  * Description of CronWritterTest
  *
  * @author Ibrahim
  */
-class TableWritterTest extends TestCase {
+class TableWritterTest extends CreateTestCase {
     /**
      * @test
      */
@@ -56,6 +55,7 @@ class TableWritterTest extends TestCase {
         $this->assertTrue($clazzObj instanceof MySQLTable);
         $this->assertEquals('`new_table`', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
+        $this->removeClass('app\\entity\\MyEntity');
     }
     /**
      * @test
@@ -77,6 +77,7 @@ class TableWritterTest extends TestCase {
         $this->assertTrue($clazzObj instanceof MSSQLTable);
         $this->assertEquals('[new_table]', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
+        $this->removeClass('app\\entity\\MyEntity');
     }
     /**
      * @test
@@ -160,6 +161,20 @@ class TableWritterTest extends TestCase {
             'col-3' => [
                 'type' => 'timestamp',
                 'default' => 'current_timestamp'
+            ],
+            'col-4' => [
+                'type' => 'bool',
+                'default' => true
+            ],
+            'col-5' => [
+                'type' => 'bool',
+                'default' => false
+            ],
+            'col-6' => [
+                'type' => 'decimal',
+                'size' => 10,
+                'scale' => '4',
+                'default' => true
             ]
         ]);
         $writter->getTable()->setName('super');
@@ -170,7 +185,7 @@ class TableWritterTest extends TestCase {
         $clazzObj = new $clazz();
         $this->assertTrue($clazzObj instanceof MySQLTable);
         $this->assertEquals('`super`', $clazzObj->getName());
-        $this->assertEquals(3, $clazzObj->getColsCount());
+        $this->assertEquals(6, $clazzObj->getColsCount());
         $this->assertEquals('The table that holds user info.', $clazzObj->getComment());
         
         $col00 = $clazzObj->getColByKey('col-1');
@@ -197,5 +212,27 @@ class TableWritterTest extends TestCase {
         $this->assertFalse($col01->isAutoInc());
         $this->assertFalse($col01->isAutoUpdate());
         $this->assertNull($col01->getComment());
+        
+        $col04 = $clazzObj->getColByKey('col-4');
+        $this->assertTrue($col04 instanceof MySQLColumn);
+        $this->assertEquals('bool', $col04->getDatatype());
+        $this->assertFalse($col04->isNull());
+        $this->assertFalse($col04->isUnique());
+        $this->assertTrue($col04->getDefault());
+        $this->assertNull($col04->getComment());
+        
+        $col05 = $clazzObj->getColByKey('col-5');
+        $this->assertTrue($col05 instanceof MySQLColumn);
+        $this->assertEquals('bool', $col05->getDatatype());
+        $this->assertFalse($col05->isNull());
+        $this->assertFalse($col05->isUnique());
+        $this->assertFalse($col05->getDefault());
+        $this->assertNull($col05->getComment());
+        
+        $col06 = $clazzObj->getColByKey('col-6');
+        $this->assertTrue($col06 instanceof MySQLColumn);
+        $this->assertEquals('decimal', $col06->getDatatype());
+        $this->assertEquals(10, $col06->getSize());
+        $this->assertEquals(4, $col06->getScale());
     }
 }

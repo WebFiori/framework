@@ -176,6 +176,14 @@ class AutoLoader {
         ];
     }
     /**
+     * Returns the directory at which autoload cache file will be created at.
+     * 
+     * @return string The directory at which autoload cache file will be created at.
+     */
+    public static function getCachePath() : string {
+        return self::get()->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+    }
+    /**
      * Returns a single instance of the class 'AutoLoader'.
      * 
      * @param $options An associative array of options that is used to initialize 
@@ -374,10 +382,8 @@ class AutoLoader {
                         && $ns == $classArr[self::$CLASS_INDICES[1]]) {
                     return true;
                 }
-            } else {
-                if ($class == $classArr[self::$CLASS_INDICES[0]]) {
-                    return true;
-                }
+            } else if ($class == $classArr[self::$CLASS_INDICES[0]]) {
+                return true;
             }
         }
 
@@ -627,7 +633,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _updateCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCache = self::getCachePath();
 
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');

@@ -8,9 +8,13 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cli\writers;
+namespace webfiori\framework\writers;
 
+use webfiori\framework\middleware\AbstractMiddleware;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\writers\ClassWriter;
+use webfiori\http\Request;
+use webfiori\http\Response;
 /**
  * A class which is used to write middleware classes.
  *
@@ -47,10 +51,10 @@ class MiddlewareClassWriter extends ClassWriter {
         parent::__construct('NewMiddleware', ROOT_DIR.DS.APP_DIR_NAME.DS.'middleware', APP_DIR_NAME.'\\middleware');
         $this->setSuffix('Middleware');
         $this->addUseStatement([
-            "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\SessionsManager",
-            "webfiori\\http\\Request",
-            "webfiori\\http\\Response",
+                AbstractMiddleware::class,
+                SessionsManager::class,
+                Request::class,
+                Response::class,
         ]);
         $this->priority = $priority;
         if (!$this->setMiddlewareName($middlewareName)) {
@@ -124,7 +128,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Creates new instance of the class.',
             ' */',
-            'public function __construct(){',
+            $this->f('__construct'),
             
         ], 1);
         $this->append("parent::__construct('$this->name');", 2);
@@ -147,7 +151,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions before accessing the application.',
             ' */',
-            'public function before(Request $request, Response $response ) {',
+            $this->f('before', ['request' => 'Request', 'response' => 'Response']),
             
         ], 1);
         $this->append('//TODO: Implement the action to perform before processing the request.', 2);
@@ -156,7 +160,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions after processing the request and before sending back the response.',
             ' */',
-            'public function after(Request $request, Response $response) {'
+            $this->f('after', ['request' => 'Request', 'response' => 'Response']),
         ], 1);
         $this->append('//TODO: Implement the action to perform after processing the request.', 2);
         $this->append([
@@ -164,7 +168,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions after sending the response.',
             ' */',
-            'public function afterSend(Request $request, Response $response) {'
+            $this->f('afterSend', ['request' => 'Request', 'response' => 'Response']),
         ], 1);
         $this->append('//TODO: Implement the action to perform after sending the request.', 2);
         $this->append('}', 1);

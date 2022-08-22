@@ -11,7 +11,7 @@
 namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\cli\writers\LangClassWriter;
+use webfiori\framework\writers\LangClassWriter;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\email\SMTPAccount;
 use webfiori\file\File;
@@ -67,6 +67,13 @@ class ConfigController {
             'website-names' => $cfg->getWebsiteNames(),
             'titles' => $cfg->getTitles(),
         ];
+    }
+    /**
+     * Removes all stored database connections from the class 'AppConfig'.
+     */
+    public function removeAllDBConnections() {
+        $this->configVars['database-connections'] = [];
+        $this->writeAppConfig();
     }
     private function __construct() {
         $this->since10 = " * @since 1.0";
@@ -1199,6 +1206,12 @@ class ConfigController {
                     ]
                 ]);
         $this->a($cFile, "        return \$this->webSiteNames;");
+        $this->a($cFile, $this->blockEnd, 1);
+        
+        $this->writeFuncHeader($cFile, 
+                'public function removeDBConnections()', 
+                'Removes all stored database connections.');
+        $this->a($cFile, "        \$this->dbConnections = [];");
         $this->a($cFile, $this->blockEnd, 1);
         
         $this->_writeDbCon($cFile);

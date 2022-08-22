@@ -2,22 +2,24 @@
 
 namespace webfiori\framework\test\cli;
 
-use webfiori\cli\Runner;
-use webfiori\file\File;
 use webfiori\framework\cli\commands\CreateCommand;
-use PHPUnit\Framework\TestCase;
+use webfiori\framework\WebFioriApp;
 
 /**
  * Description of CreateThemeTest
  *
  * @author Ibrahim
  */
-class CreateThemeTest extends TestCase {
+class CreateThemeTest extends CreateTestCase {
     /**
      * @test
      */
     public function testCreateTheme00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
         $runner->setInput([
             '6',
             'NewTest',
@@ -25,7 +27,7 @@ class CreateThemeTest extends TestCase {
             '',
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -35,7 +37,9 @@ class CreateThemeTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'themes'\n",
             'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",
@@ -48,9 +52,5 @@ class CreateThemeTest extends TestCase {
         $this->removeClass('\\themes\\fiori\\FooterSection');
         $this->removeClass('\\themes\\fiori\\HeadSection');
         $this->removeClass('\\themes\\fiori\\HeaderSection');
-    }
-    private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
-        $file->remove();
     }
 }

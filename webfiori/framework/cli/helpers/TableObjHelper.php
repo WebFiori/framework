@@ -55,11 +55,10 @@ class TableObjHelper {
             $helper->warning("The table already has a key with name '$colKey'.");
             return;
         }
-
+        $col = new MSSQLColumn();
+        
         if ($tempTable instanceof MySQLTable) {
             $col = new MySQLColumn();
-        } else {
-            $col = new MSSQLColumn();
         }
         $col->setName(str_replace('-', '_', str_replace(' ', '_', $colKey)));
         $colDatatype = $helper->select('Column data type:', $col->getSupportedTypes(), 0);
@@ -88,7 +87,7 @@ class TableObjHelper {
             while ($addExtra) {
 
                 if ($this->getTable()->getEntityMapper()->addAttribute($this->getInput('Enter attribute name:'))) {
-                    $helper->success('Attribute successfully added.');
+                    $helper->success('Attribute added.');
                 } else {
                     $helper->warning('Unable to add attribute.');
                 }
@@ -159,22 +158,20 @@ class TableObjHelper {
      */
     private function setDefaultValue($colObj) {
         $helper = $this->getCreateHelper();
-        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
-            $defaultVal = $helper->getInput('Enter default value (true or false) (Hit "Enter" to skip):', '');
-
-            if ($defaultVal == 'true') {
-                $colObj->setDefault(true);
-            } else {
-                if ($defaultVal == 'false') {
-                    $colObj->setDefault(false);
-                }
-            }
-        } else {
+        if (!($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean')) {
             $defaultVal = $helper->getInput('Enter default value (Hit "Enter" to skip):', '');
 
             if (strlen($defaultVal) != 0) {
                 $colObj->setDefault($defaultVal);
             }
+            return;
+        }
+        $defaultVal = $helper->getInput('Enter default value (true or false) (Hit "Enter" to skip):', '');
+
+        if ($defaultVal == 'true') {
+            $colObj->setDefault(true);
+        } else if ($defaultVal == 'false') {
+            $colObj->setDefault(false);
         }
     }
     /**
@@ -222,11 +219,11 @@ class TableObjHelper {
                 }
                 $valid = $colObj->setSize($dataSize);
 
-                if (!$valid) {
-                    $helper->error('Invalid size is given.');
-                } else {
+                if ($valid) {
                     $this->setScale($colObj);
+                    continue;
                 }
+                $helper->error('Invalid size is given.');
             } while (!$valid);
         }
     }
@@ -257,49 +254,44 @@ class TableObjHelper {
         $refTableName = $helper->getInput('Enter the name of the referenced table class (with namespace):');
         try {
             $refTable = new $refTableName();
-        } catch (Error $ex) {
-            $helper->error($ex->getMessage());
-            return;
-        } catch (Exception $ex) {
+        } catch (\Throwable $ex) {
             $helper->error($ex->getMessage());
             return;
         }
 
-        if ($refTable instanceof Table) {
-            $fkName = $helper->getInput('Enter a name for the foreign key:', null, new InputValidator(function ($val)
-            {
-                $trimmed = trim($val);
+        if (!($refTable instanceof Table)) {
+            $helper->error('The given class is not an instance of the class \''.Table::class.'\'.');
+            return;
+        }
+        $fkName = $helper->getInput('Enter a name for the foreign key:', null, new InputValidator(function ($val)
+        {
+            $trimmed = trim($val);
 
-                if (strlen($trimmed) == 0) {
-                    return false;
-                }
-
-                return true;
-            }));
-            $fkCols = $this->getFkCols();
-            $fkColsArr = [];
-
-            foreach ($fkCols as $colKey) {
-                $fkColsArr[$colKey] = $helper->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
+            if (strlen($trimmed) == 0) {
+                return false;
             }
-            $onUpdate = $helper->select('Choose on update condition:', [
-                'cascade', 'restrict', 'set null', 'set default', 'no action'
-            ], 1);
-            $onDelete = $helper->select('Choose on delete condition:', [
-                'cascade', 'restrict', 'set null', 'set default', 'no action'
-            ], 1);
 
-            try {
-                $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-                $helper->getWriter()->writeClass();
-                $helper->success('Foreign key added.');
-            } catch (\Exception $ex) {
-                $helper->error($ex->getMessage());
-            } catch (\Error $ex) {
-                $helper->error($ex->getMessage());
-            }
-        } else {
-            $helper->error('The given class is not an instance of the class \'webfiori\\database\\Table\'.');
+            return true;
+        }));
+        $fkCols = $this->getFkCols();
+        $fkColsArr = [];
+
+        foreach ($fkCols as $colKey) {
+            $fkColsArr[$colKey] = $helper->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
+        }
+        $onUpdate = $helper->select('Choose on update condition:', [
+            'cascade', 'restrict', 'set null', 'set default', 'no action'
+        ], 1);
+        $onDelete = $helper->select('Choose on delete condition:', [
+            'cascade', 'restrict', 'set null', 'set default', 'no action'
+        ], 1);
+
+        try {
+            $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
+            $helper->getWriter()->writeClass();
+            $helper->success('Foreign key added.');
+        } catch (\Throwable $ex) {
+            $helper->error($ex->getMessage());
         }
     }
     public function addForeignKeys() {
@@ -318,14 +310,13 @@ class TableObjHelper {
         if ($runQuery) {
             $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
 
-            if (count($dbConnections) != 0) {
-                $dbConn = $this->select('Select database connection:', $dbConnections, 0);
-
-
-                return new DB($dbConn);
-            } else {
+            if (count($dbConnections) == 0) {
                 $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
+                return null;
             }
+            $dbConn = $this->select('Select database connection:', $dbConnections, 0);
+
+            return new DB($dbConn);
         }
     }
     public function removeForeignKey() {
@@ -427,12 +418,12 @@ class TableObjHelper {
         do {
             $colKey = $helper->select('Select column #'.$colNumber.':', $keys);
 
-            if (!in_array($colKey, $fkCols)) {
-                $fkCols[] = $colKey;
-                $colNumber++;
-            } else {
+            if (in_array($colKey, $fkCols)) {
                 $helper->error('The column is already added.');
+                continue;
             }
+            $fkCols[] = $colKey;
+            $colNumber++;
         } while ($helper->confirm('Would you like to add another column to the foreign key?', false));
 
         return $fkCols;

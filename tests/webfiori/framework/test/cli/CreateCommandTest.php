@@ -1,26 +1,27 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\file\File;
-use webfiori\cli\Runner;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of TestCreateCommand
  *
  * @author Ibrahim
  */
-class CreateCommandTest extends TestCase {
+class CreateCommandTest extends CreateTestCase {
     /**
      * @test
      */
     public function testCreate00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
-            '7',
+            '9',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -30,19 +31,24 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
         ], $runner->getOutput());
     }
     /**
      * @test
      */
     public function testCreate01() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -52,7 +58,9 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
         ], $runner->getOutput());
     }
     
@@ -61,7 +69,11 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateMiddleware00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
         $runner->setInput([
             '4',
             'NewCoolMd',
@@ -72,7 +84,7 @@ class CreateCommandTest extends TestCase {
             '',
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -82,7 +94,9 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
             "Enter a name for the middleware:\n",
@@ -97,7 +111,11 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateCommand00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
         $runner->setInput([
             '5',
             'NewCLI',
@@ -108,7 +126,7 @@ class CreateCommandTest extends TestCase {
             '',
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -118,7 +136,9 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\commands'\n",
             "Enter a name for the command:\n",
@@ -133,7 +153,7 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateWebService00() {
-        $runner = new Runner();
+        $runner = $runner = WebFioriApp::getRunner();
         $runner->setInput([
             '2',
             'NewWeb',
@@ -147,8 +167,11 @@ class CreateCommandTest extends TestCase {
             'n',
             '',
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand()));
+        $runner->setArgsVector([
+            'webfiori',
+            'create'
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -158,7 +181,9 @@ class CreateCommandTest extends TestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
             "Enter a name for the new web service:\n",
@@ -192,9 +217,5 @@ class CreateCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\apis\\NewWebService'));
         $this->removeClass('\\app\\apis\\NewWebService');
-    }
-    private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
-        $file->remove();
     }
 }

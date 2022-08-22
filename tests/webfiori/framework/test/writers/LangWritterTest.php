@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\LangClassWriter;
+use webfiori\framework\writers\LangClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Language;
 /**

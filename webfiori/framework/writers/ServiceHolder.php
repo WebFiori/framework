@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cli\writers;
+namespace webfiori\framework\writers;
 
 use webfiori\http\AbstractWebService;
 /**
@@ -23,8 +23,8 @@ use webfiori\http\AbstractWebService;
  * @version 1.0
  */
 class ServiceHolder extends AbstractWebService {
-    public function __construct() {
-        parent::__construct('');
+    public function __construct(string $name = '') {
+        parent::__construct($name);
     }
     /**
      * 

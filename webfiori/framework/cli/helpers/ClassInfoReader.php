@@ -10,7 +10,9 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use InvalidArgumentException;
 use webfiori\cli\CLICommand;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\Util;
 use webfiori\framework\writers\ClassWriter;
 /**
@@ -48,7 +50,7 @@ class ClassInfoReader {
     private function getPath($default) {
         $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
         if (!Util::isDirectory($fixedPath, true)) {
-            throw new \InvalidArgumentException("Unable to create class at $default");
+            throw new InvalidArgumentException("Unable to create class at $default");
         }
         return $fixedPath;
     }
@@ -115,19 +117,9 @@ class ClassInfoReader {
      * will be added to.
      */
     public function getNamespace($defaultNs) {
-        $isNameValid = false;
-
-        do {
-            $ns = str_replace('/','\\',trim($this->getOwner()->getInput('Enter an optional namespace for the class:', $defaultNs)));
-            $isNameValid = $this->_validateNamespace($ns);
-
-            if (!$isNameValid) {
-                $this->getOwner()->error('Invalid namespace is given.');
-            }
-        } while (!$isNameValid);
-
-        return trim($ns,'\\');
+        return CLIUtils::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
     }
+    
     /**
      * Reads and returns a string that represents the name of the class that will be created.
      * 
@@ -138,71 +130,6 @@ class ClassInfoReader {
      * @return string A string that represents the name of the class.
      */
     public function getName($suffix = null) {
-        $isNameValid = false;
-
-        do {
-            $className = trim($this->getOwner()->getInput('Enter a name for the new class:'));
-            
-            if ($suffix !== null) {
-                $subSuffix = substr($className, strlen($className) - strlen($suffix));
-                
-                if ($subSuffix != $suffix) {
-                    $className .= $suffix;
-                }
-            }
-            
-            $isNameValid = ClassWriter::isValidClassName($className);
-
-            if (!$isNameValid) {
-                $this->getOwner()->error('Invalid class name is given.');
-            }
-        } while (!$isNameValid);
-
-        return $className;
-    }
-    private function _validateClassName($name) {
-        $len = strlen($name);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $name[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-    private function _validateNamespace($ns) {
-        if ($ns == '\\') {
-            return true;
-        }
-        $split = explode('\\', $ns);
-
-        foreach ($split as $subNs) {
-            $len = strlen($subNs);
-
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $subNs[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return CLIUtils::readName($this->getOwner(), $suffix, 'Enter a name for the new class:');
     }
 }

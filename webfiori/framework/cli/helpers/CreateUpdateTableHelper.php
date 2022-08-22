@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\framework\cli\writers\TableClassWriter;
+use webfiori\framework\writers\TableClassWriter;
 use webfiori\database\Table;
 use webfiori\framework\cli\helpers\TableObjHelper;
 /**

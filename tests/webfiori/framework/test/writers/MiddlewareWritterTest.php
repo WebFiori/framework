@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\MiddlewareClassWriter;
-use PHPUnit\Framework\TestCase;
 use webfiori\framework\middleware\AbstractMiddleware;
+use webfiori\framework\test\cli\CreateTestCase;
+use webfiori\framework\writers\MiddlewareClassWriter;
 /**
  * Description of CronWritterTest
  *
  * @author Ibrahim
  */
-class MiddlewareWritterTest extends TestCase {
+class MiddlewareWritterTest extends CreateTestCase {
     /**
      * @test
      */
@@ -20,7 +20,7 @@ class MiddlewareWritterTest extends TestCase {
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\SessionsManager",
+            "webfiori\\framework\\session\\SessionsManager",
             "webfiori\\http\\Request",
             "webfiori\\http\\Response",
         ], $writter->getUseStatements());
@@ -44,7 +44,7 @@ class MiddlewareWritterTest extends TestCase {
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\SessionsManager",
+            "webfiori\\framework\\session\\SessionsManager",
             "webfiori\\http\\Request",
             "webfiori\\http\\Response",
         ], $writter->getUseStatements());

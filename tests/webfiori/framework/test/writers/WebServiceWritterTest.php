@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\cli\writers\WebServiceWriter;
+use webfiori\framework\writers\WebServiceWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\http\AbstractWebService;
 /**

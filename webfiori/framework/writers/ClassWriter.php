@@ -121,10 +121,11 @@ abstract class ClassWriter {
     public function setNamespace(string $namespace) {
         $trimmed = trim($namespace);
         
-        if (strlen($trimmed) == 0) {
+        if (!self::isValidNamespace($trimmed)) {
             return false;
         }
         $this->ns = $trimmed;
+        
         return true;
     }
     /**
@@ -170,6 +171,38 @@ abstract class ClassWriter {
      */
     public function getSuffix() : string {
         return $this->suffix;
+    }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     * 
+     * @param string $ns A string to be validated.
+     * 
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) {
+        if ($ns == '\\') {
+            return true;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
     /**
      * Checks if a given string represents a valid class name or not.
@@ -223,12 +256,12 @@ abstract class ClassWriter {
     }
     public function f($funcName, $argsArr = [], $returns = null) {
         $argsPart = '(';
-        foreach ($argsArr as $argType => $argName) {
+        foreach ($argsArr as $argName => $argType) {
             if (strlen($argsPart) != 1) {
-                $argsPart .= ', '.$argType.' '.$argName;
+                $argsPart .= ', '.$argType.' $'.$argName;
                 continue;
             }
-            $argsPart .= $argType.' '.$argName;
+            $argsPart .= $argType.' $'.$argName;
         }
         $argsPart .= ')';
         if ($returns !== null) {
@@ -272,12 +305,29 @@ abstract class ClassWriter {
         if (gettype($classesToUse) == 'array') {
             foreach ($classesToUse as $class) {
                 if (!in_array($class, $this->useArr)) {
-                    $this->useArr[] = $class;
+                    $this->useArr[] = trim($class,'\\');
                 }
             }
         } else if (!in_array($classesToUse, $this->useArr)) {
-            $this->useArr[] = $classesToUse;
+            $this->useArr[] = trim($classesToUse,'\\');
         }
+    }
+    /**
+     * Removes a single use statement.
+     * 
+     * @param string $classToRemove The name of the class including its namespace
+     * (e.g. app/hello/HelloClass).
+     */
+    public function removeUseStatement(string $classToRemove) {
+        $temp = [];
+        
+        foreach ($this->getUseStatements() as $stm) {
+            
+            if ($stm !== $classToRemove) {
+                $temp[] = $stm;
+            }
+        }
+        $this->useArr = $temp;
     }
     /**
      * Appends the string that represents the start of PHP class.
@@ -325,7 +375,7 @@ abstract class ClassWriter {
         $retVal = $this->className.$this->getSuffix();
         
         if ($withNs) {
-            return $this->getNamespace().'\\'.$retVal;
+            return '\\'.$this->getNamespace().'\\'.$retVal;
              
         }
         return $retVal;

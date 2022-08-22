@@ -16,7 +16,7 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
-use webfiori\framework\cli\writers\TableClassWriter;
+use webfiori\framework\writers\TableClassWriter;
 /**
  * A helper class for creating database tables classes.
  *

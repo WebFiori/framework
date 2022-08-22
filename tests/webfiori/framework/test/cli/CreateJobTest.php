@@ -8,7 +8,7 @@ use webfiori\framework\WebFioriApp;
 /**
  * Description of CreateJobTest
  *
- * @author i.binalshikh
+ * @author Ibrahim
  */
 class CreateJobTest extends CreateTestCase {
     /**
@@ -40,7 +40,9 @@ class CreateJobTest extends CreateTestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
             "Enter a name for the job:\n",
@@ -85,7 +87,9 @@ class CreateJobTest extends CreateTestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
             "Error: A class in the given namespace which has the given name was found.\n",
@@ -132,7 +136,9 @@ class CreateJobTest extends CreateTestCase {
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
-            "7: Quit. <--\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
             "Enter a name for the job:\n",

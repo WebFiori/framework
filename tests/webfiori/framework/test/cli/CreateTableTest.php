@@ -205,7 +205,7 @@ class CreateTableTest extends TestCase {
             'y',
             
             'creation-date',
-            '3',//type
+            '4',//type
             'n',//primary
             'n',//unique
             '',//default

@@ -10,9 +10,7 @@
  */
 namespace webfiori\framework\cron\webUI;
 
-use webfiori\framework\cron\Cron;
 use webfiori\file\File;
-use webfiori\ui\HTMLNode;
 /**
  * A view to display information about CRON Jobs.
  * The view will show a table of all scheduled cron jobs. The table will include 

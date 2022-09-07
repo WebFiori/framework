@@ -93,8 +93,10 @@ class CronEmail extends EmailMessage {
             foreach (Cron::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
-            $file = new File($activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
+            $file = new File(ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
+            $file->create(true);
+            $file->write();
             $this->addAttachment($file);
         }
     }

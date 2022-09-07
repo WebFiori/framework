@@ -250,7 +250,9 @@ class TableClassWriter extends ClassWriter {
             $defaultVal = "'default' => '".$colObj->getDefault()."',";
             if ($dataType == 'bool' || $dataType == 'boolean') {
                 $defaultVal = $colObj->getDefault() === true ? "'default' => true," : "'default' => false,";
-            } 
+            } else if ($dataType == 'int' || $dataType == 'bigint' || $dataType == 'decimal' || $dataType == 'money') {
+                $defaultVal = "'default' => ".$colObj->getDefault().","; 
+            }
             $this->append($defaultVal, 4);
         }
 

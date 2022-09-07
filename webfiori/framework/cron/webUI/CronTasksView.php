@@ -10,9 +10,7 @@
  */
 namespace webfiori\framework\cron\webUI;
 
-use webfiori\framework\cron\Cron;
 use webfiori\file\File;
-use webfiori\ui\HTMLNode;
 /**
  * A view to display information about CRON Jobs.
  * The view will show a table of all scheduled cron jobs. The table will include 
@@ -56,70 +54,9 @@ class CronTasksView extends CronView {
 
         $row = $this->insert('v-row');
 
-        $table = $row->addChild('v-col', [
+        $row->addChild('v-col', [
             'cols' => 12
-        ])->addChild('v-data-table', [
-            ':items' => 'jobs',
-            ':loading' => 'loading',
-            ':headers' => 'jobs_table_headers',
-            'show-expand', 'single-expand',
-            ':expanded.sync' => "expanded",
-            'item-key' => "name",
-            ':search' => 'search'
-        ]);
-
-
-        $this->addIsTimeSlot($table, 'is_minute');
-        $this->addIsTimeSlot($table, 'is_hour');
-        $this->addIsTimeSlot($table, 'is_day_of_week');
-        $this->addIsTimeSlot($table, 'is_month');
-        $this->addIsTimeSlot($table, 'is_day_of_month');
-        $table->addChild('template', [
-            '#item.actions' => '{ item }'
-        ])->addChild('v-btn', [
-            '@click' => 'forceExec(item)',
-            ':loading' => 'item.executing',
-            ':disabled' => 'loading',
-            'x-small', 'color' => 'primary'
-        ])->text('Force Execution');
-        $tableRow = $table->addChild('template', [
-            '#expanded-item' => "{ headers, item }"
-        ])->addChild('td', [
-            ':colspan' => "headers.length"
-        ])->addChild('div', [
-            'style' => [
-                'padding' => '20px'
-            ]
-        ])->addChild('v-row');
-
-        $tableRow->addChild('v-col', [
-            'cols' => 12, 'sm' => 12, 'md' => 6
-        ])->addChild('v-textarea', [
-            'label' => 'Job Description',
-            'v-model' => 'item.description',
-            'disabled', 'outlined'
-        ]);
-        $card = $tableRow->addChild('v-col', [
-            'cols' => 12, 'sm' => 12, 'md' => 6
-        ])->addChild('div');
-        $card->addChild('h3')->text('Job Arguments');
-        $card->addChild('div', [
-            'v-if' => 'item.args.length !== 0'
-        ])->addChild('v-tooltip', [
-            'left',
-            'v-for' => 'arg in item.args'
-        ])->addChild('template', [
-            '#activator' => '{ on, attrs }'
-        ])->addChild('v-text-field', [
-            'outlined', 'dense',
-            'v-model' => 'arg.value',
-            ':label' => 'arg.name',
-            'v-bind' => "attrs",
-            'v-on' => "on"
-        ], true)->getParent()->addChild('span')->text('{{ arg.description }}');
-        $card->addChild('p', [
-            'v-else'
-        ])->text('No Arguments.');
+        ])->addChild(new TasksTable());
 
         $logRow = $this->insert('v-row');
         $card = $logRow->addChild('v-col', [
@@ -138,26 +75,5 @@ class CronTasksView extends CronView {
                 'style' => 'color:red'
             ])->text('Log file not found!');
         }
-    }
-
-    /**
-     * 
-     * @param HTMLNode $table
-     * @param type $slot
-     */
-    private function addIsTimeSlot(&$table, $slot) {
-        $template = $table->addChild('template', [
-            '#item.time.'.$slot => '{ item }'
-        ]);
-        $template->addChild('v-chip', [
-            'v-if' => 'item.time.'.$slot,
-            'color' => 'green',
-            'small'
-        ])->text('Yes');
-        $template->addChild('v-chip', [
-            'v-else',
-            'color' => 'red',
-            'small'
-        ])->text('No');
     }
 }

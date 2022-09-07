@@ -14,6 +14,7 @@ use Exception;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
 use webfiori\collections\Queue;
+use webfiori\file\File;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\cron\webServices\CronServicesManager;
 use webfiori\framework\cron\webUI\CronLoginView;
@@ -22,6 +23,7 @@ use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use const DS;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -834,43 +836,35 @@ class Cron {
     private function _isLogEnabled() {
         return $this->isLogEnabled;
     }
-    private function _logExecHelper($forced, $job, $file) {
+    private function _logExecHelper($forced, $job, File $file) {
         if ($forced) {
-            fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+            $file->setRawData('Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
 
             if ($job->isSuccess()) {
-                fwrite($file, 'Execution status: Successfully completed.'."\n");
+                $file->setRawData('Execution status: Successfully completed.'."\n");
             } else {
-                fwrite($file, 'Execution status: Failed to completed.'."\n");
+                $file->setRawData('Execution status: Failed to completed.'."\n");
             }
         } else {
-            fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+            $file->setRawData('Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
 
             if ($job->isSuccess()) {
-                fwrite($file, 'Execution status: Successfully completed.'."\n");
+                $file->setRawData('Execution status: Successfully completed.'."\n");
             } else {
-                fwrite($file, 'Execution status: Failed to completed.'."\n");
+                $file->setRawData('Execution status: Failed to completed.'."\n");
             }
         }
+        $file->write();
     }
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
-
-            if (Util::isDirectory($logsPath, true)) {
-                if (!file_exists($logFile)) {
-                    $file = fopen($logFile, 'w');
-                } else {
-                    $file = fopen($logFile, 'a+');
-                }
-
-                if (is_resource($file)) {
-                    $this->_logExecHelper($forced, $job, $file);
-                    fclose($file);
-                }
-            }
+            $file = new File($logFile);
+            $file->create(true);
+            
+            $this->_logExecHelper($forced, $job, $file);
         }
     }
     /**

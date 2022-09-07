@@ -43,7 +43,7 @@ class TableObjHelper {
      * 
      * @return CreateClassHelper
      */
-    public function getCreateHelper() {
+    public function getCreateHelper() : CreateClassHelper {
         return $this->command;
     }
     public function addColumn() {
@@ -202,7 +202,7 @@ class TableObjHelper {
 
             do {
                 $colDataType = $colObj->getDatatype();
-                $dataSize = $helper->getInput('Enter column size:');
+                $dataSize = $helper->getCommand()->readInteger('Enter column size:');
 
                 if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
                     $helper->warning('The data type "varchar" has a maximum size of 21845. The '

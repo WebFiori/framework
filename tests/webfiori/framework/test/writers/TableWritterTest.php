@@ -131,7 +131,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertEquals('`super`', $clazzObj->getName());
         $this->assertEquals(3, $clazzObj->getColsCount());
         $col00 = $clazzObj->getColByKey('col-1');
-        $this->assertEquals('varchar', $col00->getDatatype());
+        $this->assertEquals('mixed', $col00->getDatatype());
         $this->assertEquals(1, $col00->getSize());
         $this->assertNull($col00->getDefault());
         $this->assertFalse($col00->isNull());

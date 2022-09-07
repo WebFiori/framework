@@ -1,15 +1,30 @@
 <?php
-
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2022 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
+ */
 namespace webfiori\framework\cron\webUI;
 
 use webfiori\ui\HTMLNode;
 
 /**
- * Description of TasksTable
+ * A table which is used to list all scheduled background job.
+ * 
+ * This UI component is used by the page which is used to list all
+ * cron jobs. The table has job information including arguments,
+ * description and the ability to force execute a job.
  *
- * @author i.binalshikh
+ * @author Ibrahim
  */
 class TasksTable extends HTMLNode {
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         parent::__construct('v-data-table', [
             ':items' => 'jobs',

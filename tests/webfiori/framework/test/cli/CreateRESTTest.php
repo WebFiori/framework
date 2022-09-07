@@ -356,7 +356,8 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\GetSuperUserXService',
             '\\app\\apis\\super\\UpdateSuperUserXService',
             '\\app\\apis\\super\\UpdateFirstNameOfSuperUserXService',
-            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserXService'
+            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserXService',
+            '\\app\\apis\\super\\UpdateIdOfSuperUserXService'
         ];
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
@@ -540,6 +541,8 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\GetSuperUserX9Service',
             '\\app\\apis\\super\\UpdateSuperUserX9Service',
             '\\app\\apis\\super\\UpdateFirstNameOfSuperUserX9Service',
+            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service',
+            '\\app\\apis\\super\\UpdateIdOfSuperUserX9Service',
             '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service'
         ];
         foreach ($apiClazzes as $clazz) {

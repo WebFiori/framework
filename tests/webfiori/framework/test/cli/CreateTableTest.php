@@ -195,7 +195,7 @@ class CreateTableTest extends TestCase {
             'y',
             
             'name',
-            '2',//type
+            '3',//type
             '400',//size
             'n',//primary
             'n',//unique

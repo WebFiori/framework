@@ -36,6 +36,28 @@ class CreateTableTest extends TestCase {
         "16: boolean\n",
         "17: bool\n",
     ];
+    const MYSQL_COLS_TYPES = [
+        "Enter a name for column key:\n",
+        "Column data type:\n",
+        "0: mixed <--\n",
+        "1: int\n",
+        "2: char\n",
+        "3: varchar\n",
+        "4: timestamp\n",
+        "5: tinyblob\n",
+        "6: blob\n",
+        "7: mediumblob\n",
+        "8: longblob\n",
+        "9: datetime\n",
+        "10: text\n",
+        "11: mediumtext\n",
+        "12: decimal\n",
+        "13: double\n",
+        "14: float\n",
+        "15: boolean\n", 
+        "16: bool\n",
+        "17: bit\n",
+    ];
     /**
      * @test
      */
@@ -78,7 +100,7 @@ class CreateTableTest extends TestCase {
             '`id`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -87,26 +109,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -116,7 +119,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $runner->getOutput());
+        ]), $runner->getOutput());
         
     }
     /**
@@ -257,7 +260,7 @@ class CreateTableTest extends TestCase {
             '`creation_date`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -269,52 +272,14 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
@@ -323,26 +288,7 @@ class CreateTableTest extends TestCase {
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
             "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
@@ -353,7 +299,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
@@ -416,7 +362,7 @@ class CreateTableTest extends TestCase {
             '`name`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -425,26 +371,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -454,26 +381,8 @@ class CreateTableTest extends TestCase {
             "Enter a name for column key:\n",
             "Warning: The table already has a key with name 'id'.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
+            
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
@@ -486,7 +395,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
@@ -527,7 +436,7 @@ class CreateTableTest extends TestCase {
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -536,26 +445,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -570,7 +460,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add extra attributes to the entity?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
             'Info: Entity class was created at "'.ROOT_DIR.DS.'app'.DS."entity\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
@@ -654,7 +544,7 @@ class CreateTableTest extends TestCase {
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $this->removeClass($refTable);
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -663,52 +553,14 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -740,7 +592,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add another foreign key?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
     }
     /**
      * @test

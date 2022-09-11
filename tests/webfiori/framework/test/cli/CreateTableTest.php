@@ -3,11 +3,11 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\file\File;
-use webfiori\cli\Runner;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\file\File;
+use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of CreateTableTest
  *
@@ -18,7 +18,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool00Table',
@@ -35,10 +35,12 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
         $clazz = '\\app\\database\\Cool00Table';
         $this->removeClass($clazz);
@@ -99,7 +101,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mssql',
             'Cool01Table',
@@ -115,9 +117,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool01Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
@@ -176,7 +181,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable03() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool01Table',
@@ -218,9 +223,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool03Table'));
         $clazz = '\\app\\database\\Cool03Table';
@@ -344,7 +352,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable02() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool02Table',
@@ -376,9 +384,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
         $clazz = '\\app\\database\\Cool02Table';
@@ -474,7 +485,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable04() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'CoolWithEntity00Table',
@@ -496,9 +507,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->removeClass('\\app\\database\\CoolWithEntity00Table');
         $clazz = '\\app\\entity\\MySuperCoolEntity00';
@@ -555,7 +569,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable05() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool05Table',
@@ -573,9 +587,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool05Table';
         $this->assertTrue(class_exists($clazz));
         return $clazz;
@@ -585,7 +602,7 @@ class CreateTableTest extends TestCase {
      * @depends testCreateTable05
      */
     public function testCreateTable06($refTable) {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool06Table',
@@ -618,9 +635,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [
-            '--c' => 'table'
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $clazz = '\\app\\database\\Cool06Table';
         $this->assertTrue(class_exists($clazz));

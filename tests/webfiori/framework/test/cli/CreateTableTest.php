@@ -14,6 +14,28 @@ use webfiori\framework\WebFioriApp;
  * @author Ibrahim
  */
 class CreateTableTest extends TestCase {
+    const MSSQL_COLS_TYPES = [
+        "Enter a name for column key:\n",
+        "Column data type:\n",
+        "0: mixed <--\n",
+        "1: int\n",
+        "2: bigint\n",
+        "3: varchar\n",
+        "4: nvarchar\n",
+        "5: char\n",
+        "6: nchar\n",
+        "7: binary\n",
+        "8: varbinary\n",
+        "9: date\n",
+        "10: datetime2\n",
+        "11: time\n",
+        "12: money\n",
+        "13: bit\n",
+        "14: decimal\n",
+        "15: float\n",
+        "16: boolean\n",
+        "17: bool\n",
+    ];
     /**
      * @test
      */
@@ -110,6 +132,7 @@ class CreateTableTest extends TestCase {
             'This is the first cool table that was created using CLI.',
             'id',
             '1',
+            'n',
             'y',
             'The unique ID of the cool thing.',
             'n',
@@ -138,7 +161,10 @@ class CreateTableTest extends TestCase {
             '[id]'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $col = $testObj->getColByKey('id');
+        $this->assertFalse($col->isIdentity());
+        
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -147,26 +173,8 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: bigint\n",
-            "3: varchar\n",
-            "4: nvarchar\n",
-            "5: char\n",
-            "6: nchar\n",
-            "7: binary\n",
-            "8: varbinary\n",
-            "9: date\n",
-            "10: datetime2\n",
-            "11: time\n",
-            "12: money\n",
-            "13: bit\n",
-            "14: decimal\n",
-            "15: float\n",
-            "16: boolean\n",
-            "17: bool\n",
+            ], self::MSSQL_COLS_TYPES, [
+            "Is this column an identity column?(y/N)\n",
             "Is this column primary?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
@@ -174,7 +182,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $runner->getOutput());
+        ]), $runner->getOutput());
         
     }
     /**
@@ -733,6 +741,91 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
         ], $output);
+    }
+    /**
+     * @test
+     */
+    public function testCreateTable07() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            'mssql',
+            'Cool011Table',
+            '',
+            'cool_table_01',
+            'This is the first cool table that was created using CLI.',
+            'id',
+            '1',
+            'y',
+            'y',
+            'The unique ID of the cool thing.',
+            'y',
+            
+            'age',
+            '1',
+            'n',
+            'n',
+            '',
+            'n',
+            'The age of the cool thing.',
+            'n',
+            'n',
+            'n'
+        ]);
+        
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $clazz = '\\app\\database\\Cool011Table';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+        $testObj = new $clazz();
+        $this->assertTrue($testObj instanceof MSSQLTable);
+        $this->assertEquals('[cool_table_01]', $testObj->getName());
+        $this->assertEquals('This is the first cool table that was created using CLI.', $testObj->getComment());
+        $this->assertEquals(2, $testObj->getColsCount());
+        $this->assertEquals([
+            'id',
+            'age'
+        ], $testObj->getColsKeys());
+        $this->assertEquals([
+            '[id]',
+            '[age]'
+        ], $testObj->getColsNames());
+        
+        $col = $testObj->getColByKey('id');
+        $this->assertTrue($col->isIdentity());
+        
+        $this->assertEquals(array_merge([
+            "Database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter database table name:\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            ], self::MSSQL_COLS_TYPES, [
+            "Is this column an identity column?(y/N)\n",
+            "Is this column primary?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            ], self::MSSQL_COLS_TYPES, [
+                "Is this column primary?(y/N)\n",
+                "Is this column unique?(y/N)\n",
+                "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+                "Can this column have null values?(y/N)\n",
+                "Enter your optional comment about the column:\n",
+                "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to create an entity class that maps to the database table?(y/N)\n",
+            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+        ]), $runner->getOutput());
+        
     }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');

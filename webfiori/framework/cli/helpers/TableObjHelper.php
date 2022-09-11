@@ -70,6 +70,7 @@ class TableObjHelper {
         } else {
             $colObj = $tempTable->getColByKey($colKey);
             $this->setSize($colObj);
+            $this->isIdentityCheck($colObj);
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
         }
@@ -132,6 +133,20 @@ class TableObjHelper {
             $colObj->setComment($comment);
         }
         $this->getCreateHelper()->success('Column added.');
+    }
+    /**
+     * 
+     * @param MSSQLColumn $colObj
+     */
+    private function isIdentityCheck($colObj) {
+        if ($colObj instanceof MSSQLColumn) {
+            $dataType = $colObj->getDatatype();
+            $t = $this->getTable();
+            
+            if (($dataType == 'int' || $dataType == 'bigint') && !$t->hasIdentity()) {
+                $colObj->setIsIdentity($this->getCreateHelper()->confirm('Is this column an identity column?', false));
+            }
+        }
     }
     /**
      * 

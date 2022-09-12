@@ -59,7 +59,7 @@ class CreateRESTTest extends CreateTestCase {
             "app\\apis\\super"
         ]);
         $this->assertEquals(0, $runner->start());
-        $this->assertEquals(array_keys([
+        $this->assertEquals(array_merge([
             "Warning: No database connections found in the class \"app\AppConfig\"!\n",
             "Info: Run the command \"add\" to add connections.\n",
             "Database type:\n",

@@ -76,7 +76,7 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -85,7 +85,7 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -96,7 +96,7 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Is this column primary?(y/N)\n",
             "Enter default value (true or false) (Hit \"Enter\" to skip): Enter = ''\n",
@@ -205,7 +205,7 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -216,7 +216,7 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -227,7 +227,7 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Is this column primary?(y/N)\n",
             "Enter default value (true or false) (Hit \"Enter\" to skip): Enter = ''\n",
@@ -339,7 +339,7 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -350,7 +350,7 @@ class CreateRESTTest extends CreateTestCase {
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
             ],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
@@ -360,7 +360,7 @@ class CreateRESTTest extends CreateTestCase {
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n"],
-            [CreateTableTest::MYSQL_COLS_TYPES],
+            CreateTableTest::MYSQL_COLS_TYPES,
             ["Is this column primary?(y/N)\n",
             "Enter default value (true or false) (Hit \"Enter\" to skip): Enter = ''\n",
             "Can this column have null values?(y/N)\n",

@@ -31,14 +31,27 @@ class CreateDBAccessHelper extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new DBClassWriter());
     }
+    /**
+     * Sets the table at which the database access class will be associated with.
+     * 
+     * @param Table $t The table at which the database access class will be associated with.
+     */
     public function setTable(Table $t) {
         $this->getWriter()->setTable($t);
     }
+    /**
+     * Prompt the user if he would like to have update methods for every single
+     * column of the table.
+     */
     public function confirnIncludeColsUpdate() {
         if ($this->getCommand()->confirm('Would you like to have update methods for every single column?', false)) {
             $this->getWriter()->includeColumnsUpdate();
         }
     }
+    /**
+     * Prompt the user for basic database class information including name and
+     * the namespace at which the class will be added to.
+     */
     public function readDbClassInfo() {  
         $info = $this->getClassInfo(APP_DIR_NAME.'\\database', 'DB');
         $this->getWriter()->setNamespace($info['namespace']);
@@ -61,12 +74,18 @@ class CreateDBAccessHelper extends CreateClassHelper {
         }
         return '';
     }
+    
     public function readEntityInfo() {
         $t = $this->getTable();
         $m = $t->getEntityMapper();
         $m->setEntityName(CLIUtils::readName($this->getCommand(), null, 'Entity class name:'));
         $m->setNamespace(CLIUtils::readNamespace($this->getCommand(), APP_DIR_NAME.'\\entity', 'Entity namespace:'));
     }
+    /**
+     * Returns the table at which the database access class will be associated with.
+     * 
+     * @return Table The table at which the database access class will be associated with.
+     */
     public function getTable() : Table {
         return $this->getWriter()->getTable();
     }

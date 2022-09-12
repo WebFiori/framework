@@ -53,6 +53,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         if ($connection === null) {
             $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
         } else {
+            
             $dbType = $connection->getDatabaseType();
         }
 
@@ -74,6 +75,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $t->getEntityMapper()->setNamespace($this->tableObjWriter->getEntityNamespace());
         $t->getEntityMapper()->setPath($this->tableObjWriter->getEntityPath());
         $this->dbObjWritter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
+        if ($connection !== null) {
+            $this->dbObjWritter->setConnection($connection->getName());
+        }
         if ($this->confirm('Would you like to have update methods for every single column?', false)) {
             $this->dbObjWritter->includeColumnsUpdate();
         }
@@ -217,9 +221,25 @@ class CreateFullRESTHelper extends CreateClassHelper {
                 $dbClassName = $this->dbObjWritter->getName();
                 $entityName = $this->dbObjWritter->getEntityName();
                 $writer->addProcessCode([
-                    '$data = '.$dbClassName.'::get()->get'.$entityName.'s($this->getparamVal(\'page\'), $this->getParamVal(\'size\'));',
+                    "\$pageNumber = \$this->getParamVal('page');",
+                    "\$pageSize = \$this->getParamVal('size');",
+                    '$recordsCount = '.$dbClassName.'::get()->get'.$entityName.'sCount();',
+                    '$data = '.$dbClassName.'::get()->get'.$entityName.'s($pageNumber, $pageSize);',
                     "\$this->send('application/json', new Json(["
                 ]);
+                $writer->addProcessCode([
+                    "'page' => new Json(["
+                ], 3);
+                
+                $writer->addProcessCode([
+                    "'pages-count' => ceil(\$recordsCount/\$pageSize),",
+                    "'size' => \$pageSize,",
+                    "'page-number' => \$pageNumber,",
+                ], 4);
+                
+                $writer->addProcessCode([
+                    "]),"
+                ], 3);
                 $writer->addProcessCode([
                     "'data' => \$data"
                 ], 3);

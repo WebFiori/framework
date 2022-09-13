@@ -11,8 +11,8 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\database\Table;
 use webfiori\framework\cli\CLIUtils;
+use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
@@ -68,12 +68,14 @@ class CreateCommand extends CLICommand {
     }
     public function _createEntityFromQuery() {
         $tableObj = CLIUtils::readTable($this);
+        $defaultNs = APP_DIR_NAME.'\\entity';
         $this->println('We need from you to give us entity class information.');
-        $classInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
+        $infoReader = new ClassInfoReader($this);
+        $classInfo = $infoReader->readClassInfo($defaultNs);
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "'.APP_DIR_NAME.'\database".');
+            $this->warning('The entity class will be added to the namespace "'.'".');
             $classInfo['namespace'] = APP_DIR_NAME.'\\database';
         }
         $mapper = $tableObj->getEntityMapper();

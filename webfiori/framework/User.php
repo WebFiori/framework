@@ -311,7 +311,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function hasPrivilege($privilegeId) {
+    public function hasPrivilege(string $privilegeId) : bool {
         foreach ($this->userPrivileges as $p) {
             if ($p->getID() == $privilegeId) {
                 return true;

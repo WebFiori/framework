@@ -279,7 +279,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $entityName = $this->dbObjWritter->getEntityName();
         $paramsStrArr = [];
         foreach ($uniqueParamsArr as $p) {
-            $paramsStrArr[] = "\$this->getParamVal(".$p['name'].")";
+            $paramsStrArr[] = "\$this->getParamVal('".$p['name']."')";
         }
         $paramsStr = implode(", ", $paramsStrArr);
         if ($type == 'GetSingle') {

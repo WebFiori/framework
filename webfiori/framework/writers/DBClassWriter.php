@@ -384,7 +384,7 @@ class DBClassWriter extends ClassWriter {
         $this->append("\$this->table('".$t->getNormalName()."')", 2);
         
         if (count($this->paramsArr) != 0) {
-            $this->append("->delete()", 3);
+            $this->append("->delete()", 4);
             $cols = [];
             foreach ($this->getUniqueColsKeys() as $key) {
                 $cols[] = count($cols) == 0 ? 
@@ -392,9 +392,9 @@ class DBClassWriter extends ClassWriter {
                         : "->andWhere('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
             $this->append($cols, 3);
-            $this->append("->execute();", 3);
+            $this->append("->execute();", 4);
         } else {
-            $this->append("->delete();", 3);
+            $this->append("->delete();", 4);
             $this->append('//TODO: Specify delete record condition(s).', 3);
         }
         $this->append('}', 1);
@@ -417,21 +417,18 @@ class DBClassWriter extends ClassWriter {
             $this->f('get'.$this->getEntityName(), $this->paramsArr)
         ], 1);
         $this->append("\$mappedRecords = \$this->table('".$t->getNormalName()."')", 2);
-        $this->append("->select()", 3);
+        $this->append("->select()", 4);
         if (count($this->paramsArr) != 0) {
             
-            $this->append($this->whereArr, 3);
+            $this->append($this->whereArr, 4);
             
         } else {
-            $this->append('//TODO: Specify select condition for retrieving one record.', 3);
+            $this->append('//TODO: Specify select condition for retrieving one record.', 4);
         }
-        $this->append("->execute()", 3);
-        $this->append("->map(function (array \$records) {", 3);
-        $this->append("if (count(\$records) == 1) {", 4);
-        $this->append("return ".$this->getEntityName().'::map($records[0]);', 5);
-        $this->append("}", 4);
-        $this->append("return [];", 4);
-        $this->append("});", 3);
+        $this->append("->execute()", 4);
+        $this->append("->map(function (array \$record) {", 4);
+        $this->append("return ".$this->getEntityName().'::map($records);', 5);
+        $this->append("});", 4);
         $this->append('if (count($mappedRecords) == 1) {', 2);
         $this->append('return $mappedRecords[0];', 3);
         $this->append('}', 2);
@@ -454,9 +451,9 @@ class DBClassWriter extends ClassWriter {
             $this->f('get'.$this->getEntityName().'sCount', [], 'int')
         ], 1);
         $this->append("return \$this->table('".$t->getNormalName()."')", 2);
-        $this->append("->selectCount()", 3);
-        $this->append("->execute()", 3);
-        $this->append("->getRows()[0]['count'];", 3);
+        $this->append("->selectCount()", 4);
+        $this->append("->execute()", 4);
+        $this->append("->getRows()[0]['count'];", 4);
         
         $this->append('}', 1);
     }
@@ -482,16 +479,13 @@ class DBClassWriter extends ClassWriter {
             ], 'array')
         ], 1);
         $this->append("return \$this->table('".$t->getNormalName()."')", 2);
-        $this->append("->select()", 3);
-        $this->append('->page($pageNum, $pageSize)', 3);
-        $this->append("->execute()", 3);
-        $this->append("->map(function (array \$records) {", 3);
-        $this->append("\$retVal = [];", 4);
-        $this->append("foreach (\$records as \$record) {", 4);
+        $this->append("->select()", 4);
+        $this->append('->page($pageNum, $pageSize)', 4);
+        $this->append('->orderBy(["id"])', 4);
+        $this->append("->execute()", 4);
+        $this->append("->map(function (array \$record) {", 4);
         $this->append("\$retVal[] = ".$this->getEntityName().'::map($record);', 5);
-        $this->append("}", 4);
-        $this->append("return \$retVal;", 4);
-        $this->append("});", 3);
+        $this->append("});", 4);
         $this->append('}', 1);
     }
     /**

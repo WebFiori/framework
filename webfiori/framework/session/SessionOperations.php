@@ -116,20 +116,10 @@ class SessionOperations extends DB {
      * @since 1.0
      */
     public function getSessionsIDs($olderThan) {
-        $this->table('sessions')->select()->where('last-used', '<=', $olderThan)->execute();
-        $resultSet = $this->getLastResultSet();
-        $resultSet->setMappingFunction(function ($data)
-        {
-            $retVal = [];
-
-            foreach ($data as $record) {
-                $retVal[] = $record['s_id'];
-            }
-
-            return $retVal;
-        });
-
-        return $resultSet->getMappedRows();
+        return $this->table('sessions')->select()->where('last-used', '<=', $olderThan)->execute()
+                ->map(function ($record) {
+                    return $record['s_id'];
+                });
     }
     /**
      * Checks if a session which has the given ID exist or not in the database.

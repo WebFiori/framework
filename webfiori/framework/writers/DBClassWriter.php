@@ -423,7 +423,7 @@ class DBClassWriter extends ClassWriter {
         $this->append("return [".$this->getEntityName().'::map($records[0])];', 5);
         $this->append("}", 4);
         $this->append("return [];", 4);
-        $this->append("});", 3);
+        $this->append("})->toArray();", 3);
         $this->append('if (count($mappedRecords) == 1) {', 2);
         $this->append('return $mappedRecords[0];', 3);
         $this->append('}', 2);
@@ -460,7 +460,7 @@ class DBClassWriter extends ClassWriter {
         $this->append("\$retVal[] = ".$this->getEntityName().'::map($record);', 5);
         $this->append("}", 4);
         $this->append("return \$retVal;", 4);
-        $this->append("});", 3);
+        $this->append("})->toArray();", 3);
         $this->append('}', 1);
     }
     public function getUniqueColsKeys() {

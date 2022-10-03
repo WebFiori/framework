@@ -12,6 +12,9 @@ namespace webfiori\framework\writers;
 
 use webfiori\database\Column;
 use webfiori\database\EntityMapper;
+use webfiori\database\mssql\MSSQLColumn;
+use webfiori\database\mssql\MSSQLTable;
+use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\Table;
 use webfiori\framework\DB;
 use webfiori\framework\writers\ClassWriter;
@@ -167,6 +170,7 @@ class DBClassWriter extends ClassWriter {
         $this->writeDeleteRecord();
         $this->writeGetRecord();
         $this->writeGetRecords();
+        $this->writeGetRecordsCount();
         $this->writeUpdateRecord();
         if ($this->isColumnUpdateIncluded()) {
             $this->writeUpdateRecordMethods();
@@ -184,6 +188,7 @@ class DBClassWriter extends ClassWriter {
     public function includeColumnsUpdate() {
         $this->includeUpdate = true;
     }
+   
     private function writeAddRecord() {
         $t = $this->getTable();
         if ($t === null) {
@@ -199,7 +204,10 @@ class DBClassWriter extends ClassWriter {
         ], 1);
         $recordsArr = [];
         foreach ($t->getEntityMapper()->getGettersMap(true) as $methName => $col) {
-            $recordsArr[] = "'$col' => \$entity->$methName(),";
+
+            if (!(($col instanceof MSSQLColumn && $col->isIdentity()) || ($col instanceof MySQLColumn && $col->isAutoInc()))) {
+                $recordsArr[] = "'$col' => \$entity->$methName(),";
+            }
         }
         $this->append([
             "\$this->table('".$t->getNormalName()."')->insert(["
@@ -376,7 +384,7 @@ class DBClassWriter extends ClassWriter {
         $this->append("\$this->table('".$t->getNormalName()."')", 2);
         
         if (count($this->paramsArr) != 0) {
-            $this->append("->delete()", 3);
+            $this->append("->delete()", 4);
             $cols = [];
             foreach ($this->getUniqueColsKeys() as $key) {
                 $cols[] = count($cols) == 0 ? 
@@ -384,9 +392,9 @@ class DBClassWriter extends ClassWriter {
                         : "->andWhere('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
             $this->append($cols, 3);
-            $this->append("->execute();", 3);
+            $this->append("->execute();", 4);
         } else {
-            $this->append("->delete();", 3);
+            $this->append("->delete();", 4);
             $this->append('//TODO: Specify delete record condition(s).', 3);
         }
         $this->append('}', 1);
@@ -409,24 +417,44 @@ class DBClassWriter extends ClassWriter {
             $this->f('get'.$this->getEntityName(), $this->paramsArr)
         ], 1);
         $this->append("\$mappedRecords = \$this->table('".$t->getNormalName()."')", 2);
-        $this->append("->select()", 3);
+        $this->append("->select()", 4);
         if (count($this->paramsArr) != 0) {
             
-            $this->append($this->whereArr, 3);
+            $this->append($this->whereArr, 4);
             
         } else {
-            $this->append('//TODO: Specify select condition for retrieving one record.', 3);
+            $this->append('//TODO: Specify select condition for retrieving one record.', 4);
         }
-        $this->append("->execute()", 3);
-        $this->append("->map(function (array \$records) {", 3);
-        $this->append("if (count(\$records) == 1) {", 4);
-        $this->append("return [".$this->getEntityName().'::map($records[0])];', 5);
-        $this->append("}", 4);
-        $this->append("return [];", 4);
-        $this->append("})->toArray();", 3);
+        $this->append("->execute()", 4);
+        $this->append("->map(function (array \$record) {", 4);
+        $this->append("return ".$this->getEntityName().'::map($records);', 5);
+        $this->append("});", 4);
         $this->append('if (count($mappedRecords) == 1) {', 2);
         $this->append('return $mappedRecords[0];', 3);
         $this->append('}', 2);
+        $this->append('}', 1);
+    }
+    private function writeGetRecordsCount() {
+        $t = $this->getTable();
+        
+        if ($t === null) {
+            return;
+        }
+        $this->append([
+            "/**",
+            " * Returns number of records on the table '".$t->getNormalName()."'.",
+            " *",
+            " * The main use of this method is to compute number of pages.",
+            " *",
+            " * @return int Number of records on the table '".$t->getNormalName()."'.",
+            " */",
+            $this->f('get'.$this->getEntityName().'sCount', [], 'int')
+        ], 1);
+        $this->append("return \$this->table('".$t->getNormalName()."')", 2);
+        $this->append("->selectCount()", 4);
+        $this->append("->execute()", 4);
+        $this->append("->getRows()[0]['count'];", 4);
+        
         $this->append('}', 1);
     }
     private function writeGetRecords() {
@@ -451,20 +479,45 @@ class DBClassWriter extends ClassWriter {
             ], 'array')
         ], 1);
         $this->append("return \$this->table('".$t->getNormalName()."')", 2);
-        $this->append("->select()", 3);
-        $this->append('->page($pageNum, $pageSize)', 3);
-        $this->append("->execute()", 3);
-        $this->append("->map(function (array \$records) {", 3);
-        $this->append("\$retVal = [];", 4);
-        $this->append("foreach (\$records as \$record) {", 4);
+        $this->append("->select()", 4);
+        $this->append('->page($pageNum, $pageSize)', 4);
+        $this->append('->orderBy(["id"])', 4);
+        $this->append("->execute()", 4);
+        $this->append("->map(function (array \$record) {", 4);
         $this->append("\$retVal[] = ".$this->getEntityName().'::map($record);', 5);
         $this->append("}", 4);
         $this->append("return \$retVal;", 4);
         $this->append("})->toArray();", 3);
         $this->append('}', 1);
     }
-    public function getUniqueColsKeys() {
+    /**
+     * Returns an array that contains the keys of columns which are set as primary
+     * unique or identity.
+     * 
+     * Note that if the table has identity column, only the key of this column
+     * is returned. Other than that, the keys of the primary columns and
+     * unique columns are returned.
+     * 
+     * @return array An array that contains the keys of columns which are set as primary
+     * or unique.
+     */
+    public function getUniqueColsKeys() : array {
         $table = $this->getTable();
+        
+        if ($table instanceof MSSQLTable) {
+            if ($table->hasIdentity()) {
+                $cols = [];
+                
+                foreach ($table->getCols() as $key => $col) {
+                    if ($col->isIdentity()) {
+                        $cols[] = $key;
+                        break;
+                    }
+                }
+                return $cols;
+            }
+        }
+        
         $recordUniqueCols  = $table->getPrimaryKeyColsKeys();
         
         if (count($recordUniqueCols ) == 0) {

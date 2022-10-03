@@ -254,12 +254,15 @@ class SessionsManager {
      * @since 1.0
      */
     public static function hasSession(string $sName) {
-        $trimmed = trim($sName);
+        try {
+            $trimmed = trim($sName);
 
-        if (!self::_checkLoadedSesstions($trimmed)) {
-            return self::_checkAndLoadFromCookie($trimmed);
+            if (!self::_checkLoadedSesstions($trimmed)) {
+                return self::_checkAndLoadFromCookie($trimmed);
+            }
+        } catch (SessionException $e) {
+            return false;
         }
-
         return true;
     }
     /**

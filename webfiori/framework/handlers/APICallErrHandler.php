@@ -38,13 +38,14 @@ class APICallErrHandler extends AbstractHandler {
             'exception-class' => get_class($this->getException()),
             'exception-message' => $this->getMessage(),
             'exception-code' => $this->getException()->getCode(),
+            'at-class' => $this->getClass(),
             'line' => $this->getLine()
         ]);
         $stackTrace = new Json();
         $index = 0;
         
         foreach ($this->getTrace() as $traceEntry) {
-            $stackTrace->add('#'.$index,$traceEntry->getClass().' (Line '.$traceEntry->getLine().')');
+            $stackTrace->add('#'.$index,$traceEntry->getClass().'::'.$traceEntry->getMethod().'() (Line '.$traceEntry->getLine().')');
             $index++;
         }
         $j->add('stack-trace',$stackTrace);

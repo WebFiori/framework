@@ -175,7 +175,8 @@ class CronJobTest extends TestCase {
         Cron::setMinute(33);
         $cron = new CronJob('15 8 * jan-mar 0,mon,3-6');
         $this->assertEquals('15 8 * jan-mar 0,mon,3-6',$cron->getExpression());
-        $this->assertequals('{'
+        if (date('D') === 'Mon') {
+            $this->assertequals('{'
                 . '"name":"CRON-JOB",'
                 . '"expression":"15 8 * jan-mar 0,mon,3-6",'
                 . '"args":[],'
@@ -189,6 +190,22 @@ class CronJobTest extends TestCase {
                 . '"is_day_of_month":true'
                 . '}'
                 . '}', $cron->toJSON().'');
+        } else {
+            $this->assertequals('{'
+                . '"name":"CRON-JOB",'
+                . '"expression":"15 8 * jan-mar 0,mon,3-6",'
+                . '"args":[],'
+                . '"description":"NO DESCRIPTION",'
+                . '"is_time":false,'
+                . '"time":{'
+                . '"is_minute":false,'
+                . '"is_day_of_week":false,'
+                . '"is_month":false,'
+                . '"is_hour":false,'
+                . '"is_day_of_month":true'
+                . '}'
+                . '}', $cron->toJSON().'');
+        }
     }
     /**
      * @test

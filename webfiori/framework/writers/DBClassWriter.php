@@ -164,7 +164,7 @@ class DBClassWriter extends ClassWriter {
             ], 2);
         }
         $this->append([
-            "\$this->register('".trim($this->getPath(),ROOT_DIR.DS.APP_DIR_NAME)."');",
+            "\$this->register('". str_replace("\\", "\\\\", $this->getPath())."');",
         ], 2);
         $this->append('}', 1);
         
@@ -207,9 +207,15 @@ class DBClassWriter extends ClassWriter {
         ], 1);
         $recordsArr = [];
         foreach ($t->getEntityMapper()->getGettersMap(true) as $methName => $col) {
-
-            if (!(($col instanceof MSSQLColumn && $col->isIdentity()) || ($col instanceof MySQLColumn && $col->isAutoInc()))) {
-                $recordsArr[] = "'$col' => \$entity->$methName(),";
+            $colObj = $t->getColByKey($col);
+            if ($colObj instanceof MSSQLColumn) {
+                if (!$col->isIdentity() && !($colObj->getDatatype() == 'datetime2' && $colObj->getDefault() !== null)) {
+                    $recordsArr[] = "'$col' => \$entity->$methName(),";
+                }
+            } else {
+                if (!$colObj->isAutoInc() && !($colObj->getDatatype() == 'timestamp' && $colObj->getDefault() !== null)) {
+                    $recordsArr[] = "'$col' => \$entity->$methName(),";
+                }
             }
         }
         $this->append([
@@ -394,7 +400,7 @@ class DBClassWriter extends ClassWriter {
                         "->where('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())' 
                         : "->andWhere('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
-            $this->append($cols, 3);
+            $this->append($cols, 4);
             $this->append("->execute();", 4);
         } else {
             $this->append("->delete();", 4);
@@ -430,7 +436,7 @@ class DBClassWriter extends ClassWriter {
         }
         $this->append("->execute()", 4);
         $this->append("->map(function (array \$record) {", 4);
-        $this->append("return ".$this->getEntityName().'::map($records);', 5);
+        $this->append("return ".$this->getEntityName().'::map($record);', 5);
         $this->append("});", 4);
         $this->append('if (count($mappedRecords) == 1) {', 2);
         $this->append('return $mappedRecords[0];', 3);
@@ -487,10 +493,8 @@ class DBClassWriter extends ClassWriter {
         $this->append('->orderBy(["id"])', 4);
         $this->append("->execute()", 4);
         $this->append("->map(function (array \$record) {", 4);
-        $this->append("\$retVal[] = ".$this->getEntityName().'::map($record);', 5);
-        $this->append("}", 4);
-        $this->append("return \$retVal;", 4);
-        $this->append("})->toArray();", 3);
+        $this->append("return ".$this->getEntityName().'::map($record);', 5);
+        $this->append("})->toArray();", 4);
         $this->append('}', 1);
     }
     /**

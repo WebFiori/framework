@@ -15,7 +15,8 @@ class UserInfoTable extends MySQLTable {
         $this->addColumns([
             'id' => [
                 'type' => 'int',
-                'primary' => true
+                'primary' => true,
+                'auto-inc' => true
             ],
             'email' => [
                 'type' => 'varchar',

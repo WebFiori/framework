@@ -163,6 +163,9 @@ class DBClassWriter extends ClassWriter {
                 "parent::__construct('');",
             ], 2);
         }
+        $this->append([
+            "\$this->register('".trim($this->getPath(),ROOT_DIR.DS.APP_DIR_NAME)."');",
+        ], 2);
         $this->append('}', 1);
         
         $this->writeAddRecord();

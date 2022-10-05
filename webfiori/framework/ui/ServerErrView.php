@@ -37,7 +37,7 @@ class ServerErrView extends WebPage {
     public function __construct(AbstractHandler $throwableOrErr) {
         parent::__construct();
         
-        $this->setTitle('Uncaught Exception');
+        $this->setTitle('Server Error');
         $this->changeDom();
         $this->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
         $this->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
@@ -59,33 +59,36 @@ class ServerErrView extends WebPage {
             'prominent',
             'type' => "error"
         ]);
-        $hNode->addChild('v-row', [
-            'align' => "center"
-        ])->addChild('v-col')->text('500 - Server Error: Uncaught Exception.');
-        $card = $row->addChild('v-col', [
-            'cols' => 12
-        ])->addChild('v-card');
-        $card->addChild('v-card-title')->text('Exception Details');
-        $detailsList = $card->addChild('v-card-text')->addChild('v-list');
-        $this->addDetails($detailsList, 'Exception Message', $throwableOrErr->getMessage());
-        $this->addDetails($detailsList, 'Exception Class', get_class($throwableOrErr->getException()));
-        $this->addDetails($detailsList, 'At Class', $throwableOrErr->getClass());
-        $this->addDetails($detailsList, 'Line', $throwableOrErr->getLine());
-        
-      
-        
+        if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
+            $hNode->addChild('v-row', [
+                'align' => "center"
+            ])->addChild('v-col')->text('500 - Server Error: Uncaught Exception.');
+            $card = $row->addChild('v-col', [
+                'cols' => 12
+            ])->addChild('v-card');
+            $card->addChild('v-card-title')->text('Exception Details');
+            $detailsList = $card->addChild('v-card-text')->addChild('v-list');
+            $this->addDetails($detailsList, 'Exception Message', $throwableOrErr->getMessage());
+            $this->addDetails($detailsList, 'Exception Class', get_class($throwableOrErr->getException()));
+            $this->addDetails($detailsList, 'At Class', $throwableOrErr->getClass());
+            $this->addDetails($detailsList, 'Line', $throwableOrErr->getLine());
 
-        $traceCard = $row->addChild('v-col', [
-            'cols' => 12
-        ])->addChild('v-card');
-        $traceCard->addChild('v-card-title')->text('Stack Trace');
-        $traceList = $traceCard->addChild('v-card-text')->addChild('v-list', [
-            'dense'
-        ]);
-        $index = 0;
-        foreach ($throwableOrErr->getTrace() as $traceEntry) {
-            $traceList->addChild('v-list-item')->addChild('v-list-title')->text('#'.$index.' '.$traceEntry.'');
-            $index++;
+            $traceCard = $row->addChild('v-col', [
+                'cols' => 12
+            ])->addChild('v-card');
+            $traceCard->addChild('v-card-title')->text('Stack Trace');
+            $traceList = $traceCard->addChild('v-card-text')->addChild('v-list', [
+                'dense'
+            ]);
+            $index = 0;
+            foreach ($throwableOrErr->getTrace() as $traceEntry) {
+                $traceList->addChild('v-list-item')->addChild('v-list-title')->text('#'.$index.' '.$traceEntry.'');
+                $index++;
+            }
+        } else {
+            $hNode->addChild('v-row', [
+                'align' => "center"
+            ])->addChild('v-col')->text('500 - General Server Error.');
         }
     }
     private function addDetails(HTMLNode $list, $title, $message) {

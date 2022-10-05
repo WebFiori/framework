@@ -36,6 +36,10 @@ class RunSQLQueryCommand extends CLICommand {
                 'description' => 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents '
                 .'database schema.',
                 'optional' => true,
+            ],
+            '--file' => [
+                'description' => 'The path to SQL file that holds SQL query.',
+                'optional' => true
             ]
         ], 'Execute SQL query on specific database.');
     }
@@ -68,10 +72,27 @@ class RunSQLQueryCommand extends CLICommand {
     }
     private function _connectionBased($dbConnections) {
         $connName = $this->getArgValue('--connection');
-
+        $file = $this->getArgValue('--file');
         if ($connName === null) {
             $connName = $this->select('Select database connection:', $dbConnections, 0);
             $schema = new DB($connName);
+            
+            if ($file !== null) {
+                $fileObj = new File($file);
+                if ($fileObj->isExist()) {
+                    $fileObj->read();
+                    if ($fileObj->getMIME() == 'application/sql') {
+                        return $this->runFileQuery($schema, $fileObj);
+                    } else {
+                        $this->error('Provided file is not SQL file!');
+                        return -1;
+                    }
+                } else {
+                    $this->error('No such file: '.$fileObj->getAbsolutePath());
+                    return -1;
+                }
+            }
+            
 
             return $this->generalQuery($schema);
         } else if (!in_array($connName, $dbConnections)) {
@@ -198,36 +219,42 @@ class RunSQLQueryCommand extends CLICommand {
 
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query from file.') {
-            $filePath = '';
-            $file = null;
-            while (!File::isFileExist($filePath)) {
-                $filePath = $this->getInput('File path:');
-                if (File::isFileExist($filePath)) {
-                    $file = new File($filePath);
-                    $file->read();
-                    if ($file->getFileMIMEType() == 'application/sql') {
-                        break;
-                    } else {
-                        $this->error('Provided file is not SQL file!');
-                    }
-                } else {
-                    $this->error('No such file!');
-                }
-            }
-            $this->println('Executing the query...');
-            $schema->setQuery($file->getRawData());
-            try {
-                $schema->execute();
-            } catch (DatabaseException $ex) {
-                $this->error('The query finished execution with an error: '.$ex->getMessage());
-
-                return $ex->getCode();
-            }
-            $this->success('Query executed without errors.');
-
-            return 0;
+            return $this->queryFromFile($schema);
         }
     }
+    private function queryFromFile($schema) {
+        $filePath = '';
+        $file = null;
+        while (!File::isFileExist($filePath)) {
+            $filePath = $this->getInput('File path:');
+            
+            if (File::isFileExist($filePath)) {
+                $file = new File($filePath);
+                $file->read();
+                if ($file->getMIME() == 'application/sql') {
+                    break;
+                } else {
+                    $this->error('Provided file is not SQL file!');
+                }
+            } else {
+                $this->error('No such file!');
+            }
+        }
+        return $this->runFileQuery($schema, $file);
+    }
+    private function runFileQuery(DB $schema, File $f) {
+        $this->println('Executing the query...');
+        $schema->setQuery($file->getRawData());
+        try {
+            $schema->execute();
+        } catch (DatabaseException $ex) {
+            $this->error('The query finished execution with an error: '.$ex->getMessage());
+
+            return $ex->getCode();
+        }
+        $this->success('Query executed without errors.');
+    }
+
     private function queryOnSchema(DB $schema) {
         $options = [
             'Create Database.',

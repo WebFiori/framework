@@ -598,6 +598,30 @@ class WebPage {
         return $this->incHeader;
     }
     /**
+     * Checks if system user has specific privilege or not.
+     * 
+     * @param string $prId The ID of the privilege.
+     * 
+     * @return bool If the user has a privilege which has the given ID, the method
+     * will return true. Other than that, the method will return false.
+     * 
+     */
+    public function hasPrivilege(string $prId) : bool {
+        $session = $this->getActiveSession();
+        
+        if ($session == null) {
+            return false;
+        }
+        
+        $user = $session->getUser();
+        
+        if ($user === null) {
+            return false;
+        }
+        
+        return $user->hasPrivilege($prId);
+    }
+    /**
      * Sets the value of the property which is used to determine if the 
      * JavaScript variable 'window.i18n' will be included or not.
      * 

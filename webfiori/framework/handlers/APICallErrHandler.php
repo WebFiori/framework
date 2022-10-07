@@ -32,22 +32,30 @@ class APICallErrHandler extends AbstractHandler {
      * Handles the exception
      */
     public function handle() {
-        $j = new Json([
-            'message' => '500 - Server Error: Uncaught Exception.',
-            'type' => 'error',
-            'exception-class' => get_class($this->getException()),
-            'exception-message' => $this->getMessage(),
-            'exception-code' => $this->getException()->getCode(),
-            'line' => $this->getLine()
-        ]);
-        $stackTrace = new Json();
-        $index = 0;
-        
-        foreach ($this->getTrace() as $traceEntry) {
-            $stackTrace->add('#'.$index,$traceEntry->getClass().' (Line '.$traceEntry->getLine().')');
-            $index++;
+        if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
+            $j = new Json([
+                'message' => '500 - Server Error: Uncaught Exception.',
+                'type' => 'error',
+                'exception-class' => get_class($this->getException()),
+                'exception-message' => $this->getMessage(),
+                'exception-code' => $this->getException()->getCode(),
+                'at-class' => $this->getClass(),
+                'line' => $this->getLine()
+            ]);
+            $stackTrace = new Json();
+            $index = 0;
+
+            foreach ($this->getTrace() as $traceEntry) {
+                $stackTrace->add('#'.$index,$traceEntry->getClass().'::'.$traceEntry->getMethod().'() (Line '.$traceEntry->getLine().')');
+                $index++;
+            }
+            $j->add('stack-trace',$stackTrace);
+        } else {
+            $j = new Json([
+                'message' => '500 - General Server Error.',
+                'type' => 'error',
+            ]);
         }
-        $j->add('stack-trace',$stackTrace);
         if (!Response::isSent()) {
             Response::clear();
             Response::setCode(500);

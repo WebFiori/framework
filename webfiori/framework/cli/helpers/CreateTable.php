@@ -11,7 +11,8 @@
 namespace webfiori\framework\cli\helpers;
 
 use Exception;
-use webfiori\database\Table;
+use webfiori\cli\CLICommand;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
@@ -36,35 +37,16 @@ class CreateTable {
         $this->command = $command;
 
         $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
-
-        if (count($dbConnections) != 0) {
-            $dbConn = $this->_getCommand()->select('Select database connection:', $dbConnections, 0);
+        $dbConn = CLIUtils::getConnectionName($this->_getCommand());
+        
+        if ($dbConn !== null) {
+            $tableInst = CLIUtils::readTable($this->_getCommand());
             $tableClassNameValidity = false;
             $tableClassName = $this->_getCommand()->getArgValue('--table');
 
-            do {
-                if (strlen($tableClassName) == 0) {
-                    $tableClassName = $this->_getCommand()->getInput('Enter database table class name (include namespace):');
-                }
-
-                if (!class_exists($tableClassName)) {
-                    $this->_getCommand()->error('Class not found.');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableObj = new $tableClassName();
-
-                if (!$tableObj instanceof Table) {
-                    $this->_getCommand()->error('The given class is not a child of the class "webfiori\database\Table".');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableClassNameValidity = true;
-            } while (!$tableClassNameValidity);
-
             $db = new DB($dbConn);
-            $db->addTable($tableObj);
-            $db->table($tableObj->getNormalName())->createTable();
+            $db->addTable($tableInst);
+            $db->table($tableInst->getNormalName())->createTable();
 
             $this->_getCommand()->prints('The following query will be executed on the database ');
             $this->_getCommand()->println($db->getConnectionInfo()->getDBName(),[
@@ -84,8 +66,6 @@ class CreateTable {
                     $this->_getCommand()->error($ex->getMessage());
                 }
             }
-        } else {
-            $this->_getCommand()->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
         }
     }
     /**

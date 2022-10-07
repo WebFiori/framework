@@ -233,7 +233,9 @@ class TableClassWriter extends ClassWriter {
                 $this->append("'scale' => '".$colObj->getScale()."',", 4);
             }
         }
-
+        if ($colObj instanceof \webfiori\database\mssql\MSSQLColumn && $colObj->isIdentity()) {
+            $this->append("'identity' => true,", 4);
+        }
         if ($colObj->isPrimary()) {
             $this->append("'primary' => true,", 4);
 

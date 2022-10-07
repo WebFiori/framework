@@ -254,6 +254,20 @@ abstract class ClassWriter {
             $this->_a($str, $tabsCount);
         }
     }
+    /**
+     * Adds method definition to the class.
+     * 
+     * @param string $funcName The name of the method.
+     * 
+     * @param array $argsArr An associative array of method arguments. The
+     * indices of the array are parameters names and values are types of
+     * parameters.
+     * 
+     * @param string|null $returns An optional name of return type.
+     * 
+     * @return string The method will create method definition string and return
+     * it.
+     */
     public function f($funcName, $argsArr = [], $returns = null) {
         $argsPart = '(';
         foreach ($argsArr as $argName => $argType) {

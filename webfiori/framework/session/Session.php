@@ -757,8 +757,12 @@ class Session implements JsonI {
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
 
             if (strlen($encrypted) > 0) {
-                $sesstionObj = @unserialize($encrypted);
-
+                set_error_handler(function ($errNo, $errStr) {
+                    throw  new SessionException($errStr, $errNo);
+                });
+                $sesstionObj = unserialize($encrypted);
+                restore_error_handler();
+                
                 if ($sesstionObj instanceof Session) {
                     $this->sessionStatus = self::STATUS_RESUMED;
                     $this->_clone($sesstionObj);
@@ -767,7 +771,11 @@ class Session implements JsonI {
                 }
             }
         } else {
-            $sesstionObj = @unserialize($serialized);
+            set_error_handler(function ($errNo, $errStr) {
+                throw  new SessionException($errStr, $errNo);
+            });
+            $sesstionObj = unserialize($encrypted);
+            restore_error_handler();
 
             if ($sesstionObj instanceof Session) {
                 $this->sessionStatus = self::STATUS_RESUMED;

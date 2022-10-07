@@ -3,22 +3,66 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\file\File;
-use webfiori\cli\Runner;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\file\File;
+use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of CreateTableTest
  *
  * @author Ibrahim
  */
 class CreateTableTest extends TestCase {
+    const MSSQL_COLS_TYPES = [
+        "Enter a name for column key:\n",
+        "Column data type:\n",
+        "0: mixed <--\n",
+        "1: int\n",
+        "2: bigint\n",
+        "3: varchar\n",
+        "4: nvarchar\n",
+        "5: char\n",
+        "6: nchar\n",
+        "7: binary\n",
+        "8: varbinary\n",
+        "9: date\n",
+        "10: datetime2\n",
+        "11: time\n",
+        "12: money\n",
+        "13: bit\n",
+        "14: decimal\n",
+        "15: float\n",
+        "16: boolean\n",
+        "17: bool\n",
+    ];
+    const MYSQL_COLS_TYPES = [
+        "Enter a name for column key:\n",
+        "Column data type:\n",
+        "0: mixed <--\n",
+        "1: int\n",
+        "2: char\n",
+        "3: varchar\n",
+        "4: timestamp\n",
+        "5: tinyblob\n",
+        "6: blob\n",
+        "7: mediumblob\n",
+        "8: longblob\n",
+        "9: datetime\n",
+        "10: text\n",
+        "11: mediumtext\n",
+        "12: decimal\n",
+        "13: double\n",
+        "14: float\n",
+        "15: boolean\n", 
+        "16: bool\n",
+        "17: bit\n",
+    ];
     /**
      * @test
      */
     public function testCreateTable00() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool00Table',
@@ -35,10 +79,12 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
         $clazz = '\\app\\database\\Cool00Table';
         $this->removeClass($clazz);
@@ -54,7 +100,7 @@ class CreateTableTest extends TestCase {
             '`id`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -63,26 +109,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -92,14 +119,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $runner->getOutput());
+        ]), $runner->getOutput());
         
     }
     /**
      * @test
      */
     public function testCreateTable01() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mssql',
             'Cool01Table',
@@ -108,6 +135,7 @@ class CreateTableTest extends TestCase {
             'This is the first cool table that was created using CLI.',
             'id',
             '1',
+            'n',
             'y',
             'The unique ID of the cool thing.',
             'n',
@@ -115,9 +143,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool01Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
@@ -133,7 +164,10 @@ class CreateTableTest extends TestCase {
             '[id]'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $col = $testObj->getColByKey('id');
+        $this->assertFalse($col->isIdentity());
+        
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -142,26 +176,8 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: bigint\n",
-            "3: varchar\n",
-            "4: nvarchar\n",
-            "5: char\n",
-            "6: nchar\n",
-            "7: binary\n",
-            "8: varbinary\n",
-            "9: date\n",
-            "10: datetime2\n",
-            "11: time\n",
-            "12: money\n",
-            "13: bit\n",
-            "14: decimal\n",
-            "15: float\n",
-            "16: boolean\n",
-            "17: bool\n",
+            ], self::MSSQL_COLS_TYPES, [
+            "Is this column an identity column?(y/N)\n",
             "Is this column primary?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
@@ -169,14 +185,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $runner->getOutput());
+        ]), $runner->getOutput());
         
     }
     /**
      * @test
      */
     public function testCreateTable03() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool01Table',
@@ -218,9 +234,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool03Table'));
         $clazz = '\\app\\database\\Cool03Table';
@@ -241,7 +260,7 @@ class CreateTableTest extends TestCase {
             '`creation_date`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -253,52 +272,14 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
@@ -307,26 +288,7 @@ class CreateTableTest extends TestCase {
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
             "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
@@ -337,14 +299,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
      * @test
      */
     public function testCreateTable02() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool02Table',
@@ -376,9 +338,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
         $clazz = '\\app\\database\\Cool02Table';
@@ -397,7 +362,7 @@ class CreateTableTest extends TestCase {
             '`name`'
         ], $testObj->getColsNames());
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -406,26 +371,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -435,26 +381,8 @@ class CreateTableTest extends TestCase {
             "Enter a name for column key:\n",
             "Warning: The table already has a key with name 'id'.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
+            
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column unique?(y/N)\n",
@@ -467,14 +395,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
      * @test
      */
     public function testCreateTable04() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'CoolWithEntity00Table',
@@ -496,16 +424,19 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $this->removeClass('\\app\\database\\CoolWithEntity00Table');
         $clazz = '\\app\\entity\\MySuperCoolEntity00';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -514,26 +445,7 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -548,14 +460,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add extra attributes to the entity?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
             'Info: Entity class was created at "'.ROOT_DIR.DS.'app'.DS."entity\".\n",
-        ], $output);
+        ]), $output);
         
     }
     /**
      * @test
      */
     public function testCreateTable05() {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool05Table',
@@ -573,9 +485,12 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [            
-            '--c' => 'table'        
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool05Table';
         $this->assertTrue(class_exists($clazz));
         return $clazz;
@@ -585,7 +500,7 @@ class CreateTableTest extends TestCase {
      * @depends testCreateTable05
      */
     public function testCreateTable06($refTable) {
-        $runner = new Runner();
+        $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'mysql',
             'Cool06Table',
@@ -618,15 +533,18 @@ class CreateTableTest extends TestCase {
             'n'
         ]);
         
-        $this->assertEquals(0, $runner->runCommand(new CreateCommand(), [
-            '--c' => 'table'
-        ]));
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
         $clazz = '\\app\\database\\Cool06Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $this->removeClass($refTable);
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -635,52 +553,14 @@ class CreateTableTest extends TestCase {
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
             "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: mixed <--\n",
-            "1: int\n",
-            "2: char\n",
-            "3: varchar\n",
-            "4: timestamp\n",
-            "5: tinyblob\n",
-            "6: blob\n",
-            "7: mediumblob\n",
-            "8: longblob\n",
-            "9: datetime\n",
-            "10: text\n",
-            "11: mediumtext\n",
-            "12: decimal\n",
-            "13: double\n",
-            "14: float\n",
-            "15: boolean\n", 
-            "16: bool\n",
-            "17: bit\n",
+            ], self::MYSQL_COLS_TYPES, [
             "Enter column size:\n",
             "Is this column primary?(y/N)\n",
             "Is this column auto increment?(y/N)\n",
@@ -712,7 +592,92 @@ class CreateTableTest extends TestCase {
             "Would you like to add another foreign key?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], $output);
+        ]), $output);
+    }
+    /**
+     * @test
+     */
+    public function testCreateTable07() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            'mssql',
+            'Cool011Table',
+            '',
+            'cool_table_01',
+            'This is the first cool table that was created using CLI.',
+            'id',
+            '1',
+            'y',
+            'y',
+            'The unique ID of the cool thing.',
+            'y',
+            
+            'age',
+            '1',
+            'n',
+            'n',
+            '',
+            'n',
+            'The age of the cool thing.',
+            'n',
+            'n',
+            'n'
+        ]);
+        
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table' 
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $clazz = '\\app\\database\\Cool011Table';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+        $testObj = new $clazz();
+        $this->assertTrue($testObj instanceof MSSQLTable);
+        $this->assertEquals('[cool_table_01]', $testObj->getName());
+        $this->assertEquals('This is the first cool table that was created using CLI.', $testObj->getComment());
+        $this->assertEquals(2, $testObj->getColsCount());
+        $this->assertEquals([
+            'id',
+            'age'
+        ], $testObj->getColsKeys());
+        $this->assertEquals([
+            '[id]',
+            '[age]'
+        ], $testObj->getColsNames());
+        
+        $col = $testObj->getColByKey('id');
+        $this->assertTrue($col->isIdentity());
+        
+        $this->assertEquals(array_merge([
+            "Database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter database table name:\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            ], self::MSSQL_COLS_TYPES, [
+            "Is this column an identity column?(y/N)\n",
+            "Is this column primary?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            ], self::MSSQL_COLS_TYPES, [
+                "Is this column primary?(y/N)\n",
+                "Is this column unique?(y/N)\n",
+                "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+                "Can this column have null values?(y/N)\n",
+                "Enter your optional comment about the column:\n",
+                "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to create an entity class that maps to the database table?(y/N)\n",
+            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+        ]), $runner->getOutput());
+        
     }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');

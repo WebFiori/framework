@@ -146,8 +146,16 @@ abstract class AbstractJob implements JsonI {
      * @param string $jobName The name of the job.
      * 
      * @param string $when A cron expression. An exception will be thrown if 
-     * the given expression is invalid. Default is '* * * * *' which means run 
-     * the job every minute.
+     * the given expression is invalid. 
+     * The parts of the expression are as follows:
+     * <ul>
+     * <li>First part is minutes (0-59)</li>
+     * <li>Second part is hours (0-23)</li>
+     * <li>Third part is day of the month (1-31)</li>
+     * <li>Fourth part is month (1-12)</li>
+     * <li>Last part is day of the week (0-6)</li>
+     * </ul>
+     * Default is '* * * * *' which means run the job every minute.
      * 
      * @param string $description A description for the job. Shown in CRON
      * web interface or CLI.

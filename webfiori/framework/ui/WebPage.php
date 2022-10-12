@@ -10,12 +10,14 @@
  */
 namespace webfiori\framework\ui;
 
+use Error;
 use Exception;
 use webfiori\collections\LinkedList;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\Language;
+use webfiori\framework\router\Router;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
@@ -612,6 +614,22 @@ class WebPage {
         return $user->hasPrivilege($prId);
     }
     /**
+     * Returns the value of a parameter which exist in the path part of page URI.
+     * 
+     * When creating routes, some parts of the route might not be set
+     * for dynamic routes. The parts are usually defined using the syntax '{var-name}'.
+     * 
+     * @param string $paramName The name of the parameter. Note that it must 
+     * not include braces.
+     * 
+     * @return string|null The method will return the value of the 
+     * parameter if it was set. Other than that, the method will return null.
+     * 
+     */
+    public function getParameterValue(string $paramName) {
+        Router::getParameterValue($paramName);
+    }
+    /**
      * Sets the value of the property which is used to determine if the 
      * JavaScript variable 'window.i18n' will be included or not.
      * 
@@ -1099,7 +1117,7 @@ class WebPage {
                 throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
             }
             $session = null;
-        } catch (\Error $ex) {
+        } catch (Error $ex) {
             if (!$this->skipLangCheck) {
                 throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
             }

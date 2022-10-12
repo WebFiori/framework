@@ -18,12 +18,17 @@ class PageTest extends TestCase{
      */
     public function testBeforeRender00() {
         $page = new WebPage();
-        $c = $page->addBeforeRender(function (WebPage $p) {});
+        $c = $page->addBeforeRender(function (WebPage $p, TestCase $c) {
+            $c->assertTrue($p->getDocument()->hasChild('super-el'));
+        }, [$this]);
         $this->assertNotNull($c);
         $this->assertEquals(2, $c->getID());
         $this->assertEquals(0, $c->getPriority());
         
-        $c2 = $page->addBeforeRender(function(){}, [], 3);
+        $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c){
+            $ch = $p->insert('div');
+            $ch->setID('super-el');
+        }, [$this], 3);
         $this->assertEquals(3, $c2->getID());
         $this->assertEquals(3, $c2->getPriority());
     }

@@ -22,6 +22,7 @@ class BeforeRenderCallback implements Comparable {
     private $callback;
     private $priority;
     private $id;
+    private $isExecuted;
 
     /**
      * Creates new instance of the class.
@@ -43,6 +44,19 @@ class BeforeRenderCallback implements Comparable {
         $this->callback = $func;
         $this->params = $params;
         $this->priority = $priority >= 0 ? $priority : 0;
+        $this->isExecuted = false;
+    }
+    /**
+     * Checks if the callback was executed or not.
+     * 
+     * This method is used to tell if the method BeforeRenderCallback::call()
+     * was executed or not.
+     * 
+     * @return bool The method will return true if the callback was executed.
+     * False other wise.
+     */
+    public function isExecuted() : bool {
+        return $this->isExecuted;
     }
     /**
      * Sets a unique identifier for the callback.
@@ -80,8 +94,11 @@ class BeforeRenderCallback implements Comparable {
      * @param WebPage $owner The page at which the callback belongs to.
      */
     public function call(WebPage $owner) {
-        $paramsArr = array_merge([$owner], $this->params);
-        call_user_func_array($this->callback, $paramsArr);
+        if (!$this->isExecuted()) {
+            $paramsArr = array_merge([$owner], $this->params);
+            call_user_func_array($this->callback, $paramsArr);
+            $this->isExecuted = true;
+        }
     }
     /**
      * Returns the priority of the callback.

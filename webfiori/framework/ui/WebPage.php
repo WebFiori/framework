@@ -10,10 +10,14 @@
  */
 namespace webfiori\framework\ui;
 
+use Error;
 use Exception;
+use webfiori\collections\LinkedList;
 use webfiori\framework\exceptions\MissingLangException;
+use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\Language;
+use webfiori\framework\router\Router;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
@@ -58,23 +62,14 @@ class WebPage {
         'page-footer'
     ];
     /**
-     * An array that contains closures 
+     * A linked list that contains closures 
      * which will be called before the page is fully rendered.
      * 
-     * @var array
+     * @var LinkedList
      * 
      * @since 1.0
      */
     private $beforeRenderCallbacks;
-    /**
-     * An array that contains the parameters which will be based to the 
-     * callbacks which will be get executed before rendering the page.
-     * 
-     * @var array
-     * 
-     * @since 1.0
-     */
-    private $beforeRenderParams;
     /**
      *
      * @var string
@@ -216,7 +211,7 @@ class WebPage {
      * One possible use is to do some modifications to the DOM before the 
      * page is displayed. It is possible to have multiple callbacks.
      * 
-     * @param callback $callable A PHP function that will be get executed. before 
+     * @param callable $callable A PHP function that will be get executed. before 
      * the page is rendered. Note that the first argument of the function will 
      * always be an object of type "WebPage".
      * 
@@ -224,25 +219,22 @@ class WebPage {
      * callback. The parameters can be accessed in the callback in the 
      * same order at which they appear in the array.
      * 
-     * @return int|null If the callable is added, the method will return a 
-     * number that represents its ID. If not added, the method will return 
-     * null.
+     * @param int $priority A positive number that represents the priority of
+     * the callback. Large number means that
+     * the callback has higher priority. This means a callback with priority
+     * 100 will have higher priority than a callback with priority 80. If
+     * a negative number is provided, 0 will be set as its priority.
+     * 
+     * @return BeforeRenderCallback The method will return the added callback as 
+     * an object of type 'BeforeRenderCallback'.
      * 
      * @since 1.0
      */
-    public function addBeforeRender($callable = '', array $params = []) {
-        if (is_callable($callable) || $callable instanceof \Closure) {
-            $this->beforeRenderCallbacks[] = $callable;
-            $xParamsArr = [$this];
-
-            foreach ($params as $p) {
-                $xParamsArr[] = $p;
-            }
-            $this->beforeRenderParams[] = $xParamsArr;
-            $callbacksCount = count($this->beforeRenderCallbacks);
-
-            return $callbacksCount - 1;
-        }
+    public function addBeforeRender(callable $callable, array $params = [], $priority = 0) : BeforeRenderCallback {
+        $beforeRender = new BeforeRenderCallback($callable, $params, $priority);
+        $beforeRender->setID($this->beforeRenderCallbacks->size() + 1);
+        $this->beforeRenderCallbacks->add($beforeRender);
+        return $beforeRender;
     }
     /**
      * Adds new CSS source file.
@@ -622,6 +614,22 @@ class WebPage {
         return $user->hasPrivilege($prId);
     }
     /**
+     * Returns the value of a parameter which exist in the path part of page URI.
+     * 
+     * When creating routes, some parts of the route might not be set
+     * for dynamic routes. The parts are usually defined using the syntax '{var-name}'.
+     * 
+     * @param string $paramName The name of the parameter. Note that it must 
+     * not include braces.
+     * 
+     * @return string|null The method will return the value of the 
+     * parameter if it was set. Other than that, the method will return null.
+     * 
+     */
+    public function getParameterValue(string $paramName) {
+        Router::getParameterValue($paramName);
+    }
+    /**
      * Sets the value of the property which is used to determine if the 
      * JavaScript variable 'window.i18n' will be included or not.
      * 
@@ -710,8 +718,9 @@ class WebPage {
      * @since 1.0
      */
     public function render(bool $formatted = false, bool $returnResult = false) {
-        for ($x = 0 ; $x < count($this->beforeRenderCallbacks) ; $x++) {
-            call_user_func_array($this->beforeRenderCallbacks[$x], $this->beforeRenderParams[$x]);
+        $this->beforeRenderCallbacks->insertionSort(false);
+        foreach ($this->beforeRenderCallbacks as $callbackObj) {
+            $callbackObj->call($this);
         }
 
         if (!$returnResult) {
@@ -1108,7 +1117,7 @@ class WebPage {
                 throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
             }
             $session = null;
-        } catch (\Error $ex) {
+        } catch (Error $ex) {
             if (!$this->skipLangCheck) {
                 throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
             }
@@ -1174,10 +1183,8 @@ class WebPage {
         return $headNode;
     }
     private function _resetBeforeLoaded() {
-        $this->beforeRenderParams = [
-            0 => [$this]
-        ];
-        $this->beforeRenderCallbacks = [function (WebPage $page)
+        $this->beforeRenderCallbacks = new LinkedList();
+        $this->addBeforeRender(function (WebPage $page)
         {
             if ($page->includeI18nLables()) {
                 $translation = $page->getTranslation();
@@ -1239,7 +1246,7 @@ class WebPage {
                     }
                 }
             }
-        }];
+        }, [], PHP_INT_MAX);
     }
     /**
      * Load the translation file based on the language code. 

@@ -31,16 +31,17 @@ class BeforeRenderCallback implements Comparable {
      * parameter of the function will be always an instance of the
      * class 'WebPage'.
      * 
-     * @param array $params An optional array that can hold extra parameters to
-     * pass to the callback.
-     * 
      * @param int $priority A positive number that represents the priority of
      * the callback. Large number means that
      * the callback has higher priority. This means a callback with priority
      * 100 will have higher priority than a callback with priority 80. If
      * a negative number is provided, 0 will be set as its priority.
+     * 
+     * @param array $params An optional array that can hold extra parameters to
+     * pass to the callback.
+     *
      */
-    public function __construct(callable $func, array $params, int $priority = 0) {
+    public function __construct(callable $func, int $priority = 0, array $params = []) {
         $this->callback = $func;
         $this->params = $params;
         $this->priority = $priority >= 0 ? $priority : 0;

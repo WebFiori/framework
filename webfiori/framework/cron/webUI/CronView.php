@@ -82,7 +82,7 @@ class CronView extends WebPage {
             $code = new JsCode();
             $code->addCode('window.data = '.$view->getJson().';');
             $view->getDocument()->getHeadNode()->addChild($code);
-        });
+        }, 1000);
     }
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.

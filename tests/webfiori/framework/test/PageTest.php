@@ -20,7 +20,7 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $c = $page->addBeforeRender(function (WebPage $p, TestCase $c) {
             $c->assertTrue($p->getDocument()->hasChild('super-el'));
-        }, [$this]);
+        },0,  [$this]);
         $this->assertNotNull($c);
         $this->assertEquals(2, $c->getID());
         $this->assertEquals(0, $c->getPriority());
@@ -28,7 +28,7 @@ class PageTest extends TestCase{
         $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c){
             $ch = $p->insert('div');
             $ch->setID('super-el');
-        }, [$this], 3);
+        }, 3, [$this]);
         $this->assertEquals(3, $c2->getID());
         $this->assertEquals(3, $c2->getPriority());
     }

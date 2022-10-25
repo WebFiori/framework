@@ -190,11 +190,14 @@ class TableObjHelper {
      * @return string The name of table class based on associated table object.
      */
     public function getTableClassName() :string {
-        $clazz = $this->getTable()::class;
-        $split = explode('/', $clazz);
+        $clazz = get_class($this->getTable());
+        $split = explode('\\', $clazz);
+        
         if (count($split) > 1) {
+            
             return $split[count($split) - 1];
         }
+        
         return $split[0];
     }
     /**

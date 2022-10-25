@@ -167,13 +167,16 @@ class TableObjHelper {
      * The method will prompt the user to set the name of the table as it will
      * appear in the database. This name may not be same as class name
      * of the table.
+     * 
+     * @param string $defaultName A string to set as default table name in case
+     * of hitting 'enter' without providing a value.
      */
-    public function setTableName() {
+    public function setTableName($defaultName = null) {
         $invalidTableName = true;
         $helper = $this->getCreateHelper();
-        $default = CaseConverter::toSnackCase($this->getTableClassName());
+
         do {
-            $tableName = $helper->getInput('Enter database table name:', $default);
+            $tableName = $helper->getInput('Enter database table name:', $defaultName);
             $invalidTableName = !$this->getTable()->setName($tableName);
 
             if ($invalidTableName) {

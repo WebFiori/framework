@@ -13,17 +13,12 @@ namespace webfiori\framework\cli\commands;
 use Error;
 use ErrorException;
 use Exception;
-use webfiori\database\Column;
-use webfiori\database\mssql\MSSQLColumn;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
-use webfiori\framework\AutoLoader;
+use Throwable;
 use webfiori\cli\CLICommand;
+use webfiori\database\Table;
+use webfiori\framework\cli\helpers\CreateTableObj;
+use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
-use webfiori\framework\DB;
-use webfiori\framework\WebFioriApp;
 /**
  * Description of UpdateTableCommand
  *
@@ -111,17 +106,11 @@ class UpdateTableCommand extends CLICommand {
         $this->success('Table updated.');
     }
     public function exec() : int {
-        $tableClassInput = $this->getArgValue('--table');
-
-        while ($tableClassInput === null) {
-            $tableClassInput = $this->getInput('Enter the name of table class (including namespace):');
-
-            if (strlen($tableClassInput) == 0) {
-                $tableClassInput = null;
-                $this->error('Given class name is invalid!');
-            }
+        $tableClass = $this->getArgValue('--table');
+        
+        if ($tableClass === null) {
+            $tableClass = $this->readInstance('Enter the name of table class (including namespace):', 'Given class name is invalid!');
         }
-        $tableClass = trim($tableClassInput, '\\\\');
 
         try {
             $tableObj = new $tableClass();
@@ -131,7 +120,7 @@ class UpdateTableCommand extends CLICommand {
 
                 return -1;
             }
-        } catch (\Error $ex) {
+        } catch (Throwable $ex) {
             $message = $ex->getMessage();
 
             if ($message == "Class \"'$tableClass'\" not found") {
@@ -142,8 +131,7 @@ class UpdateTableCommand extends CLICommand {
             throw new ErrorException($ex->getMessage(), $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
         }
         
-        //$updateHelper = new \webfiori\framework\cli\helpers\CreateUpdateTableHelper($this, $tableObj);
-        $update = new \webfiori\framework\cli\helpers\TableObjHelper($update, $tableObj);
+        $update = new TableObjHelper($this, $tableObj);
         
         $whatToDo = $this->select('What operation whould you like to do with the table?', [
             'Add new column.',
@@ -166,6 +154,7 @@ class UpdateTableCommand extends CLICommand {
         } else {
             $this->error('Option not implemented.');
         }
+        return 0;
     }
     
 }

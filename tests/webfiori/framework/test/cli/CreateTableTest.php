@@ -106,7 +106,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_00_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MYSQL_COLS_TYPES, [
@@ -173,7 +173,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_01_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MSSQL_COLS_TYPES, [
@@ -269,7 +269,7 @@ class CreateTableTest extends TestCase {
             "Error: A class in the given namespace which has the given name was found.\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_03_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MYSQL_COLS_TYPES, [
@@ -368,7 +368,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_02_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MYSQL_COLS_TYPES, [
@@ -442,7 +442,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_with_entity_00_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MYSQL_COLS_TYPES, [
@@ -550,7 +550,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_06_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MYSQL_COLS_TYPES, [
@@ -656,7 +656,7 @@ class CreateTableTest extends TestCase {
             "1: mssql\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name:\n",
+            "Enter database table name: Enter = 'cool_011_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
             ], self::MSSQL_COLS_TYPES, [

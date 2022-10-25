@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\writers;
 
-use InvalidArgumentException;
 use webfiori\database\EntityMapper;
+use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
@@ -78,6 +78,20 @@ class TableClassWriter extends ClassWriter {
             return;
         }
         $this->setTable($tableObj);
+        
+    }
+    /**
+     * Extract and return the name of table class based on associated table object.
+     * 
+     */
+    private function extractAndSetTableClassName() {
+        $clazz = $this->getTable()::class;
+        $split = explode('/', $clazz);
+        if (count($split) > 1) {
+            $this->setClassName($split[count($split) - 1]);
+        } else {
+            $this->setClassName($split[0]);
+        }
     }
     /**
      * Returns the table object which was associated with the writer.
@@ -113,8 +127,11 @@ class TableClassWriter extends ClassWriter {
      * 
      * @param Table $table
      */
-    public function setTable($table) {
+    public function setTable(Table $table) {
         $this->tableObj = $table;
+        if ($table !== null) {
+            $this->extractAndSetTableClassName();
+        }
     }
     /**
      * Returns the name entity class will be created.
@@ -233,7 +250,7 @@ class TableClassWriter extends ClassWriter {
                 $this->append("'scale' => '".$colObj->getScale()."',", 4);
             }
         }
-        if ($colObj instanceof \webfiori\database\mssql\MSSQLColumn && $colObj->isIdentity()) {
+        if ($colObj instanceof MSSQLColumn && $colObj->isIdentity()) {
             $this->append("'identity' => true,", 4);
         }
         if ($colObj->isPrimary()) {

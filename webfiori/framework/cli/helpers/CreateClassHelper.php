@@ -87,7 +87,7 @@ class CreateClassHelper {
      * @return boolean If the name is successfully set, the method will return true.
      * Other than that, false is returned.
      */
-    public function setClassName($name) : bool {
+    public function setClassName(string $name) : bool {
         return $this->getWriter()->setClassName($name);
     }
     /**

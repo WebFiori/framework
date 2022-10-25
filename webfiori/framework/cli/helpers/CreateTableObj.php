@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\CLICommand;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
@@ -17,33 +18,27 @@ use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
+use webfiori\json\CaseConverter;
 /**
  * A helper class for creating database tables classes.
  *
  * @author Ibrahim
  */
 class CreateTableObj extends CreateClassHelper {
-    /**
-     * Creates new instance of the class.
-     * 
-     * @param CreateCommand $command A command that is used to call the class.
-     */
-    public function __construct(CreateCommand $command) {
-        parent::__construct($command, new TableClassWriter());
+
+    public function readClassInfo() {
+        $databaseType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
         
-        $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
-
-        $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
-
-
-        if ($dbType == 'mysql') {
+        if ($databaseType == 'mysql') {
             $tempTable = new MySQLTable();
-        } else if ($dbType == 'mssql') {
+        } else if ($databaseType == 'mssql') {
             $tempTable = new MSSQLTable();
         }
         $this->getWriter()->setTable($tempTable);
+        $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
+        
         $tableHelper = new TableObjHelper($this, $tempTable);
-        $tableHelper->setTableName();
+        $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));
         $tableHelper->setTableComment();
         
         $this->println('Now you have to add columns to the table.');
@@ -65,5 +60,15 @@ class CreateTableObj extends CreateClassHelper {
         if ($withEntity) {
             $this->info('Entity class was created at "'.$this->getWriter()->getEntityPath().'".');
         }
+    }
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param CreateCommand $command A command that is used to call the class.
+     * 
+     * @param Table $t An optional table instance to associate the writer with.
+     */
+    public function __construct(CLICommand $command) {
+        parent::__construct($command, new TableClassWriter());
     }
 }

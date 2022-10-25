@@ -129,7 +129,7 @@ class ClassInfoReader {
      * 
      * @return string A string that represents the name of the class.
      */
-    public function getName($suffix = null) {
-        return CLIUtils::readName($this->getOwner(), $suffix, 'Enter a name for the new class:');
+    public function getName($suffix = null, $errMsg = 'Invalid class name is given.') {
+        return $this->getOwner()->readClassName('Enter a name for the new class:', $suffix, $errMsg);
     }
 }

@@ -215,23 +215,24 @@ class WebPage {
      * the page is rendered. Note that the first argument of the function will 
      * always be an object of type "WebPage".
      * 
-     * @param array $params An array of parameters which will be passed to the 
-     * callback. The parameters can be accessed in the callback in the 
-     * same order at which they appear in the array.
-     * 
      * @param int $priority A positive number that represents the priority of
      * the callback. Large number means that
      * the callback has higher priority. This means a callback with priority
      * 100 will have higher priority than a callback with priority 80. If
      * a negative number is provided, 0 will be set as its priority.
      * 
+     * @param array $params An array of parameters which will be passed to the 
+     * callback. The parameters can be accessed in the callback in the 
+     * same order at which they appear in the array.
+     * 
+     * 
      * @return BeforeRenderCallback The method will return the added callback as 
      * an object of type 'BeforeRenderCallback'.
      * 
      * @since 1.0
      */
-    public function addBeforeRender(callable $callable, array $params = [], $priority = 0) : BeforeRenderCallback {
-        $beforeRender = new BeforeRenderCallback($callable, $params, $priority);
+    public function addBeforeRender(callable $callable, $priority = 0, array $params = []) : BeforeRenderCallback {
+        $beforeRender = new BeforeRenderCallback($callable, $priority, $params);
         $beforeRender->setID($this->beforeRenderCallbacks->size() + 1);
         $this->beforeRenderCallbacks->add($beforeRender);
         return $beforeRender;
@@ -1246,7 +1247,7 @@ class WebPage {
                     }
                 }
             }
-        }, [], PHP_INT_MAX);
+        }, PHP_INT_MAX);
     }
     /**
      * Load the translation file based on the language code. 

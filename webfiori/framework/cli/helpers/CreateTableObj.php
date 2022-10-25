@@ -18,6 +18,7 @@ use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
+use webfiori\json\CaseConverter;
 /**
  * A helper class for creating database tables classes.
  *
@@ -26,7 +27,6 @@ use webfiori\framework\writers\TableClassWriter;
 class CreateTableObj extends CreateClassHelper {
 
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
         $databaseType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
         
         if ($databaseType == 'mysql') {
@@ -35,9 +35,10 @@ class CreateTableObj extends CreateClassHelper {
             $tempTable = new MSSQLTable();
         }
         $this->getWriter()->setTable($tempTable);
+        $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
         
         $tableHelper = new TableObjHelper($this, $tempTable);
-        $tableHelper->setTableName();
+        $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));
         $tableHelper->setTableComment();
         
         $this->println('Now you have to add columns to the table.');

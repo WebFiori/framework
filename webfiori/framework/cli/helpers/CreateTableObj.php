@@ -24,25 +24,18 @@ use webfiori\framework\writers\TableClassWriter;
  * @author Ibrahim
  */
 class CreateTableObj extends CreateClassHelper {
-    /**
-     * Creates new instance of the class.
-     * 
-     * @param CreateCommand $command A command that is used to call the class.
-     */
-    public function __construct(CLICommand $command) {
-        parent::__construct($command, new TableClassWriter());
-        
-        $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
 
+    public function readClassInfo() {
         $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
-
-
-        if ($dbType == 'mysql') {
+        $databaseType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
+        
+        if ($databaseType == 'mysql') {
             $tempTable = new MySQLTable();
-        } else if ($dbType == 'mssql') {
+        } else if ($databaseType == 'mssql') {
             $tempTable = new MSSQLTable();
         }
         $this->getWriter()->setTable($tempTable);
+        
         $tableHelper = new TableObjHelper($this, $tempTable);
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
@@ -66,5 +59,15 @@ class CreateTableObj extends CreateClassHelper {
         if ($withEntity) {
             $this->info('Entity class was created at "'.$this->getWriter()->getEntityPath().'".');
         }
+    }
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param CreateCommand $command A command that is used to call the class.
+     * 
+     * @param Table $t An optional table instance to associate the writer with.
+     */
+    public function __construct(CLICommand $command) {
+        parent::__construct($command, new TableClassWriter());
     }
 }

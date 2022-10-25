@@ -21,25 +21,35 @@ use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\writers\TableClassWriter;
+use webfiori\json\CaseConverter;
 
 /**
- * A class which contains static methods which is used to create/modify tables.
+ * A CLI class helper which has methods to help in creating and 
+ * modifying table classes.
  *
  * @author Ibrahim BinAlshikh
  */
 class TableObjHelper {
     private $table;
     private $command;
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param CLICommand $c
+     * 
+     * @param Table $t An instance at which the class will use to create or 
+     * modify as class.
+     */
     public function __construct(CLICommand $c, Table $t) {
         $this->command = $c;
         $this->table = $t;
     }
     /**
+     * Returns the objects at which the class is using to perform modifications.
      * 
      * @return Table
      */
-    public function &getTable() {
+    public function &getTable() : Table {
         return $this->table;
     }
     /**
@@ -49,6 +59,12 @@ class TableObjHelper {
     public function getCreateHelper() : CLICommand {
         return $this->command;
     }
+    /**
+     * Removes a foreign key from associated table object.
+     * 
+     * The method will simply ask the user which key he would like to remove.
+     * 
+     */
     public function removeFk() {
         $tableObj = $this->getTable();
         $helper = $this->getCreateHelper();
@@ -68,10 +84,14 @@ class TableObjHelper {
         $tableObj->removeReference($toRemove);
 
         $this->getCreateHelper()->writeClass(false);
-        
-
         $helper->success('Table updated.');
     }
+    /**
+     * Adds new column to associated table.
+     * 
+     * The method will prompt the user to specify all information of the column
+     * including its name, data type, size and so on.
+     */
     public function addColumn() {
         $helper = $this->getCreateHelper();
         $tempTable = $this->getTable();
@@ -100,9 +120,11 @@ class TableObjHelper {
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
         }
-        $writer = new TableClassWriter($tempTable);
-        $writer->writeClass();
+        $this->getCreateHelper()->writeClass();
     }
+    /**
+     * Creates entity class based on associated table object.
+     */
     public function createEntity() {
         $helper = $this->getCreateHelper();
         $entityInfo = $helper->getClassInfo(APP_DIR_NAME.'\\entity');
@@ -123,7 +145,12 @@ class TableObjHelper {
             }
         }
     }
-
+    /**
+     * Sets a comment for associated table.
+     * 
+     * The method will prompt the user for optional comment. 
+     * If empty string provided, the comment will not be set.
+     */
     public function setTableComment() {
         $helper = $this->getCreateHelper();
         $tableComment = $helper->getInput('Enter your optional comment about the table:');
@@ -132,11 +159,19 @@ class TableObjHelper {
             $this->getTable()->setComment($tableComment);
         }
     }
+    /**
+     * Sets the name of the table in the database.
+     * 
+     * The method will prompt the user to set the name of the table as it will
+     * appear in the database. This name may not be same as class name
+     * of the table.
+     */
     public function setTableName() {
         $invalidTableName = true;
         $helper = $this->getCreateHelper();
+        $default = CaseConverter::toSnackCase($this->getTableClassName());
         do {
-            $tableName = $helper->getInput('Enter database table name:');
+            $tableName = $helper->getInput('Enter database table name:', $default);
             $invalidTableName = !$this->getTable()->setName($tableName);
 
             if ($invalidTableName) {
@@ -144,16 +179,37 @@ class TableObjHelper {
             }
         } while ($invalidTableName);
     }
+    /**
+     * Extract and return the name of table class based on associated table object.
+     * 
+     * @return string The name of table class based on associated table object.
+     */
+    public function getTableClassName() :string {
+        $clazz = $this->getTable()::class;
+        $split = explode('/', $clazz);
+        if (count($split) > 1) {
+            return $split[count($split) - 1];
+        }
+        return $split[0];
+    }
+    /**
+     * Prompt the user to add multiple columns.
+     * 
+     * First, the method will add one column, after that, it will ask if extra
+     * column should be added or not. If yes, it will ask for new column information.
+     * If not, the loop will stop.
+     */
     public function addColumns() {
         do {
             $this->addColumn();
         } while ($this->getCreateHelper()->confirm('Would you like to add another column?', false));
     }
     /**
+     * Prompt the user to set an optional comment for table column.
      * 
-     * @param MySQLColumn|MSSQLColumn $colObj
+     * @param Column $colObj The object that the comment will be associated with.
      */
-    private function addColComment($colObj) {
+    private function addColComment(Column $colObj) {
         $comment = $this->getCreateHelper()->getInput('Enter your optional comment about the column:');
 
         if (strlen($comment) != 0) {
@@ -177,9 +233,9 @@ class TableObjHelper {
     }
     /**
      * 
-     * @param MySQLColumn $colObj
+     * @param Column $colObj
      */
-    private function isPrimaryCheck($colObj) {
+    private function isPrimaryCheck(Column $colObj) {
         $helper = $this->getCreateHelper();
         $colObj->setIsPrimary($helper->confirm('Is this column primary?', false));
         $type = $colObj->getDatatype();
@@ -198,7 +254,7 @@ class TableObjHelper {
      * 
      * @param Column $colObj
      */
-    private function setDefaultValue($colObj) {
+    private function setDefaultValue(Column $colObj) {
         $helper = $this->getCreateHelper();
         if (!($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean')) {
             $defaultVal = $helper->getInput('Enter default value (Hit "Enter" to skip):', '');
@@ -218,9 +274,9 @@ class TableObjHelper {
     }
     /**
      * 
-     * @param MySQLColumn|MSSQLColumn $colObj
+     * @param Column $colObj
      */
-    private function setSize($colObj) {
+    private function setSize(Column $colObj) {
         $type = $colObj->getDatatype();
         $helper = $this->getCreateHelper();
         $mySqlSupportSize = $type == 'int' 
@@ -271,9 +327,9 @@ class TableObjHelper {
     }
     /**
      * 
-     * @param MySQLColumn|MSSQLColumn $colObj
+     * @param Column $colObj
      */
-    private function setScale($colObj) {
+    private function setScale(Column $colObj) {
         $colDataType = $colObj->getDatatype();
 
         if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {

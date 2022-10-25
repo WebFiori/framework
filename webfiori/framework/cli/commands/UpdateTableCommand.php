@@ -11,11 +11,10 @@
 namespace webfiori\framework\cli\commands;
 
 use Error;
-use ErrorException;
 use Exception;
-use Throwable;
 use webfiori\cli\CLICommand;
 use webfiori\database\Table;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
@@ -106,32 +105,14 @@ class UpdateTableCommand extends CLICommand {
         $this->success('Table updated.');
     }
     public function exec() : int {
-        $tableClass = $this->getArgValue('--table');
         
-        if ($tableClass === null) {
-            $tableClass = $this->readInstance('Enter the name of table class (including namespace):', 'Given class name is invalid!');
-        }
-
-        try {
-            $tableObj = new $tableClass();
-
-            if (!($tableObj instanceof Table)) {
-                $this->error('Given class is not an instance of "webfiori\database\Table".');
-
-                return -1;
-            }
-        } catch (Throwable $ex) {
-            $message = $ex->getMessage();
-
-            if ($message == "Class \"'$tableClass'\" not found") {
-                $this->error($ex->getMessage());
-
-                return -1;
-            }
-            throw new ErrorException($ex->getMessage(), $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
-        }
+        $tableObj = CLIUtils::readTable($this);
         
-        $update = new TableObjHelper($this, $tableObj);
+        $create = new CreateTableObj($this);
+        $create->getWriter()->setTable($tableObj);
+        $tableHelper = new TableObjHelper($create, $tableObj);
+        
+        
         
         $whatToDo = $this->select('What operation whould you like to do with the table?', [
             'Add new column.',
@@ -142,18 +123,19 @@ class UpdateTableCommand extends CLICommand {
         ]);
 
         if ($whatToDo == 'Add new column.') {
-            $update->addColumn();
+            $tableHelper->addColumn();
         } else if ($whatToDo == 'Drop column.') {
-            $update->dropColumn();
+            $tableHelper->dropColumn();
         } else if ($whatToDo == 'Add foreign key.') {
-            $update->addForeignKey();
+            $tableHelper->addForeignKey();
         } else if ($whatToDo == 'Update existing column.') {
-            $update->updateColumn();
+            $tableHelper->updateColumn();
         } else if ($whatToDo == 'Drop foreign key.') {
-            $update->removeForeignKey();
+            $tableHelper->removeForeignKey();
         } else {
             $this->error('Option not implemented.');
         }
+        $create->writeClass();
         return 0;
     }
     

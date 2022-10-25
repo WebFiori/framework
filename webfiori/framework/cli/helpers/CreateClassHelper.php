@@ -10,9 +10,11 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\CLICommand;
+use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\ClassWriter;
 use webfiori\framework\cli\helpers\ClassInfoReader;
+use webfiori\framework\writers\ClassWriter;
 /**
  * A wrapper class which helps in creating classes using CLI.
  *
@@ -37,12 +39,12 @@ class CreateClassHelper {
     /**
      * Creates new instance.
      * 
-     * @param CreateCommand $command The command that will be used to read inputs
+     * @param CLICommand $command The command that will be used to read inputs
      * and send outputs to the terminal.
      * 
      * @param ClassWriter $writer The writer that will hold class information.
      */
-    public function __construct(CreateCommand $command, ClassWriter $writer = null) {
+    public function __construct(CLICommand $command, ClassWriter $writer = null) {
         $this->command = $command;
         $this->classWriter = $writer;
         $this->classInfoReader = new ClassInfoReader($this->command);
@@ -119,9 +121,9 @@ class CreateClassHelper {
     /**
      * Returns the command which is used to read inputs and show outputs.
      * 
-     * @return CreateCommand
+     * @return CLICommand
      */
-    public function getCommand() : CreateCommand {
+    public function getCommand() : CLICommand {
         return $this->command;
     }
     /**
@@ -217,7 +219,7 @@ class CreateClassHelper {
      * user.
      * 
      */
-    public function getInput(string $prompt, string $default = null, \webfiori\cli\InputValidator $validator = null) {
+    public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
         return $this->getCommand()->getInput($prompt, $default, $validator);
     }
     /**

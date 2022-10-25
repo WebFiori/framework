@@ -108,6 +108,7 @@ class CreateCommand extends CLICommand {
         if ($answer == 'Quit.') {
         } else if ($answer == 'Database table class.') {
             $create = new CreateTableObj($this);
+            $create->readClassInfo();
         } else if ($answer == 'Entity class from table.') {
             $this->_createEntityFromQuery();
         } else if ($answer == 'Web service.') {

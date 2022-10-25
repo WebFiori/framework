@@ -135,7 +135,6 @@ class UpdateTableCommand extends CLICommand {
         } else {
             $this->error('Option not implemented.');
         }
-        $create->writeClass();
         return 0;
     }
     

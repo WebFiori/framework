@@ -217,7 +217,6 @@ class TableObjHelper {
         if (strlen($comment) != 0) {
             $colObj->setComment($comment);
         }
-        $this->getCreateHelper()->success('Column added.');
     }
     /**
      * 

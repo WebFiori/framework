@@ -10,15 +10,18 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\framework\cli\helpers\CreateClassHelper;
-use webfiori\database\Table;
-use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\mssql\MSSQLColumn;
-use webfiori\framework\AutoLoader;
-use webfiori\database\Column;
-use webfiori\framework\DB;
-use webfiori\database\mysql\MySQLTable;
+use Throwable;
+use webfiori\cli\CLICommand;
 use webfiori\cli\InputValidator;
+use webfiori\database\Column;
+use webfiori\database\mssql\MSSQLColumn;
+use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\database\Table;
+use webfiori\framework\AutoLoader;
+use webfiori\framework\DB;
+use webfiori\framework\WebFioriApp;
+use webfiori\framework\writers\TableClassWriter;
 
 /**
  * A class which contains static methods which is used to create/modify tables.
@@ -28,7 +31,7 @@ use webfiori\cli\InputValidator;
 class TableObjHelper {
     private $table;
     private $command;
-    public function __construct(CreateClassHelper $c, Table $t) {
+    public function __construct(CLICommand $c, Table $t) {
         $this->command = $c;
         $this->table = $t;
     }
@@ -41,10 +44,33 @@ class TableObjHelper {
     }
     /**
      * 
-     * @return CreateClassHelper
+     * @return CLICommand
      */
-    public function getCreateHelper() : CreateClassHelper {
+    public function getCreateHelper() : CLICommand {
         return $this->command;
+    }
+    public function removeFk() {
+        $tableObj = $this->getTable();
+        $helper = $this->getCreateHelper();
+        
+        if ($tableObj->getForignKeysCount() == 0) {
+            $helper->info('Selected table has no foreign keys.');
+
+            return;
+        }
+        $fks = $tableObj->getForignKeys();
+        $optionsArr = [];
+
+        foreach ($fks as $fkObj) {
+            $optionsArr[] = $fkObj->getKeyName();
+        }
+        $toRemove = $helper->select('Select the key that you would like to remove:', $optionsArr);
+        $tableObj->removeReference($toRemove);
+
+        $this->getCreateHelper()->writeClass(false);
+        
+
+        $helper->success('Table updated.');
     }
     public function addColumn() {
         $helper = $this->getCreateHelper();
@@ -74,7 +100,8 @@ class TableObjHelper {
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
         }
-        $this->getCreateHelper()->writeClass(false);
+        $writer = new TableClassWriter($tempTable);
+        $writer->writeClass();
     }
     public function createEntity() {
         $helper = $this->getCreateHelper();
@@ -217,7 +244,7 @@ class TableObjHelper {
 
             do {
                 $colDataType = $colObj->getDatatype();
-                $dataSize = $helper->getCommand()->readInteger('Enter column size:');
+                $dataSize = $helper->readInteger('Enter column size:');
 
                 if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
                     $helper->warning('The data type "varchar" has a maximum size of 21845. The '
@@ -269,7 +296,7 @@ class TableObjHelper {
         $refTableName = $helper->getInput('Enter the name of the referenced table class (with namespace):');
         try {
             $refTable = new $refTableName();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             $helper->error($ex->getMessage());
             return;
         }
@@ -305,7 +332,7 @@ class TableObjHelper {
             $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
             $helper->getWriter()->writeClass();
             $helper->success('Foreign key added.');
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             $helper->error($ex->getMessage());
         }
     }

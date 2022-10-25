@@ -19,7 +19,7 @@
         "webfiori/file":"v1.2.1",
         "webfiori/collections":"v1.1.1",
         "webfiori/ui":"v2.3.5",
-        "webfiori/jsonx":"v3.1.4",
+        "webfiori/jsonx":"v3.1.5",
         "webfiori/database":"v0.5.2",
         "webfiori/http":"v3.2.17",
         "webfiori/mailer":"v1.0.2"

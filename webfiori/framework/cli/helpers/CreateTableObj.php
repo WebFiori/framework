@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\CLICommand;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
@@ -28,7 +29,7 @@ class CreateTableObj extends CreateClassHelper {
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
-    public function __construct(CreateCommand $command) {
+    public function __construct(CLICommand $command) {
         parent::__construct($command, new TableClassWriter());
         
         $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);

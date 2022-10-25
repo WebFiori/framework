@@ -85,8 +85,7 @@ class TableClassWriter extends ClassWriter {
      * 
      */
     private function extractAndSetTableClassName() {
-        $t = $this->getTable();
-        $clazz = $t::class;
+        $clazz = get_class($this->getTable());
         
         $split = explode('\\', $clazz);
         $count = count($split);

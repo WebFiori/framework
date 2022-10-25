@@ -119,8 +119,10 @@ class TableObjHelper {
             $this->isIdentityCheck($colObj);
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
+            $this->getCreateHelper()->writeClass(false);
+            $helper->success('Column added.');
         }
-        $this->getCreateHelper()->writeClass();
+        
     }
     /**
      * Creates entity class based on associated table object.
@@ -386,7 +388,7 @@ class TableObjHelper {
 
         try {
             $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-            $helper->getWriter()->writeClass();
+            $helper->getWriter()->writeClass(false);
             $helper->success('Foreign key added.');
         } catch (Throwable $ex) {
             $helper->error($ex->getMessage());
@@ -437,7 +439,7 @@ class TableObjHelper {
 
         $this->setClassInfo(get_class($tableObj));
         
-        $helper->getWriter()->writeClass();
+        $helper->getWriter()->writeClass(false);
         $this->success('Table updated.');
     }
     public function updateColumn() {

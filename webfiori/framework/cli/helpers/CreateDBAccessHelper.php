@@ -78,8 +78,8 @@ class CreateDBAccessHelper extends CreateClassHelper {
     public function readEntityInfo() {
         $t = $this->getTable();
         $m = $t->getEntityMapper();
-        $m->setEntityName(CLIUtils::readName($this->getCommand(), null, 'Entity class name:'));
-        $m->setNamespace(CLIUtils::readNamespace($this->getCommand(), APP_DIR_NAME.'\\entity', 'Entity namespace:'));
+        $m->setEntityName($this->getCommand()->readClassName('Entity class name:', null));
+        $m->setNamespace($this->getCommand()->readNamespace('Entity namespace:',  APP_DIR_NAME.'\\entity'));
     }
     /**
      * Returns the table at which the database access class will be associated with.

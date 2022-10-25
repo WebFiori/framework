@@ -31,7 +31,7 @@ use webfiori\json\CaseConverter;
  */
 class TableObjHelper {
     private $table;
-    private $command;
+    private $createHelper;
     /**
      * Creates new instance of the class.
      * 
@@ -40,8 +40,8 @@ class TableObjHelper {
      * @param Table $t An instance at which the class will use to create or 
      * modify as class.
      */
-    public function __construct(CLICommand $c, Table $t) {
-        $this->command = $c;
+    public function __construct(CreateTableObj $c, Table $t) {
+        $this->createHelper = $c;
         $this->table = $t;
     }
     /**
@@ -54,10 +54,10 @@ class TableObjHelper {
     }
     /**
      * 
-     * @return CLICommand
+     * @return CreateTableObj
      */
-    public function getCreateHelper() : CLICommand {
-        return $this->command;
+    public function getCreateHelper() : CreateTableObj {
+        return $this->createHelper;
     }
     /**
      * Removes a foreign key from associated table object.
@@ -300,7 +300,7 @@ class TableObjHelper {
 
             do {
                 $colDataType = $colObj->getDatatype();
-                $dataSize = $helper->readInteger('Enter column size:');
+                $dataSize = $helper->getCommand()->readInteger('Enter column size:');
 
                 if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
                     $helper->warning('The data type "varchar" has a maximum size of 21845. The '

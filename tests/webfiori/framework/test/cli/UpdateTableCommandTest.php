@@ -21,7 +21,7 @@ class UpdateTableCommandTest extends TestCase {
         $runner->setInput([
             '   ',
             'ok\\y\\Super',
-            'tables\\EmployeeInfoTable',
+            'app\\database\\TestTable',
             '0',
             'new-col',
             '1',
@@ -74,7 +74,6 @@ class UpdateTableCommandTest extends TestCase {
             "Can this column have null values?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Success: Column added.\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.APP_DIR_NAME.DS."database\".\n",
         ], $runner->getOutput());
     }
 }

@@ -361,7 +361,10 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $ns = CLIUtils::readNamespace($this->getCommand(), APP_DIR_NAME.'\\database', 'Provide us with a namespace for table class:');
         $this->tableObjWriter->setNamespace($ns);
         $this->tableObjWriter->setPath($ns);
-        $tableHelper = new TableObjHelper(new CreateClassHelper($this->getCommand(), $this->tableObjWriter), $this->tableObjWriter->getTable());
+        
+        $create = new CreateTableObj($this->getCommand());
+        $create->getWriter()->setTable($this->tableObjWriter->getTable());
+        $tableHelper = new TableObjHelper($create, $this->tableObjWriter->getTable());
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
         $this->println('Now you have to add columns to the table.');

@@ -8,11 +8,11 @@
 
 namespace webfiori\framework\test;
 
+use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\DB;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
-use app\database\TestTable;
+use webfiori\framework\DB;
 
 /**
  * Description of DBTest

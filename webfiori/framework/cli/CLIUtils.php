@@ -69,6 +69,7 @@ class CLIUtils {
         $isNameValid = false;
 
         do {
+            $c->readClassName($prompt, $suffix, $errMsg);
             $className = trim($c->getInput($prompt));
             
             if ($suffix !== null) {

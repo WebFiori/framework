@@ -132,7 +132,7 @@ class ConfigController {
      * folder if not exist.
      */
     public function createAppConfigFile() {
-        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\\config\\AppConfig')) {
             $this->writeAppConfig();
         }
     }
@@ -797,7 +797,7 @@ class ConfigController {
      * @since 1.5
      */
     public function writeAppConfig() {
-        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
         $cFile->remove();
 
         $this->_writeAppConfigAttrs($cFile);
@@ -1222,7 +1222,7 @@ class ConfigController {
         $this->a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
-        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'config'.DS.'AppConfig.php';
     }
     private function _mkdir($dir) {
         if (!is_dir($dir)) {
@@ -1237,7 +1237,7 @@ class ConfigController {
     private function _writeAppConfigAttrs(&$cFile) {
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR_NAME.";");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\config;");
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
         $this->a($cFile, "use webfiori\\email\\SMTPAccount;");

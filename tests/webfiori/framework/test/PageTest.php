@@ -188,9 +188,9 @@ class PageTest extends TestCase{
     public function testDirs01() {
         $page = new WebPage();
         $page->setTheme();
-        $this->assertEquals('assets/fioriTheme/css',$page->getThemeCSSDir());
-        $this->assertEquals('assets/fioriTheme/images',$page->getThemeImagesDir());
-        $this->assertEquals('assets/fioriTheme/js',$page->getThemeJSDir());
+        $this->assertEquals('',$page->getThemeCSSDir());
+        $this->assertEquals('',$page->getThemeImagesDir());
+        $this->assertEquals('',$page->getThemeJSDir());
     }
     /**
      * @test
@@ -199,17 +199,13 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $page->setTheme();
         $theme = $page->getTheme();
-        $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseThemeName(), get_class($theme));
-        $page->setTheme(get_class($theme));
+        $this->assertNull($theme);
+
+        $page->setTheme('New Theme 2');
         $theme2 = $page->getTheme();
-        $this->assertTrue($theme2 === $theme);
         $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();
-        $this->assertFalse($theme3 === $theme2);
-        $page->setTheme('New Theme 2');
-        $theme4 = $page->getTheme('New Theme 2');
-        $this->assertTrue($theme3 === $theme4);
+        $this->assertTrue($theme3 === $theme2);
     }
     /**
      * @test
@@ -237,10 +233,13 @@ class PageTest extends TestCase{
         $firstThemeName = 'New Theme 2';
         $secondThemeName = 'New Super Theme';
         $page = new WebPage();
+        
         $page->setTheme($firstThemeName);
         $theme3 = $page->getTheme();
-        $page->setTheme();
+        
+        $page->setTheme($secondThemeName);
         $fTheme = $page->getTheme();
+        
         $this->assertFalse($theme3 === $fTheme);
         $this->assertNotEquals($firstThemeName,$fTheme->getName());
         $page->setTheme($secondThemeName);
@@ -570,7 +569,7 @@ class PageTest extends TestCase{
     public function testHead00() {
         $page = new WebPage();
         $head00 = $page->getDocument()->getHeadNode();
-        $page->setTheme();
+        $page->setTheme('New Theme 2');
         $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
     }
@@ -581,7 +580,7 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $page->setDescription('This is for testing.');
         $head00 = $page->getDocument()->getHeadNode();
-        $page->setTheme();
+        $page->setTheme('New Theme 2');
         $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
         $this->assertEquals($head00->getMeta('description')->getAttribute('content'),

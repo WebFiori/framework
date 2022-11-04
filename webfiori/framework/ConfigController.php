@@ -97,8 +97,8 @@ class ConfigController {
                 'primary-lang' => 'EN',
                 'title-sep' => '|',
                 'home-page' => null,
-                'admin-theme' => '\themes\newFiori\NewFiori',
-                'base-theme' => '\themes\newFiori\NewFiori',
+                'admin-theme' => '',
+                'base-theme' => '',
                 'descriptions' => [
                     'EN' => '',
                     'AR' => ''
@@ -428,6 +428,8 @@ class ConfigController {
      * Returns a string that represents the name of admin theme of the web 
      * application.
      * 
+     * Note that if theme is not set the method will return empty string.
+     * 
      * @return string
      * 
      * @since 1.0
@@ -463,11 +465,13 @@ class ConfigController {
      * Returns a string that represents the name of the base theme of the web 
      * application.
      * 
-     * @return string
+     * Note that if theme is not set the method will return empty string.
+     * 
+     * @return string 
      * 
      * @since 1.0
      */
-    public function getBaseTheme() {
+    public function getBaseTheme() : string {
 
         return $this->configVars['site']['base-theme'];
     }

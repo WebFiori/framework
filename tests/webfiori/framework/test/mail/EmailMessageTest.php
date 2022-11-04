@@ -1,8 +1,12 @@
 <?php
 namespace webfiori\framework\test\mail;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
+use webfiori\email\SMTPAccount;
 use webfiori\framework\EmailMessage;
+use webfiori\framework\exceptions\MissingLangException;
+use webfiori\framework\WebFioriApp;
 /**
  * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *
@@ -13,6 +17,16 @@ class EmailMessageTest extends TestCase {
      * @test
      */
     public function testLang00() {
+        $acc = new SMTPAccount([
+            'port' => 587,
+            'server-address' => 'outlook.office365.com',
+            'user' => 'randomxyz@hotmail.com',
+            'pass' => '???',
+            'sender-name' => 'Ibrahim',
+            'sender-address' => 'randomxyz@hotmail.com',
+            'account-name' => 'no-reply'
+        ]);
+        WebFioriApp::getAppConfig()->addAccount($acc);
         $message = new EmailMessage();
         $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
         $this->assertNull($message->getTranslation());
@@ -21,7 +35,7 @@ class EmailMessageTest extends TestCase {
      * @test
      */
     public function testLang01() {
-        $this->expectException(\webfiori\framework\exceptions\MissingLangException::class);
+        $this->expectException(MissingLangException::class);
         $message = new EmailMessage();
         $message->setLang('KR');
     }
@@ -128,7 +142,7 @@ class EmailMessageTest extends TestCase {
      * @test
      */
     public function test00() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No SMTP account was found which has the name "not exist".');
         $message = new EmailMessage('not exist');
     }

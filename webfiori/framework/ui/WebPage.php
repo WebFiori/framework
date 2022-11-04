@@ -984,6 +984,9 @@ class WebPage {
             return;
         }
         $xthemeName = $themeNameOrClass === null ? WebFioriApp::getAppConfig()->getBaseThemeName() : $themeNameOrClass;
+        if (strlen($xthemeName) === 0) {
+            return;
+        }
         $tmpTheme = ThemeLoader::usingTheme($xthemeName);
 
         if ($tmpTheme !== null) {

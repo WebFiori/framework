@@ -405,11 +405,11 @@ class WebFioriApp {
     }
     private function _initAppConfig() {
 
-        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\\config\\AppConfig')) {
             ConfigController::get()->createAppConfigFile();
         }
 
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'config\\AppConfig';
         $this->appConfig = new $constructor();
         ConfigController::get()->setConfig($this->appConfig);
     }

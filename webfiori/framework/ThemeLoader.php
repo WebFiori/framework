@@ -162,7 +162,10 @@ class ThemeLoader {
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {
-            $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
+            $themeName = ConfigController::get()->getBaseTheme();
+            if (strlen($themeName) == 0) {
+                return;
+            }
         }
 
         $themeToLoad = null;

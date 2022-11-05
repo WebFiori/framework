@@ -137,9 +137,9 @@ class ConfigController {
         }
     }
     /**
-     * Creates the class 'GlobalConstants'.
+     * Creates the class 'Env'.
      * 
-     * By default, the class will be created inside the folder 'app/ini'.
+     * By default, the class will be created inside the folder 'APP_DIR/config'.
      * 
      * @throws \Exception The method will throw an exception if the method
      * was unable to create the class.
@@ -149,7 +149,7 @@ class ConfigController {
         $DS = DIRECTORY_SEPARATOR;
         //The class GlobalConstants must exist before autoloader.
         //For this reason, use the 'resource' instead of the class 'File'. 
-        $path = ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS."GlobalConstants.php";
+        $path = ROOT_DIR.$DS.APP_DIR_NAME.$DS.'config'.$DS."Env.php";
         $resource = fopen($path, 'w');
 
         if (!is_resource($resource)) {
@@ -159,26 +159,26 @@ class ConfigController {
         $this->a($resource, [
             "<?php",
             '',
-            "namespace ".APP_DIR_NAME."\\ini;",
+            "namespace ".APP_DIR_NAME."\\config;",
             '',
             $this->docStart,
-            " * A class which is used to initialize global constants.",
+            " * A class which is used to initialize environment variables as global constants.",
             $this->docEmptyLine,
-            " * This class has one static method which is used to define the constants.",
+            " * This class has one static method which is used to define environment variables.",
             " * The class can be used to initialize any constant that the application depends",
             " * on. The constants that this class will initialize are the constants which",
             " * uses the function <code>define()</code>.",
             " * Also, the developer can modify existing ones as needed to change some of the",
-            " * default settings of the framework.",
+            " * default settings of application environment.",
             $this->docEmptyLine,
             " * @since 1.1.0",
             $this->docEnd,
-            "class GlobalConstants {"
+            "class Env {"
         ]);
 
         $this->a($resource, [
             $this->docStart,
-            " * Initialize the constants.",
+            " * Initialize environment variables.",
             $this->docEmptyLine,
             " * Include your own in the body of this method or modify existing ones",
             " * to suite your configuration. It is recommended to check if the global",
@@ -187,27 +187,27 @@ class ConfigController {
             $this->docEmptyLine,
             $this->since10,
             $this->docEnd,
-            "public static function defineConstants() {"
+            "public static function defineEnvVars() {"
         ], 1);
         $constantsArr = [
             'SCRIPT_MEMORY_LIMIT' => [
                 'summary' => 'Memory limit per script.',
-                'description' => "This constant represents the maximum amount of memory each script will 
-                 * consume before showing a fatal error. Default value is 2GB. The 
-                 * developer can change this value as needed.",
+                'description' => "This constant represents the maximum amount of memory each script will
+             * consume before showing a fatal error. 
+             * Default value is 2GB. The* developer can change this value as needed.",
                 'since' => '1.0',
                 'type' => 'string',
                 'value' => "'2048M'"
             ],
             'WF_SESSION_STORAGE' => [
                 'summary' => 'A constant which holds the class name of sessions storage 
-                * engine alongside its namespace.',
+             * engine alongside its namespace.',
                'description' => "The value of this constant is used to configure session storage 
-                * engine. For example, if the name of the class that represents 
-                * storage engine is 'MySessionStorage' and the class exist in the 
-                * namespace 'extras\\util', then the value of the constant should be 
-                * '\\extras\\util\\MySessionStorage'. To use database session storage 
-                * set this constant to the value '\\webfiori\\framework\\session\\DatabaseSessionStorage'.",
+             * engine. For example, if the name of the class that represents 
+             * storage engine is 'MySessionStorage' and the class exist in the 
+             * namespace 'extras\\util', then the value of the constant should be 
+             * '\\extras\\util\\MySessionStorage'. To use database session storage 
+             * set this constant to the value '\\webfiori\\framework\\session\\DatabaseSessionStorage'.",
                'since' => '2.1.0',
                'type' => 'string',
                'value' => "'\\webfiori\\framework\\session\\DefaultSessionStorage'"
@@ -215,24 +215,24 @@ class ConfigController {
             'DATE_TIMEZONE' => [
                 'summary' => 'Define the timezone at which the system will operate in.',
                 'description' => "The value of this constant is passed to the function 'date_default_timezone_set()'. 
-                 * This one is used to fix some date and time related issues when the 
-                 * application is deployed in multiple servers.
-                 * See http://php.net/manual/en/timezones.php for supported time zones.
-                 * Change this as needed.",
+             * This one is used to fix some date and time related issues when the 
+             * application is deployed in multiple servers.
+             * See http://php.net/manual/en/timezones.php for supported time zones.
+             * Change this as needed.",
                 'since' => '1.0',
                 'type' => 'string',
                 'value' => "'Asia/Riyadh'"
             ],
             'PHP_INT_MIN' => [
                 'summary' => 'Fallback for older php versions that does not support the constant 
-                * PHP_INT_MIN.',
+             * PHP_INT_MIN.',
                'since' => '1.0',
                'type' => 'int',
                'value' => '~PHP_INT_MAX'
             ],
             'LOAD_COMPOSER_PACKAGES' => [
                 'summary' => 'This constant is used to tell the core if the application uses composer 
-                * packages or not.',
+             * packages or not.',
                'description' => "If set to true, then composer packages will be loaded.",
                'since' => '1.0',
                'type' => 'boolean',
@@ -241,21 +241,21 @@ class ConfigController {
             'CRON_THROUGH_HTTP' => [
                 'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
                 'description' => "If the constant value is set to true, the framework will add routes to the 
-                 * components which is used to allow access to cron control panel. The control 
-                 * panel is used to execute jobs and check execution status. Default value is false.",
+             * components which is used to allow access to cron control panel. The control 
+             * panel is used to execute jobs and check execution status. Default value is false.",
                 'since' => '1.0',
                 'type' => 'boolean',
                 'value' => "false"
             ],
             'WF_VERBOSE' => [
                 'summary' => 'This constant is used to tell the framework if more information should 
-                * be displayed if an exception is thrown or an error happens.',
+             * be displayed if an exception is thrown or an error happens.',
                'description' => "The main aim 
-                * of this constant is to hide some sensitive information from users if the 
-                * system is in production environment. Note that the constant will have effect 
-                * only if the framework is accessed through HTTP protocol. If used in CLI 
-                * environment, everything will appear. Default value of the constant is 
-                * false.",
+             * of this constant is to hide some sensitive information from users if the 
+             * system is in production environment. Note that the constant will have effect 
+             * only if the framework is accessed through HTTP protocol. If used in CLI 
+             * environment, everything will appear. Default value of the constant is 
+             * false.",
                'since' => '1.0',
                'type' => 'boolean',
                'value' => "false"
@@ -263,35 +263,23 @@ class ConfigController {
             'NO_WWW' => [
                 'summary' => 'This constant is used to redirect a URI with www to non-www.',
                 'description' => "If this constant is defined and is set to true and a user tried to 
-                 * access a resource using a URI that contains www in the host part,
-                 * the router will send a 301 - permanent redirect HTTP response code and 
-                 * send the user to non-www host. For example, if a request is sent to 
-                 * 'https://www.example.com/my-page', it will be redirected to 
-                 * 'https://example.com/my-page'. Default value of the constant is false which 
-                 * means no redirection will be performed.",
+             * access a resource using a URI that contains www in the host part,
+             * the router will send a 301 - permanent redirect HTTP response code and 
+             * send the user to non-www host. For example, if a request is sent to 
+             * 'https://www.example.com/my-page', it will be redirected to 
+             * 'https://example.com/my-page'. Default value of the constant is false which 
+             * means no redirection will be performed.",
                 'since' => '1.0',
                 'type' => 'boolean',
                 'value' => "false"
             ],
-            'MAX_BOX_MESSAGES' => [
-                'summary' => 'The maximum number of message boxes to show in one page.',
-                'description' => "A message box is a box which will be shown in a web page that 
-                 * contains some information. The 
-                 * box can be created manually by using the method 'Util::print_r()' or 
-                 * it can be as a result of an error during execution.
-                 * Default value is 15. The developer can change the value as needed. Note 
-                 * that if the constant is not defined, the number of boxes will 
-                 * be almost unlimited.",
-                'since' => '1.0',
-                'type' => 'int',
-                'value' => "15"
-            ],
+            
             'CLI_HTTP_HOST' => [
                 'summary' => 'Host name to use in case the system is executed through CLI.',
                 'description' => "When the application is running throgh CLI, there is no actual 
-                 * host name. For this reason, the host is set to 127.0.0.1 by default. 
-                 * If this constant is defined, the host will be changed to the value of 
-                 * the constant. Default value of the constant is 'example.com'.",
+             * host name. For this reason, the host is set to 127.0.0.1 by default. 
+             * If this constant is defined, the host will be changed to the value of 
+             * the constant. Default value of the constant is 'example.com'.",
                 'since' => '1.0',
                 'type' => 'string',
                 'value' => "'example.com'"
@@ -299,7 +287,7 @@ class ConfigController {
             'DS' => [
                 'summary' => 'Directory separator.',
                 'description' => "This one is is used as a shorthand instead of using PHP 
-                 * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.",
+             * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.",
                 'since' => '1.0',
                 'type' => 'string',
                 'value' => "DIRECTORY_SEPARATOR"
@@ -307,9 +295,9 @@ class ConfigController {
             'USE_HTTP' => [
                 'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
                 'description' => "The default behaviour of the framework is to use 'https://'. But 
-                 * in some cases, there is a need for using 'http://'.
-                 * If this constant is set to true, the framework will use 'http://' for 
-                 * base URI of the system. Default value is false.",
+             * in some cases, there is a need for using 'http://'.
+             * If this constant is set to true, the framework will use 'http://' for 
+             * base URI of the system. Default value is false.",
                 'since' => '1.0',
                 'type' => 'boolean',
                 'value' => "false"
@@ -1635,6 +1623,7 @@ class ConfigController {
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'apis');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'config');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');

@@ -60,8 +60,7 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            var_dump(THEMES_PATH);
-            die;
+
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
 
@@ -70,6 +69,8 @@ class ThemeLoader {
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
                     self::_scanDir($filesInDir, $pathToScan);
                 }
+            } else {
+                throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
             }
         }
 

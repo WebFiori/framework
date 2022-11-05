@@ -60,7 +60,8 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-
+            var_dump(THEMES_PATH);
+            die;
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
 

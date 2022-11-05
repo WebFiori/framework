@@ -210,6 +210,8 @@ class ThemeLoader {
                 $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
+                var_dump($cName);
+                var_dump($aCName);
 
                 if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
                     $instance = new $aCName();

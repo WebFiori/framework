@@ -201,13 +201,19 @@ class PageTest extends TestCase{
      * @test
      */
     public function testTheme00() {
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]);
         $page = new WebPage();
         $page->setTheme();
         $theme = $page->getTheme();
         $this->assertNull($theme);
-
-        $page->setTheme('New Theme 2');
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => 'New Theme 2'
+        ]);
+        $page->setTheme();
         $theme2 = $page->getTheme();
+        $this->assertNotNull($theme2);
         $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();
         $this->assertTrue($theme3 === $theme2);

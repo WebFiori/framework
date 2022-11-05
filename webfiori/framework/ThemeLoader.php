@@ -63,7 +63,7 @@ class ThemeLoader {
             var_dump(THEMES_PATH);
             var_dump(Util::isDirectory(THEMES_PATH, true));
             if (Util::isDirectory(THEMES_PATH, true)) {
-                $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
+                $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
                 var_dump($themesDirs);
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;

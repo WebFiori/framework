@@ -784,6 +784,15 @@ class ConfigController {
         $this->a($cFile, $phpDocArr, 1);
     }
     /**
+     * Removes the class 'Env.php' and the file 'AppConfig.php'.
+     */
+    public function removeConfigFiles() {
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
+        $cFile->remove();
+        $eFile = new File('Env.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
+        $eFile->remove();
+    }
+    /**
      * Stores configuration variables into the application configuration class.
      * 
      * @since 1.5

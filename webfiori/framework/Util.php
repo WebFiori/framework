@@ -168,16 +168,6 @@ class Util {
 
         return false;
     }
-    /**
-     * Call this method to display errors and warnings.
-     * 
-     * @since 0.2
-     */
-    public static function displayErrors() {
-        ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
-    }
     public static function extractClassName($filePath) {
         $expl = explode(DS, $filePath);
         $classFile = $expl[count($expl) - 1];

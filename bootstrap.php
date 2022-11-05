@@ -1,7 +1,10 @@
 <?php
 
 //Bootstrap file which is used to boot testing process.
+
+
 use webfiori\framework\AutoLoader;
+use webfiori\framework\ConfigController;
 use webfiori\framework\WebFioriApp;
 
 $DS = DIRECTORY_SEPARATOR;
@@ -90,6 +93,7 @@ fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.
 register_shutdown_function(function()
 {
+    ConfigController::get()->removeConfigFiles();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"Starting to run tests...\n");

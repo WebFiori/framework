@@ -1,12 +1,14 @@
 <?php
 namespace webfiori\framework\test;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
-use webfiori\ui\HTMLNode;
-use webfiori\framework\Theme;
+use themes\fioriTheme\NewFTestTheme;
+use webfiori\framework\ConfigController;
 use webfiori\framework\Language;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
+use webfiori\ui\HTMLNode;
 /**
  * Description of PageTest
  *
@@ -187,6 +189,9 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         $page = new WebPage();
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]);
         $page->setTheme();
         $this->assertEquals('',$page->getThemeCSSDir());
         $this->assertEquals('',$page->getThemeImagesDir());
@@ -312,7 +317,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testUsingLang02() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'NM\'.');
         $page = new WebPage();
         $page->setLang('nm');
@@ -321,7 +326,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testUsingLang03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
         $page = new WebPage();
         $page->setLang('jp');
@@ -484,7 +489,7 @@ class PageTest extends TestCase{
      */
     public function testCreateHtmlNode02() {
         $page = new WebPage();
-        $page->setTheme(\themes\fioriTheme\NewFTestTheme::class);
+        $page->setTheme(NewFTestTheme::class);
         $node = $page->createHTMLNode([
             'type' => 'section',
             'element-id' => 'super-sec'

@@ -62,6 +62,8 @@ class ThemeLoader {
             self::$AvailableThemes = [];
             var_dump(THEMES_PATH);
             var_dump(Util::isDirectory(THEMES_PATH, true));
+            var_dump(THEMES_PATH.DS.'fioriTheme');
+            var_dump(Util::isDirectory(THEMES_PATH.DS.'fioriTheme', true));
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
                 var_dump($themesDirs);

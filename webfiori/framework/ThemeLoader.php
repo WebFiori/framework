@@ -60,12 +60,9 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            var_dump(THEMES_PATH);
-            var_dump(Util::isDirectory(THEMES_PATH, true));
-            var_dump(THEMES_PATH.DS.'fioriTheme');
-            var_dump(Util::isDirectory(THEMES_PATH.DS.'fioriTheme', true));
+            
             if (Util::isDirectory(THEMES_PATH, true)) {
-                $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
+                $themesDirs = array_diff(scandir(DS.THEMES_PATH.DS), ['..', '.']);
                 var_dump($themesDirs);
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;

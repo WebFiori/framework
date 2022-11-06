@@ -209,7 +209,7 @@ class DBClassWriter extends ClassWriter {
         foreach ($t->getEntityMapper()->getGettersMap(true) as $methName => $col) {
             $colObj = $t->getColByKey($col);
             if ($colObj instanceof MSSQLColumn) {
-                if (!$col->isIdentity() && !($colObj->getDatatype() == 'datetime2' && $colObj->getDefault() !== null)) {
+                if (!$colObj->isIdentity() && !($colObj->getDatatype() == 'datetime2' && $colObj->getDefault() !== null)) {
                     $recordsArr[] = "'$col' => \$entity->$methName(),";
                 }
             } else {

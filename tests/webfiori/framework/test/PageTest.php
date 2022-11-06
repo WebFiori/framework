@@ -1,12 +1,14 @@
 <?php
 namespace webfiori\framework\test;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
-use webfiori\ui\HTMLNode;
-use webfiori\framework\Theme;
+use themes\fioriTheme\NewFTestTheme;
+use webfiori\framework\ConfigController;
 use webfiori\framework\Language;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
+use webfiori\ui\HTMLNode;
 /**
  * Description of PageTest
  *
@@ -187,29 +189,34 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         $page = new WebPage();
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]);
         $page->setTheme();
-        $this->assertEquals('assets/fioriTheme/css',$page->getThemeCSSDir());
-        $this->assertEquals('assets/fioriTheme/images',$page->getThemeImagesDir());
-        $this->assertEquals('assets/fioriTheme/js',$page->getThemeJSDir());
+        $this->assertEquals('',$page->getThemeCSSDir());
+        $this->assertEquals('',$page->getThemeImagesDir());
+        $this->assertEquals('',$page->getThemeJSDir());
     }
     /**
      * @test
      */
     public function testTheme00() {
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]);
         $page = new WebPage();
         $page->setTheme();
         $theme = $page->getTheme();
-        $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseThemeName(), get_class($theme));
-        $page->setTheme(get_class($theme));
+        $this->assertNull($theme);
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => 'New Theme 2'
+        ]);
+        $page->setTheme();
         $theme2 = $page->getTheme();
-        $this->assertTrue($theme2 === $theme);
+        $this->assertNotNull($theme2);
         $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();
-        $this->assertFalse($theme3 === $theme2);
-        $page->setTheme('New Theme 2');
-        $theme4 = $page->getTheme('New Theme 2');
-        $this->assertTrue($theme3 === $theme4);
+        $this->assertTrue($theme3 === $theme2);
     }
     /**
      * @test
@@ -237,10 +244,13 @@ class PageTest extends TestCase{
         $firstThemeName = 'New Theme 2';
         $secondThemeName = 'New Super Theme';
         $page = new WebPage();
+        
         $page->setTheme($firstThemeName);
         $theme3 = $page->getTheme();
-        $page->setTheme();
+        
+        $page->setTheme($secondThemeName);
         $fTheme = $page->getTheme();
+        
         $this->assertFalse($theme3 === $fTheme);
         $this->assertNotEquals($firstThemeName,$fTheme->getName());
         $page->setTheme($secondThemeName);
@@ -313,7 +323,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testUsingLang02() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'NM\'.');
         $page = new WebPage();
         $page->setLang('nm');
@@ -322,7 +332,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testUsingLang03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
         $page = new WebPage();
         $page->setLang('jp');
@@ -485,7 +495,7 @@ class PageTest extends TestCase{
      */
     public function testCreateHtmlNode02() {
         $page = new WebPage();
-        $page->setTheme(\themes\fioriTheme\NewFTestTheme::class);
+        $page->setTheme(NewFTestTheme::class);
         $node = $page->createHTMLNode([
             'type' => 'section',
             'element-id' => 'super-sec'
@@ -570,7 +580,7 @@ class PageTest extends TestCase{
     public function testHead00() {
         $page = new WebPage();
         $head00 = $page->getDocument()->getHeadNode();
-        $page->setTheme();
+        $page->setTheme('New Theme 2');
         $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
     }
@@ -581,7 +591,7 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $page->setDescription('This is for testing.');
         $head00 = $page->getDocument()->getHeadNode();
-        $page->setTheme();
+        $page->setTheme('New Theme 2');
         $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
         $this->assertEquals($head00->getMeta('description')->getAttribute('content'),

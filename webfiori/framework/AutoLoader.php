@@ -597,13 +597,13 @@ class AutoLoader {
                 //Index 1 of the explode will contain class namespace.
                 if (isset($this->casheArr[$exploded[1]])) {
                     if (!in_array($exploded[0], $this->casheArr[$exploded[1]])) {
-                        $this->casheArr[$exploded[1]][] = $exploded[0];
+                        $this->casheArr[$exploded[1]][] = $this->getRoot().$exploded[0];
                     }
                 } else {
                     //The cashe array hold namespace as index and a set of 
                     //Pathes to the same class.
                     $this->casheArr[$exploded[1]] = [
-                        $exploded[0]
+                        $this->getRoot().$exploded[0]
                     ];
                 }
             }
@@ -642,9 +642,9 @@ class AutoLoader {
                 foreach ($this->loadedClasses as $classArr) {
                     if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
                         //A class without a namespace
-                        fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
                     } else {
-                        fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
                     }
                 }
                 fclose($h);

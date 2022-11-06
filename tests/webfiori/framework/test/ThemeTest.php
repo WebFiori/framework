@@ -2,9 +2,12 @@
 namespace webfiori\framework\test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\WebFioriApp;
+use themes\fioriTheme\NewFTestTheme;
+use webfiori\framework\ConfigController;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
+use webfiori\framework\WebFioriApp;
+use const DS;
 /**
  * Description of ThemeTest
  *
@@ -20,7 +23,13 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testToJson00() {
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]); 
         $theme = ThemeLoader::usingTheme();
+        $this->assertNull($theme);
+        $theme = ThemeLoader::usingTheme('New Super Theme');
+                
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{"name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":""}',$j.'');
@@ -49,7 +58,12 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testUseTheme01() {
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => ''
+        ]); 
         $theme = ThemeLoader::usingTheme();
+        $this->assertNull($theme);
+        $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
         $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
@@ -60,6 +74,10 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testCreateHTMLNode00() {
+        ConfigController::get()->updateSiteInfo([
+            'base-theme' => 'New Super Theme'
+        ]);   
+                
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());

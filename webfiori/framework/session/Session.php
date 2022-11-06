@@ -774,7 +774,7 @@ class Session implements JsonI {
             set_error_handler(function ($errNo, $errStr) {
                 throw  new SessionException($errStr, $errNo);
             });
-            $sesstionObj = unserialize($encrypted);
+            $sesstionObj = unserialize($serialized);
             restore_error_handler();
 
             if ($sesstionObj instanceof Session) {

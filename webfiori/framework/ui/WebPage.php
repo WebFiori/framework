@@ -13,6 +13,7 @@ namespace webfiori\framework\ui;
 use Error;
 use Exception;
 use webfiori\collections\LinkedList;
+use webfiori\framework\ConfigController;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
@@ -983,7 +984,10 @@ class WebPage {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
             return;
         }
-        $xthemeName = $themeNameOrClass === null ? WebFioriApp::getAppConfig()->getBaseThemeName() : $themeNameOrClass;
+        $xthemeName = $themeNameOrClass === null ? ConfigController::get()->getBaseTheme() : $themeNameOrClass;
+        if (strlen($xthemeName) === 0) {
+            return;
+        }
         $tmpTheme = ThemeLoader::usingTheme($xthemeName);
 
         if ($tmpTheme !== null) {

@@ -60,15 +60,17 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-
+            
             if (Util::isDirectory(THEMES_PATH, true)) {
-                $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-
+                $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
+                
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
                     self::_scanDir($filesInDir, $pathToScan);
                 }
+            } else {
+                throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
             }
         }
 
@@ -162,7 +164,10 @@ class ThemeLoader {
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {
-            $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
+            $themeName = ConfigController::get()->getBaseTheme();
+            if (strlen($themeName) == 0) {
+                return;
+            }
         }
 
         $themeToLoad = null;

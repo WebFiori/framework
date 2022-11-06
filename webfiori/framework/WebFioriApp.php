@@ -110,7 +110,7 @@ class WebFioriApp {
             mb_http_output($encoding);
             mb_regex_encoding($encoding);
         }
-        $this->_loadConstants();
+        $this->loadEnvVars();
         /**
          * Set memory limit.
          */
@@ -405,11 +405,11 @@ class WebFioriApp {
     }
     private function _initAppConfig() {
 
-        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\\config\\AppConfig')) {
             ConfigController::get()->createAppConfigFile();
         }
 
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'config\\AppConfig';
         $this->appConfig = new $constructor();
         ConfigController::get()->setConfig($this->appConfig);
     }
@@ -564,8 +564,8 @@ class WebFioriApp {
          */
         define('WF_RELEASE_DATE', '2022-08-21');
     }
-    private function _loadConstants() {
-        if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
+    private function loadEnvVars() {
+        if (!class_exists(APP_DIR_NAME.'\config\Env')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
@@ -581,14 +581,14 @@ class WebFioriApp {
                         'ConfigController.php';
             }
             require_once $confControllerPath;
-            $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
 
             if (!file_exists($path)) {
                 ConfigController::get()->createConstClass();
             }
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
         }
-        call_user_func(APP_DIR_NAME.'\ini\GlobalConstants::defineConstants');
+        call_user_func(APP_DIR_NAME.'\config\\Env::defineEnvVars');
     }
     
     private function setHandler() {

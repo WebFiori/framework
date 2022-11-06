@@ -244,7 +244,7 @@ class RunSQLQueryCommand extends CLICommand {
     }
     private function runFileQuery(DB $schema, File $f) {
         $this->println('Executing the query...');
-        $schema->setQuery($file->getRawData());
+        $schema->setQuery($f->getRawData());
         try {
             $schema->execute();
         } catch (DatabaseException $ex) {

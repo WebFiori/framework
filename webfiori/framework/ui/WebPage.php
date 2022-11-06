@@ -728,7 +728,7 @@ class WebPage {
         if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
             Response::write($this->getDocument()->toHTML($formatted));
-            return;
+            return null;
         }
         return $this->getDocument();
     }

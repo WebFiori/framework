@@ -36,13 +36,11 @@ class CreateTable {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+        
         $dbConn = CLIUtils::getConnectionName($this->_getCommand());
         
         if ($dbConn !== null) {
             $tableInst = CLIUtils::readTable($this->_getCommand());
-            $tableClassNameValidity = false;
-            $tableClassName = $this->_getCommand()->getArgValue('--table');
 
             $db = new DB($dbConn);
             $db->addTable($tableInst);

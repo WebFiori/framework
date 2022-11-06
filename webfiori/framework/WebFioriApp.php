@@ -265,7 +265,7 @@ class WebFioriApp {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $constructor = '\\'.APP_DIR_NAME.'\\config\\AppConfig';
 
         return new $constructor();
     }

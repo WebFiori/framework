@@ -62,8 +62,8 @@ class ThemeLoader {
             self::$AvailableThemes = [];
             
             if (Util::isDirectory(THEMES_PATH, true)) {
-                $themesDirs = array_diff(scandir(DS.THEMES_PATH.DS), ['..', '.']);
-                var_dump($themesDirs);
+                $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
+                
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
@@ -210,8 +210,6 @@ class ThemeLoader {
                 $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
-                var_dump($cName);
-                var_dump($aCName);
 
                 if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
                     $instance = new $aCName();

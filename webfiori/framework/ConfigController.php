@@ -309,7 +309,7 @@ class ConfigController {
         }
         $this->a($resource, "        if (!defined('THEMES_PATH')){");
         $this->a($resource, "            \$themesDirName = 'themes';");
-        $this->a($resource, "            \$themesPath = trim(substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/config')), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.\$themesDirName;");
+        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/config')).DIRECTORY_SEPARATOR.\$themesDirName;");
         $this->a($resource, '            /**');
         $this->a($resource, '             * This constant represents the directory at which themes exist.');
         $this->a($resource, '             * ');

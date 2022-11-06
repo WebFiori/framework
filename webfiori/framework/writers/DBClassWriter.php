@@ -511,18 +511,16 @@ class DBClassWriter extends ClassWriter {
     public function getUniqueColsKeys() : array {
         $table = $this->getTable();
         
-        if ($table instanceof MSSQLTable) {
-            if ($table->hasIdentity()) {
-                $cols = [];
-                
-                foreach ($table->getCols() as $key => $col) {
-                    if ($col->isIdentity()) {
-                        $cols[] = $key;
-                        break;
-                    }
+        if ($table instanceof MSSQLTable && $table->hasIdentity()) {
+            $cols = [];
+
+            foreach ($table->getCols() as $key => $col) {
+                if ($col->isIdentity()) {
+                    $cols[] = $key;
+                    break;
                 }
-                return $cols;
             }
+            return $cols;
         }
         
         $recordUniqueCols  = $table->getPrimaryKeyColsKeys();

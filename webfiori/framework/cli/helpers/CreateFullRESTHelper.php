@@ -367,6 +367,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $tableHelper = new TableObjHelper($create, $this->tableObjWriter->getTable());
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
+        $tableHelper->getCreateHelper()->setNamespace($ns);
+        $tableHelper->getCreateHelper()->setPath($ns);
+        $tableHelper->getCreateHelper()->setClassName($this->tableObjWriter->getName());
         $this->println('Now you have to add columns to the table.');
         $tableHelper->addColumns();
         

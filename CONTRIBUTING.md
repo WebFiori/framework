@@ -11,12 +11,12 @@ pull request in the repo which corresponds to the library.
 * Make sure that you are following the framework's code convention when writing your code.
 
 ## Coding Convention
-Overall, the framework follows the same convention as Java Programming Language. For sure there are few changes since we are dealing with PHP and not Java. Please follow the following conventions when writing your code:
+Please follow the following conventions when writing your code:
 * Always place your code inside classes.
 * Always declare one namespace per file.
 * Always place one class per file.
 * The name of your .php file should be the same as your class name.
-* Use 'camelCase' in your methods names.
+* Use 'camelCase' in your methods names and variables names.
 
 ## Other rules to follow:
 * Make sure that you add 'PHPDoc' to your code.

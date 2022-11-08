@@ -319,13 +319,13 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _asArrayHelper($group) {
-        $retVal = [
-            'group-id' => $group->getID(),
-            'given-title' => $group->getName(),
-            'child-groups' => [],
-            'privileges' => []
-        ];
-
+        $retVal = [];
+        
+        $retVal['group-id'] = $group->getID();
+        $retVal['given-title'] = $group->getName();
+        $retVal['child-groups'] = [];
+        $retVal['privileges'] = [];
+        
         foreach ($group->childGroups() as $groupX) {
             $retVal['child-groups'][] = $this->_asArrayHelper($groupX);
         }
@@ -605,12 +605,12 @@ class Access {
                 $groupsBelongsTo[] = $prSplit[1];
             }
         }
-
-        return [
-            'privileges-to-have' => $privilegesToHave,
-            'privileges-to-not-have' => $privilegesToNotHave,
-            'groups-belongs-to' => $groupsBelongsTo
-        ];
+        $retVal = [];
+        $retVal['privileges-to-have'] = $privilegesToHave;
+        $retVal['privileges-to-not-have'] = $privilegesToNotHave;
+        $retVal['groups-belongs-to'] = $groupsBelongsTo;
+        
+        return $retVal;
     }
     private function _groupHasPrivilege($prId, $group) {
         $retVal = false;

@@ -22,6 +22,14 @@ class NewTestTheme2 extends Theme {
         $this->setLicenseName('MIT');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setUrl('https://my-theme-side.com');
+        $this->setBeforeLoaded(function (Theme $theme) {
+            $theme->setDescription('This theme is in before loaded.');
+        });
+        $this->setAfterLoaded(function (Theme $theme) {
+            $paragraph = $theme->getPage()->insert('p');
+            $paragraph->text('Theme is loaded.');
+            $paragraph->setID('theme-after-loaded-el');
+        });
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 

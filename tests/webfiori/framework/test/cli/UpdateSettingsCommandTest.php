@@ -16,6 +16,41 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
+    public function test00() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'q'
+        ]);
+        $runner->setInput([]);
+        
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+        ], $runner->getOutput());
+
+    }
+    public function testUpdatePrimaryLang() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'primary-lang'
+        ]);
+        $runner->setInput(['1']);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select new primary language:\n",
+            "0: EN\n",
+            "1: AR\n",
+            "Success: Primary language successfully updated.\n"
+        ], $runner->getOutput());
+        $this->assertEquals('AR', ConfigController::get()->getPrimaryLang());
+    }
+    /**
+     * @test
+     */
     public function testUpdateVersion00() {
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([

@@ -53,6 +53,9 @@ class ThemeTest extends TestCase {
         $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
         $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
         $this->assertEquals(ROOT_DIR.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
+        $this->assertEquals('css', $theme->getCssDirName());
+        $this->assertEquals('js', $theme->getJsDirName());
+        $this->assertEquals('images', $theme->getImagesDirName());
     }
     /**
      * @test

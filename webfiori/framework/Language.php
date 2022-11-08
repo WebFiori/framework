@@ -307,9 +307,7 @@ class Language {
             } else if (isset($this->languageVars[$subSplit[0]])) {
                 $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
             } else {
-                $this->createAndSet($dir, [
-                    $varName => $varValue
-                ]);
+                $this->createAndSet($dir, [$varName => $varValue]);
             }
         }
     }

@@ -98,9 +98,7 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _setAdminTheme() {
         $classNs = $this->getThemeNs();
-        ConfigController::get()->updateSiteInfo([
-            'admin-theme' => $classNs
-        ]);
+        ConfigController::get()->updateSiteInfo(['admin-theme' => $classNs]);
         $this->success('Admin theme successfully updated.');
     }
     private function _setHome() {
@@ -110,16 +108,12 @@ class UpdateSettingsCommand extends CLICommand {
             return;
         }
         $home = $this->select('Select home page route:', $routes);
-        ConfigController::get()->updateSiteInfo([
-            'home-page' => trim($home, Router::base())
-        ]);
+        ConfigController::get()->updateSiteInfo(['home-page' => trim($home, Router::base())]);
         $this->success('Home page successfully updated.');
     }
     private function _setPrimaryTheme() {
         $classNs = $this->getThemeNs();
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => $classNs
-        ]);
+        ConfigController::get()->updateSiteInfo(['base-theme' => $classNs]);
         $this->success('Primary theme successfully updated.');
     }
     private function _updateCronPass() {
@@ -140,9 +134,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         $descriptions = WebFioriApp::getAppConfig()->getDescriptions();
         $descriptions[$lang] = $newName;
-        ConfigController::get()->updateSiteInfo([
-            'descriptions' => $descriptions
-        ]);
+        ConfigController::get()->updateSiteInfo(['descriptions' => $descriptions]);
         $this->success('Description successfully updated.');
     }
     private function _updateName() {
@@ -153,17 +145,13 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         $names = WebFioriApp::getAppConfig()->getWebsiteNames();
         $names[$lang] = trim($newName);
-        ConfigController::get()->updateSiteInfo([
-            'website-names' => $names
-        ]);
+        ConfigController::get()->updateSiteInfo(['website-names' => $names]);
         $this->println('Name successfully updated.');
     }
     private function _updatePrimaryLang() {
         $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
         $newPrimary = $this->select('Select new primary language:', $langs);
-        ConfigController::get()->updateSiteInfo([
-            'primary-lang' => $newPrimary
-        ]);
+        ConfigController::get()->updateSiteInfo(['primary-lang' => $newPrimary]);
         $this->success('Primary language successfully updated.');
     }
     private function _updateTitle() {
@@ -174,9 +162,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         $titles = WebFioriApp::getAppConfig()->getTitles();
         $titles[$lang] = trim($newName);
-        ConfigController::get()->updateSiteInfo([
-            'titles' => $titles
-        ]);
+        ConfigController::get()->updateSiteInfo(['titles' => $titles]);
         $this->success('Title successfully updated.');
     }
     private function _updateTitleSep() {
@@ -184,9 +170,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        ConfigController::get()->updateSiteInfo([
-            'title-sep' => $newSep
-        ]);
+        ConfigController::get()->updateSiteInfo(['title-sep' => $newSep]);
         $this->success('Title separator successfully updated.');
     }
     private function _updateVersionInfo() {

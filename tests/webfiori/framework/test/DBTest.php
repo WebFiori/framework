@@ -74,6 +74,6 @@ class DBTest extends TestCase {
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
         $this->assertEquals(2, count($db->getTables()));
-        ConfigController::get()->removeDBConnection('default-conn');
+        WebFioriApp::getAppConfig()->removeDBConnections();
     }
 }

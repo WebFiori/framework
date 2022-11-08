@@ -59,6 +59,6 @@ class DBTest extends TestCase {
         $db = new DB($conn);
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
-        $this->assertEquals(1, count($db->getTables()));
+        $this->assertEquals(2, count($db->getTables()));
     }
 }

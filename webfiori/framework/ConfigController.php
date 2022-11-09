@@ -509,9 +509,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        $this->configVars['site']['home-page'];
 
-        return null;
+        return $this->configVars['site']['home-page'];
     }
     /**
      * Returns a string that represents primary language of the web application.

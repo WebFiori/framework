@@ -486,6 +486,11 @@ abstract class AbstractJob implements JsonI {
             $val = $this->getArgValFromTerminal($name);
         }
         
+        
+        
+        if ($val === null) {
+            $val = $argObj->getValue();
+        }
         if ($val === null) {
             $val = $argObj->getDefault();
         }

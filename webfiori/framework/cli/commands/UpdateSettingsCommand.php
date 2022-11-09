@@ -108,7 +108,7 @@ class UpdateSettingsCommand extends CLICommand {
             return;
         }
         $home = $this->select('Select home page route:', $routes);
-        ConfigController::get()->updateSiteInfo(['home-page' => trim($home, Router::base())]);
+        ConfigController::get()->updateSiteInfo(['home-page' => substr($home, strlen(Router::base()) + 1)]);
         $this->success('Home page successfully updated.');
     }
     private function _setPrimaryTheme() {
@@ -184,12 +184,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         $versionReleaseDate = $this->getInput('Release date (YYYY-MM-DD):', date('Y-m-d'), new InputValidator(function ($val)
         {
-            $trimmed = trim($val);
-
-            if (strlen($trimmed) == 0) {
-                return false;
-            }
-            $expl = explode('-', $trimmed);
+            $expl = explode('-', $val);
 
             if (count($expl) != 3) {
                 return false;

@@ -12,6 +12,7 @@ use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
+use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
 
@@ -73,5 +74,6 @@ class DBTest extends TestCase {
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
         $this->assertEquals(2, count($db->getTables()));
+        WebFioriApp::getAppConfig()->removeDBConnections();
     }
 }

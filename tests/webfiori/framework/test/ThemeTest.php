@@ -56,7 +56,6 @@ class ThemeTest extends TestCase {
         $this->assertEquals('css', $theme->getCssDirName());
         $this->assertEquals('js', $theme->getJsDirName());
         $this->assertEquals('images', $theme->getImagesDirName());
-        $this->assertNull($theme->getPage());
     }
     /**
      * @test

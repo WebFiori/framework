@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework;
 
-use webfiori\email\EmailMessage;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\framework\exceptions\MissingLangException;
@@ -23,7 +22,7 @@ use webfiori\framework\WebFioriApp;
  * @author Ibrahim
  * @version 1.0.6
  */
-class EmailMessage extends EmailMessage {
+class EmailMessage extends \webfiori\email\EmailMessage {
     /**
      *
      * @var Language|null 

@@ -112,7 +112,7 @@ class AddCommandTest extends TestCase {
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
             "Error: Unable to connect to the database.\n",
-            "Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 2002 - No such file or directory\n",
             "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in application configuration.\n"
         ], $runner->getOutput());
@@ -156,7 +156,7 @@ class AddCommandTest extends TestCase {
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
             "Error: Unable to connect to the database.\n",
-            "Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 2002 - No such file or directory\n",
             "Would you like to store conne...y/N)\n",
         ], $runner->getOutput());
     }

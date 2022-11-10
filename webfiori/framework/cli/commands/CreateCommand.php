@@ -76,10 +76,6 @@ class CreateCommand extends CLICommand {
         $classInfo = $infoReader->readClassInfo($defaultNs);
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         
-        if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "'.'".');
-            $classInfo['namespace'] = APP_DIR_NAME.'\\entity';
-        }
         $mapper = $tableObj->getEntityMapper();
         if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
             $addExtra = true;

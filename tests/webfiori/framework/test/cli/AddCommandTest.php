@@ -70,7 +70,92 @@ class AddCommandTest extends TestCase {
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
             "Success: Connected. Adding the connection...\n",
-            'Success: Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".'."\n"
+            "Success: Connection information was stored in application configuration.\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testAddDBConnection01() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            '0',
+            '0',
+            '127.0.0.1',
+            '',
+            'root',
+            '12345326',
+            'testing_db',
+            '',
+            'y'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'add'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+        $this->assertEquals([
+            "What would you like to add?\n",
+            "0: New database connection.\n",
+            "1: New SMTP connection.\n",
+            "2: New website language.\n",
+            "3: Quit. <--\n",
+            "Select database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Database host: Enter = '127.0.0.1'\n",
+            "Port number: Enter = '3306'\n",
+            "Username:\n",
+            "Password:\n",
+            "Database name:\n",
+            "Give your connection a friendly name: Enter = '$connName'\n",
+            "Trying to connect to the database...\n",
+            "Error: Unable to connect to database: 2002 - No connection could be made because the target machine actively refused it\n",
+            "Would you like to store conne...y/N)\n",
+            "Success: Connection information was stored in application configuration.\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testAddDBConnection02() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            '0',
+            '0',
+            '127.0.0.1',
+            '',
+            'root',
+            '12345326',
+            'testing_db',
+            '',
+            'n'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'add'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+        $this->assertEquals([
+            "What would you like to add?\n",
+            "0: New database connection.\n",
+            "1: New SMTP connection.\n",
+            "2: New website language.\n",
+            "3: Quit. <--\n",
+            "Select database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Database host: Enter = '127.0.0.1'\n",
+            "Port number: Enter = '3306'\n",
+            "Username:\n",
+            "Password:\n",
+            "Database name:\n",
+            "Give your connection a friendly name: Enter = '$connName'\n",
+            "Trying to connect to the database...\n",
+            "Error: Unable to connect to database: 2002 - No connection could be made because the target machine actively refused it\n",
+            "Would you like to store conne...y/N)\n",
         ], $runner->getOutput());
     }
     /**

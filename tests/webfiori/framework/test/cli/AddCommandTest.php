@@ -111,8 +111,9 @@ class AddCommandTest extends TestCase {
             "Database name:\n",
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
-            "Error: Unable to connect to database: 2002 - No connection could be made because the target machine actively refused it\n",
-            "Would you like to store conne...y/N)\n",
+            "Error: Unable to connect to the database.\n",
+            "Error: \n",
+            "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in application configuration.\n"
         ], $runner->getOutput());
     }
@@ -158,85 +159,7 @@ class AddCommandTest extends TestCase {
             "Would you like to store conne...y/N)\n",
         ], $runner->getOutput());
     }
-    /**
-     * @test
-     */
-//    public function testAddDBConnection01() {
-//        $runner = new CommandRunner([
-//            '0',
-//            '0',
-//            '',
-//            '',
-//            'root',
-//            '12345',
-//            'testing_db',
-//            '',
-//            'n'
-//        ]);
-//        $runner->runCommand(new AddCommand());
-//        $this->assertEquals(0, $runner->getExitStatus());
-//        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
-//        $this->assertTrue($runner->isOutputEquals([
-//            "What would you like to add?\n",
-//            "0: New database connection.\n",
-//            "1: New SMTP connection.\n",
-//            "2: New website language.\n",
-//            "3: Quit. <--\n",
-//            "Select database type:\n",
-//            "0: mysql\n",
-//            "1: mssql\n",
-//            "Database host: Enter = \"127.0.0.1\"\n",
-//            "Port number: Enter = \"3306\"\n",
-//            "Username:\n",
-//            "Password:\n",
-//            "Database name:\n",
-//            "Give your connection a friendly name: Enter = \"$connName\"\n",
-//            "Trying to connect to the database...\n",
-//            "Error: Unable to connect to the database.\n",
-//            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
-//            "Would you like to store connection information anyway?(y/N)\n"
-//        ], $this));
-//    }
-    /**
-     * @test
-     */
-//    public function testAddDBConnection03() {
-//        $runner = new CommandRunner([
-//            '0',
-//            '0',
-//            '',
-//            '',
-//            'root',
-//            '12345',
-//            'testing_db',
-//            '',
-//            'y'
-//        ]);
-//        $runner->runCommand(new AddCommand());
-//        $this->assertEquals(0, $runner->getExitStatus());
-//        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
-//        $this->assertTrue($runner->isOutputEquals([
-//            "What would you like to add?\n",
-//            "0: New database connection.\n",
-//            "1: New SMTP connection.\n",
-//            "2: New website language.\n",
-//            "3: Quit. <--\n",
-//            "Select database type:\n",
-//            "0: mysql\n",
-//            "1: mssql\n",
-//            "Database host: Enter = \"127.0.0.1\"\n",
-//            "Port number: Enter = \"3306\"\n",
-//            "Username:\n",
-//            "Password:\n",
-//            "Database name:\n",
-//            "Give your connection a friendly name: Enter = \"$connName\"\n",
-//            "Trying to connect to the database...\n",
-//            "Error: Unable to connect to the database.\n",
-//            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
-//            "Would you like to store connection information anyway?(y/N)\n",
-//            "Success: Connection information was stored in the class \"".APP_DIR_NAME."\\AppConfig\".\n"
-//        ], $this));
-//    }
+    
     /**
      * @test
      */
@@ -313,6 +236,47 @@ class AddCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
+    }
+    /**
+     * @test
+     */
+    public function testAddSMTPConnection00() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            '1',
+            '127.0.0.1',
+            '',
+            'test@example.com',
+            '12345326',
+            'test@example.com',
+            'test@example.com',
+            '',
+            'n'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'add'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $connName = 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts());
+        $this->assertEquals([
+            "What would you like to add?\n",
+            "0: New database connection.\n",
+            "1: New SMTP connection.\n",
+            "2: New website language.\n",
+            "3: Quit. <--\n",
+            "SMTP Server address: Enter = '127.0.0.1'\n",
+            "Port number: Enter = '25'\n",
+            "Username:\n",
+            "Password:\n",
+            "Sender email address: Enter = 'test@example.com'\n",
+            "Sender name: Enter = 'test@example.com'\n",
+            "Give your connection a friendly name: Enter = '$connName'\n",
+            "Trying to connect. This can take up to 1 minute...\n",
+            "Error: Unable to connect to SMTP server.\n",
+            "Error Information: \n",
+            "Would you like to store connection information anyway?(y/N)\n",
+        ], $runner->getOutput());
     }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');

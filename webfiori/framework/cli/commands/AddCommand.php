@@ -91,7 +91,7 @@ class AddCommand extends CLICommand {
             $this->success('Connected. Adding the connection...');
 
             ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
-            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+            $this->success('Connection information was stored in application configuration.');
         } else {
             $this->error('Unable to connect to the database.');
             $this->error($addConnection->getMessage());
@@ -164,7 +164,7 @@ class AddCommand extends CLICommand {
             if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
                 $this->success('Connectd. Adding connection information...');
                 ConfigController::get()->updateOrAddEmailAccount($smtpConn);
-                $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+                $this->success('Connection information was stored in application configuration.');
 
                 
             } else {
@@ -187,7 +187,7 @@ class AddCommand extends CLICommand {
             } else if ($smtpOrDbConn instanceof ConnectionInfo) {
                 ConfigController::get()->addOrUpdateDBConnection($smtpOrDbConn);
             }
-            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+            $this->success('Connection information was stored in application configuration.');
         }
     }
 }

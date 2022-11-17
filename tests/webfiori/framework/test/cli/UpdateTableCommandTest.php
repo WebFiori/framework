@@ -76,4 +76,56 @@ class UpdateTableCommandTest extends TestCase {
             "Success: Column added.\n",
         ], $runner->getOutput());
     }
+    /**
+     * 
+     */
+    public function test01() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-table',
+        ]);
+        $runner->setInput([
+            'app\\database\\TestTable',
+            '2',
+            '',
+            '1',
+            '0',
+            'user-id',
+            'int',
+            '10',
+            'n',
+            'n',
+            '',
+            'n',
+            'Cool modifiyed column.'
+        ]);
+        
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter database table class name (include namespace):\n",
+            "Error: Class not found.\n",
+            "Enter database table class name (include namespace):\n",
+            "Error: Class not found.\n",
+            "Enter database table class name (include namespace):\n",
+            "What operation whould you like to do with the table?\n",
+            "0: Add new column.\n",
+            "1: Add foreign key.\n",
+            "2: Update existing column.\n",
+            "3: Drop column.\n",
+            "4: Drop foreign key.\n",
+            "Which column would you like to update?\n",
+            "0: id\n",
+            "Enter a new name for column key:\n",
+            "Select column data type:\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column unique?(y/N)\n",
+            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column updated.\n",
+        ], $runner->getOutput());
+    }
 }

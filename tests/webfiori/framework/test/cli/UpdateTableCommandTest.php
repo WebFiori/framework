@@ -3,9 +3,8 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\Runner;
-use webfiori\framework\cli\commands\UpdateSettingsCommand;
-use webfiori\framework\ConfigController;
+use webfiori\database\Table;
+use webfiori\file\File;
 use webfiori\framework\WebFioriApp;
 
 class UpdateTableCommandTest extends TestCase {
@@ -96,7 +95,10 @@ class UpdateTableCommandTest extends TestCase {
             'n',
             '',
             'n',
-            'Cool modifiyed column.'
+            'Cool modifiyed column.',
+            'y',
+            'Modified',
+            ''
         ]);
         
         
@@ -137,7 +139,19 @@ class UpdateTableCommandTest extends TestCase {
             "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
             "Can this column have null values?(y/N)\n",
             "Enter your optional comment about the column:\n",
+            "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Column updated.\n",
         ], $runner->getOutput());
+        $clazz = '\\app\\database\\ModifiedTable';
+        $this->assertTrue(class_exists($clazz));
+        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file->remove();
+        $obj = new $clazz();
+        $this->assertTrue($obj instanceof Table);
+        $col = $obj->getColByKey('user-id');
+        $this->assertEquals('int', $col->getDatatype());
+        $this->assertEquals(10, $col->getSize());
     }
 }

@@ -512,7 +512,7 @@ class TableObjHelper {
         $path = AutoLoader::getClassPath($cName, $ns)[0];
         $createHelper->setClassName($cName);
         $createHelper->setNamespace($ns);
-        $createHelper->setPath($path);
+        $createHelper->setPath(substr($path, 0, strlen($path) - strlen($cName.'.php')));
     }
     private function getFkCols() {
         $colNumber = 1;

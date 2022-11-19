@@ -461,8 +461,8 @@ class TableObjHelper {
 
         $this->setClassInfo(get_class($tableObj));
         
-        $helper->getWriter()->writeClass(false);
-        $this->success('Table updated.');
+        $this->copyCheck();
+        $helper->success('Table updated.');
     }
     public function updateColumn() {
         $tableObj = $this->getTable();

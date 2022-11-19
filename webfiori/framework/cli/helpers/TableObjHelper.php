@@ -352,6 +352,18 @@ class TableObjHelper {
             } while (!$validScale);
         }
     }
+    public function copyCheck() {
+        $helper = $this->getCreateHelper();
+        if ($helper->confirm('Would you like to update same class or create a copy with the update?', false)) {
+            $info = $helper->getClassInfo(APP_DIR_NAME.'\\database', 'Table');
+            $helper->setClassName($info['name']);
+            $helper->setNamespace($info['namespace']);
+            $helper->setPath($info['path']);
+            $helper->getWriter()->writeClass(false);
+        } else {
+            $helper->getWriter()->writeClass(false);
+        }
+    }
     public function addForeignKey() {
         $refTable = null;
         $helper = $this->getCreateHelper();
@@ -480,7 +492,7 @@ class TableObjHelper {
         }
         
         $this->setClassInfo(get_class($tableObj));
-        $this->getCreateHelper()->writeClass(false);
+        $this->copyCheck();
         $helper->success('Column updated.');
     }
     /**
@@ -499,7 +511,7 @@ class TableObjHelper {
         $this->getTable()->removeColByKey($colToDrop);
         $class = get_class($this->getTable());
         $this->setClassInfo($class);
-        $this->getCreateHelper()->writeClass(false);
+        $this->copyCheck();
         $this->success('Column dropped.');
         return $colToDrop;
     }

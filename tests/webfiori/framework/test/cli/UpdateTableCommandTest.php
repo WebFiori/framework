@@ -225,4 +225,74 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
         
     }
+    /**
+     * 
+     */
+    public function test04() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-table',
+        ]);
+        $runner->setInput([
+            'app\\database\\TestTable',
+            '1',
+            'app\\database\\Test2Table',
+            'new_fk',
+            '0',
+            'n',
+            '0',
+            '0',
+            '0',
+            'y',
+            'Modified3',
+            ''
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter database table class name (include namespace):\n",
+            "What operation whould you like to do with the table?\n",
+            "0: Add new column.\n",
+            "1: Add foreign key.\n",
+            "2: Update existing column.\n",
+            "3: Drop column.\n",
+            "4: Drop foreign key.\n",
+            "Enter the name of the referenced table class (with namespace):\n",
+            "Enter a name for the foreign key:\n",
+            "Select column #1:\n",
+            "0: id\n",
+            "Would you like to add another column to the foreign key?(y/N)\n",
+            "Select the column that will be referenced by the column 'id':\n",
+            "0: user-id\n",
+            "Choose on update condition:\n",
+            "0: cascade\n",
+            "1: restrict <--\n",
+            "2: set null\n",
+            "3: set default\n",
+            "4: no action\n",
+            "Choose on delete condition:\n",
+            "0: cascade\n",
+            "1: restrict <--\n",
+            "2: set null\n",
+            "3: set default\n",
+            "4: no action\n",
+            "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Success: Foreign key added.\n"
+        ], $runner->getOutput());
+        $clazz = '\\app\\database\\Modified3Table';
+        $this->assertTrue(class_exists($clazz));
+        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file->remove();
+        $obj = new $clazz();
+        $this->assertTrue($obj instanceof Table);
+        $fk = $obj->getForeignKey('new_fk');
+        $this->assertTrue($fk instanceof \webfiori\database\ForeignKey);
+        $this->assertTrue($fk->getSource() instanceof \app\database\Test2Table);
+        $col1 = $fk->getOwnerCols()['id'];
+        $this->assertEquals('`id`', $col1->getName());
+        $col2 = $fk->getSourceCols()['user_id'];
+        $this->assertEquals('`user_id`', $col2->getName());
+    }
 }

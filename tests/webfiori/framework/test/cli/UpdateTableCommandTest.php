@@ -292,7 +292,7 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertTrue($fk->getSource() instanceof \app\database\Test2Table);
         $col1 = $fk->getOwnerCols()['id'];
         $this->assertEquals('`id`', $col1->getName());
-        $col2 = $fk->getSourceCols()['user_id'];
+        $col2 = $fk->getSourceCols()['user-id'];
         $this->assertEquals('`user_id`', $col2->getName());
     }
 }

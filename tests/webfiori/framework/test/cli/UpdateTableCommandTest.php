@@ -29,7 +29,8 @@ class UpdateTableCommandTest extends TestCase {
             'n',
             '',
             'n',
-            'Cool new column.'
+            'Cool new column.',
+            'n'
         ]);
         
         
@@ -72,6 +73,7 @@ class UpdateTableCommandTest extends TestCase {
             "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
             "Can this column have null values?(y/N)\n",
             "Enter your optional comment about the column:\n",
+            "Would you like to update same class or create a copy with the update?(y/N)\n",
             "Success: Column added.\n",
         ], $runner->getOutput());
     }
@@ -153,5 +155,6 @@ class UpdateTableCommandTest extends TestCase {
         $col = $obj->getColByKey('user-id');
         $this->assertEquals('int', $col->getDatatype());
         $this->assertEquals(10, $col->getSize());
+        $this->assertEquals('Cool modifiyed column.', $col->getComment());
     }
 }

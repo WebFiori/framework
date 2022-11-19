@@ -19,9 +19,9 @@ use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
+use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\json\CaseConverter;
 
 /**
  * A CLI class helper which has methods to help in creating and 
@@ -119,7 +119,12 @@ class TableObjHelper {
             $this->isIdentityCheck($colObj);
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
-            $this->copyCheck();
+            
+            if ($helper->getCommand() instanceof UpdateTableCommand) {
+                $this->copyCheck();
+            } else {
+                $this->getCreateHelper()->writeClass(false);
+            }
             $helper->success('Column added.');
         }
         

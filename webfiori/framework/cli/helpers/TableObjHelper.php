@@ -410,7 +410,11 @@ class TableObjHelper {
 
         try {
             $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-            $helper->getWriter()->writeClass(false);
+            if ($helper->getCommand() instanceof UpdateTableCommand) {
+                $this->copyCheck();
+            } else {
+                $helper->getWriter()->writeClass(false);
+            }
             $helper->success('Foreign key added.');
         } catch (Throwable $ex) {
             $helper->error($ex->getMessage());

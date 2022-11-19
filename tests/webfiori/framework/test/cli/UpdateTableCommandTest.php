@@ -199,4 +199,30 @@ class UpdateTableCommandTest extends TestCase {
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
     }
+    /**
+     * 
+     */
+    public function test03() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-table',
+        ]);
+        $runner->setInput([
+            'app\\database\\TestTable',
+            '4',
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter database table class name (include namespace):\n",
+            "What operation whould you like to do with the table?\n",
+            "0: Add new column.\n",
+            "1: Add foreign key.\n",
+            "2: Update existing column.\n",
+            "3: Drop column.\n",
+            "4: Drop foreign key.\n",
+            "Info: Selected table has no foreign keys.\n",
+        ], $runner->getOutput());
+        
+    }
 }

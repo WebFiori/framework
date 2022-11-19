@@ -119,7 +119,7 @@ class TableObjHelper {
             $this->isIdentityCheck($colObj);
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
-            $this->getCreateHelper()->writeClass(false);
+            $this->copyCheck();
             $helper->success('Column added.');
         }
         

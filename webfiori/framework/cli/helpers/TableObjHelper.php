@@ -530,7 +530,7 @@ class TableObjHelper {
         $cName = $split[count($split) - 1];
         $ns = implode('\\', array_slice($split, 0, count($split) - 1));
 
-        $path = AutoLoader::getClassPath($cName, $ns)[0];
+        $path = ROOT_DIR.DS.$ns.DS.$cName.'.php';
         $createHelper->setClassName($cName);
         $createHelper->setNamespace($ns);
         $createHelper->setPath(substr($path, 0, strlen($path) - strlen($cName.'.php')));

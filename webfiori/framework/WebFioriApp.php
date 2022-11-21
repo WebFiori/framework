@@ -489,7 +489,6 @@ class WebFioriApp {
                     '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
                     '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
                     '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
-                    '\\webfiori\\framework\\cli\\commands\\TestRouteCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
                 ];

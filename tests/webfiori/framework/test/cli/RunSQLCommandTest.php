@@ -34,7 +34,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         

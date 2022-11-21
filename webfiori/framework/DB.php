@@ -53,7 +53,15 @@ class DB extends Database {
         $conn = WebFioriApp::getAppConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
-            throw new DatabaseException("No connection was found which has the name '$connName'.");
+            $conns = ConfigController::get()->getDatabaseConnections();
+            foreach ($conns as $xCon) {
+                if ($xCon->getName() == $connName) {
+                    $conn = $xCon;
+                }
+            }
+            if (!($conn instanceof ConnectionInfo)) {
+                throw new DatabaseException("No connection was found which has the name '$connName'.");
+            }
         }
         parent::__construct($conn);
     }

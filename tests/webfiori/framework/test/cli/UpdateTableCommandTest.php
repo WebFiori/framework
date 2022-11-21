@@ -78,7 +78,7 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
     }
     /**
-     * 
+     * @test
      */
     public function test01() {
         $runner = WebFioriApp::getRunner();
@@ -294,5 +294,49 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertEquals('`id`', $col1->getName());
         $col2 = $fk->getSourceCols()['user-id'];
         $this->assertEquals('`user_id`', $col2->getName());
+    }
+    /**
+     * @test
+     * @depends test01
+     */
+    public function test05() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-table',
+        ]);
+        $runner->setInput([
+            'app\\database\\TestTable',
+            '3',
+            '0',
+            'y',
+            'ModifiedX',
+            ''
+        ]);
+        
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter database table class name (include namespace):\n",
+            "What operation whould you like to do with the table?\n",
+            "0: Add new column.\n",
+            "1: Add foreign key.\n",
+            "2: Update existing column.\n",
+            "3: Drop column.\n",
+            "4: Drop foreign key.\n",
+            "Which column would you like to drop?\n",
+            "0: id\n",
+            "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Success: Column dropped.\n",
+        ], $runner->getOutput());
+        $clazz = '\\app\\database\\ModifiedXTable';
+        $this->assertTrue(class_exists($clazz));
+        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file->remove();
+        $obj = new $clazz();
+        $this->assertTrue($obj instanceof Table);
+        $this->assertFalse($obj->hasColumn('user-id'));
     }
 }

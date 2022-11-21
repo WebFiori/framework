@@ -521,7 +521,7 @@ class TableObjHelper {
         $class = get_class($this->getTable());
         $this->setClassInfo($class);
         $this->copyCheck();
-        $this->success('Column dropped.');
+        $this->getCreateHelper()->success('Column dropped.');
         return $colToDrop;
     }
     private function setClassInfo($class) {

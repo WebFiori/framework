@@ -34,7 +34,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
@@ -60,7 +60,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function test02() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
@@ -86,7 +86,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function test03() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
@@ -113,7 +113,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function test04() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         

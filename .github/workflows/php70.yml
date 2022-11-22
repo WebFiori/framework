@@ -57,6 +57,9 @@ jobs:
       - name: Checks
         run: |
          php -i | grep mysql.default_socket
+      - name: Checks2
+        run: |
+         mysql_config --socket
       - name: Setup MSSQL
         run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
       

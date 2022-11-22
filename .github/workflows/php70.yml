@@ -54,7 +54,10 @@ jobs:
           while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
             sleep 1
           done
-          
+      - name: Checks
+        run: |
+         netstat -ln | grep -o -m 1 '/.*mysql.sock'
+         php -r 'echo ini_get("mysql.default_socket") . "\n";'
       - name: Setup MSSQL
         run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
       

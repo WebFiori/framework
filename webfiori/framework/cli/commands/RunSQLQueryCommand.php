@@ -37,6 +37,10 @@ class RunSQLQueryCommand extends CLICommand {
                 .'database schema.',
                 'optional' => true,
             ],
+            '--table' => [
+                'description' => 'Table class to run query on.',
+                'optional' => true
+            ],
             '--file' => [
                 'description' => 'The path to SQL file that holds SQL query.',
                 'optional' => true
@@ -191,31 +195,11 @@ class RunSQLQueryCommand extends CLICommand {
             $schema->setQuery($query);
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query on table instance.') {
-            $tableClassName = '';
-            $tableClassNameValidity = false;
 
-            do {
-                if (strlen($tableClassName) == 0) {
-                    $tableClassName = $this->getInput('Enter database table class name (include namespace):');
-                }
-
-                if (!class_exists($tableClassName)) {
-                    $this->error('Class not found.');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableObj = new $tableClassName();
-
-                if (!$tableObj instanceof Table) {
-                    $this->error('The given class is not a child of the class "webfiori\database\Table".');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableClassNameValidity = true;
-            } while (!$tableClassNameValidity);
+            $tableObj = \webfiori\framework\cli\CLIUtils::readTable($this);
+            
             $schema->addTable($tableObj);
             $this->tableQuery($schema, $tableObj);
-
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query from file.') {
             return $this->queryFromFile($schema);

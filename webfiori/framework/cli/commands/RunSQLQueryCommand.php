@@ -189,18 +189,8 @@ class RunSQLQueryCommand extends CLICommand {
 
         if ($selected == 'Run general query.') {
             $query = $this->getInput('Please provide us with the query:');
-            $this->println('Executing the query...');
             $schema->setQuery($query);
-            try {
-                $schema->execute();
-            } catch (DatabaseException $ex) {
-                $this->error('The query finished execution with an error: '.$ex->getMessage());
-
-                return $ex->getCode();
-            }
-            $this->success('Query executed without errors.');
-
-            return 0;
+            return $this->confirmExecute($schema);
         } else if ($selected == 'Run query on table instance.') {
             $tableClassName = '';
             $tableClassNameValidity = false;

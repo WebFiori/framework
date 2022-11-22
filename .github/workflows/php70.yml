@@ -56,8 +56,7 @@ jobs:
           done
       - name: Checks
         run: |
-         netstat -ln | grep -o -m 1 '/.*mysql.sock'
-         php -r 'echo ini_get("mysql.default_socket") . "\n";'
+         php -i | grep mysql.default_socket
       - name: Setup MSSQL
         run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
       

@@ -80,7 +80,6 @@ class RunSQLQueryCommand extends CLICommand {
         $file = $this->getArgValue('--file');
         if ($connName === null) {
             $connName = $this->select('Select database connection:', $dbConnections, 0);
-            $schema = new DB($connName);
         } else if (!in_array($connName, $dbConnections)) {
             $this->error('No connection with name "'.$connName.'" was found!');
             return -1;

@@ -37,6 +37,12 @@ class RunSQLQueryCommand extends CLICommand {
                 .'database schema.',
                 'optional' => true,
             ],
+            '--create' => [
+                'description' => 'This option is used alongside the option --table and --schema.'
+                . ' If it is provided, this means initiate the process of creating the database or the'
+                . ' Table.',
+                'optional' => true,
+            ],
             '--table' => [
                 'description' => 'Table class to run query on.',
                 'optional' => true
@@ -231,6 +237,11 @@ class RunSQLQueryCommand extends CLICommand {
     }
 
     private function queryOnSchema(DB $schema) {
+    
+        if ($this->isArgProvided('--create')) {
+            $schema->createTables();
+            return $this->confirmExecute($schema);
+        }
         $options = [
             'Create Database.',
             'Run Query on Specific Table.'
@@ -243,8 +254,6 @@ class RunSQLQueryCommand extends CLICommand {
             $selectedTable = $this->select('Select database table:', array_keys($schema->getTables()));
             $this->tableQuery($schema, $schema->getTable($selectedTable));
         }
-
-        return $this->confirmExecute($schema);
     }
     /**
      * 
@@ -252,6 +261,10 @@ class RunSQLQueryCommand extends CLICommand {
      * @param Table $tableObj
      */
     private function tableQuery($schema, $tableObj) {
+        if ($this->isArgProvided('--create')) {
+            $schema->table($tableObj->getNormalName())->createTable();
+            return $this->confirmExecute($schema);
+        }
         $queryTypes = [
             'Create database table.',
             'Drop database table.',
@@ -280,6 +293,7 @@ class RunSQLQueryCommand extends CLICommand {
             $query1 = $schema->getLastQuery();
             $schema->table($tableObj->getNormalName())->createTable();
             $schema->setQuery($query1."\n".$schema->getLastQuery());
-        }     
+        }
+        return $this->confirmExecute($schema);
     }
 }

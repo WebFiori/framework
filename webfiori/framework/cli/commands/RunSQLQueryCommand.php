@@ -145,13 +145,13 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     private function confirmExecute($schema) {
-        if ($this->isArgProvided('--no-confirm')) {
-            return $this->executeQ($schema);
-        }
         $this->println('The following query will be executed on the database:');
         $this->println($schema->getLastQuery(), [
             'color' => 'blue'
         ]);
+        if ($this->isArgProvided('--no-confirm')) {
+            return $this->executeQ($schema);
+        }
 
         if ($this->confirm('Continue?', true)) {
             return $this->executeQ($schema);

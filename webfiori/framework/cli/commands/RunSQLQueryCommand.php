@@ -215,8 +215,7 @@ class RunSQLQueryCommand extends CLICommand {
             $tableObj = \webfiori\framework\cli\CLIUtils::readTable($this);
             
             $schema->addTable($tableObj);
-            $this->tableQuery($schema, $tableObj);
-            return $this->confirmExecute($schema);
+            return $this->tableQuery($schema, $tableObj);
         } else if ($selected == 'Run query from file.') {
             return $this->queryFromFile($schema);
         }

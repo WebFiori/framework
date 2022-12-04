@@ -58,7 +58,8 @@ class RunSQLQueryCommand extends CLICommand {
             ],
             '--show-sql' => [
                 'description' => 'If this argument is provided, SQL statement will be '
-                . 'shown in the console. This option is ignored if option --no-confirm is not provided.'
+                . 'shown in the console. This option is ignored if option --no-confirm is not provided.',
+                'optional' => true
             ]
         ], 'Execute SQL query on specific database.');
     }

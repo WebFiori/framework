@@ -55,6 +55,10 @@ class RunSQLQueryCommand extends CLICommand {
                 'description' => 'If this argument is provided, the query'
                 . 'will be executed without confirmation step.',
                 'optional' => true
+            ],
+            '--show-sql' => [
+                'description' => 'If this argument is provided, SQL statement will be '
+                . 'shown in the console. This option is ignored if option --no-confirm is not provided.'
             ]
         ], 'Execute SQL query on specific database.');
     }
@@ -145,11 +149,16 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     private function confirmExecute($schema) {
-        $this->println('The following query will be executed on the database:');
-        $this->println($schema->getLastQuery(), [
-            'color' => 'blue'
-        ]);
-        if ($this->isArgProvided('--no-confirm')) {
+        $noConfirmExec = $this->isArgProvided('--no-confirm');
+        
+        if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
+            $this->println('The following query will be executed on the database:');
+            $this->println($schema->getLastQuery(), [
+                'color' => 'blue'
+            ]);
+        }
+        
+        if ($noConfirmExec) {
             return $this->executeQ($schema);
         }
 

@@ -327,8 +327,9 @@ class RunSQLCommandTest extends TestCase {
             '1'
         ]);
         
+        $code = $runner->start();
         
-        $this->assertEquals(0, $runner->start());
+        
         
         $this->assertEquals([
             "What type of query you would like to run?\n",
@@ -345,5 +346,7 @@ class RunSQLCommandTest extends TestCase {
             "Info: Executing the query...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
+        
+        $this->assertEquals(0, $code);
     }
 }

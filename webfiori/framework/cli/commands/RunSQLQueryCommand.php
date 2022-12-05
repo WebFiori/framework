@@ -207,7 +207,7 @@ class RunSQLQueryCommand extends CLICommand {
         $selected = $this->select('What type of query you would like to run?', $options);
 
         if ($selected == 'Run general query.') {
-            $query = $this->getInput('Please provide us with the query:');
+            $query = $this->getInput('Please type in SQL query:');
             $schema->setQuery($query);
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query on table instance.') {

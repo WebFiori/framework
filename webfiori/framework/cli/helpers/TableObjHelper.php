@@ -19,9 +19,9 @@ use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
+use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\json\CaseConverter;
 
 /**
  * A CLI class helper which has methods to help in creating and 
@@ -119,7 +119,12 @@ class TableObjHelper {
             $this->isIdentityCheck($colObj);
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
-            $this->getCreateHelper()->writeClass(false);
+            
+            if ($helper->getCommand() instanceof UpdateTableCommand) {
+                $this->copyCheck();
+            } else {
+                $this->getCreateHelper()->writeClass(false);
+            }
             $helper->success('Column added.');
         }
         
@@ -352,6 +357,18 @@ class TableObjHelper {
             } while (!$validScale);
         }
     }
+    public function copyCheck() {
+        $helper = $this->getCreateHelper();
+        if ($helper->confirm('Would you like to update same class or create a copy with the update?', false)) {
+            $info = $helper->getClassInfo(APP_DIR_NAME.'\\database', 'Table');
+            $helper->setClassName($info['name']);
+            $helper->setNamespace($info['namespace']);
+            $helper->setPath($info['path']);
+            $helper->getWriter()->writeClass(false);
+        } else {
+            $helper->getWriter()->writeClass(false);
+        }
+    }
     public function addForeignKey() {
         $refTable = null;
         $helper = $this->getCreateHelper();
@@ -393,7 +410,11 @@ class TableObjHelper {
 
         try {
             $this->getTable()->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-            $helper->getWriter()->writeClass(false);
+            if ($helper->getCommand() instanceof UpdateTableCommand) {
+                $this->copyCheck();
+            } else {
+                $helper->getWriter()->writeClass(false);
+            }
             $helper->success('Foreign key added.');
         } catch (Throwable $ex) {
             $helper->error($ex->getMessage());
@@ -444,8 +465,8 @@ class TableObjHelper {
 
         $this->setClassInfo(get_class($tableObj));
         
-        $helper->getWriter()->writeClass(false);
-        $this->success('Table updated.');
+        $this->copyCheck();
+        $helper->success('Table updated.');
     }
     public function updateColumn() {
         $tableObj = $this->getTable();
@@ -480,7 +501,7 @@ class TableObjHelper {
         }
         
         $this->setClassInfo(get_class($tableObj));
-        $this->getCreateHelper()->writeClass(false);
+        $this->copyCheck();
         $helper->success('Column updated.');
     }
     /**
@@ -499,8 +520,8 @@ class TableObjHelper {
         $this->getTable()->removeColByKey($colToDrop);
         $class = get_class($this->getTable());
         $this->setClassInfo($class);
-        $this->getCreateHelper()->writeClass(false);
-        $this->success('Column dropped.');
+        $this->copyCheck();
+        $this->getCreateHelper()->success('Column dropped.');
         return $colToDrop;
     }
     private function setClassInfo($class) {
@@ -509,10 +530,10 @@ class TableObjHelper {
         $cName = $split[count($split) - 1];
         $ns = implode('\\', array_slice($split, 0, count($split) - 1));
 
-        $path = AutoLoader::getClassPath($cName, $ns)[0];
+        $path = ROOT_DIR.DS.$ns.DS.$cName.'.php';
         $createHelper->setClassName($cName);
         $createHelper->setNamespace($ns);
-        $createHelper->setPath($path);
+        $createHelper->setPath(substr($path, 0, strlen($path) - strlen($cName.'.php')));
     }
     private function getFkCols() {
         $colNumber = 1;

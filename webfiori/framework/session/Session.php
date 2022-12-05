@@ -271,7 +271,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function getCookieHeader() : string {
-        return $this->sessionCookie.'';;
+        return $this->sessionCookie.'';
     }
     /**
      * Returns the cookie which is associated with the cookie.

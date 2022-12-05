@@ -45,7 +45,7 @@ class ThemeTest extends TestCase {
         $this->assertTrue($theme instanceof Theme);
         $this->assertTrue(ThemeLoader::isThemeLoaded($themeName));
         $this->assertEquals('1.0',$theme->getVersion());
-        $this->assertEquals('Colofull Theme.',$theme->getDescription());
+        $this->assertEquals('This theme is in before loaded.',$theme->getDescription());
         $this->assertEquals('Ibrahim Ali',$theme->getAuthor());
         $this->assertEquals('https://opensource.org/licenses/MIT',$theme->getLicenseUrl());
         $this->assertEquals('MIT',$theme->getLicenseName());
@@ -53,6 +53,9 @@ class ThemeTest extends TestCase {
         $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
         $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
         $this->assertEquals(ROOT_DIR.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
+        $this->assertEquals('css', $theme->getCssDirName());
+        $this->assertEquals('js', $theme->getJsDirName());
+        $this->assertEquals('images', $theme->getImagesDirName());
     }
     /**
      * @test

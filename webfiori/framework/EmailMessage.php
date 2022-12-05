@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\exceptions\MissingLangException;
 use webfiori\email\exceptions\SMTPException;
+use webfiori\email\SMTPAccount;
+use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\Language;
 use webfiori\framework\WebFioriApp;
-use webfiori\email\SMTPAccount;
 
 /**
  * A class that can be used to write HTML formatted Email messages.
@@ -42,17 +42,14 @@ class EmailMessage extends \webfiori\email\EmailMessage {
      * @since 1.0
      */
     public function __construct(string $sendAccountName = 'no-reply') {
-        if (class_exists(APP_DIR_NAME.'\AppConfig')) {
-            $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
+        $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
 
-            if ($acc instanceof SMTPAccount) {
-                parent::__construct($acc);
+        if ($acc instanceof SMTPAccount) {
+            parent::__construct($acc);
 
-                return;
-            }
-            throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
+            return;
         }
-        throw new SMTPException('Class "'.APP_DIR_NAME.'\\AppConfig" not found.');
+        throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
     }
     public function get(string $label) {
         $langObj = $this->getTranslation();

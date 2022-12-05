@@ -166,7 +166,7 @@ class ThemeLoader {
         } else {
             $themeName = ConfigController::get()->getBaseTheme();
             if (strlen($themeName) == 0) {
-                return;
+                return null;
             }
         }
 

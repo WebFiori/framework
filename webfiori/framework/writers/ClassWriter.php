@@ -98,14 +98,14 @@ abstract class ClassWriter {
         return false;
     }
     private function fixClassName($className) {
-        $suffix = $this->getSuffix();
-        if ($suffix == '') {
+        $classSuffix = $this->getSuffix();
+        if ($classSuffix == '') {
             return $className;
         }
-        $subSuffix = substr($className, strlen($className) - strlen($suffix));
+        $subSuffix = substr($className, strlen($className) - strlen($classSuffix));
 
-        if ($subSuffix == $suffix) {
-            return substr($className, 0, -strlen($suffix));
+        if ($subSuffix == $classSuffix) {
+            return substr($className, 0, -strlen($classSuffix));
         }
         return $className;
     }

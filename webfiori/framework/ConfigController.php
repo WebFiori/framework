@@ -509,9 +509,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        $this->configVars['site']['home-page'];
 
-        return null;
+        return $this->configVars['site']['home-page'];
     }
     /**
      * Returns a string that represents primary language of the web application.
@@ -792,17 +791,7 @@ class ConfigController {
         $eFile = new File('Env.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
         $eFile->remove();
     }
-    /**
-     * Stores configuration variables into the application configuration class.
-     * 
-     * @since 1.5
-     */
-    public function writeAppConfig() {
-        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
-        $cFile->remove();
-
-        $this->_writeAppConfigAttrs($cFile);
-
+    private function writeAppConfigConstructor(File $cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * Creates new instance of the class.");
         $this->a($cFile, $this->docEmptyLine, 1);
@@ -819,7 +808,8 @@ class ConfigController {
         $this->_writeCronPass($cFile);
 
         $this->a($cFile, $this->blockEnd, 1);
-        
+    }
+    private function writeAppConfigAddMethods(File $cFile) {
         $this->writeFuncHeader($cFile, 
                 'public function addAccount(SMTPAccount $acc)', 
                 'Adds SMTP account.', 
@@ -851,6 +841,21 @@ class ConfigController {
                 ]);
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
         $this->a($cFile, $this->blockEnd, 1);
+    }
+    /**
+     * Stores configuration variables into the application configuration class.
+     * 
+     * @since 1.5
+     */
+    public function writeAppConfig() {
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME.DS.'config');
+        $cFile->remove();
+
+        $this->_writeAppConfigAttrs($cFile);
+
+        $this->writeAppConfigConstructor($cFile);
+        
+        $this->writeAppConfigAddMethods($cFile);
         
         $this->writeFuncHeader($cFile, 
                 'public function getAccount(string $name)', 

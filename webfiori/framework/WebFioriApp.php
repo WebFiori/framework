@@ -14,6 +14,7 @@ use Closure;
 use Error;
 use webfiori\cli\Runner;
 use webfiori\error\Handler;
+use webfiori\file\File;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
@@ -202,7 +203,7 @@ class WebFioriApp {
     public static function autoRegister($folder, $regCallback, $suffix = null, array $otherParams = []) {
         $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
 
-        if (Util::isDirectory($dir)) {
+        if (File::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
 
             //Since it will be used to build class namespace, each
@@ -265,7 +266,7 @@ class WebFioriApp {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $constructor = '\\'.APP_DIR_NAME.'\\config\\AppConfig';
 
         return new $constructor();
     }
@@ -488,7 +489,6 @@ class WebFioriApp {
                     '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
                     '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
                     '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
-                    '\\webfiori\\framework\\cli\\commands\\TestRouteCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
                 ];

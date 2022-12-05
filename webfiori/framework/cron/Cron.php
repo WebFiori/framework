@@ -556,8 +556,9 @@ class Cron {
         self::log('Running job(s) check...');
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
-
-        if (Cron::password() != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != Cron::password()) {
+        $cronPass = Cron::password();
+        
+        if ($cronPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $cronPass) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
 

@@ -238,7 +238,7 @@ class TableClassWriter extends ClassWriter {
         $this->append("'$key' => [", 3);
         $this->append("'type' => '".$colObj->getDatatype()."',", 4);
 
-        if (($dataType == 'int' && $colObj instanceof MySQLTable) 
+        if (($dataType == 'int' && $colObj instanceof MySQLColumn) 
                 || $dataType == 'varchar' 
                 || $dataType == 'decimal' 
                 || $dataType == 'float' 

@@ -19,11 +19,14 @@ use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
 /**
- * Description of UpdateTableCommand
+ * A command which is used to update the properties of database table class.
  *
- * @author Eng.Ibrahim
+ * @author Ibrahim
  */
 class UpdateTableCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         parent::__construct('update-table', [
             '--table' => [
@@ -33,77 +36,11 @@ class UpdateTableCommand extends CLICommand {
         ], 'Update a database table.');
     }
     /**
+     * Execute the command.
      * 
-     * @param Table $tableObj
+     * @return int The method will return 0 if the command succsessfully 
+     * executed.
      */
-    public function _addFks($tableObj) {
-        $refTable = null;
-        $refTabelsNs = [];
-
-        do {
-            $refTableName = $this->getInput('Enter the name of the referenced table class (with namespace):');
-            try {
-                $refTable = new $refTableName();
-            } catch (Error $ex) {
-                $this->error($ex->getMessage());
-                continue;
-            } catch (Exception $ex) {
-                $this->error($ex->getMessage());
-                continue;
-            }
-
-            if ($refTable instanceof Table) {
-                $fkName = $this->getInput('Enter a name for the foreign key:', null, function ($val)
-                {
-                    $trimmed = trim($val);
-
-                    if (strlen($trimmed) == 0) {
-                        return false;
-                    }
-
-                    return true;
-                });
-                $fkCols = $this->_getFkCols($tableObj);
-                $fkColsArr = [];
-
-                foreach ($fkCols as $colKey) {
-                    $fkColsArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
-                }
-                $onUpdate = $this->select('Choose on update condition:', [
-                    'cascade', 'restrict', 'set null', 'set default', 'no action'
-                ], 1);
-                $onDelete = $this->select('Choose on delete condition:', [
-                    'cascade', 'restrict', 'set null', 'set default', 'no action'
-                ], 1);
-
-                try {
-                    $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-                    $this->success('Foreign key added.');
-                    $refTabelsNs[$fkName] = $refTableName;
-                } catch (Exception $ex) {
-                    $this->error($ex->getMessage());
-                }
-            } else {
-                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
-            }
-        } while ($this->confirm('Would you like to add another foreign key?', false));
-
-        $class = get_class($tableObj);
-        $arr = $this->getClassNs($class);
-        $arr['fk-info'] = $refTabelsNs;
-        $writer = new TableClassWriter($tableObj, $arr);
-        $writer->writeClass();
-        $db = $this->getDb('Would you like to run a query to '
-                .'update the table in the database?');
-
-        if ($db !== null) {
-            $db->addTable($tableObj);
-            $db->table($tableObj->getNormalName())->addForeignKey($fkName);
-            $this->runQuery($db);
-        }
-
-        $this->success('Table updated.');
-    }
     public function exec() : int {
         
         $tableObj = CLIUtils::readTable($this);

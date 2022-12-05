@@ -194,7 +194,7 @@ class LanguageTest extends TestCase{
             'wait' => 'Please wait a moment...'
         ]);
         $this->assertEquals('Please wait a moment...',$lang->get('general/status/wait'));
-        $this->assertTrue($lang->set('general/status', 'wait', 'Wait a sec...'));
+        $lang->set('general/status', 'wait', 'Wait a sec...');
         $this->assertEquals('Wait a sec...',$lang->get('general/status/wait'));
     }
     /**

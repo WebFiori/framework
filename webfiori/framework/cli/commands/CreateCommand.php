@@ -36,22 +36,24 @@ class CreateCommand extends CLICommand {
             '--c' => [
                 'optional' => true,
                 'description' => 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.'
+            ],
+            '--table' => [
+                'optional' => true
             ]
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     private function getWhat() {
-        $options = [
-           'table' => 'Database table class.',
-           'entity' => 'Entity class from table.',
-           'web-service' => 'Web service.',
-           'job' => 'Background job.',
-           'middleware' => 'Middleware.',
-           'command' => 'CLI Command.',
-           'theme' => 'Theme.',
-           'db' => 'Database access class based on table.',
-           'rest' => 'Complete REST backend (Database table, entity, database access and web services).',
-           'Quit.'
-        ];
+        $options = [];
+        $options['table'] = 'Database table class.';
+        $options['entity'] = 'Entity class from table.';
+        $options['web-service'] = 'Web service.';
+        $options['job'] = 'Background job.';
+        $options['middleware'] = 'Middleware.';
+        $options['command'] = 'CLI Command.';
+        $options['theme'] = 'Theme.';
+        $options['db'] = 'Database access class based on table.';
+        $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
+        $options['q'] = 'Quit.';
         $what = $this->getArgValue('--c');
         $answer = null;
         if ($what !== null) {
@@ -74,10 +76,6 @@ class CreateCommand extends CLICommand {
         $classInfo = $infoReader->readClassInfo($defaultNs);
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         
-        if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "'.'".');
-            $classInfo['namespace'] = APP_DIR_NAME.'\\database';
-        }
         $mapper = $tableObj->getEntityMapper();
         if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
             $addExtra = true;

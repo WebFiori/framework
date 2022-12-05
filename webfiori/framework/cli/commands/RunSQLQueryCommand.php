@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\cli\commands;
 
+use webfiori\cli\CLICommand;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
-use webfiori\cli\CLICommand;
-use webfiori\framework\DB;
-use webfiori\framework\WebFioriApp;
 use webfiori\file\File;
+use webfiori\framework\ConfigController;
+use webfiori\framework\DB;
 /**
  * A command which can be used to execute SQL queries on 
  * specific database.
@@ -37,8 +37,28 @@ class RunSQLQueryCommand extends CLICommand {
                 .'database schema.',
                 'optional' => true,
             ],
+            '--create' => [
+                'description' => 'This option is used alongside the option --table and --schema.'
+                . ' If it is provided, this means initiate the process of creating the database or the'
+                . ' Table.',
+                'optional' => true,
+            ],
+            '--table' => [
+                'description' => 'Table class to run query on.',
+                'optional' => true
+            ],
             '--file' => [
                 'description' => 'The path to SQL file that holds SQL query.',
+                'optional' => true
+            ],
+            '--no-confirm' => [
+                'description' => 'If this argument is provided, the query'
+                . 'will be executed without confirmation step.',
+                'optional' => true
+            ],
+            '--show-sql' => [
+                'description' => 'If this argument is provided, SQL statement will be '
+                . 'shown in the console. This option is ignored if option --no-confirm is not provided.',
                 'optional' => true
             ]
         ], 'Execute SQL query on specific database.');
@@ -49,7 +69,7 @@ class RunSQLQueryCommand extends CLICommand {
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
-        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+        $dbConnections = array_keys(ConfigController::get()->getDatabaseConnections());
         $schema = $this->getArgValue('--schema');
 
         if (count($dbConnections) != 0) {
@@ -65,41 +85,40 @@ class RunSQLQueryCommand extends CLICommand {
                 return $this->_connectionBased($dbConnections);
             }
         } else {
-            $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
+            $this->error('No database connections available. Add connections to application configuration or use the command "add".');
 
             return -1;
         }
     }
-    private function _connectionBased($dbConnections) {
+    private function _connectionBased($dbConnections) : int {
         $connName = $this->getArgValue('--connection');
         $file = $this->getArgValue('--file');
         if ($connName === null) {
             $connName = $this->select('Select database connection:', $dbConnections, 0);
-            $schema = new DB($connName);
-            
-            if ($file !== null) {
-                $fileObj = new File($file);
-                if ($fileObj->isExist()) {
-                    $fileObj->read();
-                    if ($fileObj->getMIME() == 'application/sql') {
-                        return $this->runFileQuery($schema, $fileObj);
-                    } else {
-                        $this->error('Provided file is not SQL file!');
-                        return -1;
-                    }
-                } else {
-                    $this->error('No such file: '.$fileObj->getAbsolutePath());
-                    return -1;
-                }
-            }
-            
-
-            return $this->generalQuery($schema);
         } else if (!in_array($connName, $dbConnections)) {
             $this->error('No connection with name "'.$connName.'" was found!');
-
             return -1;
         }
+        $schema = new DB($connName);
+        if ($file !== null) {
+            $fileObj = new File($file);
+            
+            if ($fileObj->isExist()) {
+                $fileObj->read();
+                if ($fileObj->getMIME() == 'application/sql') {
+                    return $this->runFileQuery($schema, $fileObj);
+                } else {
+                    $this->error('Provided file is not SQL file!');
+                    return -1;
+                }
+            } else {
+                $this->error('No such file: '.$file);
+                return -1;
+            }
+        }
+
+
+        return $this->generalQuery($schema);
     }
     private function _schemaBased($schema) {
         $schemaInst = new $schema();
@@ -131,27 +150,37 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     private function confirmExecute($schema) {
-        $this->println('The following query will be executed on the database:');
-        $this->println($schema->getLastQuery(), [
-            'color' => 'blue'
-        ]);
+        $noConfirmExec = $this->isArgProvided('--no-confirm');
+        
+        if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
+            $this->println('The following query will be executed on the database:');
+            $this->println($schema->getLastQuery(), [
+                'color' => 'blue'
+            ]);
+        }
+        
+        if ($noConfirmExec) {
+            return $this->executeQ($schema);
+        }
 
         if ($this->confirm('Continue?', true)) {
-            $this->info('Executing the query...');
-            try {
-                $schema->execute();
-                $this->success('Query executed without errors.');
-
-                return 0;
-            } catch (DatabaseException $ex) {
-                $this->error($ex->getMessage());
-
-                return $ex->getCode();
-            }
+            return $this->executeQ($schema);
         } else {
             $this->info('Nothing to execute.');
+            return 0;
+        }
+    }
+    private function executeQ(DB $schema) {
+        $this->info('Executing the query...');
+        try {
+            $schema->execute();
+            $this->success('Query executed without errors.');
 
             return 0;
+        } catch (DatabaseException $ex) {
+            $this->error($ex->getMessage());
+
+            return $ex->getCode();
         }
     }
     private function fkQuery($schema, $selectedQuery, $tableObj) {
@@ -178,46 +207,15 @@ class RunSQLQueryCommand extends CLICommand {
         $selected = $this->select('What type of query you would like to run?', $options);
 
         if ($selected == 'Run general query.') {
-            $query = $this->getInput('Please provide us with the query:');
-            $this->println('Executing the query...');
+            $query = $this->getInput('Please type in SQL query:');
             $schema->setQuery($query);
-            try {
-                $schema->execute();
-            } catch (DatabaseException $ex) {
-                $this->error('The query finished execution with an error: '.$ex->getMessage());
-
-                return $ex->getCode();
-            }
-            $this->success('Query executed without errors.');
-
-            return 0;
-        } else if ($selected == 'Run query on table instance.') {
-            $tableClassName = '';
-            $tableClassNameValidity = false;
-
-            do {
-                if (strlen($tableClassName) == 0) {
-                    $tableClassName = $this->getInput('Enter database table class name (include namespace):');
-                }
-
-                if (!class_exists($tableClassName)) {
-                    $this->error('Class not found.');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableObj = new $tableClassName();
-
-                if (!$tableObj instanceof Table) {
-                    $this->error('The given class is not a child of the class "webfiori\database\Table".');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableClassNameValidity = true;
-            } while (!$tableClassNameValidity);
-            $schema->addTable($tableObj);
-            $this->tableQuery($schema, $tableObj);
-
             return $this->confirmExecute($schema);
+        } else if ($selected == 'Run query on table instance.') {
+
+            $tableObj = \webfiori\framework\cli\CLIUtils::readTable($this);
+            
+            $schema->addTable($tableObj);
+            return $this->tableQuery($schema, $tableObj);
         } else if ($selected == 'Run query from file.') {
             return $this->queryFromFile($schema);
         }
@@ -242,20 +240,17 @@ class RunSQLQueryCommand extends CLICommand {
         }
         return $this->runFileQuery($schema, $file);
     }
-    private function runFileQuery(DB $schema, File $f) {
-        $this->println('Executing the query...');
+    private function runFileQuery(DB $schema, File $f) : int {
         $schema->setQuery($f->getRawData());
-        try {
-            $schema->execute();
-        } catch (DatabaseException $ex) {
-            $this->error('The query finished execution with an error: '.$ex->getMessage());
-
-            return $ex->getCode();
-        }
-        $this->success('Query executed without errors.');
+        return $this->confirmExecute($schema);
     }
 
     private function queryOnSchema(DB $schema) {
+    
+        if ($this->isArgProvided('--create')) {
+            $schema->createTables();
+            return $this->confirmExecute($schema);
+        }
         $options = [
             'Create Database.',
             'Run Query on Specific Table.'
@@ -268,8 +263,6 @@ class RunSQLQueryCommand extends CLICommand {
             $selectedTable = $this->select('Select database table:', array_keys($schema->getTables()));
             $this->tableQuery($schema, $schema->getTable($selectedTable));
         }
-
-        return $this->confirmExecute($schema);
     }
     /**
      * 
@@ -277,6 +270,10 @@ class RunSQLQueryCommand extends CLICommand {
      * @param Table $tableObj
      */
     private function tableQuery($schema, $tableObj) {
+        if ($this->isArgProvided('--create')) {
+            $schema->table($tableObj->getNormalName())->createTable();
+            return $this->confirmExecute($schema);
+        }
         $queryTypes = [
             'Create database table.',
             'Drop database table.',
@@ -305,6 +302,7 @@ class RunSQLQueryCommand extends CLICommand {
             $query1 = $schema->getLastQuery();
             $schema->table($tableObj->getNormalName())->createTable();
             $schema->setQuery($query1."\n".$schema->getLastQuery());
-        }     
+        }
+        return $this->confirmExecute($schema);
     }
 }

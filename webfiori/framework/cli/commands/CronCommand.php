@@ -122,7 +122,7 @@ class CronCommand extends CLICommand {
         $args = $job->getExecArgsNames();
 
         if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {
-            $this->_setArgs($args);
+            $this->_setArgs($args, $job);
         }
     }
     private function _force() {
@@ -178,7 +178,7 @@ class CronCommand extends CLICommand {
             }
         }
     }
-    private function _setArgs($argsArr) {
+    private function _setArgs($argsArr, \webfiori\framework\cron\AbstractJob $job) {
         $setArg = true;
         $index = 0;
         $count = count($argsArr);
@@ -187,7 +187,7 @@ class CronCommand extends CLICommand {
             $val = $this->getInput('Enter a value for the argument "'.$argsArr[$index].'":', '');
 
             if (strlen($val) != 0) {
-                $_POST[$argsArr[$index]] = $val;
+                $job->getArgument($argsArr[$index])->setValue($val);
             }
 
             if ($index + 1 == $count) {

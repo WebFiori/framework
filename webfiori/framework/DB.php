@@ -36,7 +36,7 @@ class DB extends Database {
      * 
      * @param ConnectionInfo|string $connName This can be an object that holds 
      * connection information or a string that represents connection name as 
-     * specified when the connection was added to the file 'Config.php'.
+     * specified when the connection was added to application configuration.
      * 
      * 
      * @throws DatabaseException If no connection was found which has the 
@@ -53,7 +53,15 @@ class DB extends Database {
         $conn = WebFioriApp::getAppConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
-            throw new DatabaseException("No connection was found which has the name '$connName'.");
+            $conns = ConfigController::get()->getDatabaseConnections();
+            foreach ($conns as $xCon) {
+                if ($xCon->getName() == $connName) {
+                    $conn = $xCon;
+                }
+            }
+            if (!($conn instanceof ConnectionInfo)) {
+                throw new DatabaseException("No connection was found which has the name '$connName'.");
+            }
         }
         parent::__construct($conn);
     }
@@ -74,27 +82,16 @@ class DB extends Database {
      * @since 1.0
      */
     public function addTable(Table $table, bool $updateOwnerDb = true) {
-        $connInfo = $this->getConnectionInfo();
+        $connType = $this->getConnectionInfo()->getDatabaseType();
 
-        if ($connInfo === null) {
-            
+        if (($connType == 'mysql' && $table instanceof MySQLTable) 
+         || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
+
             foreach ($table->getForignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);
             }
-            
-            return parent::addTable($table, $updateOwnerDb);
-        } else {
-            $connType = $connInfo->getDatabaseType();
 
-            if (($connType == 'mysql' && $table instanceof MySQLTable) 
-             || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-                
-                foreach ($table->getForignKeys() as $fk) {
-                    parent::addTable($fk->getSource(), false);
-                }
-                
-                return parent::addTable($table, $updateOwnerDb);
-            }
+            return parent::addTable($table, $updateOwnerDb);
         }
         return false;
     }

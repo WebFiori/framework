@@ -30,6 +30,7 @@ class CronCommandTest extends TestCase {
      * @test
      */
     public function test01() {
+        Cron::password(hash('sha256', '123456'));
         $runner = WebFioriApp::getRunner();
         $runner->setInput();
         $runner->setArgsVector([
@@ -366,5 +367,69 @@ class CronCommandTest extends TestCase {
             "Job Name          : Success 1\n",
             "Cron Expression   : 30 4 * * *\n",
         ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test12() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput();
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--check',
+            'p' => '4'
+        ]);
+        $this->assertEquals(-1, $runner->start());
+        $this->assertEquals([
+            "Error: Provided password is incorrect\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test13() {
+        $runner = WebFioriApp::getRunner();
+        Cron::reset();
+        Cron::execLog(true);
+        Cron::password(hash('sha256', '123456'));
+        Cron::registerJobs();
+        
+        $runner->setInput([
+            'Y',
+            '2021-01-01',
+            '2020-01-01'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--force',
+            '--job-name' => 'Success 1',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Would you like to customize execution arguments?(y/N)\n",
+            "Enter a value for the argument \"start\": Enter = ''\n",
+            "Enter a value for the argument \"end\": Enter = ''\n",
+            "Start: 2021-01-01\n",
+            "End: 2020-01-01\n",
+            "The job was forced.\n",
+            "Total number of jobs: 5\n",
+            "Executed Jobs: 1\n",
+            "Successfully finished jobs:\n",
+            "    Success 1\n",
+            "Failed jobs:\n",
+            "    <NONE>\n",
+        ], $runner->getOutput());
+        $this->assertEquals([
+            'Running job(s) check...',
+            "Forceing job 'Success 1' to execute...",
+            "Active job: \"Success 1\" ...",
+            "Calling the method app\jobs\SuccessTestJob::execute()",
+            "Calling the method app\jobs\SuccessTestJob::onSuccess()",
+            "Calling the method app\jobs\SuccessTestJob::afterExec()",
+            "Check finished.",
+        ], Cron::getLogArray());
     }
 }

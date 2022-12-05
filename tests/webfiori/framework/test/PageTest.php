@@ -213,6 +213,8 @@ class PageTest extends TestCase{
         ]);
         $page->setTheme();
         $theme2 = $page->getTheme();
+        $this->assertSame($theme2->getPage(), $page);
+        $this->assertNotNull($page->getChildByID('theme-after-loaded-el'));
         $this->assertNotNull($theme2);
         $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();

@@ -16,6 +16,41 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
+    public function test00() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'q'
+        ]);
+        $runner->setInput([]);
+        
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+        ], $runner->getOutput());
+
+    }
+    public function testUpdatePrimaryLang() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'primary-lang'
+        ]);
+        $runner->setInput(['1']);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select new primary language:\n",
+            "0: EN\n",
+            "1: AR\n",
+            "Success: Primary language successfully updated.\n"
+        ], $runner->getOutput());
+        $this->assertEquals('AR', ConfigController::get()->getPrimaryLang());
+    }
+    /**
+     * @test
+     */
     public function testUpdateVersion00() {
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
@@ -28,7 +63,7 @@ class UpdateSettingsCommandTest extends TestCase {
             'Beta',
             '99',
             '99-99-99',
-            ''
+            '   ',
         ]);
         
         
@@ -326,6 +361,33 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
+    public function testUpdateHomePage01() {
+        \webfiori\framework\router\Router::page([
+            'path' => 'x/y/z',
+            'route-to' => 'test.txt'
+        ]);
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            '0'
+        ]);
+        
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'home-page'
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select home page route:\n",
+            "0: https://example.com/x/y/z\n",
+            "Success: Home page successfully updated.\n",
+        ], $runner->getOutput());
+        $this->assertEquals('x/y/z', ConfigController::get()->getHomePage());
+    }
+    /**
+     * @test
+     */
     public function testUpdatePrimaryTheme00() {
         $runner = WebFioriApp::getRunner();
         $runner->setInput([
@@ -402,6 +464,34 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner = WebFioriApp::getRunner();
         $runner->setInput([
             'themes\\greeny\\NotATheme',
+            '',
+            'themes\\fioriTheme2\\NewTestTheme2'
+        ]);
+        
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'admin-theme'
+        ]);
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Admin theme successfully updated.\n"
+        ], $runner->getOutput());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getAdminTheme());
+    }
+    /**
+     * @test
+     */
+    public function testUpdateAdminTheme02() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            'app\\entity\\WithException',
             '',
             'themes\\fioriTheme2\\NewTestTheme2'
         ]);

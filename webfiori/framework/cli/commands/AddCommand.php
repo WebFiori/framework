@@ -91,7 +91,7 @@ class AddCommand extends CLICommand {
             $this->success('Connected. Adding the connection...');
 
             ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
-            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+            $this->success('Connection information was stored in application configuration.');
         } else {
             $this->error('Unable to connect to the database.');
             $this->error($addConnection->getMessage());
@@ -157,14 +157,14 @@ class AddCommand extends CLICommand {
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', $smtpConn->getAddress()));
         $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts())));
-        $this->println('Testing connection. This can take up to 1 minute...');
+        $this->println('Trying to connect. This can take up to 1 minute...');
         $server = new SMTPServer($smtpConn->getServerAddress(), $smtpConn->getPort());
 
         try {
             if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
                 $this->success('Connectd. Adding connection information...');
                 ConfigController::get()->updateOrAddEmailAccount($smtpConn);
-                $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+                $this->success('Connection information was stored in application configuration.');
 
                 
             } else {
@@ -187,7 +187,7 @@ class AddCommand extends CLICommand {
             } else if ($smtpOrDbConn instanceof ConnectionInfo) {
                 ConfigController::get()->addOrUpdateDBConnection($smtpOrDbConn);
             }
-            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+            $this->success('Connection information was stored in application configuration.');
         }
     }
 }

@@ -12,7 +12,9 @@ use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
+use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
+use webfiori\framework\WebFioriApp;
 
 /**
  * Description of DBTest
@@ -59,6 +61,19 @@ class DBTest extends TestCase {
         $db = new DB($conn);
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
-        $this->assertEquals(1, count($db->getTables()));
+        $this->assertEquals(2, count($db->getTables()));
+    }
+    /**
+     * @test
+     */
+    public function test04() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn->setName('default-conn');
+        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        $db = new DB('default-conn');
+        $this->assertEquals(0, count($db->getTables()));
+        $db->register('database');
+        $this->assertEquals(2, count($db->getTables()));
+        WebFioriApp::getAppConfig()->removeDBConnections();
     }
 }

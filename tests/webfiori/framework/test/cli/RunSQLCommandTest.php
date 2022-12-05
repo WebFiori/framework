@@ -286,46 +286,46 @@ class RunSQLCommandTest extends TestCase {
      * @test
      * @depends testTableQuery00
      */
-    public function testTableQuery01() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
-        $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
-        
-        $runner = WebFioriApp::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'run-query',
-            '--connection' => 'testing-connection',
-            '--no-confirm',
-            '--table' => 'app\\database\\TestTable'
-        ]);
-        $runner->setInput([
-            '1',
-            '1'
-        ]);
-        
-        $code = $runner->start();
-        
-        
-        
-        $this->assertEquals([
-            "What type of query you would like to run?\n",
-            "0: Run general query.\n",
-            "1: Run query on table instance.\n",
-            "2: Run query from file.\n",
-            "Select query type:\n",
-            "0: Create database table.\n",
-            "1: Drop database table.\n",
-            "2: Drop and create table.\n",
-            "3: Add Column.\n",
-            "4: Modify Column.\n",
-            "5: Drop Column.\n",
-            "Info: Executing the query...\n",
-            "Success: Query executed without errors.\n"
-        ], $runner->getOutput());
-        
-        $this->assertEquals(0, $code);
-    }
+//    public function testTableQuery01() {
+//        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+//        $conn->setName('testing-connection');
+//        ConfigController::get()->addOrUpdateDBConnection($conn);
+//        
+//        $runner = WebFioriApp::getRunner();
+//        $runner->setArgsVector([
+//            'webfiori',
+//            'run-query',
+//            '--connection' => 'testing-connection',
+//            '--no-confirm',
+//            '--table' => 'app\\database\\TestTable'
+//        ]);
+//        $runner->setInput([
+//            '1',
+//            '1'
+//        ]);
+//        
+//        $code = $runner->start();
+//        
+//        
+//        
+//        $this->assertEquals([
+//            "What type of query you would like to run?\n",
+//            "0: Run general query.\n",
+//            "1: Run query on table instance.\n",
+//            "2: Run query from file.\n",
+//            "Select query type:\n",
+//            "0: Create database table.\n",
+//            "1: Drop database table.\n",
+//            "2: Drop and create table.\n",
+//            "3: Add Column.\n",
+//            "4: Modify Column.\n",
+//            "5: Drop Column.\n",
+//            "Info: Executing the query...\n",
+//            "Success: Query executed without errors.\n"
+//        ], $runner->getOutput());
+//        
+//        $this->assertEquals(0, $code);
+//    }
     public function testCLIQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');

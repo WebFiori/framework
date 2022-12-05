@@ -11,7 +11,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test00() {
+    public function testQueryFromFile00() {
         $runner = WebFioriApp::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -33,7 +33,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test01() {
+    public function testQueryFromFile01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -59,7 +59,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test02() {
+    public function testQueryFromFile02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -85,7 +85,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test03() {
+    public function testQueryFromFile03() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -112,7 +112,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test04() {
+    public function testQueryFromFile04() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -142,7 +142,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test05() {
+    public function testQueryFromFile05() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -171,7 +171,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test06() {
+    public function testCLIQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -198,7 +198,7 @@ class RunSQLCommandTest extends TestCase {
             "0: Run general query.\n",
             "1: Run query on table instance.\n",
             "2: Run query from file.\n",
-            "Please provide us with the query:\n",
+            "Please type in SQL query:\n",
             "The following query will be executed on the database:\n",
             "select * from hello;\n",
             "Continue?(Y/n)\n",
@@ -209,7 +209,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test07() {
+    public function testQueryFromFile06() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -235,7 +235,7 @@ class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
-    public function test08() {
+    public function testTableQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
@@ -273,10 +273,43 @@ class RunSQLCommandTest extends TestCase {
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
     }
+    public function testCLIQuery01() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--connection' => 'testing-connection',
+        ]);
+        $runner->setInput([
+            '0',
+            'drop table test2_x;',
+            'y'
+        ]);
+        $runner->start();
+        //$this->assertEquals(0, $runner->start());
+        
+        $this->assertEquals([
+            "What type of query you would like to run?\n",
+            "0: Run general query.\n",
+            "1: Run query on table instance.\n",
+            "2: Run query from file.\n",
+            "Please type in SQL query:\n",
+            "The following query will be executed on the database:\n",
+            "drop table test2_x;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing the query...\n",
+            "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
+        ], $runner->getOutput());
+    }
     /**
      * @test
+     * @depends testTableQuery00
      */
-    public function test09() {
+    public function testTableQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);

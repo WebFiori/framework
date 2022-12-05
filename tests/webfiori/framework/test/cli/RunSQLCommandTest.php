@@ -245,7 +245,8 @@ class RunSQLCommandTest extends TestCase {
             'webfiori',
             'run-query',
             '--connection' => 'testing-connection',
-            '--no-confirm'
+            '--no-confirm',
+            '--show-sql'
         ]);
         $runner->setInput([
             '1',
@@ -269,40 +270,16 @@ class RunSQLCommandTest extends TestCase {
             "3: Add Column.\n",
             "4: Modify Column.\n",
             "5: Drop Column.\n",
+            "The following query will be executed on the database:\n",
+            "create table if not exists `test` (\n".
+            "    `id` int not null\n".
+            "\n".
+            ")\n".
+            "engine = InnoDB\n".
+            "default charset = utf8mb4\n".
+            "collate = utf8mb4_unicode_520_ci;\n",
             "Info: Executing the query...\n",
             "Success: Query executed without errors.\n"
-        ], $runner->getOutput());
-    }
-    public function testCLIQuery01() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
-        $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
-        
-        $runner = WebFioriApp::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'run-query',
-            '--connection' => 'testing-connection',
-        ]);
-        $runner->setInput([
-            '0',
-            'drop table test2_x;',
-            'y'
-        ]);
-
-        $this->assertEquals(1051, $runner->start());
-        
-        $this->assertEquals([
-            "What type of query you would like to run?\n",
-            "0: Run general query.\n",
-            "1: Run query on table instance.\n",
-            "2: Run query from file.\n",
-            "Please type in SQL query:\n",
-            "The following query will be executed on the database:\n",
-            "drop table test2_x;\n",
-            "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
-            "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
         ], $runner->getOutput());
     }
     /**
@@ -349,4 +326,37 @@ class RunSQLCommandTest extends TestCase {
         
         $this->assertEquals(0, $code);
     }
+    public function testCLIQuery01() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--connection' => 'testing-connection',
+        ]);
+        $runner->setInput([
+            '0',
+            'drop table test2_x;',
+            'y'
+        ]);
+
+        $this->assertEquals(1051, $runner->start());
+        
+        $this->assertEquals([
+            "What type of query you would like to run?\n",
+            "0: Run general query.\n",
+            "1: Run query on table instance.\n",
+            "2: Run query from file.\n",
+            "Please type in SQL query:\n",
+            "The following query will be executed on the database:\n",
+            "drop table test2_x;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing the query...\n",
+            "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
+        ], $runner->getOutput());
+    }
+    
 }

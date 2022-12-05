@@ -289,8 +289,8 @@ class RunSQLCommandTest extends TestCase {
             'drop table test2_x;',
             'y'
         ]);
-        $runner->start();
-        //$this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(1051, $runner->start());
         
         $this->assertEquals([
             "What type of query you would like to run?\n",

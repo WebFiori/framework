@@ -22,7 +22,7 @@ use webfiori\framework\DB;
  * 
  * @since 2.1.1
  */
-class SessionOperations extends DB {
+class SessionDB extends DB {
     /**
      * Creates new instance of the class.
      * 

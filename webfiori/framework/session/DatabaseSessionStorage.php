@@ -22,7 +22,7 @@ namespace webfiori\framework\session;
 class DatabaseSessionStorage implements SessionStorage {
     /**
      *
-     * @var SessionOperations 
+     * @var SessionDB 
      */
     private $dbController;
     /**
@@ -31,7 +31,7 @@ class DatabaseSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function __construct() {
-        $this->dbController = new SessionOperations();
+        $this->dbController = new SessionDB();
     }
     /**
      * Removes all inactive sessions from the database.

@@ -10,6 +10,9 @@
  */
 namespace webfiori\framework\session;
 
+use webfiori\database\DatabaseException;
+use webfiori\framework\exceptions\SessionException;
+
 /**
  * A session storage engine which uses database to store session state.
  *
@@ -31,7 +34,14 @@ class DatabaseSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function __construct() {
-        $this->dbController = new SessionDB();
+        try {
+            $this->dbController = new SessionDB();
+        } catch (DatabaseException $ex) {
+            if ($ex->getMessage() == "No connection was found which has the name 'sessions-connection'.") {
+                throw new SessionException("Connection 'sessions-connection' was not found in application configuration.", $ex->getCode(), $ex);
+            }
+            throw new DatabaseException($ex->getMessage(), $ex->getCode(), $ex);
+        }
     }
     /**
      * Removes all inactive sessions from the database.
@@ -77,5 +87,14 @@ class DatabaseSessionStorage implements SessionStorage {
      */
     public function save($sessionId, $serializedSession) {
         $this->dbController->saveSession($sessionId, $serializedSession);
+    }
+    /**
+     * Returns the instance at which the storage is using to send queries to
+     * database and read sessions.
+     * 
+     * @return SessionDB An instance of the class SessionDB.
+     */
+    public function getController() : SessionDB {
+        return $this->dbController;
     }
 }

@@ -61,6 +61,9 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
+        <testsuite name="Database Tests">
+            <directory>./tests/webfiori/framework/test/DBTest.php</directory>
+        </testsuite>
         <testsuite name="I18n Tests">
             <directory>./tests/webfiori/framework/test/langs</directory>
         </testsuite>

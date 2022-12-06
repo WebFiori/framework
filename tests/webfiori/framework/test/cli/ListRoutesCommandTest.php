@@ -15,6 +15,7 @@ class ListRoutesCommandTest extends TestCase {
      * @test
      */
     public function test00() {
+        Router::removeAll();
         $runner = WebFioriApp::getRunner();
         $runner->setInput();
         $runner->setArgsVector([

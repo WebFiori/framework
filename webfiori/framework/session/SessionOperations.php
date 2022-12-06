@@ -144,6 +144,7 @@ class SessionOperations extends DB {
      * @since 1.0
      */
     public function removeSession($sId) {
+        $this->table('session_data')->delete()->where('s-id', '=', $sId)->execute();
         $this->table('sessions')->delete()->where('s-id', '=', $sId)->execute();
     }
     /**

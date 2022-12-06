@@ -22,6 +22,8 @@
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
+            <file>./webfiori/framework/session/DatabaseSessionStorage.php</file>
+            <file>./webfiori/framework/session/SessionDB.php</file>
             <file>./webfiori/framework/cli/commands/AddCommand.php</file>
             <file>./webfiori/framework/cli/commands/CreateCommand.php</file>
             <file>./webfiori/framework/cli/commands/CronCommand.php</file>

@@ -61,8 +61,29 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
-        <testsuite name="Tests">
-            <directory>./tests</directory>
+        <testsuite name="I18n Tests">
+            <directory>./tests/webfiori/framework/test/langs</directory>
+        </testsuite>
+        <testsuite name="Router Tests">
+            <directory>./tests/webfiori/framework/test/router</directory>
+        </testsuite>
+        <testsuite name="EMail Tests">
+            <directory>./tests/webfiori/framework/test/mail</directory>
+        </testsuite>
+        <testsuite name="Writers Tests">
+            <directory>./tests/webfiori/framework/test/writers</directory>
+        </testsuite>
+        <testsuite name="CLI Tests">
+            <directory>./tests/webfiori/framework/test/cli</directory>
+        </testsuite>
+        <testsuite name="CRON Tests">
+            <directory>./tests/webfiori/framework/test/cron</directory>
+        </testsuite>
+        <testsuite name="Session Tests">
+            <directory>./tests/webfiori/framework/test/session</directory>
+        </testsuite>
+        <testsuite name="General Tests">
+            <directory>./tests/webfiori/framework/test</directory>
         </testsuite>
     </testsuites>
 </phpunit>

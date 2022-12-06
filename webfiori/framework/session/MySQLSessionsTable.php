@@ -27,7 +27,7 @@ class MySQLSessionsTable extends MySQLTable {
      * Creates new instance of the class.
      */
     public function __construct() {
-        parent::__construct('`sessions`');
+        parent::__construct('sessions');
         $this->setComment('This table is used to store session related data');
         $this->addColumns([
             's-id' => [

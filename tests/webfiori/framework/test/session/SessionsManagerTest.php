@@ -180,6 +180,7 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
+     * @depends testDatabaseSession01
      */
     public function testDatabaseSession02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');

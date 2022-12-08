@@ -212,7 +212,13 @@ class Session implements JsonI {
         $this->passedTime = 0;
         $this->ipAddr = Request::getClientIP();
         $this->getCookie()->setSameSite('Lax');
-        $this->getCookie()->setIsSecure(true);
+        Request::getUri()->getScheme();
+        
+        if ((defined('USE_HTTP') && USE_HTTP === true) || Request::getUri()->getScheme() == 'http') {
+            $this->getCookie()->setIsSecure(false);
+        } else {
+            $this->getCookie()->setIsSecure(true);
+        }
         $this->getCookie()->setIsHttpOnly(true);
         
     }

@@ -82,6 +82,9 @@
         <testsuite name="CLI Tests">
             <directory>./tests/webfiori/framework/test/cli</directory>
         </testsuite>
+        <testsuite name="Themes Tests">
+            <directory>./tests/webfiori/framework/test/theme</directory>
+        </testsuite>
         <testsuite name="CRON Tests">
             <directory>./tests/webfiori/framework/test/cron</directory>
         </testsuite>

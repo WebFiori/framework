@@ -182,7 +182,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      * @depends testDatabaseSession01
      */
-    public function testDatabaseSession02() {
+    public function testInitSessionsDb() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
         WebFioriApp::getAppConfig()->addDbConnection($conn);
@@ -190,6 +190,18 @@ class SessionsManagerTest extends TestCase {
         $sto = new DatabaseSessionStorage();
         $sto->getController()->createTables();
         $sto->getController()->execute();
+        $this->assertTrue(true);
+    }
+    /**
+     * @test
+     * @depends testInitSessionsDb
+     */
+    public function testDatabaseSession02() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('sessions-connection');
+        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
         SessionsManager::setStorage($sto);
         
         $this->assertEquals(0, count(SessionsManager::getSessions()));

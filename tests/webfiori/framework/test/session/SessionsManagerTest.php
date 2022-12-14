@@ -188,8 +188,7 @@ class SessionsManagerTest extends TestCase {
         WebFioriApp::getAppConfig()->addDbConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables();
-        $sto->getController()->execute();
+        $sto->getController()->createTables()->execute();
         $this->assertTrue(true);
     }
     /**

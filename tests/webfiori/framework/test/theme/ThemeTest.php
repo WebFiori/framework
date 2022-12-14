@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\test;
+namespace webfiori\framework\test\theme;
 
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;

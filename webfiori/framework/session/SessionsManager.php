@@ -329,6 +329,9 @@ class SessionsManager {
     /**
      * Reset sessions manager to defaults.
      * 
+     * This method will clear all sessions, set session storage to 'DefaultSessionStorage',
+     * and set active session to null.
+     * 
      * @since 1.0
      */
     public static function reset() {

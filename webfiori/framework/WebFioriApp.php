@@ -546,7 +546,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC0');
+        define('WF_VERSION', '3.0.0-RC1');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -562,7 +562,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2022-08-21');
+        define('WF_RELEASE_DATE', '2022-12-25');
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR_NAME.'\config\Env')) {

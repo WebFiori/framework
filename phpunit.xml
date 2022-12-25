@@ -22,6 +22,8 @@
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
+            <file>./webfiori/framework/session/DatabaseSessionStorage.php</file>
+            <file>./webfiori/framework/session/SessionDB.php</file>
             <file>./webfiori/framework/cli/commands/AddCommand.php</file>
             <file>./webfiori/framework/cli/commands/CreateCommand.php</file>
             <file>./webfiori/framework/cli/commands/CronCommand.php</file>
@@ -59,8 +61,36 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
-        <testsuite name="Tests">
-            <directory>./tests</directory>
+        <testsuite name="General Tests">
+            <directory>./tests/webfiori/framework/test</directory>
         </testsuite>
+        <testsuite name="Database Tests">
+            <directory>./tests/webfiori/framework/test/DBTest.php</directory>
+        </testsuite>
+        <testsuite name="I18n Tests">
+            <directory>./tests/webfiori/framework/test/langs</directory>
+        </testsuite>
+        <testsuite name="Router Tests">
+            <directory>./tests/webfiori/framework/test/router</directory>
+        </testsuite>
+        <testsuite name="EMail Tests">
+            <directory>./tests/webfiori/framework/test/mail</directory>
+        </testsuite>
+        <testsuite name="Writers Tests">
+            <directory>./tests/webfiori/framework/test/writers</directory>
+        </testsuite>
+        <testsuite name="CLI Tests">
+            <directory>./tests/webfiori/framework/test/cli</directory>
+        </testsuite>
+        <testsuite name="Themes Tests">
+            <directory>./tests/webfiori/framework/test/theme</directory>
+        </testsuite>
+        <testsuite name="CRON Tests">
+            <directory>./tests/webfiori/framework/test/cron</directory>
+        </testsuite>
+        <testsuite name="Session Tests">
+            <directory>./tests/webfiori/framework/test/session</directory>
+        </testsuite>
+        
     </testsuites>
 </phpunit>

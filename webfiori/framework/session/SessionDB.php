@@ -22,7 +22,7 @@ use webfiori\framework\DB;
  * 
  * @since 2.1.1
  */
-class SessionOperations extends DB {
+class SessionDB extends DB {
     /**
      * Creates new instance of the class.
      * 
@@ -144,6 +144,7 @@ class SessionOperations extends DB {
      * @since 1.0
      */
     public function removeSession($sId) {
+        $this->table('session_data')->delete()->where('s-id', '=', $sId)->execute();
         $this->table('sessions')->delete()->where('s-id', '=', $sId)->execute();
     }
     /**

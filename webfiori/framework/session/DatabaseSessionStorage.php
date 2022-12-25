@@ -44,6 +44,16 @@ class DatabaseSessionStorage implements SessionStorage {
         }
     }
     /**
+     * Drop the tables which are used to store sessions information.
+     * 
+     * The method will drop two tables, the table 'session_data' and the
+     * table 'sessions'.
+     */
+    public function dropTables() {
+        $this->getController()->table('session_data')->drop()->execute();
+        $this->getController()->table('sessions')->drop()->execute();
+    }
+    /**
      * Removes all inactive sessions from the database.
      */
     public function gc() {

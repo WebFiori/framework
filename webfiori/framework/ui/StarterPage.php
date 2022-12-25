@@ -40,7 +40,7 @@ class StarterPage extends WebPage {
         ]);
         $div->addChild('h2')->text('Welcome to WebFiori v'.WF_VERSION);
 
-        $row = $div->addChild('v-row', ['justify' => 'center']);
+        $row = $div->addChild('v-container')->addChild('v-row', ['justify' => 'center']);
         $row->addChild('v-col', [
             'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('v-text-field', [
@@ -78,7 +78,10 @@ class StarterPage extends WebPage {
                 $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
     }
     private function createCard($link, $icon, $cardTitle, $paragraph, \webfiori\ui\HTMLNode $el) {
-        $card = $el->addChild('v-card');
+        $card = $el->addChild('v-card', [
+            'hover',
+            
+        ]);
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'
         ])
@@ -95,7 +98,7 @@ class StarterPage extends WebPage {
                 ."    el:'#page-body',"
                 ."    vuetify:new Vuetify({"
                 ."        theme: {"
-                ."            dark:true,"
+                ."            dark:false,"
                 ."            themes:{"
                 ."                dark:{},"
                 ."                light:{}"
@@ -106,7 +109,7 @@ class StarterPage extends WebPage {
                 .""
                 .""
                 .""
-                ."");
+                ."", false);
     }
     private function initHead() {
         $head = $this->getDocument()->getHeadNode();

@@ -10,14 +10,9 @@
  */
 namespace webfiori\framework\ui;
 
-use Throwable;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Util;
-use webfiori\framework\WebFioriApp;
-use webfiori\http\Response;
-use webfiori\ui\HTMLNode;
 use webfiori\error\AbstractHandler;
 use webfiori\framework\ui\WebPage;
+use webfiori\ui\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -82,7 +77,7 @@ class ServerErrView extends WebPage {
             ]);
             $index = 0;
             foreach ($throwableOrErr->getTrace() as $traceEntry) {
-                $traceList->addChild('v-list-item')->addChild('v-list-title')->text('#'.$index.' '.$traceEntry.'');
+                $traceList->addChild('v-list-item')->addChild('v-list-item-title')->text('#'.$index.' '.$traceEntry.'');
                 $index++;
             }
         } else {

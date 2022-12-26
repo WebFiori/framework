@@ -13,8 +13,8 @@ namespace webfiori\framework\handlers;
 use webfiori\error\AbstractHandler;
 use webfiori\framework\router\Router;
 use webfiori\framework\ui\ServerErrView;
-use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use webfiori\http\Request;
 use webfiori\http\Response;
 /**
  * Errors and exceptions handler which is used to handle errors in case of
@@ -60,7 +60,7 @@ class HTTPErrHandler  extends AbstractHandler {
             //We already have the API error handler active. So, disable it.
             return false;
         }
-        $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
+        $routeUri = Router::getUriObjByURL(Request::getRequestedURI());
 
         if ($routeUri !== null) {
             $routeType = $routeUri->getType();

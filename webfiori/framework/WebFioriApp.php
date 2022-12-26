@@ -429,7 +429,7 @@ class WebFioriApp {
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
     }
     private function _initCRON() {
-        $uriObj = new RouterUri(Util::getRequestedURL(), '');
+        $uriObj = new RouterUri(Request::getRequestedURI(), '');
         $pathArr = $uriObj->getPathArray();
 
         if (!class_exists(APP_DIR_NAME.'\ini\InitCron')) {

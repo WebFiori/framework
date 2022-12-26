@@ -1429,12 +1429,12 @@ class Router {
                         }
                     } else {
                         if ($loadResource === true) {
-                            $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
+                            $message = 'The resource "'.Request::getRequestedURI().'" was availble. '
                             .'but its route is not configured correctly. '
                             .'The resource which the route is pointing to was not found.';
 
                             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
+                                $message = 'The resource "'.Request::getRequestedURI().'" was availble. '
                                 .'but its route is not configured correctly. '
                                 .'The resource which the route is pointing to was not found ('.$file.').';
                             }

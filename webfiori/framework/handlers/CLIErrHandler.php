@@ -10,22 +10,31 @@
  */
 namespace webfiori\framework\handlers;
 
+use webfiori\cli\Formatter;
+use webfiori\cli\Runner;
 use webfiori\error\AbstractHandler;
 use webfiori\framework\cron\Cron;
-use webfiori\cli\Runner;
-use webfiori\cli\CLICommand;
-use webfiori\cli\Formatter;
 use webfiori\framework\WebFioriApp;
 /**
- * Description of CLIExceptionHandler
+ * Exceptions handler which is used to handle exceptions in case of running
+ * CLI applications.
+ * 
  *
  * @author Ibrahim
  */
 class CLIErrHandler  extends AbstractHandler {
+    /**
+     * Creates new instance of the class.
+     * 
+     * This method will set the name of the handler to 'CLI Errors Handler'.
+     */
     public function __construct() {
         parent::__construct();
         $this->setName('CLI Errors Handler');
     }
+    /**
+     * Handles the exception
+     */
     public function handle() {
         $stream = WebFioriApp::getRunner()->getOutputStream();
         $stream->prints(Formatter::format("Uncaught Exception\n", [
@@ -57,11 +66,25 @@ class CLIErrHandler  extends AbstractHandler {
             $num++;
         }
     }
-
+    /**
+     * Checks if the handler is active or not.
+     * 
+     * The handler will be active only if the framework is running through terminal.
+     * 
+     * @return bool True if active. false otherwise.
+     */
     public function isActive(): bool {
+        if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
+            return true;
+        }
+        
         return Runner::isCLI();
     }
-
+    /**
+     * Checks if the handler is a shutdown handler or not.
+     * 
+     * @return bool The method will always return true.
+     */
     public function isShutdownHandler(): bool {
         return true;
     }

@@ -453,6 +453,10 @@ class WebFioriApp {
      * @return Runner
      */
     public static function getRunner() : Runner {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitCommands')) {
+            ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
+        }
+
         if (self::$CliRunner === null) {
             self::$CliRunner = new Runner();
             if (Runner::isCLI()) {
@@ -496,6 +500,7 @@ class WebFioriApp {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
+                call_user_func(APP_DIR_NAME.'\ini\InitCommands::init');
             });
         }
         return self::$CliRunner;

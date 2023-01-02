@@ -17,7 +17,6 @@ use webfiori\file\File;
 use webfiori\framework\ui\HTTPCodeView;
 use webfiori\framework\ui\StarterPage;
 use webfiori\framework\ui\WebPage;
-use webfiori\framework\Util;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\http\Uri;
@@ -1294,7 +1293,7 @@ class Router {
         $fileObj = new File($info['name'], $info['dir']);
         $fileObj->read();
 
-        if ($fileObj->getFileMIMEType() === 'text/plain') {
+        if ($fileObj->getMIME() === 'text/plain') {
             $classNamespace = require_once $file;
 
             if (gettype($classNamespace) == 'string') {

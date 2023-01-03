@@ -11,11 +11,11 @@
 namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
-use webfiori\json\Json;
-use webfiori\http\Response;
 use webfiori\framework\router\Router;
-use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use webfiori\http\Request;
+use webfiori\http\Response;
+use webfiori\json\Json;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
  * 
@@ -24,6 +24,11 @@ use webfiori\framework\WebFioriApp;
  * @author Ibrahim
  */
 class APICallErrHandler extends AbstractHandler {
+    /**
+     * Creates new instance of the class.
+     * 
+     * This method will set the name of the handler to 'API Call Errors Handler'.
+     */
     public function __construct() {
         parent::__construct();
         $this->setName('API Call Errors Handler');
@@ -64,12 +69,24 @@ class APICallErrHandler extends AbstractHandler {
             Response::send();
         }
     }
-
+    /**
+     * Checks if the handler is active or not.
+     * 
+     * The handler will be active in following cases:
+     * <ul>
+     * <li>Class WebfioriApp is in initialization stage.</li>
+     * <li>Route type is Router::API_ROUTE.</li>
+     * <li>The constant API_CALL is defined and set to true.</li>
+     * </ul>
+     * 
+     * @return bool True if active. false otherwise.
+     */
     public function isActive(): bool {
         if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
             return true;
         }
-        $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
+
+        $routeUri = Router::getUriObjByURL(Request::getRequestedURI());
 
         if ($routeUri !== null) {
             $routeType = $routeUri->getType();
@@ -77,9 +94,13 @@ class APICallErrHandler extends AbstractHandler {
             $routeType = Router::VIEW_ROUTE;
         }
         
-        return $routeType == Router::API_ROUTE || defined('API_CALL');
+        return $routeType == Router::API_ROUTE || (defined('API_CALL') && API_CALL === true);
     }
-
+    /**
+     * Checks if the handler is a shutdown handler or not.
+     * 
+     * @return bool The method will always return true.
+     */
     public function isShutdownHandler(): bool {
         return true;
     }

@@ -174,6 +174,7 @@ class CronJobTest extends TestCase {
     public function testConstructor07() {
         Cron::setMinute(33);
         Cron::setDayOfWeek(4);
+        Cron::setMonth(5);
         $cron = new CronJob('15 8 * jan-mar 0,mon,3-5');
         $this->assertEquals('15 8 * jan-mar 0,mon,3-5',$cron->getExpression());
             $this->assertTrue($cron->isDayOfWeek());

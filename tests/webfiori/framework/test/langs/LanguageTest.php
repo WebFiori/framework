@@ -81,6 +81,29 @@ class LanguageTest extends TestCase{
         $this->assertFalse(Language::unloadTranslation('FR'));
     }
     /**
+     * @test
+     */
+    public function testGetLabel00() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No language class was found for the language \'GB\'.');
+        Language::getLabel('general.ok','GB');
+    }
+    /**
+     * @test
+     */
+    public function testGetLabel01() {
+        $this->assertEquals('general/action/print', Language::getLabel('general/action/print','EN'));
+        Language::getActive()->set('general.action', 'print', 'Print Report');
+        $this->assertEquals('Print Report', Language::getLabel('general/action/print'));
+        $this->assertEquals('general/action/print', Language::getLabel('general/action/print','AR'));
+        $this->assertEquals('Print Report', Language::getLabel('general/action/print', 'EN'));
+        $this->assertEquals('general/action/print', Language::getLabel('general.action.print','AR'));
+        Language::getActive()->set('general.action', 'print', 'طباعة التقرير');
+        $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
+        $this->assertEquals('Print Report', Language::getLabel('general.action.print'));
+        Language::reset();
+    }
+    /**
      * Try to load a language which does not have a translation file.
      * @test
      */
@@ -126,6 +149,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation04() {
+        
         $lang = Language::loadTranslation('Ar');
         $this->assertTrue($lang instanceof Language);
         $this->assertEquals('AR',$lang->getCode());
@@ -188,6 +212,17 @@ class LanguageTest extends TestCase{
     /**
      * @test
      */
+    public function testActive00() {
+        Language::reset();
+        $this->assertNull(Language::getActive());
+        Language::loadTranslation('EN');
+        $active = Language::getActive();
+        $this->assertEquals('EN', $active->getCode());
+        $this->assertEquals('ltr', $active->getWritingDir());
+    }
+    /**
+     * @test
+     */
     public function testSet00() {
         $lang = Language::loadTranslation('en');
         $lang->createAndSet('general/status', [
@@ -238,6 +273,20 @@ class LanguageTest extends TestCase{
         $this->assertEquals('Super', $lang->get('a/var/y/Z'));
     }
     /**
+     * @test
+     */
+    public function testSet06() {
+        $lang = Language::loadTranslation('en');
+        $lang->createAndSet('general.new.status', [
+            'wait' => 'Please wait a moment...'
+        ]);
+        $this->assertEquals('Please wait a moment...',$lang->get('general.new.status.wait'));
+        $this->assertEquals('Please wait a moment...',$lang->get('general/new/status/wait'));
+        $lang->set('general.new.status', 'wait', 'Wait a sec...');
+        $this->assertEquals('Wait a sec...',$lang->get('general/new/status/wait'));
+        $this->assertEquals('Wait a sec...',$lang->get('general.new.status/wait'));
+    }
+    /**
      * Testing the method Language::get() with non-exiting language variable.
      * @test
      */
@@ -247,6 +296,20 @@ class LanguageTest extends TestCase{
         $var = $lang->get('   this/does/not/exist/');
         $this->assertEquals('this/does/not/exist',$var);
         $var2 = $lang->get('general/not-exist');
+        $this->assertEquals('general/not-exist',$var2);
+        
+        $var3 = $lang->get('general');
+        $this->assertEquals('array', gettype($var3));
+    }
+    /**
+     * @test
+     */
+    public function testGet01() {
+        $lang = Language::loadTranslation('ar');
+        $lang->createDirectory('general');
+        $var = $lang->get('   this.does.not.exist.');
+        $this->assertEquals('this/does/not/exist',$var);
+        $var2 = $lang->get('general.not-exist');
         $this->assertEquals('general/not-exist',$var2);
         
         $var3 = $lang->get('general');

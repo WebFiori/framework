@@ -1,7 +1,10 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\framework\Language;
+
+use Exception;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\Language;
+use webfiori\framework\session\SessionsManager;
 /**
  * Description of LanguageTest
  *
@@ -84,7 +87,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testGetLabel00() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'GB\'.');
         Language::getLabel('general.ok','GB');
     }
@@ -101,6 +104,17 @@ class LanguageTest extends TestCase{
         Language::getActive()->set('general.action', 'print', 'طباعة التقرير');
         $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
         $this->assertEquals('Print Report', Language::getLabel('general.action.print'));
+    }
+    /**
+     * @test
+     * @depends testGetLabel01
+     */
+    public function testGetLabel02() {
+        SessionsManager::start('new-x-session');
+        $_POST['lang'] = 'ar';
+        $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
+        $_POST['lang'] = 'en';
+        $this->assertEquals('Print Report', Language::getLabel('general.action.print'));
         Language::reset();
     }
     /**
@@ -108,7 +122,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation00() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'GB\'.');
         Language::loadTranslation('GB');
     }
@@ -118,7 +132,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation01() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'CA\'.');
         Language::loadTranslation('CA');
     }
@@ -128,7 +142,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation02() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'Language\'.');
         Language::loadTranslation('fr');
     }
@@ -139,7 +153,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
                                 . '$addtoLoadedAfterCreate is set to true when creating the language object.');
         Language::loadTranslation('Jp');

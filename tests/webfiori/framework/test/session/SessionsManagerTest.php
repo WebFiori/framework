@@ -119,6 +119,7 @@ class SessionsManagerTest extends TestCase {
      */
     public function testGetSessionIDFromRequest() {
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
+        putenv('REQUEST_METHOD=GET');
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
         

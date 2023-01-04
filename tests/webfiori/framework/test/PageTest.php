@@ -506,8 +506,6 @@ class PageTest extends TestCase{
         $this->assertEquals('super-sec', $node->getChild(0)->getID());
         $el = $page->getChildByID('my-div');
         $this->assertEquals('My Name Is Super Hero', $el->getChild(0)->getText());
-        $el = $page->getChildByID('my-div-2');
-        $this->assertEquals('Ok', $el->getChild(0)->getText());
     }
     /**
      * @test

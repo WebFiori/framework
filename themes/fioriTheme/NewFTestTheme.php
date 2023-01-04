@@ -25,6 +25,14 @@ class NewFTestTheme extends Theme {
         //$this->setCssDirName('css');
         //$this->setJsDirName('js');
         //$this->setImagesDirName('images');
+        $this->setBeforeLoaded(function (Theme $theme, string $txt) {
+            $theme->setAfterLoaded(function (Theme $theme, string $txt2) {
+                $div = $theme->getPage()->insert('div');
+                $div->text($txt2);
+                $div->setID('my-div');
+            }, [$txt]);
+        }, ['My Name Is Super Hero']);
+        
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 

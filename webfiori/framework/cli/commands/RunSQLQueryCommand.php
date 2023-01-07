@@ -259,9 +259,10 @@ class RunSQLQueryCommand extends CLICommand {
 
         if ($selected == 'Create Database.') {
             $schema->createTables();
+            return $this->confirmExecute($schema);
         } else {
             $selectedTable = $this->select('Select database table:', array_keys($schema->getTables()));
-            $this->tableQuery($schema, $schema->getTable($selectedTable));
+            return $this->tableQuery($schema, $schema->getTable($selectedTable));
         }
     }
     /**
@@ -301,7 +302,7 @@ class RunSQLQueryCommand extends CLICommand {
             $schema->table($tableObj->getNormalName())->drop();
             $query1 = $schema->getLastQuery();
             $schema->table($tableObj->getNormalName())->createTable();
-            $schema->setQuery($query1."\n".$schema->getLastQuery());
+            $schema->getQueryGenerator()->setQuery($query1."\n".$schema->getLastQuery(), true);
         }
         return $this->confirmExecute($schema);
     }

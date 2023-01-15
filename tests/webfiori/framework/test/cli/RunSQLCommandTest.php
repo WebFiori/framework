@@ -286,46 +286,49 @@ class RunSQLCommandTest extends TestCase {
      * @test
      * @depends testTableQuery00
      */
-//    public function testTableQuery01() {
-//        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
-//        $conn->setName('testing-connection');
-//        ConfigController::get()->addOrUpdateDBConnection($conn);
-//        
-//        $runner = WebFioriApp::getRunner();
-//        $runner->setArgsVector([
-//            'webfiori',
-//            'run-query',
-//            '--connection' => 'testing-connection',
-//            '--no-confirm',
-//            '--table' => 'app\\database\\TestTable'
-//        ]);
-//        $runner->setInput([
-//            '1',
-//            '1'
-//        ]);
-//        
-//        $code = $runner->start();
-//        
-//        
-//        
-//        $this->assertEquals([
-//            "What type of query you would like to run?\n",
-//            "0: Run general query.\n",
-//            "1: Run query on table instance.\n",
-//            "2: Run query from file.\n",
-//            "Select query type:\n",
-//            "0: Create database table.\n",
-//            "1: Drop database table.\n",
-//            "2: Drop and create table.\n",
-//            "3: Add Column.\n",
-//            "4: Modify Column.\n",
-//            "5: Drop Column.\n",
-//            "Info: Executing the query...\n",
-//            "Success: Query executed without errors.\n"
-//        ], $runner->getOutput());
-//        
-//        $this->assertEquals(0, $code);
-//    }
+    public function testTableQuery01() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--connection' => 'testing-connection',
+            '--no-confirm',
+            '--table' => 'app\\database\\TestTable'
+        ]);
+        $runner->setInput([
+            '1',
+            '1'
+        ]);
+        
+        $code = $runner->start();
+        
+        
+        
+        $this->assertEquals([
+            "What type of query you would like to run?\n",
+            "0: Run general query.\n",
+            "1: Run query on table instance.\n",
+            "2: Run query from file.\n",
+            "Select query type:\n",
+            "0: Create database table.\n",
+            "1: Drop database table.\n",
+            "2: Drop and create table.\n",
+            "3: Add Column.\n",
+            "4: Modify Column.\n",
+            "5: Drop Column.\n",
+            "Info: Executing the query...\n",
+            "Success: Query executed without errors.\n"
+        ], $runner->getOutput());
+        
+        $this->assertEquals(0, $code);
+    }
+    /**
+     * @test
+     */
     public function testCLIQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
@@ -358,5 +361,142 @@ class RunSQLCommandTest extends TestCase {
             "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
         ], $runner->getOutput());
     }
-    
+    /**
+     * @test
+     */
+    public function testSchemaQuery00() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--schema' => \tables\Schema::class
+        ]);
+        $runner->setInput([
+            '0',
+            'y',
+        ]);
+        
+        $code = $runner->start();
+        
+        
+        $this->assertEquals([
+            "Select an option:\n",
+            "0: Create Database.\n",
+            "1: Run Query on Specific Table.\n",
+            "The following query will be executed on the database:\n",
+            "create table if not exists `users` (\n"
+            . "    `id` int not null,\n"
+            . "    `email` varchar(128) not null collate utf8mb4_unicode_520_ci,\n"
+            . "    `first_name` varchar(128) not null collate utf8mb4_unicode_520_ci,\n"
+            . "    `last_name` varchar(128) null collate utf8mb4_unicode_520_ci,\n"
+            . "    `joining_date` datetime not null,\n"
+            . "    `created_on` timestamp not null default now()\n"
+            . "\n"
+            . ")\n"
+            . "engine = InnoDB\n"
+            . "default charset = utf8mb4\n"
+            . "collate = utf8mb4_unicode_520_ci;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing the query...\n",
+            "Success: Query executed without errors.\n"
+        ], $runner->getOutput());
+        $this->assertEquals(0, $code);
+    }
+    /**
+     * @test
+     */
+    public function testSchemaQuery01() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--schema' => \tables\Schema2::class,
+            '--create'
+        ]);
+        $runner->setInput([
+            'y',
+        ]);
+        $code = $runner->start();
+        $this->assertEquals([
+            "The following query will be executed on the database:\n",
+            "create table if not exists `users` (\n"
+            . "    `id` int not null unique,\n"
+            . "    `name` varchar(128) not null unique collate utf8mb4_unicode_520_ci,\n"
+            . "    `company` varchar(128) not null collate utf8mb4_unicode_520_ci,\n"
+            . "    `salary` decimal(10,2) not null default '0',\n"
+            . "    `created_on` timestamp not null default now(),\n"
+            . "    `last_updated` datetime null\n"
+            . "\n)"
+            . "\n"
+            . "engine = InnoDB\n"
+            . "default charset = utf8mb4\n"
+            . "collate = utf8mb4_unicode_520_ci;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing the query...\n",
+            "Success: Query executed without errors.\n"
+        ], $runner->getOutput());
+        $this->assertEquals(0, $code);
+    }
+    /**
+     * @test
+     */
+    public function testSchemaQuery03() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        ConfigController::get()->addOrUpdateDBConnection($conn);
+        
+        $runner = WebFioriApp::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+            '--schema' => \tables\Schema2::class,
+        ]);
+        $runner->setInput([
+            '1',
+            "0",
+            "2",
+            "y"
+        ]);
+        $code = $runner->start();
+        $this->assertEquals([
+            "Select an option:\n",
+            "0: Create Database.\n",
+            "1: Run Query on Specific Table.\n",
+            "Select database table:\n",
+            "0: users\n",
+            "Select query type:\n",
+            "0: Create database table.\n",
+            "1: Drop database table.\n",
+            "2: Drop and create table.\n",
+            "3: Add Column.\n",
+            "4: Modify Column.\n",
+            "5: Drop Column.\n",
+            "The following query will be executed on the database:\n",
+            "drop table `users`;\n"
+            . "create table if not exists `users` (\n"
+            . "    `id` int not null unique,\n"
+            . "    `name` varchar(128) not null unique collate utf8mb4_unicode_520_ci,\n"
+            . "    `company` varchar(128) not null collate utf8mb4_unicode_520_ci,\n"
+            . "    `salary` decimal(10,2) not null default '0',\n"
+            . "    `created_on` timestamp not null default now(),\n"
+            . "    `last_updated` datetime null\n"
+            . "\n)"
+            . "\n"
+            . "engine = InnoDB\n"
+            . "default charset = utf8mb4\n"
+            . "collate = utf8mb4_unicode_520_ci;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing the query...\n",
+            "Success: Query executed without errors.\n"
+        ], $runner->getOutput());
+        $this->assertEquals(0, $code);
+    }
 }

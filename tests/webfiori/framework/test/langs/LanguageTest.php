@@ -1,7 +1,10 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\framework\Language;
+
+use Exception;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\Language;
+use webfiori\framework\session\SessionsManager;
 /**
  * Description of LanguageTest
  *
@@ -81,11 +84,45 @@ class LanguageTest extends TestCase{
         $this->assertFalse(Language::unloadTranslation('FR'));
     }
     /**
+     * @test
+     */
+    public function testGetLabel00() {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('No language class was found for the language \'GB\'.');
+        Language::getLabel('general.ok','GB');
+    }
+    /**
+     * @test
+     */
+    public function testGetLabel01() {
+        $this->assertEquals('general/action/print', Language::getLabel('general/action/print','EN'));
+        Language::getActive()->set('general.action', 'print', 'Print Report');
+        $this->assertEquals('Print Report', Language::getLabel('general/action/print'));
+        $this->assertEquals('general/action/print', Language::getLabel('general/action/print','AR'));
+        $this->assertEquals('Print Report', Language::getLabel('general/action/print', 'EN'));
+        $this->assertEquals('general/action/print', Language::getLabel('general.action.print','AR'));
+        Language::getActive()->set('general.action', 'print', 'طباعة التقرير');
+        $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
+        $this->assertEquals('Print Report', Language::getLabel('general.action.print'));
+    }
+    /**
+     * @test
+     * @depends testGetLabel01
+     */
+    public function testGetLabel02() {
+        SessionsManager::start('new-x-session');
+        $_POST['lang'] = 'ar';
+        $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
+        $_POST['lang'] = 'en';
+        $this->assertEquals('Print Report', Language::getLabel('general.action.print'));
+        Language::reset();
+    }
+    /**
      * Try to load a language which does not have a translation file.
      * @test
      */
     public function testLoadTranslation00() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'GB\'.');
         Language::loadTranslation('GB');
     }
@@ -95,7 +132,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation01() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'CA\'.');
         Language::loadTranslation('CA');
     }
@@ -105,7 +142,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation02() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'Language\'.');
         Language::loadTranslation('fr');
     }
@@ -116,7 +153,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
                                 . '$addtoLoadedAfterCreate is set to true when creating the language object.');
         Language::loadTranslation('Jp');
@@ -126,6 +163,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation04() {
+        
         $lang = Language::loadTranslation('Ar');
         $this->assertTrue($lang instanceof Language);
         $this->assertEquals('AR',$lang->getCode());
@@ -188,6 +226,17 @@ class LanguageTest extends TestCase{
     /**
      * @test
      */
+    public function testActive00() {
+        Language::reset();
+        $this->assertNull(Language::getActive());
+        Language::loadTranslation('EN');
+        $active = Language::getActive();
+        $this->assertEquals('EN', $active->getCode());
+        $this->assertEquals('ltr', $active->getWritingDir());
+    }
+    /**
+     * @test
+     */
     public function testSet00() {
         $lang = Language::loadTranslation('en');
         $lang->createAndSet('general/status', [
@@ -238,6 +287,20 @@ class LanguageTest extends TestCase{
         $this->assertEquals('Super', $lang->get('a/var/y/Z'));
     }
     /**
+     * @test
+     */
+    public function testSet06() {
+        $lang = Language::loadTranslation('en');
+        $lang->createAndSet('general.new.status', [
+            'wait' => 'Please wait a moment...'
+        ]);
+        $this->assertEquals('Please wait a moment...',$lang->get('general.new.status.wait'));
+        $this->assertEquals('Please wait a moment...',$lang->get('general/new/status/wait'));
+        $lang->set('general.new.status', 'wait', 'Wait a sec...');
+        $this->assertEquals('Wait a sec...',$lang->get('general/new/status/wait'));
+        $this->assertEquals('Wait a sec...',$lang->get('general.new.status/wait'));
+    }
+    /**
      * Testing the method Language::get() with non-exiting language variable.
      * @test
      */
@@ -247,6 +310,20 @@ class LanguageTest extends TestCase{
         $var = $lang->get('   this/does/not/exist/');
         $this->assertEquals('this/does/not/exist',$var);
         $var2 = $lang->get('general/not-exist');
+        $this->assertEquals('general/not-exist',$var2);
+        
+        $var3 = $lang->get('general');
+        $this->assertEquals('array', gettype($var3));
+    }
+    /**
+     * @test
+     */
+    public function testGet01() {
+        $lang = Language::loadTranslation('ar');
+        $lang->createDirectory('general');
+        $var = $lang->get('   this.does.not.exist.');
+        $this->assertEquals('this/does/not/exist',$var);
+        $var2 = $lang->get('general.not-exist');
         $this->assertEquals('general/not-exist',$var2);
         
         $var3 = $lang->get('general');

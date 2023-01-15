@@ -42,7 +42,8 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$sesston->getResumedAt());
         $this->assertEquals(0,$sesston->getPassedTime());
         $this->assertEquals('', $sesston->getLangCode());
-        //$this->assertNull($sesston->getUser());
+        $this->assertEquals('', $sesston->getLangCode(true));
+        $this->assertNull($sesston->getUser());
         $this->assertEquals('super',$sesston->getId());
         $this->assertEquals(Session::STATUS_INACTIVE,$sesston->getStatus());
     }
@@ -123,7 +124,14 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$session->getResumedAt());
         $session->set('hello','world');
         $this->assertNull($session->get('hello'));
-        $session->start();      
+        $this->assertEquals('', $session->getLangCode());
+        $session->start(); 
+        $this->assertEquals('EN', $session->getLangCode());
+        $this->assertEquals('EN', $session->getLangCode(true));
+        $_POST['lang'] = 'AR';
+        putenv('REQUEST_METHOD=POST');
+        $this->assertEquals('EN', $session->getLangCode());
+        $this->assertEquals('AR', $session->getLangCode(true));
         $this->assertEquals(0,$session->getPassedTime());
         $this->assertEquals(Session::STATUS_NEW,$session->getStatus());
         $this->assertEquals(time(),$session->getStartedAt());
@@ -236,7 +244,7 @@ class SessionTest extends TestCase {
                 . '"resumedAt":'.$s->getStartedAt().','
                 . '"passedTime":0,'
                 . '"remainingTime":60,'
-                . '"language":"EN",'
+                . '"language":"FR",'
                 . '"id":"'.$s->getId().'",'
                 . '"isRefresh":false,'
                 . '"isPersistent":true,'
@@ -248,7 +256,7 @@ class SessionTest extends TestCase {
      * @test
      */
     public function testToJsonTest01() {
-        $_GET['lang'] = 'en';
+        $_POST['lang'] = 'fr';
         $s = new Session(['name'=>'session','duration'=>1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
@@ -266,6 +274,25 @@ class SessionTest extends TestCase {
                 . '"user":null,'
                 . '"vars":[]}',$j.'');
         $s->start();
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session",'
+                . '"started_at":'.$s->getStartedAt().','
+                . '"duration":60,'
+                . '"resumed_at":'.$s->getStartedAt().','
+                . '"passed_time":0,'
+                . '"remaining_time":60,'
+                . '"language":"FR",'
+                . '"id":"'.$s->getId().'",'
+                . '"is_refresh":false,'
+                . '"is_persistent":true,'
+                . '"status":"status_new",'
+                . '"user":null,'
+                . '"vars":[]}',$j.'');
+        $_POST['lang'] = 'enx';
+        $this->assertEquals('FR', $s->getLangCode(true));
+        $_POST['lang'] = 'En';
+        $this->assertEquals('EN', $s->getLangCode(true));
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
         $this->assertEquals('{"name":"session",'

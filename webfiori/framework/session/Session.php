@@ -839,20 +839,16 @@ class Session implements JsonI {
      */
     private function _getLangFromRequest() {
         $langIdx = 'lang';
-        //get language code from $_GET
-        $lang = filter_input(INPUT_GET, $langIdx);
 
+        //if not in $_GET, check $_POST
+        $lang = Request::getParam($langIdx);
+
+        //If not in $_POST, check cookie.
         if (!$lang || $lang == null) {
-            //if not in $_GET, check $_POST
-            $lang = filter_input(INPUT_POST, $langIdx);
+            $lang = filter_input(INPUT_COOKIE, $langIdx);
 
-            //If not in $_POST, check cookie.
             if (!$lang || $lang == null) {
-                $lang = filter_input(INPUT_COOKIE, $langIdx);
-
-                if (!$lang || $lang == null) {
-                    $lang = null;
-                }
+                $lang = null;
             }
         }
 
@@ -873,16 +869,13 @@ class Session implements JsonI {
      * @param boolean $forceUpdate Set to true if the language is set and want to 
      * reset it. Default is false.
      * 
-     * @param boolean $useDefault If set to true, the method will 
-     * use default language if no language attribute is found in request body.
-     * 
      * @return boolean The method will return true if the language is set or 
      * updated. Other than that, the method will return false. Default is true which 
      * happens when session is not running.
      * 
      * @since 1.2
      */
-    private function _initLang($forceUpdate = false,$useDefault = true) {
+    private function _initLang($forceUpdate = false) {
         if ($this->isRunning()) {
             if ($this->langCode != '' && !$forceUpdate) {
                 return false;
@@ -896,9 +889,9 @@ class Session implements JsonI {
             $isNullCode = $langCodeFromReq === null;
             
             if ($isNullCode) {
-                if ($this->langCode != '' || $useDefault === false) {
+                if ($this->langCode != '') {
                     $retVal = false;
-                } else if ($useDefault) {
+                } else {
                     $langCodeFromReq = $defaultLang;
                 }
             }
@@ -911,7 +904,7 @@ class Session implements JsonI {
                     $retVal = true;
                 }
 
-                if ($useDefault && !$retVal && $this->langCode == '') {
+                if (!$retVal && $this->langCode == '') {
                     $this->langCode = $defaultLang;
                     $retVal = true;
                 } else {

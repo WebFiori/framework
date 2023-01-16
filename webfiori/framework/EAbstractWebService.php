@@ -11,6 +11,7 @@
 namespace webfiori\framework;
 
 use webfiori\http\AbstractWebService;
+use webfiori\http\WebServicesManager;
 /**
  * A class which represents a web service.
  *
@@ -32,12 +33,12 @@ abstract class EAbstractWebService extends AbstractWebService {
      * The developer does not have to use this method. It is used when a 
      * service is added to a manager.
      * 
-     * @param ExtendedWebServicesManager|null $manager The manager at which the service 
+     * @param WebServicesManager|null $manager The manager at which the service 
      * will be associated with. If null is given, the association will be removed if 
      * the service was associated with a manager.
      * 
      */
-    public function setManager($manager) {
+    public function setManager(WebServicesManager $manager = null) {
         parent::setManager($manager);
     }
 }

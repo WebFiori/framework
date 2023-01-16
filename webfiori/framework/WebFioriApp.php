@@ -12,6 +12,7 @@ namespace webfiori\framework;
 
 use Closure;
 use Error;
+use ReflectionClass;
 use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\File;
@@ -20,6 +21,7 @@ use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
+use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
@@ -195,12 +197,15 @@ class WebFioriApp {
      * be 'Table' If provided, only classes with the specified suffix will 
      * be considered.
      * 
+     * @param array $constructorParams An optional array that can hold constructor
+     * parameters for objects that will be registered.
+     * 
      * @param array $otherParams An optional array that can hold extra parameters 
      * which will be passed to the register callback.
      * 
      * @since 1.3.6
      */
-    public static function autoRegister($folder, $regCallback, $suffix = null, array $otherParams = []) {
+    public static function autoRegister($folder, $regCallback, $suffix = null,array $constructorParams = [], array $otherParams = []) {
         $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
 
         if (File::isDirectory($dir)) {
@@ -228,7 +233,8 @@ class WebFioriApp {
                         'folder' => $folder, 
                         'class-name' => $expl[0], 
                         'params' => $otherParams, 
-                        'callback' => $regCallback
+                        'callback' => $regCallback,
+                        'constructor-params' => $constructorParams
                     ]);
                 }
             }
@@ -241,6 +247,7 @@ class WebFioriApp {
         $className = $options['class-name'];
         $otherParams = $options['params'];
         $regCallback = $options['callback'];
+        $constructorParams = $options['constructor-params'];
         $instanceNs = require_once $dir.DS.$phpFile;
 
         if (strlen($instanceNs) == 0 || $instanceNs == 1) {
@@ -248,7 +255,9 @@ class WebFioriApp {
         }
         $class = $instanceNs.'\\'.$className;
         try {
-            $toPass = [new $class()];
+            $reflectionClass = new ReflectionClass($class);  
+             
+            $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
 
             foreach ($otherParams as $param) {
                 $toPass[] = $param;
@@ -506,7 +515,7 @@ class WebFioriApp {
         return self::$CliRunner;
     }
     private function _initMiddleware() {
-        WebFioriApp::autoRegister('middleware', function($inst)
+        WebFioriApp::autoRegister('middleware', function(AbstractMiddleware $inst)
         {
             MiddlewareManager::register($inst);
         });

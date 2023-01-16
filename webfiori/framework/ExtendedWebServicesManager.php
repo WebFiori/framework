@@ -375,7 +375,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         WebFioriApp::autoRegister($pathToScan, function (AbstractWebService $ws, ExtendedWebServicesManager $m)
         {
             $m->addService($ws);
-        }, 'Service', [$this]);
+        }, 'Service', [$this], [$this]);
     }
     /**
      * Sends a response message to indicate that request method is not supported.

@@ -207,7 +207,11 @@ class WebFioriApp {
      */
     public static function autoRegister($folder, $regCallback, $suffix = null,array $constructorParams = [], array $otherParams = []) {
         $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
-
+        if (!File::isDirectory($dir)) {
+            //If directory is outside application folder.
+            $dir = ROOT_PATH.DS.$folder;
+        }
+        
         if (File::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
 

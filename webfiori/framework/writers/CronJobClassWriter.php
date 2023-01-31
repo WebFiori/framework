@@ -35,7 +35,7 @@ class CronJobClassWriter extends ClassWriter {
      * the job needs.
      */
     public function __construct($jobName = '', $jobDesc = '', array $argsArr = []) {
-        parent::__construct('NewJob', ROOT_DIR.DS.APP_DIR_NAME.DS.'jobs', APP_DIR_NAME.'\\jobs');
+        parent::__construct('NewJob', ROOT_DIR.DS.APP_DIR.DS.'jobs', APP_DIR.'\\jobs');
         $this->job = new CronJob();
         if (!$this->setJobName($jobName)) {
             $this->setJobName('New Job');

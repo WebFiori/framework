@@ -33,7 +33,7 @@ class CreateWebService extends CreateClassHelper {
         $serviceObj = new ServiceHolder();
         parent::__construct($command, new WebServiceWriter($serviceObj));
 
-        $this->setClassInfo(APP_DIR_NAME.'\\apis', 'Service');
+        $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
         
 

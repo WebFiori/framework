@@ -29,7 +29,7 @@ class CreateMiddleware extends CreateClassHelper {
      */
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new MiddlewareClassWriter());
-        $this->setClassInfo(APP_DIR_NAME.'\\middleware', 'Middleware');
+        $this->setClassInfo(APP_DIR.'\\middleware', 'Middleware');
         
         $middlewareName = $this->_getMiddlewareName();
         $priority = $this->_getMiddlewareProprity();

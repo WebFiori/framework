@@ -46,7 +46,7 @@ class WebServiceWriter extends ClassWriter {
      * </ul>
      */
     public function __construct($webServicesObj = null) {
-        parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
+        parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR.DS.'apis', APP_DIR.'\\apis');
         
         $this->setSuffix('Service');
         $this->addUseStatement(EAbstractWebService::class);

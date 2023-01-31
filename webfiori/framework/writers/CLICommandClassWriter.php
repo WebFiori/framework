@@ -43,12 +43,12 @@ class CLICommandClassWriter extends ClassWriter {
      * the command will have.
      */
     public function __construct() {
-        parent::__construct('NewCommand', ROOT_DIR.DS.APP_DIR_NAME.DS.'commands', APP_DIR_NAME.'\\commands');
+        parent::__construct('NewCommand', ROOT_DIR.DS.APP_DIR.DS.'commands', APP_DIR.'\\commands');
         $this->name = 'new-command';
         $this->args = [];
         $this->desc = '';
         $this->setSuffix('Command');
-        $this->setNamespace(APP_DIR_NAME.'\\commands');
+        $this->setNamespace(APP_DIR.'\\commands');
         $this->addUseStatement([
             'webfiori\\cli\\CLICommand'
         ]);

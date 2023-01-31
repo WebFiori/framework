@@ -181,7 +181,7 @@ class AutoLoader {
      * @return string The directory at which autoload cache file will be created at.
      */
     public static function getCachePath() : string {
-        return self::get()->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        return self::get()->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
     }
     /**
      * Returns a single instance of the class 'AutoLoader'.
@@ -220,10 +220,10 @@ class AutoLoader {
     ]) {
         $DS = DIRECTORY_SEPARATOR;
 
-        if (!defined('APP_DIR_NAME')) {
-            define('APP_DIR_NAME', 'app');
+        if (!defined('APP_DIR')) {
+            define('APP_DIR', 'app');
         }
-        $appFolder = APP_DIR_NAME;
+        $appFolder = APP_DIR;
 
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
@@ -613,7 +613,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _readCache() {
-        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
+        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto';
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {

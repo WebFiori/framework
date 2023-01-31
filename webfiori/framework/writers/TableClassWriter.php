@@ -71,7 +71,7 @@ class TableClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function __construct($tableObj = null) {
-        parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR_NAME.DS.'database', APP_DIR_NAME.'\\database');
+        parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR.DS.'database', APP_DIR.'\\database');
         $this->setSuffix('Table');
         if ($tableObj === null) {
             $this->setTableType('mysql');

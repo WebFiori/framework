@@ -136,7 +136,7 @@ class CLIUtils {
         $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
         
         if (count($dbConnections) == 0) {
-            $c->warning('No database connections found in the class "'.APP_DIR_NAME.'\\AppConfig"!');
+            $c->warning('No database connections found in the class "'.APP_DIR.'\\AppConfig"!');
             $c->info('Run the command "add" to add connections.');
             
             return null;

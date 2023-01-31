@@ -63,7 +63,7 @@ class CronTasksView extends CronView {
             'cols' => 12
         ])->addChild('v-card');
         $card->addChild('v-card-title')->text('Jobs Execution Log');
-        $file = new File(ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'logs'.DS.'cron.log');
+        $file = new File(ROOT_DIR.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron.log');
 
         if ($file->isExist()) {
             $file->read();

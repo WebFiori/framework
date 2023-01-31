@@ -70,7 +70,7 @@ class CreateCommand extends CLICommand {
     }
     public function _createEntityFromQuery() {
         $tableObj = CLIUtils::readTable($this);
-        $defaultNs = APP_DIR_NAME.'\\entity';
+        $defaultNs = APP_DIR.'\\entity';
         $this->println('We need from you to give us entity class information.');
         $infoReader = new ClassInfoReader($this);
         $classInfo = $infoReader->readClassInfo($defaultNs);

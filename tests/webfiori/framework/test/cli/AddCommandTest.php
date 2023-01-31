@@ -280,7 +280,7 @@ class AddCommandTest extends TestCase {
         ], $runner->getOutput());
     }
     private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
+        $file = new File(ROOT_PATH.$classPath.'.php');
         $file->remove();
     }
 }

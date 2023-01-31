@@ -133,13 +133,13 @@ class AutoLoader {
         $this->loadedClasses = [];
         require_once 'exceptions'.DIRECTORY_SEPARATOR.'ClassLoaderException.php';
 
-        if (defined('ROOT_DIR')) {
-            $this->rootDir = ROOT_DIR;
+        if (defined('ROOT_PATH')) {
+            $this->rootDir = ROOT_PATH;
         } else if (strlen($root) != 0 && is_dir($root)) {
             $this->rootDir = $root;
 
             if ($defineRoot === true) {
-                define('ROOT_DIR', $this->rootDir);
+                define('ROOT_PATH', $this->rootDir);
             }
         } else {
             throw new ClassLoaderException('Unable to set root search folder.');
@@ -190,12 +190,12 @@ class AutoLoader {
      * the autoloader. The available options are:
      * <ul>
      * <li><b>root</b>: A directory that can be used as a base search folder. 
-     * Default is empty string. Ignored if the constant ROOT_DIR is defined.</li>
+     * Default is empty string. Ignored if the constant ROOT_PATH is defined.</li>
      * <li><b>search-folders</b>: An array which contains a set of folders to search 
      * on. Default is an empty array.</li>
      * <li><b>define-root</b>: If set to true, The autoloader will try to define 
-     * the constant 'ROOT_DIR' based on the autoload folders. 
-     * Default is false. Ignored if the constant ROOT_DIR is defined.</li>,
+     * the constant 'ROOT_PATH' based on the autoload folders. 
+     * Default is false. Ignored if the constant ROOT_PATH is defined.</li>,
      * <li>
      * <b>on-load-failure</b>: An attribute that will be used if the 
      * loader is unable to load the class. Possible values are:
@@ -499,7 +499,7 @@ class AutoLoader {
      */
     private static function _getComposerVendorDirs() {
         $DS = DIRECTORY_SEPARATOR;
-        $split = explode($DS, ROOT_DIR);
+        $split = explode($DS, ROOT_PATH);
         $vendorPath = '';
         $pathsCount = count($split);
         $vendorFound = false;

@@ -42,11 +42,11 @@ class WebServiceWriter extends ClassWriter {
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
      * the namespace 'webfiori' is used.</li>
      * <li><b>path</b>: The location at which the query will be created on. If not 
-     * provided, the constant ROOT_DIR is used. </li>
+     * provided, the constant ROOT_PATH is used. </li>
      * </ul>
      */
     public function __construct($webServicesObj = null) {
-        parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR.DS.'apis', APP_DIR.'\\apis');
+        parent::__construct('NewWebService', ROOT_PATH.DS.APP_DIR.DS.'apis', APP_DIR.'\\apis');
         
         $this->setSuffix('Service');
         $this->addUseStatement(EAbstractWebService::class);

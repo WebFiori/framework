@@ -11,7 +11,7 @@ class CLICommandClassWriterTest extends TestCase {
     public function test00() {
         $writer = new CLICommandClassWriter();
         $this->assertEquals('NewCommand', $writer->getName());
-        $this->assertEquals(ROOT_DIR.DS.APP_DIR.DS.'commands'.DS.'NewCommand.php', $writer->getAbsolutePath());
+        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'NewCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
         $this->assertEquals('new-command', $writer->getCommandName());
         $this->assertEquals('', $writer->getDescription());
@@ -36,7 +36,7 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertFalse($writer->setClassName('   '));
         $this->assertTrue($writer->setClassName('DoItCommand'));
         $this->assertEquals('DoItCommand', $writer->getName());
-        $this->assertEquals(ROOT_DIR.DS.APP_DIR.DS.'commands'.DS.'DoItCommand.php', $writer->getAbsolutePath());
+        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'DoItCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
         $this->assertEquals('Lets-Do-It', $writer->getCommandName());
         $this->assertEquals('', $writer->getDescription());

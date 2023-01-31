@@ -206,7 +206,7 @@ class WebFioriApp {
      * @since 1.3.6
      */
     public static function autoRegister($folder, $regCallback, $suffix = null,array $constructorParams = [], array $otherParams = []) {
-        $dir = ROOT_DIR.DS.APP_DIR.DS.$folder;
+        $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
 
         if (File::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
@@ -478,8 +478,8 @@ class WebFioriApp {
                 $_SERVER['HTTP_HOST'] = $host;
                 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
-                if (defined('ROOT_DIR')) {
-                    $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+                if (defined('ROOT_PATH')) {
+                    $_SERVER['DOCUMENT_ROOT'] = ROOT_PATH;
                 }
                 $_SERVER['REQUEST_URI'] = '/';
                 putenv('HTTP_HOST='.$host);
@@ -546,7 +546,7 @@ class WebFioriApp {
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
-            $themesPath = ROOT_DIR.DS.$themesDirName;
+            $themesPath = ROOT_PATH.DS.$themesDirName;
             /**
              * This constant represents the directory at which themes exist.
              * @since 1.0
@@ -580,7 +580,7 @@ class WebFioriApp {
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR.'\config\Env')) {
-            $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+            $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
@@ -589,18 +589,18 @@ class WebFioriApp {
                     'ConfigController.php';
 
             if (!file_exists($confControllerPath)) {
-                $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+                $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
                         'webfiori'.DIRECTORY_SEPARATOR.
                         'framework'.DIRECTORY_SEPARATOR.
                         'ConfigController.php';
             }
             require_once $confControllerPath;
-            $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
+            $path = ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
 
             if (!file_exists($path)) {
                 ConfigController::get()->createConstClass();
             }
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
+            require_once ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
         }
         call_user_func(APP_DIR.'\config\\Env::defineEnvVars');
     }

@@ -57,7 +57,7 @@ abstract class ClassWriter {
      * string 'NewClass' is used.
      * 
      * @param string $path The location at which the class will be created on. If not 
-     * provided, the constant ROOT_DIR is used.
+     * provided, the constant ROOT_PATH is used.
      * 
      * @param string $ns The namespace that the class will belong to. If not provided, 
      * the global namespace is used.
@@ -65,7 +65,7 @@ abstract class ClassWriter {
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
      */
-    public function __construct(string $name = 'NewClass', string $path = ROOT_DIR, string $namespace = '\\') {
+    public function __construct(string $name = 'NewClass', string $path = ROOT_PATH, string $namespace = '\\') {
         $this->suffix = '';
         $this->useArr = [];
         if (!$this->setClassName($name)) {
@@ -73,7 +73,7 @@ abstract class ClassWriter {
         }
 
         if (!$this->setPath($path)) {
-            $this->setPath(ROOT_DIR);
+            $this->setPath(ROOT_PATH);
         }
 
         if (!$this->setNamespace($namespace)) {
@@ -409,7 +409,7 @@ abstract class ClassWriter {
      * Returns the location at which the class will be created on.
      * 
      * @return string The location at which the class will be created on.
-     * default is the value of the contstant ROOT_DIR
+     * default is the value of the contstant ROOT_PATH
      * 
      * @since 1.0
      */

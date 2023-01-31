@@ -25,7 +25,7 @@ class SettingsCommandTest extends TestCase {
             "    Version Type             : ".WF_VERSION_TYPE."\n",
             "    Release Date             : ".WF_RELEASE_DATE."\n",
             "AppConfig.php Settings:\n",
-            "    Application Path         : ".ROOT_DIR.DS.APP_DIR."\n",
+            "    Application Path         : ".ROOT_PATH.DS.APP_DIR."\n",
             "    Application Version      : ".$config->getVersion()."\n",
             "    Version Type             : ".$config->getVersionType()."\n",
             "    Application Release Date : ".$config->getReleaseDate()."\n",

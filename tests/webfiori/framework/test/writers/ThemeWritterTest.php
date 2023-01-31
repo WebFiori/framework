@@ -31,7 +31,7 @@ class ThemeWritterTest extends TestCase {
         $writter->setThemeName('Cool Theme');
         $this->assertEquals('SuperHotNewTheme', $writter->getName());
         $writter->setNamespace('app\\themes\\cool');
-        $writter->setPath(ROOT_DIR.DS.APP_DIR.DS.'themes'.DS.'cool');
+        $writter->setPath(ROOT_PATH.DS.APP_DIR.DS.'themes'.DS.'cool');
         $this->assertEquals('app\\themes\\cool', $writter->getNamespace());
         $this->assertEquals('Theme', $writter->getSuffix());
         $this->assertEquals([

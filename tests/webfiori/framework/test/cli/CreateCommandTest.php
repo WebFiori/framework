@@ -102,7 +102,7 @@ class CreateCommandTest extends CreateTestCase {
             "Enter a name for the middleware:\n",
             "Enter middleware priority: Enter = '0'\n",
             "Would you like to add the middleware to a group?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."middleware\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."middleware\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\middleware\\NewCoolMdMiddleware'));
         $this->removeClass('\\app\\middleware\\NewCoolMdMiddleware');
@@ -144,7 +144,7 @@ class CreateCommandTest extends CreateTestCase {
             "Enter a name for the command:\n",
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."commands\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."commands\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\commands\\NewCLICommand'));
         $this->removeClass('\\app\\commands\\NewCLICommand');
@@ -212,7 +212,7 @@ class CreateCommandTest extends CreateTestCase {
             "Success: New parameter added to the service 'get-hello'.\n",
             "Would you like to add another parameter?(y/N)\n",
             "Creating the class...\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."apis\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\apis\\NewWebService'));

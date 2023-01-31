@@ -13,7 +13,7 @@ class TestAutoLoader extends TestCase {
      * @test
      */
     public function test00() {
-        $this->assertEquals(ROOT_DIR, AutoLoader::root());
+        $this->assertEquals(ROOT_PATH, AutoLoader::root());
     }
     /**
      * @test

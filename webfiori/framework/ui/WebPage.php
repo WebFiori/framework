@@ -1209,7 +1209,7 @@ class WebPage {
             if ($pageTheme !== null) {
                 $themeAssetsDir = 'assets'.DS.$pageTheme->getDirectoryName();
 
-                $jsDir = ROOT_DIR.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getJsDirName();
+                $jsDir = ROOT_PATH.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getJsDirName();
 
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
@@ -1230,7 +1230,7 @@ class WebPage {
                     }
                 }
 
-                $cssDir = ROOT_DIR.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getCssDirName();
+                $cssDir = ROOT_PATH.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getCssDirName();
 
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);

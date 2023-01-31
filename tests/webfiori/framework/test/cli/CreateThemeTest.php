@@ -42,8 +42,8 @@ class CreateThemeTest extends CreateTestCase {
             "9: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'themes'\n",
-            'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'themes'.DS."fiori\".\n",
+            'Creating theme at "'.ROOT_PATH.DS.'themes'.DS."fiori\"...\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'themes'.DS."fiori\".\n",
         ], $runner->getOutput());
 
         $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));

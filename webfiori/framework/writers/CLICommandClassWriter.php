@@ -32,7 +32,7 @@ class CLICommandClassWriter extends ClassWriter {
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
      * the namespace 'webfiori' is used.</li>
      * <li><b>path</b>: The location at which the class will be created on. If not 
-     * provided, the constant ROOT_DIR is used. </li>
+     * provided, the constant ROOT_PATH is used. </li>
      * 
      * </ul>
      * @param string $commandName A string that represents the name of the command.
@@ -43,7 +43,7 @@ class CLICommandClassWriter extends ClassWriter {
      * the command will have.
      */
     public function __construct() {
-        parent::__construct('NewCommand', ROOT_DIR.DS.APP_DIR.DS.'commands', APP_DIR.'\\commands');
+        parent::__construct('NewCommand', ROOT_PATH.DS.APP_DIR.DS.'commands', APP_DIR.'\\commands');
         $this->name = 'new-command';
         $this->args = [];
         $this->desc = '';

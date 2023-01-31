@@ -44,7 +44,7 @@ class StarterPage extends WebPage {
         $row->addChild('v-col', [
             'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('v-text-field', [
-            'value' => ROOT_DIR.DS.APP_DIR,
+            'value' => ROOT_PATH.DS.APP_DIR,
             'disabled',
             'label' => 'Your application is ready at'
         ]);

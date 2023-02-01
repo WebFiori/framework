@@ -53,7 +53,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
      * the namespace at which the class will be added to.
      */
     public function readDbClassInfo() {  
-        $info = $this->getClassInfo(APP_DIR_NAME.'\\database', 'DB');
+        $info = $this->getClassInfo(APP_DIR.'\\database', 'DB');
         $this->getWriter()->setNamespace($info['namespace']);
         $this->getWriter()->setPath($info['namespace']);
         $this->getWriter()->setClassName($info['name']);
@@ -79,7 +79,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
         $t = $this->getTable();
         $m = $t->getEntityMapper();
         $m->setEntityName($this->getCommand()->readClassName('Entity class name:', null));
-        $m->setNamespace($this->getCommand()->readNamespace('Entity namespace:',  APP_DIR_NAME.'\\entity'));
+        $m->setNamespace($this->getCommand()->readNamespace('Entity namespace:',  APP_DIR.'\\entity'));
     }
     /**
      * Returns the table at which the database access class will be associated with.

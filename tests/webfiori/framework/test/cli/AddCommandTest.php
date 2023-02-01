@@ -188,7 +188,7 @@ class AddCommandTest extends TestCase {
             "Select writing direction:\n",
             "0: ltr\n",
             "1: rtl\n",
-            "Success: Language added. Also, a class for the language is created at \"".APP_DIR_NAME."\langs\" for that language.\n"
+            "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
@@ -280,7 +280,7 @@ class AddCommandTest extends TestCase {
         ], $runner->getOutput());
     }
     private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
+        $file = new File(ROOT_PATH.$classPath.'.php');
         $file->remove();
     }
 }

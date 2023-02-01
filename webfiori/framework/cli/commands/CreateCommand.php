@@ -11,6 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
@@ -18,7 +19,6 @@ use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
-use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
@@ -33,13 +33,8 @@ use webfiori\framework\cli\helpers\CreateWebService;
 class CreateCommand extends CLICommand {
     public function __construct() {
         parent::__construct('create', [
-            '--c' => [
-                'optional' => true,
-                'description' => 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.'
-            ],
-            '--table' => [
-                'optional' => true
-            ]
+            new CommandArgument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
+            new CommandArgument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     private function getWhat() {
@@ -70,7 +65,7 @@ class CreateCommand extends CLICommand {
     }
     public function _createEntityFromQuery() {
         $tableObj = CLIUtils::readTable($this);
-        $defaultNs = APP_DIR_NAME.'\\entity';
+        $defaultNs = APP_DIR.'\\entity';
         $this->println('We need from you to give us entity class information.');
         $infoReader = new ClassInfoReader($this);
         $classInfo = $infoReader->readClassInfo($defaultNs);
@@ -111,8 +106,6 @@ class CreateCommand extends CLICommand {
             $this->_createEntityFromQuery();
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
-        } else if ($answer == 'Database table from class.') {
-            $create = new CreateTable($this);
         } else if ($answer == 'Middleware.') {
             $create = new CreateMiddleware($this);
         } else if ($answer == 'CLI Command.') {

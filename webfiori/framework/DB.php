@@ -120,6 +120,6 @@ class DB extends Database {
                 $db->addTable($fk->getSource(), false);
             }
             $db->addTable($table);
-        }, 'Table', [$this]);
+        }, 'Table', [], [$this]);
     }
 }

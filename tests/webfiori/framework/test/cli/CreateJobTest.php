@@ -48,7 +48,7 @@ class CreateJobTest extends CreateTestCase {
             "Enter a name for the job:\n",
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
         $this->removeClass('\\app\\jobs\\SuperCoolJob');
@@ -97,7 +97,7 @@ class CreateJobTest extends CreateTestCase {
             "Enter an optional namespace for the class: Enter = 'app\jobs'\n","Enter a name for the job:\n",
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\jobs\\SuperCool2Job'));
         $this->removeClass('\\app\\jobs\\SuperCoolJob');
@@ -148,7 +148,7 @@ class CreateJobTest extends CreateTestCase {
             "Enter a name for the job:\n",
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\jobs\\NewRoundJob'));
         $this->removeClass('\\app\\jobs\\NewRoundJob');
@@ -200,7 +200,7 @@ class CreateJobTest extends CreateTestCase {
             "Descripe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
-            "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
         ], $runner->getOutput());
         $clazz = '\\app\\jobs\\SendDailyReportJob';
         $this->assertTrue(class_exists($clazz));

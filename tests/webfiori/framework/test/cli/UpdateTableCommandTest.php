@@ -148,7 +148,7 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
         $clazz = '\\app\\database\\ModifiedTable';
         $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
@@ -194,7 +194,7 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
         $clazz = '\\app\\database\\Modified2Table';
         $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
@@ -283,7 +283,7 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
         $clazz = '\\app\\database\\Modified3Table';
         $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
@@ -333,7 +333,7 @@ class UpdateTableCommandTest extends TestCase {
         ], $runner->getOutput());
         $clazz = '\\app\\database\\ModifiedXTable';
         $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_DIR.$clazz.'.php');
+        $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);

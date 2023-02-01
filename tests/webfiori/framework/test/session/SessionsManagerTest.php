@@ -119,6 +119,7 @@ class SessionsManagerTest extends TestCase {
      */
     public function testGetSessionIDFromRequest() {
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
+        putenv('REQUEST_METHOD=GET');
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
         
@@ -171,6 +172,7 @@ class SessionsManagerTest extends TestCase {
      */
     public function testDatabaseSession01() {
         $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
         WebFioriApp::getAppConfig()->addDbConnection($conn);
@@ -295,5 +297,21 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals(300, SessionsManager::getActiveSession()->getDuration());
         $this->assertNull(SessionsManager::get('super-var'));
         SessionsManager::validateStorage();
+    }
+    /**
+     * @test
+     * @depends testDatabaseSession02
+     */
+    public function testDropDbTables00() {
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('sessions-connection');
+        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->dropTables();
+        SessionsManager::setStorage($sto);
+        SessionsManager::start('hello');
     }
 }

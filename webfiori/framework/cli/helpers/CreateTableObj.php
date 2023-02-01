@@ -35,7 +35,7 @@ class CreateTableObj extends CreateClassHelper {
             $tempTable = new MSSQLTable();
         }
         $this->getWriter()->setTable($tempTable);
-        $this->setClassInfo(APP_DIR_NAME.'\\database', 'Table');
+        $this->setClassInfo(APP_DIR.'\\database', 'Table');
         
         $tableHelper = new TableObjHelper($this, $tempTable);
         $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));

@@ -29,21 +29,20 @@ class CreateMiddleware extends CreateClassHelper {
      */
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new MiddlewareClassWriter());
-        $this->setClassInfo(APP_DIR_NAME.'\\middleware', 'Middleware');
+        $this->setClassInfo(APP_DIR.'\\middleware', 'Middleware');
         
-        $middlewareName = $this->_getMiddlewareName();
-        $priority = $this->_getMiddlewareProprity();
+        $middlewareName = $this->getMiddlewareName();
+        $priority = $this->getCommand()->readInteger('Enter middleware priority:', 0);;
 
         if ($this->confirm('Would you like to add the middleware to a group?', false)) {
-            $this->_getGroups();
+            $this->getGroups();
         }
         
         $this->getWriter()->setMiddlewareName($middlewareName);
         $this->getWriter()->setMiddlewarePriority($priority);
         $this->writeClass();
     }
-    private function _getGroups() {
-        $groupsArr = [];
+    private function getGroups() {
         $addToMore = true;
 
         while ($addToMore) {
@@ -55,22 +54,11 @@ class CreateMiddleware extends CreateClassHelper {
             $addToMore = $this->confirm('Would you like to add the middleware to another group?', false);
         }
 
-        return $groupsArr;
     }
-    private function _getMiddlewareName() {
+    private function getMiddlewareName() : string {
         return $this->getInput('Enter a name for the middleware:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
-                return true;
-            }
-
-            return false;
-        }));
-    }
-    private function _getMiddlewareProprity() {
-        return $this->getInput('Enter middleware priority:', 0, new InputValidator(function ($val)
-        {
-            if ($val >= 0) {
                 return true;
             }
 

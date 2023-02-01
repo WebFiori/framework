@@ -312,7 +312,7 @@ class Language {
             self::$ActiveLang = self::$loadedLangs[$uLangCode];
             return self::getActive();
         } 
-        $langClassName = APP_DIR_NAME.'\\langs\\Language'.$uLangCode;
+        $langClassName = APP_DIR.'\\langs\\Language'.$uLangCode;
 
         if (!class_exists($langClassName)) {
             throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');

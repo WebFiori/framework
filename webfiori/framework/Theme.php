@@ -272,11 +272,10 @@ abstract class Theme implements JsonI {
      * @return string The base URL that will be used by the theme.
      */
     public function getBaseURL() : string {
-        if ($this->baseUrl !== null) {
-            return $this->baseUrl;
-        } else {
+        if ($this->baseUrl === null) {
             return WebFioriApp::getAppConfig()->getBaseURL();
         }
+        return $this->baseUrl;
     }
 
     /**
@@ -435,6 +434,9 @@ abstract class Theme implements JsonI {
     /**
      * Returns the page at which the theme will be applied to.
      * 
+     * This method can be used on the 'after loaded' callbacks to do
+     * extra modifications to the page once the theme is loaded.
+     * 
      * @return WebPage|null If the theme is applied to a page, the 
      * method will return it as an object. If theme is not applied to 
      * any page, the method will return null.
@@ -502,7 +504,7 @@ abstract class Theme implements JsonI {
      * Sets the value of the callback which will be called after theme is loaded.
      * 
      * @param callable $function The callback. The first parameter of the 
-     * callback will be always 'this' theme. (e.g. function ($theme){}). The function 
+     * callback will be always 'this' theme. (e.g. function (Theme $theme){}). The function 
      * can have other parameters if they are provided.
      * 
      * @param array $params An array of parameters which can be passed to the 
@@ -567,7 +569,7 @@ abstract class Theme implements JsonI {
      * Sets the value of the callback which will be called before theme is loaded.
      * 
      * @param callback $function The callback. The first parameter of the 
-     * callback will be always 'this' theme. (e.g. function ($theme){}). The function 
+     * callback will be always 'this' theme. (e.g. function (Theme $theme){}). The function 
      * can have other parameters if they are provided.
      * 
      * @param array $params An array of parameters which can be passed to the 

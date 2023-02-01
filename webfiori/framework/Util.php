@@ -223,7 +223,7 @@ class Util {
         }
         $docRoot = filter_var($_SERVER['DOCUMENT_ROOT']);
         $len = strlen($docRoot);
-        $toAppend = substr(ROOT_DIR, $len, strlen(ROOT_DIR) - $len);
+        $toAppend = substr(ROOT_PATH, $len, strlen(ROOT_PATH) - $len);
 
         if (isset($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'])) {
             $toAppend = str_replace($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'],'' ,$toAppend);

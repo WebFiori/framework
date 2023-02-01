@@ -11,6 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
 use webfiori\framework\ThemeLoader;
 
 /**
@@ -30,10 +31,7 @@ class ListThemesCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('list-themes', [
-            '--theme-name' => [
-                'optional' => true,
-                'description' => 'An optional theme name. If provided, only given theme information will be shown.'
-            ]
+            new CommandArgument('--theme-name', 'An optional theme name. If provided, only given theme information will be shown.', true)
         ], 'List all registered themes.');
     }
     /**

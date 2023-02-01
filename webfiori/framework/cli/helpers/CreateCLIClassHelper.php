@@ -28,12 +28,12 @@ class CreateCLIClassHelper extends CreateClassHelper {
      */
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new CLICommandClassWriter());
-        $this->setClassInfo(APP_DIR_NAME.'\\commands', 'Command');
+        $this->setClassInfo(APP_DIR.'\\commands', 'Command');
         $commandName = $this->_getCommandName();
         $commandDesc = $this->getInput('Give a short description of the command:');
 
         if ($command->confirm('Would you like to add arguments to the command?', false)) {
-            $argsArr = $this->_getArgs();
+            $argsArr = $this->getArgs();
         } else {
             $argsArr = [];
         }
@@ -43,7 +43,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
         
         $this->writeClass();
     }
-    private function _getArgs() {
+    private function getArgs() {
         $argsArr = [];
         $addToMore = true;
 
@@ -55,7 +55,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
                 $argArr['name'] = $groupName;
             }
             $argArr['description'] = $this->getInput('Describe this argument and how to use it:', '');
-            $argArr['values'] = $this->_getFixedVals();
+            $argArr['values'] = $this->getFixedVals();
             $argArr['optional'] = $this->confirm('Is this argument optional or not?', true);
             $argArr['default'] = $this->getInput('Enter default value:');
 
@@ -75,7 +75,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
             return false;
         }));
     }
-    private function _getFixedVals() {
+    private function getFixedVals() {
         if (!$this->confirm('Does this argument have a fixed set of values?', false)) {
             return [];
         }
@@ -87,6 +87,8 @@ class CreateCLIClassHelper extends CreateClassHelper {
 
             if (!in_array($val, $valsArr)) {
                 $valsArr[] = $val;
+            } else {
+                $this->info('Given value was already added.');
             }
             $addVals = $this->confirm('Would you like to add more values?', false);
         }

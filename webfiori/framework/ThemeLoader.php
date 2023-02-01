@@ -238,7 +238,7 @@ class ThemeLoader {
                     }
                 },
                 'closure-params' => [
-                    ROOT_DIR.DS.self::THEMES_DIR.DS.$themeDirName,
+                    ROOT_PATH.DS.self::THEMES_DIR.DS.$themeDirName,
                     $themeDirName,
                     $dir
                 ]

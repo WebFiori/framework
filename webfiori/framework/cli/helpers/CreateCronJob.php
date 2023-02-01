@@ -31,7 +31,7 @@ class CreateCronJob extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new CronJobClassWriter());
         
-        $this->setClassInfo(APP_DIR_NAME.'\\jobs', 'Job');
+        $this->setClassInfo(APP_DIR.'\\jobs', 'Job');
         $jobName = $this->_getJobName();
         $jobDesc = $this->_getJobDesc();
         

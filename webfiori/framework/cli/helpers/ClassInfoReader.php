@@ -48,7 +48,7 @@ class ClassInfoReader {
      * Constructs class path based on its namespace.
      */
     private function getPath($default) {
-        $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
+        $fixedPath = ROOT_PATH.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
         if (!Util::isDirectory($fixedPath, true)) {
             throw new InvalidArgumentException("Unable to create class at $default");
         }

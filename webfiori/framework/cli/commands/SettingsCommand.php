@@ -44,7 +44,7 @@ class SettingsCommand extends CLICommand {
         $this->println("    Release Date %".($spaces - strlen('Release Date'))."s %s",':',WF_RELEASE_DATE);
 
         $this->println("AppConfig.php Settings:", $format);
-        $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',ROOT_DIR.DS.APP_DIR_NAME);
+        $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',ROOT_PATH.DS.APP_DIR);
         $this->println("    Application Version %".($spaces - strlen('Application Version'))."s %s",':',$C->getVersion());
         $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
         $this->println("    Application Release Date %".($spaces - strlen('Application Release Date'))."s %s",':',$C->getReleaseDate());

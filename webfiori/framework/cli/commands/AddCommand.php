@@ -31,9 +31,7 @@ use webfiori\framework\writers\LangClassWriter;
  */
 class AddCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('add', [
-
-        ], 'Add a database connection or SMTP account.');
+        parent::__construct('add', [], 'Add a database connection or SMTP account.');
     }
     /**
      * Execute the command.
@@ -134,7 +132,7 @@ class AddCommand extends CLICommand {
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
-                .'is created at "'.APP_DIR_NAME.'\langs" for that language.');
+                .'is created at "'.APP_DIR.'\langs" for that language.');
         return 0;
     }
     private function _addSmtp() {

@@ -93,7 +93,7 @@ class CronEmail extends EmailMessage {
             foreach (Cron::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
-            $file = new File(ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
+            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
             $file->create(true);
             $file->write();
@@ -118,8 +118,8 @@ class CronEmail extends EmailMessage {
         $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
         $jobTable->addChild($this->_createTableRow('Framework Version:', WF_VERSION));
         $jobTable->addChild($this->_createTableRow('Framework Release Date:', WF_RELEASE_DATE));
-        $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_DIR));
-        $jobTable->addChild($this->_createTableRow('Application Directory:', ROOT_DIR.DS.APP_DIR_NAME));
+        $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_PATH));
+        $jobTable->addChild($this->_createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
         $jobTable->addChild($this->_createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
         $jobTable->addChild($this->_createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
         $jobTable->addChild($this->_createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));

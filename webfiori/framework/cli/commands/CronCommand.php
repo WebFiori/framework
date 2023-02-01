@@ -11,6 +11,8 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
+use webfiori\framework\cron\AbstractJob;
 use webfiori\framework\cron\Cron;
 /**
  * A CLI command which is related to executing 
@@ -37,39 +39,13 @@ class CronCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('cron', [
-            'p' => [
-                'optional' => true,
-                'description' => 'CRON password. If it is set in CRON, then it must be '
-                .'provided here.'
-            ],
-            '--list' => [
-                'optional' => true,
-                'description' => 'List all scheduled CRON jobs.'
-            ],
-            '--check' => [
-                'optional' => true,
-                'description' => 'Run a check aginst all jobs to check if '
-                .'it is time to execute them or not.'
-            ],
-            '--force' => [
-                'optional' => true,
-                'description' => 'Force a specific job to execute.'
-            ],
-            '--job-name' => [
-                'optional' => true,
-                'description' => 'The name of the job that will be forced to '
-                .'execute or to show its arguments.'
-            ],
-            '--show-job-args' => [
-                'optional' => true,
-                'description' => 'If this one is provided with job name and a '
-                .'job has custom execution args, they will be shown.'
-            ],
-            '--show-log' => [
-                'optional' => true,
-                'description' => 'If set, execution log will be shown after '
-                .'execution is completed.'
-            ]
+            new CommandArgument('p', 'CRON password. If it is set in CRON, then it must be provided here.', true),
+            new CommandArgument('--list', 'List all scheduled CRON jobs.', true),
+            new CommandArgument('--check', 'Run a check aginst all jobs to check if it is time to execute them or not.', true),
+            new CommandArgument('--force', 'Force a specific job to execute.', true),
+            new CommandArgument('--job-name', 'The name of the job that will be forced to execute or to show its arguments.', true),
+            new CommandArgument('--show-job-args', 'If this one is provided with job name and a job has custom execution args, they will be shown.', true),
+            new CommandArgument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
         ], 'Run CRON Scheduler.');
 
         if (Cron::password() != 'NO_PASSWORD') {
@@ -178,7 +154,7 @@ class CronCommand extends CLICommand {
             }
         }
     }
-    private function _setArgs($argsArr, \webfiori\framework\cron\AbstractJob $job) {
+    private function _setArgs($argsArr, AbstractJob $job) {
         $setArg = true;
         $index = 0;
         $count = count($argsArr);

@@ -35,7 +35,7 @@ class MiddlewareClassWriter extends ClassWriter {
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
      * the namespace 'webfiori' is used.</li>
      * <li><b>path</b>: The location at which the class will be created on. If not 
-     * provided, the constant ROOT_DIR is used. </li>
+     * provided, the constant ROOT_PATH is used. </li>
      * 
      * </ul>
      * 
@@ -48,7 +48,7 @@ class MiddlewareClassWriter extends ClassWriter {
      * will be added to.
      */
     public function __construct($middlewareName = '', $priority = 0, array $groupsArr = []) {
-        parent::__construct('NewMiddleware', ROOT_DIR.DS.APP_DIR_NAME.DS.'middleware', APP_DIR_NAME.'\\middleware');
+        parent::__construct('NewMiddleware', ROOT_PATH.DS.APP_DIR.DS.'middleware', APP_DIR.'\\middleware');
         $this->setSuffix('Middleware');
         $this->addUseStatement([
                 AbstractMiddleware::class,

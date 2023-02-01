@@ -54,7 +54,7 @@ class TableClassWriter extends ClassWriter {
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
      * the namespace 'webfiori' is used.</li>
      * <li><b>path</b>: The location at which the query will be created on. If not 
-     * provided, the constant ROOT_DIR is used. </li>
+     * provided, the constant ROOT_PATH is used. </li>
      * <li><b>entity-info</b>: A sub associative array that contains information about the entity 
      * at which the class is mapped to (if any). The array must have the following indices:
      * <ul>
@@ -71,7 +71,7 @@ class TableClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function __construct($tableObj = null) {
-        parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR_NAME.DS.'database', APP_DIR_NAME.'\\database');
+        parent::__construct('NewTable', ROOT_PATH.DS.APP_DIR.DS.'database', APP_DIR.'\\database');
         $this->setSuffix('Table');
         if ($tableObj === null) {
             $this->setTableType('mysql');

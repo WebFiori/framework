@@ -12,6 +12,7 @@ namespace webfiori\framework;
 
 use Closure;
 use Error;
+use ReflectionClass;
 use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\File;
@@ -20,6 +21,7 @@ use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
+use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
@@ -134,12 +136,12 @@ class WebFioriApp {
         $this->_initThemesPath();
         $this->_checkStandardLibs();
 
-        if (!class_exists(APP_DIR_NAME.'\ini\InitPrivileges')) {
+        if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
             ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
-        call_user_func(APP_DIR_NAME.'\ini\InitPrivileges::init');
+        call_user_func(APP_DIR.'\ini\InitPrivileges::init');
 
 
 
@@ -185,7 +187,7 @@ class WebFioriApp {
      * Register CLI commands or cron jobs.
      * @param string $folder The name of the folder that contains the jobs or 
      * commands. It must be a folder inside 'app' folder or the folder which is defined 
-     * by the constant 'APP_DIR_NAME'.
+     * by the constant 'APP_DIR'.
      * 
      * @param Closure $regCallback A callback which is used to register the 
      * classes of the folder.
@@ -195,14 +197,21 @@ class WebFioriApp {
      * be 'Table' If provided, only classes with the specified suffix will 
      * be considered.
      * 
+     * @param array $constructorParams An optional array that can hold constructor
+     * parameters for objects that will be registered.
+     * 
      * @param array $otherParams An optional array that can hold extra parameters 
      * which will be passed to the register callback.
      * 
      * @since 1.3.6
      */
-    public static function autoRegister($folder, $regCallback, $suffix = null, array $otherParams = []) {
-        $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
-
+    public static function autoRegister($folder, $regCallback, $suffix = null,array $constructorParams = [], array $otherParams = []) {
+        $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
+        if (!File::isDirectory($dir)) {
+            //If directory is outside application folder.
+            $dir = ROOT_PATH.DS.$folder;
+        }
+        
         if (File::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
 
@@ -228,7 +237,8 @@ class WebFioriApp {
                         'folder' => $folder, 
                         'class-name' => $expl[0], 
                         'params' => $otherParams, 
-                        'callback' => $regCallback
+                        'callback' => $regCallback,
+                        'constructor-params' => $constructorParams
                     ]);
                 }
             }
@@ -241,14 +251,17 @@ class WebFioriApp {
         $className = $options['class-name'];
         $otherParams = $options['params'];
         $regCallback = $options['callback'];
+        $constructorParams = $options['constructor-params'];
         $instanceNs = require_once $dir.DS.$phpFile;
 
         if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-            $instanceNs = '\\'.APP_DIR_NAME.'\\'.$folder;
+            $instanceNs = '\\'.APP_DIR.'\\'.$folder;
         }
         $class = $instanceNs.'\\'.$className;
         try {
-            $toPass = [new $class()];
+            $reflectionClass = new ReflectionClass($class);  
+             
+            $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
 
             foreach ($otherParams as $param) {
                 $toPass[] = $param;
@@ -266,7 +279,7 @@ class WebFioriApp {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
-        $constructor = '\\'.APP_DIR_NAME.'\\config\\AppConfig';
+        $constructor = '\\'.APP_DIR.'\\config\\AppConfig';
 
         return new $constructor();
     }
@@ -326,19 +339,19 @@ class WebFioriApp {
         return self::$LC;
     }
     private function _checkAppDir() {
-        if (!defined('APP_DIR_NAME')) {
+        if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application 
              * code.
              * 
              * @since 2.2.1
              */
-            define('APP_DIR_NAME','app');
+            define('APP_DIR','app');
         }
 
-        if (strpos(APP_DIR_NAME, ' ') !== false || strpos(APP_DIR_NAME, '-')) {
+        if (strpos(APP_DIR, ' ') !== false || strpos(APP_DIR, '-')) {
             http_response_code(500);
-            die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR_NAME.'".');
+            die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR.'".');
         }
     }
     /**
@@ -406,11 +419,11 @@ class WebFioriApp {
     }
     private function _initAppConfig() {
 
-        if (!class_exists(APP_DIR_NAME.'\\config\\AppConfig')) {
+        if (!class_exists(APP_DIR.'\\config\\AppConfig')) {
             ConfigController::get()->createAppConfigFile();
         }
 
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'config\\AppConfig';
+        $constructor = '\\'.APP_DIR.'\\'.'config\\AppConfig';
         $this->appConfig = new $constructor();
         ConfigController::get()->setConfig($this->appConfig);
     }
@@ -423,16 +436,16 @@ class WebFioriApp {
         }
         self::$AU = AutoLoader::get();
 
-        if (!class_exists(APP_DIR_NAME.'\ini\InitAutoLoad')) {
+        if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
-        call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
+        call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Request::getRequestedURI(), '');
         $pathArr = $uriObj->getPathArray();
 
-        if (!class_exists(APP_DIR_NAME.'\ini\InitCron')) {
+        if (!class_exists(APP_DIR.'\ini\InitCron')) {
             ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
         }
 
@@ -442,7 +455,7 @@ class WebFioriApp {
             }
             Cron::password($this->appConfig->getCRONPassword());
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
+            call_user_func(APP_DIR.'\ini\InitCron::init');
             Cron::registerJobs();
         }
     }
@@ -453,7 +466,7 @@ class WebFioriApp {
      * @return Runner
      */
     public static function getRunner() : Runner {
-        if (!class_exists(APP_DIR_NAME.'\ini\InitCommands')) {
+        if (!class_exists(APP_DIR.'\ini\InitCommands')) {
             ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
         }
 
@@ -469,8 +482,8 @@ class WebFioriApp {
                 $_SERVER['HTTP_HOST'] = $host;
                 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
-                if (defined('ROOT_DIR')) {
-                    $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+                if (defined('ROOT_PATH')) {
+                    $_SERVER['DOCUMENT_ROOT'] = ROOT_PATH;
                 }
                 $_SERVER['REQUEST_URI'] = '/';
                 putenv('HTTP_HOST='.$host);
@@ -500,30 +513,30 @@ class WebFioriApp {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
-                call_user_func(APP_DIR_NAME.'\ini\InitCommands::init');
+                call_user_func(APP_DIR.'\ini\InitCommands::init');
             });
         }
         return self::$CliRunner;
     }
     private function _initMiddleware() {
-        WebFioriApp::autoRegister('middleware', function($inst)
+        WebFioriApp::autoRegister('middleware', function(AbstractMiddleware $inst)
         {
             MiddlewareManager::register($inst);
         });
 
-        if (!class_exists(APP_DIR_NAME.'\ini\InitMiddleware')) {
+        if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
             ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
-        call_user_func(APP_DIR_NAME.'\ini\InitMiddleware::init');
+        call_user_func(APP_DIR.'\ini\InitMiddleware::init');
     }
     private function _initRoutes() {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
-            if (!class_exists(APP_DIR_NAME.'\\ini\\routes\\'.$className)) {
+            if (!class_exists(APP_DIR.'\\ini\\routes\\'.$className)) {
                 ConfigController::get()->createRoutesClass($className);
             }
-            call_user_func(APP_DIR_NAME.'\ini\routes\\'.$className.'::create');
+            call_user_func(APP_DIR.'\ini\routes\\'.$className.'::create');
         }
 
         if (Router::routesCount() != 0) {
@@ -537,7 +550,7 @@ class WebFioriApp {
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
-            $themesPath = ROOT_DIR.DS.$themesDirName;
+            $themesPath = ROOT_PATH.DS.$themesDirName;
             /**
              * This constant represents the directory at which themes exist.
              * @since 1.0
@@ -551,7 +564,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC1');
+        define('WF_VERSION', '3.0.0-RC3');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -570,8 +583,8 @@ class WebFioriApp {
         define('WF_RELEASE_DATE', '2022-12-25');
     }
     private function loadEnvVars() {
-        if (!class_exists(APP_DIR_NAME.'\config\Env')) {
-            $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+        if (!class_exists(APP_DIR.'\config\Env')) {
+            $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
@@ -580,20 +593,20 @@ class WebFioriApp {
                     'ConfigController.php';
 
             if (!file_exists($confControllerPath)) {
-                $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+                $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
                         'webfiori'.DIRECTORY_SEPARATOR.
                         'framework'.DIRECTORY_SEPARATOR.
                         'ConfigController.php';
             }
             require_once $confControllerPath;
-            $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
+            $path = ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
 
             if (!file_exists($path)) {
                 ConfigController::get()->createConstClass();
             }
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
+            require_once ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
         }
-        call_user_func(APP_DIR_NAME.'\config\\Env::defineEnvVars');
+        call_user_func(APP_DIR.'\config\\Env::defineEnvVars');
     }
     
     private function setHandler() {

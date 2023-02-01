@@ -55,7 +55,7 @@ class ThemeClassWriter extends ClassWriter {
             $this->getNamespace().'\\HeaderSection.php',
         ];
         foreach ($components as $c) {
-            $classFile = new File(ROOT_DIR.'\\'.$c);
+            $classFile = new File(ROOT_PATH.'\\'.$c);
             $classFile->remove();
         }
     }
@@ -71,7 +71,7 @@ class ThemeClassWriter extends ClassWriter {
      * </ul>
      */
     public function __construct(string $themeName = '') {
-        parent::__construct('NewTheme', ROOT_DIR.DS.APP_DIR_NAME.DS.'themes', APP_DIR_NAME.'\\themes\\new');
+        parent::__construct('NewTheme', ROOT_PATH.DS.APP_DIR.DS.'themes', APP_DIR.'\\themes\\new');
         if (!$this->setThemeName($themeName)) {
             $this->setThemeName('New Theme');
         }

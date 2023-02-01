@@ -80,7 +80,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const API_ROUTE = DS.APP_DIR_NAME.DS.'apis';
+    const API_ROUTE = DS.APP_DIR.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
@@ -100,7 +100,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const VIEW_ROUTE = DS.APP_DIR_NAME.DS.'pages';
+    const VIEW_ROUTE = DS.APP_DIR.DS.'pages';
     /**
      *
      * @var type 
@@ -187,7 +187,7 @@ class Router {
      * $_GET['username']. Note that its possible to get the value of the 
      * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b></li>
      * <li><b>route-to</b>: The path to the file that the route will point to. 
-     * It can be any file in the scope of the variable ROOT_DIR.</li>
+     * It can be any file in the scope of the variable ROOT_PATH.</li>
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
      * will be initiated when a request is made to the route. Note that if the PHP file that 
@@ -1416,9 +1416,9 @@ class Router {
                     $routeType = $route->getType();
 
                     if ($routeType == self::VIEW_ROUTE || $routeType == self::CUSTOMIZED || $routeType == self::API_ROUTE) {
-                        $file = ROOT_DIR.$routeType.$this->_fixFilePath($file);
+                        $file = ROOT_PATH.$routeType.$this->_fixFilePath($file);
                     } else {
-                        $file = ROOT_DIR.$this->_fixFilePath($file);
+                        $file = ROOT_PATH.$this->_fixFilePath($file);
                     }
 
                     if (gettype($file) == 'string' && file_exists($file)) {

@@ -511,7 +511,7 @@ class Cron {
      */
     public static function registerJobs() {
         if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
-            WebFioriApp::autoRegister('jobs', function ($job)
+            WebFioriApp::autoRegister('jobs', function (AbstractJob $job)
             {
                 Cron::scheduleJob($job);
             });
@@ -860,7 +860,7 @@ class Cron {
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
-            $logsPath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'logs';
+            $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
             $file = new File($logFile);
             $file->create(true);

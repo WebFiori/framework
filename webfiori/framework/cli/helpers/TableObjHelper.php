@@ -134,7 +134,7 @@ class TableObjHelper {
      */
     public function createEntity() {
         $helper = $this->getCreateHelper();
-        $entityInfo = $helper->getClassInfo(APP_DIR_NAME.'\\entity');
+        $entityInfo = $helper->getClassInfo(APP_DIR.'\\entity');
         $entityInfo['implement-jsoni'] = $helper->confirm('Would you like from your entity class to implement the interface JsonI?', true);
         $helper->getWriter()->setEntityInfo($entityInfo['name'], $entityInfo['namespace'], $entityInfo['path'], $entityInfo['implement-jsoni']);
 
@@ -360,7 +360,7 @@ class TableObjHelper {
     public function copyCheck() {
         $helper = $this->getCreateHelper();
         if ($helper->confirm('Would you like to update same class or create a copy with the update?', false)) {
-            $info = $helper->getClassInfo(APP_DIR_NAME.'\\database', 'Table');
+            $info = $helper->getClassInfo(APP_DIR.'\\database', 'Table');
             $helper->setClassName($info['name']);
             $helper->setNamespace($info['namespace']);
             $helper->setPath($info['path']);
@@ -530,7 +530,7 @@ class TableObjHelper {
         $cName = $split[count($split) - 1];
         $ns = implode('\\', array_slice($split, 0, count($split) - 1));
 
-        $path = ROOT_DIR.DS.$ns.DS.$cName.'.php';
+        $path = ROOT_PATH.DS.$ns.DS.$cName.'.php';
         $createHelper->setClassName($cName);
         $createHelper->setNamespace($ns);
         $createHelper->setPath(substr($path, 0, strlen($path) - strlen($cName.'.php')));

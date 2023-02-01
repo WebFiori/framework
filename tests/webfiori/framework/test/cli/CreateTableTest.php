@@ -118,7 +118,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
         
     }
@@ -184,7 +184,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
         
     }
@@ -298,7 +298,7 @@ class CreateTableTest extends TestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
         
     }
@@ -394,7 +394,7 @@ class CreateTableTest extends TestCase {
             
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
         
     }
@@ -458,8 +458,8 @@ class CreateTableTest extends TestCase {
             "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
             "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-            'Info: Entity class was created at "'.ROOT_DIR.DS.'app'.DS."entity\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
+            'Info: Entity class was created at "'.ROOT_PATH.DS.'app'.DS."entity\".\n",
         ]), $output);
         
     }
@@ -591,7 +591,7 @@ class CreateTableTest extends TestCase {
             "Success: Foreign key added.\n",
             "Would you like to add another foreign key?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
     }
     /**
@@ -675,12 +675,12 @@ class CreateTableTest extends TestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
         
     }
     private function removeClass($classPath) {
-        $file = new File(ROOT_DIR.$classPath.'.php');
+        $file = new File(ROOT_PATH.$classPath.'.php');
         $file->remove();
     }
 }

@@ -11,9 +11,11 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
 use webfiori\file\File;
+use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 /**
@@ -27,40 +29,13 @@ use webfiori\framework\DB;
 class RunSQLQueryCommand extends CLICommand {
     public function __construct() {
         parent::__construct('run-query', [
-            '--connection' => [
-                'description' => 'Database connection that the query will '
-                .'be executed on.',
-                'optional' => true,
-            ],
-            '--schema' => [
-                'description' => 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents '
-                .'database schema.',
-                'optional' => true,
-            ],
-            '--create' => [
-                'description' => 'This option is used alongside the option --table and --schema.'
-                . ' If it is provided, this means initiate the process of creating the database or the'
-                . ' Table.',
-                'optional' => true,
-            ],
-            '--table' => [
-                'description' => 'Table class to run query on.',
-                'optional' => true
-            ],
-            '--file' => [
-                'description' => 'The path to SQL file that holds SQL query.',
-                'optional' => true
-            ],
-            '--no-confirm' => [
-                'description' => 'If this argument is provided, the query'
-                . 'will be executed without confirmation step.',
-                'optional' => true
-            ],
-            '--show-sql' => [
-                'description' => 'If this argument is provided, SQL statement will be '
-                . 'shown in the console. This option is ignored if option --no-confirm is not provided.',
-                'optional' => true
-            ]
+            new CommandArgument('--connection', 'Database connection that the query will be executed on.', true),
+            new CommandArgument('--schema', 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents database schema.', true),
+            new CommandArgument('--create', 'This option is used alongside the option --table and --schema. If it is provided, this means initiate the process of creating the database or the Table.', true),
+            new CommandArgument('--table', 'Table class to run query on.', true),
+            new CommandArgument('--file', 'The path to SQL file that holds SQL query.', true),
+            new CommandArgument('--no-confirm', 'If this argument is provided, the query will be executed without confirmation step.', true),
+            new CommandArgument('--show-sql', 'If this argument is provided, SQL statement will be shown in the console. This option is ignored if option --no-confirm is not provided.', true),
         ], 'Execute SQL query on specific database.');
     }
     /**
@@ -212,7 +187,7 @@ class RunSQLQueryCommand extends CLICommand {
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query on table instance.') {
 
-            $tableObj = \webfiori\framework\cli\CLIUtils::readTable($this);
+            $tableObj = CLIUtils::readTable($this);
             
             $schema->addTable($tableObj);
             return $this->tableQuery($schema, $tableObj);

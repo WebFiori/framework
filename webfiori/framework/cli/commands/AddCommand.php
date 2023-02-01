@@ -31,9 +31,7 @@ use webfiori\framework\writers\LangClassWriter;
  */
 class AddCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('add', [
-
-        ], 'Add a database connection or SMTP account.');
+        parent::__construct('add', [], 'Add a database connection or SMTP account.');
     }
     /**
      * Execute the command.

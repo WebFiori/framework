@@ -11,6 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
@@ -33,13 +34,8 @@ use webfiori\framework\cli\helpers\CreateWebService;
 class CreateCommand extends CLICommand {
     public function __construct() {
         parent::__construct('create', [
-            '--c' => [
-                'optional' => true,
-                'description' => 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.'
-            ],
-            '--table' => [
-                'optional' => true
-            ]
+            new CommandArgument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
+            new CommandArgument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     private function getWhat() {

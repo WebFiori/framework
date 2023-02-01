@@ -10,14 +10,11 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use Error;
-use Exception;
 use webfiori\cli\CLICommand;
-use webfiori\database\Table;
+use webfiori\cli\CommandArgument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;
-use webfiori\framework\writers\TableClassWriter;
 /**
  * A command which is used to update the properties of database table class.
  *
@@ -29,10 +26,7 @@ class UpdateTableCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('update-table', [
-            '--table' => [
-                'description' => 'The namespace of the table class (including namespace).',
-                'optional' => true,
-            ]
+            new CommandArgument('--table', 'The namespace of the table class (including namespace).', true),
         ], 'Update a database table.');
     }
     /**

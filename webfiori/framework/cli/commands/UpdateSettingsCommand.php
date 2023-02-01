@@ -12,6 +12,7 @@ namespace webfiori\framework\cli\commands;
 
 use Throwable;
 use webfiori\cli\CLICommand;
+use webfiori\cli\CommandArgument;
 use webfiori\cli\InputValidator;
 use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
@@ -28,13 +29,10 @@ use webfiori\framework\WebFioriApp;
 class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-settings', [
-            '--w' => [
-                'description' => 'An argument which is used to indicate what will be updated. '
+            new CommandArgument('--w', 'An argument which is used to indicate what will be updated. '
                 . 'Possible values are: version, app-name, cron-pass, page-title, '
                 . 'page-description, primary-lang, title-sep, home-page, primary-theme,'
-                . 'admin-theme.',
-                'optional' => true
-            ]
+                . 'admin-theme.', true),
         ], 'Update application settings which are stored in the class "AppConfig".');
     }
     private function addOption(&$optArr, $key, $txt) {

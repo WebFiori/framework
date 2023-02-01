@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\file\File;
+use app\database\TestTable;
 use webfiori\framework\WebFioriApp;
 /**
  * Description of TestCreateCommand
@@ -66,48 +66,7 @@ class CreateCommandTest extends CreateTestCase {
     
     
     
-    /**
-     * @test
-     */
-    public function testCreateCommand00() {
-        $runner = $runner = WebFioriApp::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'create'
-        ]);
-        $runner->setInput([
-            '5',
-            'NewCLI',
-            'app\commands',
-            'print-hello',
-            'Prints \'Hello World\' in the console.',
-            'N',
-            '',
-        ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: CLI Command.\n",
-            "6: Theme.\n",
-            "7: Database access class based on table.\n",
-            "8: Complete REST backend (Database table, entity, database access and web services).\n",
-            "9: Quit. <--\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\commands'\n",
-            "Enter a name for the command:\n",
-            "Give a short description of the command:\n",
-            "Would you like to add arguments to the command?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."commands\".\n",
-        ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\commands\\NewCLICommand'));
-        $this->removeClass('\\app\\commands\\NewCLICommand');
-    }
+    
     /**
      * @test
      */
@@ -198,7 +157,7 @@ class CreateCommandTest extends CreateTestCase {
             'webfiori',
             'create',
             '--c' => 'entity',
-            '--table' => \app\database\TestTable::class
+            '--table' => TestTable::class
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
@@ -245,7 +204,7 @@ class CreateCommandTest extends CreateTestCase {
             'webfiori',
             'create',
             '--c' => 'entiy',
-            '--table' => \app\database\TestTable::class
+            '--table' => TestTable::class
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([

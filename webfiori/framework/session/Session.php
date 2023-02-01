@@ -199,7 +199,7 @@ class Session implements JsonI {
         if ($this->getDuration() == 0) {
             $this->setIsRefresh(false);
         }
-        $tempSName = isset($options['name']) ? trim($options['name']) : null;
+        $tempSName = isset($options['name']) ? trim($options['name']) : '';
 
         if (!$this->_setName($tempSName)) {
             throw new SessionException('Invalid session name: \''.$tempSName.'\'.');

@@ -93,8 +93,6 @@ fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.
 register_shutdown_function(function()
 {
-    $sessionDb = new webfiori\framework\session\DatabaseSessionStorage();
-    $sessionDb->dropTables();
     ConfigController::get()->removeConfigFiles();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");

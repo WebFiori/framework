@@ -10,7 +10,7 @@ use webfiori\framework\WebFioriApp;
  *
  * @author Ibrahim
  */
-class CreateCLICommandTest extends TestCase {
+class CreateCLICommandTest extends CreateTestCase {
     /**
      * @test
      */
@@ -92,15 +92,15 @@ class CreateCLICommandTest extends TestCase {
             "Would you like to add arguments to the command?(y/N)\n",
             "Enter argument name:\n",
             "Describe this argument and how to use it: Enter = ''\n",
-            "Does this argument have a fixed set of values?(y/N)",
-            "Enter the value:",
-            "Would you like to add more values?(y/N)",
-            "Enter the value:",
-            "Would you like to add more values?(y/N)",
-            "Enter the value:",
-            "Info: Given value was already added.",
-            "Would you like to add more values?(y/N)",
-            "Is this argument optional or not?(y/N)",
+            "Does this argument have a fixed set of values?(y/N)\n",
+            "Enter the value:\n",
+            "Would you like to add more values?(y/N)\n",
+            "Enter the value:\n",
+            "Would you like to add more values?(y/N)\n",
+            "Enter the value:\n",
+            "Info: Given value was already added.\n",
+            "Would you like to add more values?(y/N)\n",
+            "Is this argument optional or not?(Y/n)\n",
             "Enter default value:\n",
             "Would you like to add more arguments?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."commands\".\n",
@@ -116,7 +116,7 @@ class CreateCLICommandTest extends TestCase {
             'Say Hi', 'Say No'
         ], $arg->getAllowedValues());
         $this->assertTrue($arg->isOptional());
-        $this->assertEquals('The thing that the command will do.', $arg->getDefault());
+        $this->assertEquals('The thing that the command will do.', $arg->getDescription());
         $this->assertEquals('', $arg->getDefault());
         $this->removeClass($clazz);
     }

@@ -19,7 +19,6 @@ use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
-use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
@@ -107,8 +106,6 @@ class CreateCommand extends CLICommand {
             $this->_createEntityFromQuery();
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
-        } else if ($answer == 'Database table from class.') {
-            $create = new CreateTable($this);
         } else if ($answer == 'Middleware.') {
             $create = new CreateMiddleware($this);
         } else if ($answer == 'CLI Command.') {

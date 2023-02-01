@@ -3,6 +3,7 @@ namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\file\File;
+use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\Session;
 /**
  * Description of SessionTest
@@ -98,7 +99,8 @@ class SessionTest extends TestCase {
      * @test
      */
     public function testConstructor04() {
-        $this->expectException(\Exception::class);
+        $this->expectException(SessionException::class);
+        $this->expectExceptionMessage("Invalid session name: ''.");
         $session = new Session();
     }
     /**

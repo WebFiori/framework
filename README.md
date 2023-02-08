@@ -36,22 +36,22 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.4/badge.svg?branch=master"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.0/badge.svg?branch=master"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.2/badge.svg?branch=dev"></a><br>(dev)|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a><br>|
 
 
 ## Key Features
 
 * Provide minimum utilities to setup a small web application.
 * Theming and the ability to create multiple UIs for the same web app using any CSS or JavaScript framework.
-* Building and manipulating the DOM of a web page using PHP language.
+* Building and manipulating the DOM of a web page inside PHP.
 * Basic template engine.
-* Fast and simple routing system.
+* Fast and simple routing engine.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
-* Middleware support which can help in filtering HTTP requests before reaching application level.
+* Middleware support for HTTP requests filtering before reaching application level.
 * Basic support for MySQL and MSSQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
-* Simple sessions manager.
+* Customized sessions manager.
 * Support for creating and sending nice-looking HTML emails.
 * Autoloading of user defined classes (loading composer packages also supported).
 * Ability to create background tasks and let them run in specific time using CRON.
@@ -61,7 +61,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 
 ## Standard Libraries
 
-The following table shows build status of the standard libraries that the framework is composed of. The build is based on the latest stable PHP release. 
+Following table shows build status of the standard libraries that the framework is composed of. The build is based on the latest stable PHP release. 
 
 | Library | Build | Latest |
 |----|----|----|
@@ -113,7 +113,7 @@ For more information about how to setup the framework, [check here](https://webf
 For information on how to contribute to the project, [check here](https://webfiori.com/contribute).
 
 ## Notes
-* This project is a hoppy project. 
+* This project is started as a hoppy project. 
 * The main aim of this project is learning.
 * If you think that there is a better way of doing things or wants new feature, feel free to [drop an issue](https://github.com/WebFiori/framework/issues/new).
 * To report security vulnerabilities, please send an email to [ibrahim@webfiori.com](mailto:ibrahim@webfiori.com).

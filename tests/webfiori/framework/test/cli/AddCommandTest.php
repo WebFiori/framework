@@ -20,7 +20,7 @@ class AddCommandTest extends TestCase {
      */
     public function test00() {
         $runner = new Runner();
-        $runner->setInput([
+        $runner->setInputs([
             '3'
         ]);
         $this->assertEquals(0, $runner->runCommand(new AddCommand()));
@@ -37,7 +37,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddDBConnection00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             '0',
             '127.0.0.1',
@@ -78,7 +78,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddDBConnection01() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             '0',
             '127.0.0.1',
@@ -122,7 +122,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddDBConnection02() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             '0',
             '127.0.0.1',
@@ -166,7 +166,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddLang00() {
         $runner = new Runner();
-        $runner->setInput([
+        $runner->setInputs([
             '2',
             'FK',
             'F Name',
@@ -199,7 +199,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddLang01() {
         $runner = new Runner();
-        $runner->setInput([
+        $runner->setInputs([
             '2',
             'EN',
         ]);
@@ -220,7 +220,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddLang02() {
         $runner = new Runner();
-        $runner->setInput([
+        $runner->setInputs([
             '2',
             'FKRR',
         ]);
@@ -243,7 +243,7 @@ class AddCommandTest extends TestCase {
      */
     public function testAddSMTPConnection00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             '127.0.0.1',
             '',

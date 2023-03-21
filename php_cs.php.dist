@@ -6,8 +6,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
 ;
 
-return PhpCsFixer\Config::create()
-    ->setRules([
+$config = new PhpCsFixer\Config();
+return $config->setRules([
         'align_multiline_comment' => [
             'comment_type' => 'phpdocs_only'
         ],
@@ -54,7 +54,7 @@ return PhpCsFixer\Config::create()
             'sort_algorithm' => 'alpha'
         ],
         'ordered_class_elements' => [
-            'sortAlgorithm' => 'alpha',
+            'sort_algorithm' => 'alpha',
             'order' => [
                 'constant_public',
                 'constant_protected',

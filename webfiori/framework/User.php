@@ -26,7 +26,7 @@ class User implements JsonI, SessionUser {
      * 
      * @var string 
      */
-    private $dispName;
+    private $displayName;
     /**
      * The email address of the user.
      * 
@@ -58,7 +58,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.6 
      */
-    private $lastPasswordReseted;
+    private $lastPasswordReset;
     /**
      * The password of the user.
      * 
@@ -110,7 +110,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function __construct($username = '',$password = '',$email = '') {
+    function __construct(string $username = '', string $password = '', string $email = '') {
         $this->setEmail($email);
         $this->setPassword($password);
         $this->setUserName($username);
@@ -141,16 +141,17 @@ class User implements JsonI, SessionUser {
     /**
      * Adds new privilege to the array of user privileges.
      * 
-     * @param string $privilegeId The ID of the privilege. It must be exist in 
+     * @param string $privilegeId The ID of the privilege. It must be existed in
      * the class 'Access' or it won't be added. If the privilege is already 
      * added, It will be not added again. 
      * 
-     * @return boolean The method will return true if the privilege is 
+     * @return bool The method will return true if the privilege is 
      * added. false if not.
      * 
      * @since 1.7
      */
-    public function addPrivilege($privilegeId) {
+    public function addPrivilege(string $privilegeId): bool
+    {
         $p = Access::getPrivilege($privilegeId);
 
         if ($p != null) {
@@ -173,7 +174,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function addToGroup($groupId) {
+    public function addToGroup(string $groupId) {
         $g = Access::getGroup($groupId);
 
         if ($g instanceof PrivilegesGroup) {
@@ -189,7 +190,7 @@ class User implements JsonI, SessionUser {
      * @since 1.2
      */
     public function getDisplayName() {
-        return $this->dispName;
+        return $this->displayName;
     }
     /**
      * Returns the value of the property '$email'.
@@ -199,7 +200,8 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getEmail() {
+    function getEmail(): string
+    {
         return $this->email;
     }
     /**
@@ -224,15 +226,15 @@ class User implements JsonI, SessionUser {
         return $this->lastLogin;
     }
     /**
-     * Returns the date at which user password was reseted.
+     * Returns the date at which user password was last rested.
      * 
-     * @return string|null the date at which user password was reseted. 
+     * @return string|null the date at which user password was last rested.
      * If not set, the method will return null.
      * 
      * @since 1.6
      */
     public function getLastPasswordResetDate() {
-        return $this->lastPasswordReseted;
+        return $this->lastPasswordReset;
     }
     /**
      * Returns the value of the property '$password'.
@@ -242,30 +244,32 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getPassword() {
+    function getPassword(): string
+    {
         return $this->password;
     }
+
     /**
      * Returns the value of the property '$regDate'.
-     * 
-     * @param string|null $date Registration date. If not set, the method will
-     * return null.
-     * 
+     *
+     * @return string
      * @since 1.4
      */
-    public function getRegDate() {
+    public function getRegDate(): string
+    {
         return $this->regDate;
     }
     /**
      * Returns the number of times the user has requested that his password 
-     * to be reseted.
+     * to be rested.
      * 
      * @return int The number of times the user has requested that his password 
-     * to be reseted. Default value is 0.
+     * to be rested. Default value is 0.
      * 
      * @since 1.6
      */
-    public function getResetCount() {
+    public function getResetCount(): int
+    {
         return $this->resetPassCounts;
     }
     /**
@@ -276,7 +280,8 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getUserName() {
+    function getUserName(): string
+    {
         return $this->userName;
     }
     /**
@@ -285,10 +290,11 @@ class User implements JsonI, SessionUser {
      * @param array $privilegesIdsArr An array that contains the IDs of the 
      * privileges.
      * 
-     * @return boolean If the user has one of the given privileges, the method 
+     * @return bool If the user has one of the given privileges, the method 
      * will return true. Other than that, the method will return false.
      */
-    public function hasAnyPrivilege(array $privilegesIdsArr) {
+    public function hasAnyPrivilege(array $privilegesIdsArr): bool
+    {
         $hasPr = false;
 
         foreach ($privilegesIdsArr as $prId) {
@@ -306,7 +312,7 @@ class User implements JsonI, SessionUser {
      * 
      * @param string $privilegeId The ID of the privilege.
      * 
-     * @return boolean The method will return true if the user has the given 
+     * @return bool The method will return true if the user has the given 
      * privilege. false if not.
      * 
      * @since 1.7
@@ -323,19 +329,20 @@ class User implements JsonI, SessionUser {
     /**
      * Checks if the user belongs to a privileges group given its ID.
      * A user will be a part of privileges group only if the group has at least 
-     * one privilege and he has all the 
+     * one privilege, and he has all the
      * privileges of that group. In addition, he must have all the privileges 
      * of all child groups of that group.
      * 
      * @param string $groupId The ID of the group.
      * 
-     * @return boolean The method will return true if the user belongs 
+     * @return bool The method will return true if the user belongs 
      * to the users group. The user will be considered a part of the group 
      * only if he has all the permissions in the group.
      * 
      * @since 1.7
      */
-    public function inGroup($groupId) {
+    public function inGroup(string $groupId): bool
+    {
         $g = Access::getGroup($groupId);
 
         if ($g instanceof PrivilegesGroup) {
@@ -352,7 +359,8 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function privileges() {
+    public function privileges(): array
+    {
         return $this->userPrivileges;
     }
     /**
@@ -368,12 +376,13 @@ class User implements JsonI, SessionUser {
      * 
      * @param string $privilegeId The ID of the privilege.
      * 
-     * @return boolean If the privilege is removed, the method will 
+     * @return bool If the privilege is removed, the method will 
      * return true. Other than that, the method will return false.
      * 
      * @since 1.7.1
      */
-    public function removePrivilege($privilegeId) {
+    public function removePrivilege(string $privilegeId): bool
+    {
         $p = Access::getPrivilege($privilegeId);
 
         if ($p != null) {
@@ -407,11 +416,11 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.2
      */
-    public function setDisplayName($name) {
+    public function setDisplayName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
-            $this->dispName = $trimmed;
+            $this->displayName = $trimmed;
         }
     }
     /**
@@ -422,7 +431,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    public function setEmail($email) {
+    public function setEmail(string $email) {
         $this->email = trim($email);
     }
 
@@ -439,22 +448,22 @@ class User implements JsonI, SessionUser {
     /**
      * Sets the value of the property <b>$lastLogin</b>.
      * 
-     * @param string $date Last login date date.
+     * @param string $date Last login date.
      * 
      * @since 1.4
      */
-    public function setLastLogin($date) {
+    public function setLastLogin(string $date) {
         $this->lastLogin = $date;
     }
     /**
-     * Sets the date at which user password was reseted.
+     * Sets the date at which user password was rested.
      * 
-     * @param string $date The date at which user password was reseted.
+     * @param string $date The date at which user password was rested.
      * 
      * @since 1.6
      */
-    public function setLastPasswordResetDate($date) {
-        $this->lastPasswordReseted = $date;
+    public function setLastPasswordResetDate(string $date) {
+        $this->lastPasswordReset = $date;
     }
     /**
      * Sets the password of a user.
@@ -463,7 +472,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function setPassword($password) {
+    function setPassword(string $password) {
         $this->password = $password;
     }
     /**
@@ -473,32 +482,32 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.4
      */
-    public function setRegDate($date) {
+    public function setRegDate(string $date) {
         $this->regDate = $date;
     }
     /**
      * Sets the number of times the user has requested that his password 
-     * to be reseted.
+     * to be rested.
      * 
      * @param int $times The number of times the user has requested that his password 
-     * to be reseted. Must be an integer greater than -1.
+     * to be rested. Must be an integer greater than -1.
      * 
      * @since 1.6
      */
-    public function setResetCount($times) {
-        if (gettype($times) == 'integer' && $times >= 0) {
+    public function setResetCount(int $times) {
+        if ($times >= 0) {
             $this->resetPassCounts = $times;
         }
     }
     /**
-     * Sets the user name of a user.
+     * Sets the username of a user.
      * 
      * @param string $username The username to set. Note that the method will 
      * use the method 'trim()' in order to trim passed value.
      * 
      * @since 1.0
      */
-    function setUserName($username) {
+    function setUserName(string $username) {
         $this->userName = trim($username);
     }
     /**
@@ -530,7 +539,7 @@ class User implements JsonI, SessionUser {
      * 
      * @param PrivilegesGroup $group
      */
-    private function _addToGroup($group) {
+    private function _addToGroup(PrivilegesGroup $group) {
         foreach ($group->privileges() as $p) {
             $this->addPrivilege($p->getID());
         }
@@ -542,9 +551,10 @@ class User implements JsonI, SessionUser {
     /**
      * 
      * @param PrivilegesGroup $group
-     * @return type
+     * @return bool
      */
-    private function _inGroup($group) {
+    private function _inGroup(PrivilegesGroup $group): bool
+    {
         $inGroup = true;
 
         if (count($group->privileges()) === 0) {

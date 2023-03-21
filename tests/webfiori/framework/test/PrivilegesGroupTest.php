@@ -16,9 +16,9 @@ class PrivilegesGroupTest extends TestCase {
     public function testAddPrivilege01() {
         $g = new PrivilegesGroup();
         $pr = new Privilege();
-        $this->assertTrue($g->addPrivilage($pr));
+        $this->assertTrue($g->addPrivilege($pr));
         $pr1 = new Privilege();
-        $this->assertFalse($g->addPrivilage($pr1));
+        $this->assertFalse($g->addPrivilege($pr1));
     }
     /**
      * @test
@@ -69,7 +69,7 @@ class PrivilegesGroupTest extends TestCase {
         $parent = new PrivilegesGroup('Parent');
         $child = new PrivilegesGroup('Child');
         $pr = new Privilege('Child_pr');
-        $child->addPrivilage($pr);
+        $child->addPrivilege($pr);
         $child->setParentGroup($parent);
         $this->assertTrue($parent->hasPrivilege($pr));
         $this->assertFalse($parent->hasPrivilege($pr,false));
@@ -82,7 +82,7 @@ class PrivilegesGroupTest extends TestCase {
         $child = new PrivilegesGroup('Child');
         $childOfChild = new PrivilegesGroup('Child_of_child');
         $pr = new Privilege('Child_pr');
-        $childOfChild->addPrivilage($pr);
+        $childOfChild->addPrivilege($pr);
         $child->setParentGroup($parent);
         $childOfChild->setParentGroup($child);
         $this->assertTrue($parent->hasPrivilege($pr));
@@ -103,7 +103,7 @@ class PrivilegesGroupTest extends TestCase {
         $parent = new PrivilegesGroup('Parent');
         $child = new PrivilegesGroup('Child');
         $pr = new Privilege('Child_pr');
-        $child->addPrivilage($pr);
+        $child->addPrivilege($pr);
         $child->setParentGroup($parent);
         $this->assertFalse($child->setID('Parent'));
         $this->assertEquals('Child',$child->getID());
@@ -116,7 +116,7 @@ class PrivilegesGroupTest extends TestCase {
         $child = new PrivilegesGroup('Child');
         $childOfChild = new PrivilegesGroup('Child_of_child');
         $pr = new Privilege('Child_pr');
-        $child->addPrivilage($pr);
+        $child->addPrivilege($pr);
         $child->setParentGroup($parent);
         $childOfChild->setParentGroup($child);
         $this->assertFalse($child->setID('Parent'));

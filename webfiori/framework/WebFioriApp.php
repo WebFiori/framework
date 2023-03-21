@@ -10,11 +10,12 @@
  */
 namespace webfiori\framework;
 
-use Closure;
 use Error;
+use Exception;
 use ReflectionClass;
 use webfiori\cli\Runner;
 use webfiori\error\Handler;
+use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\exceptions\InitializationException;
@@ -86,7 +87,7 @@ class WebFioriApp {
      * 
      * @since 1.0 
      */
-    private static $classStatus = 'NONE';
+    private static $classStatus = self::STATUS_NONE;
     /**
      * A single instance of the class.
      * 
@@ -95,14 +96,17 @@ class WebFioriApp {
      * @since 1.0 
      */
     private static $LC;
+
     /**
      * The entry point for initiating the system.
-     * 
+     *
+     * @throws FileException
+     * @throws InitializationException
      * @since 1.0
      */
     private function __construct() {
-        $this->_checkStdInOut();
-        $this->_initVersionInfo();
+        $this->checkStdInOut();
+        $this->initFrameworkVersionInfo();
         $this->_checkAppDir();
         /**
          * Change encoding of mb_ functions to UTF-8
@@ -124,17 +128,17 @@ class WebFioriApp {
          */
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
-        $this->_initAutoLoader();
-        $this->_setHandlers();
+        $this->initAutoLoader();
+        $this->setHandlers();
         //Initialize CLI
         self::getRunner();
         
-        $this->_initAppConfig();
+        $this->initAppConfig();
 
 
 
-        $this->_initThemesPath();
-        $this->_checkStandardLibs();
+        $this->initThemesPath();
+        $this->checkStandardLibs();
 
         if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
             ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
@@ -145,9 +149,9 @@ class WebFioriApp {
 
 
 
-        $this->_initMiddleware();
-        $this->_initRoutes();
-        $this->_initCRON();
+        $this->initMiddleware();
+        $this->initRoutes();
+        $this->initCRON();
         Response::beforeSend(function ()
         {
             register_shutdown_function(function()
@@ -181,7 +185,7 @@ class WebFioriApp {
             }
         });
         //class is now initialized
-        self::$classStatus = 'INITIALIZED';
+        self::$classStatus = self::STATUS_INITIALIZED;
     }
     /**
      * Register CLI commands or cron jobs.
@@ -189,7 +193,7 @@ class WebFioriApp {
      * commands. It must be a folder inside 'app' folder or the folder which is defined 
      * by the constant 'APP_DIR'.
      * 
-     * @param Closure $regCallback A callback which is used to register the 
+     * @param callable $regCallback A callback which is used to register the
      * classes of the folder.
      * 
      * @param string|null $suffix A string which is appended to class name.
@@ -205,7 +209,7 @@ class WebFioriApp {
      * 
      * @since 1.3.6
      */
-    public static function autoRegister($folder, $regCallback, $suffix = null,array $constructorParams = [], array $otherParams = []) {
+    public static function autoRegister(string $folder, callable $regCallback, string $suffix = null, array $constructorParams = [], array $otherParams = []) {
         $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
         if (!File::isDirectory($dir)) {
             //If directory is outside application folder.
@@ -275,7 +279,8 @@ class WebFioriApp {
      * 
      * @return Config
      */
-    public static function getAppConfig() {
+    public static function getAppConfig(): Config
+    {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
@@ -290,7 +295,8 @@ class WebFioriApp {
      * 
      * @since 1.2.1
      */
-    public static function getAutoloader() {
+    public static function getAutoloader(): AutoLoader
+    {
         return self::$AU;
     }
     /**
@@ -307,8 +313,8 @@ class WebFioriApp {
         return self::$classStatus;
     }
     /**
-     * Sets the configuration object that will be used to configure some of the 
-     * framework settings.
+     * Sets the configuration object that will be used to configure part of
+     * application settings.
      * 
      * @param Config $conf
      * 
@@ -319,14 +325,17 @@ class WebFioriApp {
             self::$LC->appConfig = $conf;
         }
     }
+
     /**
      * Start your WebFiori application.
-     * 
+     *
      * @return WebFioriApp An instance of the class.
-     * 
+     *
+     * @throws InitializationException
      * @since 1.0
      */
-    public static function start() {
+    public static function start(): WebFioriApp
+    {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
@@ -353,16 +362,23 @@ class WebFioriApp {
             http_response_code(500);
             die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR.'".');
         }
+        /**
+         * The absolute path to application directory.
+         *
+         */
+        define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
     }
+
     /**
      * Checks if framework standard libraries are loaded or not.
-     * 
-     * If a library is missing, the method will throw an exception that tell 
+     *
+     * If a library is missing, the method will throw an exception that tell
      * which library is missing.
-     * 
+     *
+     * @throws InitializationException
      * @since 1.3.5
      */
-    private function _checkStandardLibs() {
+    private function checkStandardLibs() {
         $standardLibsClasses = [
             'webfiori/collections' => 'webfiori\\collections\\Node',
             'webfiori/ui' => 'webfiori\\ui\\HTMLNode',
@@ -381,7 +397,11 @@ class WebFioriApp {
             }
         }
     }
-    private function _checkStdInOut() {
+
+    /**
+     * Checks and initialize standard input and output streams.
+     */
+    private function checkStdInOut() {
         /*
          * first, check for php streams if they are open or not.
          */
@@ -417,7 +437,13 @@ class WebFioriApp {
             define('STDERR',fopen('php://stderr', 'w'));
         }
     }
-    private function _initAppConfig() {
+
+    /**
+     * Initialize application configuration class.
+     *
+     * @throws FileException If the method was not able to Initialize configuration class.
+     */
+    private function initAppConfig() {
 
         if (!class_exists(APP_DIR.'\\config\\AppConfig')) {
             ConfigController::get()->createAppConfigFile();
@@ -427,7 +453,12 @@ class WebFioriApp {
         $this->appConfig = new $constructor();
         ConfigController::get()->setConfig($this->appConfig);
     }
-    private function _initAutoLoader() {
+
+    /**
+     * @throws FileException
+     * @throws Exception
+     */
+    private function initAutoLoader() {
         /**
          * Initialize autoloader.
          */
@@ -441,7 +472,11 @@ class WebFioriApp {
         }
         call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
     }
-    private function _initCRON() {
+
+    /**
+     * @throws FileException
+     */
+    private function initCRON() {
         $uriObj = new RouterUri(Request::getRequestedURI(), '');
         $pathArr = $uriObj->getPathArray();
 
@@ -454,16 +489,18 @@ class WebFioriApp {
                 Cron::initRoutes();
             }
             Cron::password($this->appConfig->getCRONPassword());
-            //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
+            //initialize cron jobs only if in CLI or cron is enabled through HTTP.
             call_user_func(APP_DIR.'\ini\InitCron::init');
             Cron::registerJobs();
         }
     }
+
     /**
      * Returns an instance which represents the class that is used to run the
      * terminal.
-     * 
+     *
      * @return Runner
+     * @throws FileException
      */
     public static function getRunner() : Runner {
         if (!class_exists(APP_DIR.'\ini\InitCommands')) {
@@ -518,7 +555,11 @@ class WebFioriApp {
         }
         return self::$CliRunner;
     }
-    private function _initMiddleware() {
+
+    /**
+     * @throws FileException
+     */
+    private function initMiddleware() {
         WebFioriApp::autoRegister('middleware', function(AbstractMiddleware $inst)
         {
             MiddlewareManager::register($inst);
@@ -529,7 +570,11 @@ class WebFioriApp {
         }
         call_user_func(APP_DIR.'\ini\InitMiddleware::init');
     }
-    private function _initRoutes() {
+
+    /**
+     * @throws FileException
+     */
+    private function initRoutes() {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
@@ -547,7 +592,7 @@ class WebFioriApp {
             }
         }
     }
-    private function _initThemesPath() {
+    private function initThemesPath() {
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
             $themesPath = ROOT_PATH.DS.$themesDirName;
@@ -558,7 +603,7 @@ class WebFioriApp {
             define('THEMES_PATH', $themesPath);
         }
     }
-    private function _initVersionInfo() {
+    private function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
          * 
@@ -581,6 +626,7 @@ class WebFioriApp {
          * @since 2.1
          */
         define('WF_RELEASE_DATE', '2022-12-25');
+
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR.'\config\Env')) {
@@ -608,18 +654,14 @@ class WebFioriApp {
         }
         call_user_func(APP_DIR.'\config\\Env::defineEnvVars');
     }
-    
-    private function setHandler() {
+    /**
+     * Sets new error and exception handler.
+     */
+    private function setHandlers() {
+        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
         Handler::registerHandler(new CLIErrHandler());
         Handler::registerHandler(new APICallErrHandler());
         Handler::registerHandler(new HTTPErrHandler());
         Handler::unregisterHandler(Handler::getHandler('Default'));
-    }
-    /**
-     * Sets new error and exception handler.
-     */
-    private function _setHandlers() {
-        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
-        $this->setHandler();
     }
 }

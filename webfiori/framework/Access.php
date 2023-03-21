@@ -503,7 +503,7 @@ class Access {
                     $p->setID($privilegeId);
 
                     if (!$g->hasPrivilege($p)) {
-                        $g->addPrivilage($p);
+                        $g->addPrivilege($p);
 
                         return true;
                     }

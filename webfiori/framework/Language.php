@@ -12,6 +12,8 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\session\SessionsManager;
+use webfiori\http\Request;
+
 /**
  * A class that is can be used to make the application ready for 
  * Internationalization (i18n).
@@ -20,7 +22,7 @@ use webfiori\framework\session\SessionsManager;
  * The language class must be added to the namespace 'app/langs' and the name 
  * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
  * represents language code. The directory at which the language file must exist in 
- * is not important but it is recommended to add them to the folder 'app/langs' 
+ * is not important, but it is recommended to add them to the folder 'app/langs'
  * of the framework.
  * 
  * @author Ibrahim
@@ -47,7 +49,7 @@ class Language {
     /**
      * An array that contains language definition.
      * 
-     * @var type 
+     * @var array
      */
     private $languageVars;
     /**
@@ -81,9 +83,7 @@ class Language {
      * @param string $dir 'ltr' or 'rtl'. Default is 'ltr'.
      * 
      * @param string $code Language code (such as 'AR'). Default is 'XX'
-     * 
-     * @param array $initials An initial array of directories.
-     * 
+     *
      * @param bool $addtoLoadedAfterCreate If set to true, the language object that 
      * will be created will be added to the set of loaded languages. Default is true.
      * 
@@ -219,23 +219,25 @@ class Language {
 
         return 'XX';
     }
+
     /**
      * Returns the value of a language variable.
-     * 
+     *
      * @param string $dir A directory to the language variable (such as 'pages/login/login-label').
      * This also can be a string similar to 'pages.login.login-label'.
-     * 
+     *
      * @param string $langCode An optional language code. If provided, the
      * method will attempt to replace active language with the provided
      * one. If not provided, the method
      * will attempt to load a translation based on the session or default
      * web application language.
-     * 
-     * @return string|array If the given directory represents a label, the 
-     * method will return its value. If it represents an array, the array will 
-     * be returned. If nothing was found, the returned value will be the passed 
-     * value to the function. 
-     * 
+     *
+     * @return string|array If the given directory represents a label, the
+     * method will return its value. If it represents an array, the array will
+     * be returned. If nothing was found, the returned value will be the passed
+     * value to the function.
+     *
+     * @throws MissingLangException
      * @since 1.0
      */
     public static function getLabel(string $dir, string $langCode = null) {
@@ -246,7 +248,11 @@ class Language {
             if ($session !== null) {
                 $langCode = $session->getLangCode(true);
             } else {
-                $langCode = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+                $langCode = Request::getParam('lang');
+
+                if ($langCode === null || strlen($langCode) == 2) {
+                    $langCode = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+                }
             }
         }
         
@@ -296,7 +302,7 @@ class Language {
      * 
      * @throws MissingLangException An exception will be thrown if no language file 
      * was found that matches the given language code. Language files must 
-     * have the name 'LanguageXX.php' where 'XX' is language code. Also the method 
+     * have the name 'LanguageXX.php' where 'XX' is language code. Also, the method
      * will throw an exception when the translation file is loaded but no object 
      * of type 'Language' was stored in the set of loaded translations.
      * 
@@ -349,7 +355,7 @@ class Language {
      * directory. 
      * 
      * @param string $varName The name of the variable. Note that if the name 
-     * of the variable is set and it was an array, it will become a string 
+     * of the variable is set, and it was an array, it will become a string
      * which has the given name and value.
      * 
      * @param string $varValue The value of the variable.
@@ -460,7 +466,8 @@ class Language {
      * 
      * @since 1.2 
      */
-    public static function unloadTranslation(string $langCode) {
+    public static function unloadTranslation(string $langCode): bool
+    {
         $uLangCode = strtoupper(trim($langCode));
 
         if (isset(self::$loadedLangs[$uLangCode])) {
@@ -482,6 +489,8 @@ class Language {
             }
             return $this->_create($subs, $top[$subs[$index]],++$index);
         }
+
+        return null;
     }
     private function _get(&$subs,&$top,$index) {
         $count = count($subs);
@@ -497,7 +506,8 @@ class Language {
         return null;
     }
 
-    private function _set($subs,&$top,$var,$val,$index) {
+    private function _set($subs,&$top,$var,$val,$index): bool
+    {
         $count = count($subs);
 
         if ($index + 1 == $count) {

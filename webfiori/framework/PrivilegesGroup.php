@@ -108,7 +108,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function addPrivilage(Privilege $pr) : bool {
+    public function addPrivilege(Privilege $pr) : bool {
         foreach ($this->privilegesArr as $prev) {
             if ($prev->getID() == $pr->getID()) {
                 return false;
@@ -170,7 +170,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * This method will only check the given group (does not include parent). 
      * 
-     * @param Privilege $p An object of type 'Privilige'.
+     * @param Privilege $p An object of type 'Privilege'.
      * 
      * @param boolean $checkChildGroups If this parameter is set to true, the 
      * search for the privilege will include child groups. By default, it will 
@@ -184,20 +184,18 @@ class PrivilegesGroup implements JsonI {
     public function hasPrivilege(Privilege $p, bool $checkChildGroups = true) : bool {
         $hasPr = false;
 
-        if ($p instanceof Privilege) {
-            foreach ($this->privileges() as $privilege) {
-                if ($p->getID() == $privilege->getID()) {
-                    $hasPr = true;
-                }
+        foreach ($this->privileges() as $privilege) {
+            if ($p->getID() == $privilege->getID()) {
+                $hasPr = true;
             }
+        }
 
-            if (!$hasPr && $checkChildGroups === true) {
-                foreach ($this->childGroups() as $g) {
-                    $hasPr = $this->_hasPrivilege($g, $p);
+        if (!$hasPr && $checkChildGroups === true) {
+            foreach ($this->childGroups() as $g) {
+                $hasPr = $this->_hasPrivilege($g, $p);
 
-                    if ($hasPr) {
-                        break;
-                    }
+                if ($hasPr) {
+                    break;
                 }
             }
         }
@@ -209,7 +207,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * The ID of the group can only consist of the following characters: [A-Z], 
      * [a-z], [0-9] and underscore. In addition, it must not be the same as the 
-     * ID of any of the parent groups or child groups.
+     * ID of the parent groups or child groups.
      * 
      * @param string $id The ID of the group.
      * 
@@ -222,11 +220,11 @@ class PrivilegesGroup implements JsonI {
         if (!self::isValidID($id)) {
             return false;
         }
-        
+        $taken = true;
         $parentG = $this->getParentGroup();
 
         if ($parentG === null) {
-            $taken = $this->_checkID($id, $this);
+            $taken = $this->checkID($id, $this);
 
             if ($taken === true) {
                 return false;
@@ -244,7 +242,7 @@ class PrivilegesGroup implements JsonI {
         }
         
         if ($testInst !== null) {
-            $taken = $this->_checkID($id, $testInst);
+            $taken = $this->checkID($id, $testInst);
         }
         
 
@@ -310,15 +308,15 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.1
      */
-    public function setParentGroup($group = null) : bool {
-        if ($group instanceof PrivilegesGroup) {
+    public function setParentGroup(PrivilegesGroup $group = null) : bool {
+        if ($group !== null) {
             if ($group !== $this && $group->getID() != $this->getID()) {
                 $this->parentGroup = $group;
                 $this->parentGroup->childGroups[] = $this;
 
                 return true;
             }
-        } else if ($group === null && $this->parentGroup !== null) {
+        } else if ($this->parentGroup !== null) {
             $this->parentGroup->_removeChildGroup($this->getID());
             $this->parentGroup = null;
 
@@ -356,19 +354,22 @@ class PrivilegesGroup implements JsonI {
 
         return $j;
     }
+
     /**
-     * 
-     * @param type $id
+     *
+     * @param string $id
      * @param PrivilegesGroup $group
+     * @return bool
      */
-    private function _checkID($id,$group) {
+    private function checkID(string $id, PrivilegesGroup $group): bool
+    {
         if ($group->getID() == $id) {
             return true;
         }
         $bool = false;
 
         foreach ($group->childGroups() as $g) {
-            $bool = $bool || $this->_checkID($id, $g);
+            $bool = $bool || $this->checkID($id, $g);
         }
 
         return $bool;
@@ -380,7 +381,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @param Privilege $p The privilege that will be checked. 
      */
-    private function _hasPrivilege($group,$p) {
+    private function _hasPrivilege(PrivilegesGroup $group, Privilege $p) {
         $hasPr = false;
 
         foreach ($group->privileges() as $privilege) {

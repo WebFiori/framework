@@ -2,12 +2,13 @@
 
 ## Supported Versions
 
-The following table shows which versions are still maintained and beigng updated with security updated.
+The following table shows which versions are still maintained and being updated with security updated.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 2.x.x   | :white_check_mark: |
-| 1.x.x   | :x:                |
+| Version                   | Supported          |
+|---------------------------|--------------------|
+| 3.x.x (under development) | :white_check_mark: |
+| 2.x.x                     | :white_check_mark: |
+| 1.x.x                     | :x:                |
 
 ## Reporting a Vulnerability
 

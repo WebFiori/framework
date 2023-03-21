@@ -24,7 +24,7 @@
 
 ## What is WebFiori Framework?
 
-WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It uses semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
+WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object-oriented (OOP). It uses semi-MVC model, but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Supported PHP Versions
 | Build Status |

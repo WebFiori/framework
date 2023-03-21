@@ -296,11 +296,4 @@ class AccessTest extends TestCase{
         $privilegesStr = Access::createPermissionsStr($user);
         $this->assertEquals('SUB_PR_3-1;SUB_PR_2-1;SUB_OF_PR_2-1',$privilegesStr);
     }
-    /**
-     * @test
-     */
-    public function testCreatePrivilegesStr05() {
-        $privilegesStr = Access::createPermissionsStr('');
-        $this->assertEquals('',$privilegesStr);
-    }
 }

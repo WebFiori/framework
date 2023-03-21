@@ -235,7 +235,7 @@ class TableClassWriter extends ClassWriter {
         $this->append(']);', 2);
     }
     private function _addFks() {
-        $fks = $this->tableObj->getForignKeys();
+        $fks = $this->tableObj->getForeignKeys();
 
         foreach ($fks as $fkObj) {
             $refTableNs = get_class($fkObj->getSource());
@@ -345,7 +345,7 @@ class TableClassWriter extends ClassWriter {
     }
     private function addFksUseTables() {
         if ($this->tableObj !== null) {
-            $fks = $this->tableObj->getForignKeys();
+            $fks = $this->tableObj->getForeignKeys();
             $addedRefs = [];
 
             foreach ($fks as $fkObj) {

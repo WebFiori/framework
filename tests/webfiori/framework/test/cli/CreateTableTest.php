@@ -63,7 +63,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'Cool00Table',
             '',
@@ -127,7 +127,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable01() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mssql',
             'Cool01Table',
             '',
@@ -193,7 +193,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable03() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'Cool01Table',
             '',
@@ -307,7 +307,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable02() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'Cool02Table',
             '',
@@ -403,7 +403,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable04() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'CoolWithEntity00Table',
             '',
@@ -468,7 +468,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable05() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'Cool05Table',
             '',
@@ -501,7 +501,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable06($refTable) {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mysql',
             'Cool06Table',
             '',
@@ -599,7 +599,7 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable07() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'mssql',
             'Cool011Table',
             '',

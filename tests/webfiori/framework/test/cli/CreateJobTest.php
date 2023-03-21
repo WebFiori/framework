@@ -20,7 +20,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'SuperCoolJob',
             'app\jobs',
@@ -65,7 +65,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'SuperCoolJob',
             'app\jobs',
@@ -114,7 +114,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'NewRound',
             'app\jobs',
@@ -164,7 +164,7 @@ class CreateJobTest extends CreateTestCase {
             'create',
             '--c' => 'job'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'SendDailyReport',
             'app\jobs',
             'Send Sales Report',

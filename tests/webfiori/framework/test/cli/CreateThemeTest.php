@@ -20,7 +20,7 @@ class CreateThemeTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '6',
             'NewTest',
             'themes\\fiori',

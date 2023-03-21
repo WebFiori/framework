@@ -21,7 +21,7 @@ class CreateDBAccessTest extends CreateTestCase {
             'create',
             '--c' => 'db'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'tables\\EmployeeInfoTable',
             'EmployeeOperations',
             '',
@@ -56,7 +56,7 @@ class CreateDBAccessTest extends CreateTestCase {
             'create',
             '--c' => 'db'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'tables\\EmployeeInfoTable',
             'EmployeeS',
             'app\\database\\empl',
@@ -95,7 +95,7 @@ class CreateDBAccessTest extends CreateTestCase {
             'create',
             '--c' => 'db'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'tables\\PositionInfoTable',
             'Position2x',
             'app\\database',

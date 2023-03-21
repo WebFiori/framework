@@ -17,7 +17,7 @@ class ListRoutesCommandTest extends TestCase {
     public function test00() {
         Router::removeAll();
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-routes'
@@ -32,7 +32,7 @@ class ListRoutesCommandTest extends TestCase {
      */
     public function test01() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-routes'

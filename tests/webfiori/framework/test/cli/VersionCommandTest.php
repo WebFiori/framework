@@ -16,7 +16,7 @@ class VersionCommandTest extends TestCase {
      */
     public function test00() {
         $runner = new Runner();
-        $runner->setInput();
+        $runner->setInputs();
         $this->assertEquals(0, $runner->runCommand(new VersionCommand()));
         $this->assertEquals([
             'Framework Version: '.WF_VERSION."\n",
@@ -29,7 +29,7 @@ class VersionCommandTest extends TestCase {
      */
     public function test01() {
         $runner = new Runner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->register(new VersionCommand());
         $this->assertEquals(0, $runner->runCommand(null, [
             'v',

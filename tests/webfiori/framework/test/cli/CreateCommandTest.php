@@ -14,7 +14,7 @@ class CreateCommandTest extends CreateTestCase {
      */
     public function testCreate00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '9',
         ]);
         $runner->setArgsVector([
@@ -41,7 +41,7 @@ class CreateCommandTest extends CreateTestCase {
      */
     public function testCreate01() {
         $runner = $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '',
         ]);
         $runner->setArgsVector([
@@ -72,7 +72,7 @@ class CreateCommandTest extends CreateTestCase {
      */
     public function testCreateWebService00() {
         $runner = $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '2',
             'NewWeb',
             '',
@@ -141,7 +141,7 @@ class CreateCommandTest extends CreateTestCase {
      */
     public function testCreateEntity00() {
         $runner = $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'NeEntity',
             '',
             'y',
@@ -187,7 +187,7 @@ class CreateCommandTest extends CreateTestCase {
      */
     public function testCreateEntity01() {
         $runner = $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             'NewEntity',
             '           ',

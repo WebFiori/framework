@@ -20,7 +20,7 @@ class MiddlewareTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '4',
             'NewCoolMd',
             'app\middleware',
@@ -63,7 +63,7 @@ class MiddlewareTest extends CreateTestCase {
             'create',
             '--c' => 'middleware'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'NewCool',
             'app\middleware',
             'Check is cool',

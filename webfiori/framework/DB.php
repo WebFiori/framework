@@ -88,7 +88,7 @@ class DB extends Database {
 
         if (($connType == 'mysql' && $table instanceof MySQLTable) 
          || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-            foreach ($table->getForignKeys() as $fk) {
+            foreach ($table->getForeignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);
             }
 

@@ -16,7 +16,7 @@ class CronCommandTest extends TestCase {
      */
     public function test00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron'
@@ -32,7 +32,7 @@ class CronCommandTest extends TestCase {
     public function test01() {
         Cron::password(hash('sha256', '123456'));
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -56,7 +56,7 @@ class CronCommandTest extends TestCase {
      */
     public function test02() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -72,7 +72,7 @@ class CronCommandTest extends TestCase {
      */
     public function test03() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -103,7 +103,7 @@ class CronCommandTest extends TestCase {
      */
     public function test04() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -142,7 +142,7 @@ class CronCommandTest extends TestCase {
      */
     public function test05() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '1'
         ]);
         $runner->setArgsVector([
@@ -186,7 +186,7 @@ class CronCommandTest extends TestCase {
      */
     public function test06() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -224,7 +224,7 @@ class CronCommandTest extends TestCase {
     public function test07() {
         $runner = WebFioriApp::getRunner();
         Cron::execLog(true);
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -268,7 +268,7 @@ class CronCommandTest extends TestCase {
         Cron::password('123456');
         Cron::registerJobs();
         
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -294,7 +294,7 @@ class CronCommandTest extends TestCase {
      */
     public function test09() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             
         ]);
         $runner->setArgsVector([
@@ -316,7 +316,7 @@ class CronCommandTest extends TestCase {
      */
     public function test10() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -342,7 +342,7 @@ class CronCommandTest extends TestCase {
      */
     public function test11() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -373,7 +373,7 @@ class CronCommandTest extends TestCase {
      */
     public function test12() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -395,7 +395,7 @@ class CronCommandTest extends TestCase {
         Cron::password(hash('sha256', '123456'));
         Cron::registerJobs();
         
-        $runner->setInput([
+        $runner->setInputs([
             'Y',
             '2021-01-01',
             '2020-01-01'

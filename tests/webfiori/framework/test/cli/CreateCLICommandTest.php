@@ -20,7 +20,7 @@ class CreateCLICommandTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '5',
             'NewCLI',
             'app\commands',
@@ -63,7 +63,7 @@ class CreateCLICommandTest extends CreateTestCase {
             'create',
             '--c' => 'command'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'DoIt',
             'app\commands',
             'do-it',

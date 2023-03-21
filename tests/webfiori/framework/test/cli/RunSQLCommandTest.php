@@ -20,7 +20,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'not-exist'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -46,7 +46,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'not-exist'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -72,7 +72,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'app\\database\\Test2Table.php'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -98,7 +98,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -124,7 +124,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'y'
         ]);
         
@@ -154,7 +154,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'n'
         ]);
         
@@ -181,7 +181,7 @@ class RunSQLCommandTest extends TestCase {
             'webfiori',
             'run-query',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             '0',
             'select * from hello;',
@@ -221,7 +221,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection-2',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'n'
         ]);
         
@@ -248,7 +248,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--show-sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             'app\database\TestTable',
             '0'
@@ -299,7 +299,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--table' => 'app\\database\\TestTable'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             '1'
         ]);
@@ -340,7 +340,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--connection' => 'testing-connection',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'drop table test2_x;',
             'y'
@@ -375,7 +375,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--schema' => \tables\Schema::class
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'y',
         ]);
@@ -421,7 +421,7 @@ class RunSQLCommandTest extends TestCase {
             '--schema' => \tables\Schema2::class,
             '--create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'y',
         ]);
         $code = $runner->start();
@@ -459,7 +459,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--schema' => \tables\Schema2::class,
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             "0",
             "2",

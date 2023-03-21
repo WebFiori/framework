@@ -671,7 +671,7 @@ class Access {
         $retVal = false;
 
         foreach ($this->userGroups as $g) {
-            $retVal = $this->hasPrivilegeHelper1($privilegeId, $groupId, $g);
+            $retVal = $this->hasPrivilegeHelper1($privilegeId, $g, $groupId);
 
             if ($retVal === true) {
                 break;
@@ -688,7 +688,7 @@ class Access {
      * @param PrivilegesGroup $group
      * @return bool
      */
-    private function hasPrivilegeHelper1(string $prId, string $groupId, PrivilegesGroup $group) : bool {
+    private function hasPrivilegeHelper1(string $prId, PrivilegesGroup $group, string $groupId = null) : bool {
         if ($groupId === null || $group->getID() != $groupId) {
             if ($groupId !== null) {
                 return $this->isChildGroupHasPrivilege($prId, $groupId, $group);
@@ -704,7 +704,7 @@ class Access {
         $retVal = false;
 
         foreach ($group->childGroups() as $g) {
-            $b = $this->hasPrivilegeHelper1($prId, $groupId, $g);
+            $b = $this->hasPrivilegeHelper1($prId, $g, $groupId);
 
             if ($b === true) {
                 $retVal = true;

@@ -12,9 +12,9 @@ namespace webfiori\framework;
 
 use Exception;
 use webfiori\framework\exceptions\InitializationException;
-use webfiori\http\Response;
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
+use webfiori\http\Response;
 
 
 /**
@@ -62,14 +62,13 @@ class ThemeLoader {
      * @throws Exception
      * @since 1.0
      */
-    public static function getAvailableThemes(): array
-    {
+    public static function getAvailableThemes(): array {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            
+
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
-                
+
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
@@ -91,8 +90,7 @@ class ThemeLoader {
      * 
      * @since 1.0
      */
-    public static function getLoadedThemes(): array
-    {
+    public static function getLoadedThemes(): array {
         return self::$loadedThemes;
     }
     /**
@@ -106,8 +104,7 @@ class ThemeLoader {
      * 
      * @since 1.0
      */
-    public static function isThemeLoaded(string $themeName): bool
-    {
+    public static function isThemeLoaded(string $themeName): bool {
         return isset(self::$loadedThemes[$themeName]) === true;
     }
 
@@ -177,6 +174,7 @@ class ThemeLoader {
             $themeName = $trimmedName;
         } else {
             $themeName = ConfigController::get()->getBaseTheme();
+
             if (strlen($themeName) == 0) {
                 return null;
             }

@@ -15,8 +15,6 @@ use webfiori\database\ConnectionInfo;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\helpers\CreateClassHelper;
-use webfiori\framework\cli\helpers\TableObjHelper;
 use webfiori\framework\writers\TableClassWriter;
 use webfiori\json\CaseConverter;
 /**
@@ -25,42 +23,6 @@ use webfiori\json\CaseConverter;
  * @author Ibrahim
  */
 class CreateTableObj extends CreateClassHelper {
-
-    public function readClassInfo() {
-        $databaseType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
-        
-        if ($databaseType == 'mysql') {
-            $tempTable = new MySQLTable();
-        } else if ($databaseType == 'mssql') {
-            $tempTable = new MSSQLTable();
-        }
-        $this->getWriter()->setTable($tempTable);
-        $this->setClassInfo(APP_DIR.'\\database', 'Table');
-        
-        $tableHelper = new TableObjHelper($this, $tempTable);
-        $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));
-        $tableHelper->setTableComment();
-        
-        $this->println('Now you have to add columns to the table.');
-        $tableHelper->addColumns();
-        
-        
-
-        if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
-            $tableHelper->addForeignKeys();
-        }
-        
-        $withEntity = false;
-        if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $tableHelper->createEntity();
-            $withEntity = true;
-        }
-        
-        $this->writeClass();
-        if ($withEntity) {
-            $this->info('Entity class was created at "'.$this->getWriter()->getEntityPath().'".');
-        }
-    }
     /**
      * Creates new instance of the class.
      * 
@@ -70,5 +32,43 @@ class CreateTableObj extends CreateClassHelper {
      */
     public function __construct(CLICommand $command) {
         parent::__construct($command, new TableClassWriter());
+    }
+
+    public function readClassInfo() {
+        $databaseType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
+
+        if ($databaseType == 'mysql') {
+            $tempTable = new MySQLTable();
+        } else if ($databaseType == 'mssql') {
+            $tempTable = new MSSQLTable();
+        }
+        $this->getWriter()->setTable($tempTable);
+        $this->setClassInfo(APP_DIR.'\\database', 'Table');
+
+        $tableHelper = new TableObjHelper($this, $tempTable);
+        $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));
+        $tableHelper->setTableComment();
+
+        $this->println('Now you have to add columns to the table.');
+        $tableHelper->addColumns();
+
+
+
+        if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
+            $tableHelper->addForeignKeys();
+        }
+
+        $withEntity = false;
+
+        if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
+            $tableHelper->createEntity();
+            $withEntity = true;
+        }
+
+        $this->writeClass();
+
+        if ($withEntity) {
+            $this->info('Entity class was created at "'.$this->getWriter()->getEntityPath().'".');
+        }
     }
 }

@@ -1,8 +1,5 @@
 <?php
-
 namespace app\ini\routes;
-
-use webfiori\framework\router\Router;
 
 class APIsRoutes {
     /**
@@ -11,6 +8,5 @@ class APIsRoutes {
      * @since 1.0
      */
     public static function create() {
-        
     }
 }

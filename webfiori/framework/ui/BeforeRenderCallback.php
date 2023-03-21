@@ -18,11 +18,11 @@ use webfiori\collections\Comparable;
  * @author Ibrahim
  */
 class BeforeRenderCallback implements Comparable {
-    private $params;
     private $callback;
-    private $priority;
     private $id;
     private $isExecuted;
+    private $params;
+    private $priority;
 
     /**
      * Creates new instance of the class.
@@ -48,6 +48,48 @@ class BeforeRenderCallback implements Comparable {
         $this->isExecuted = false;
     }
     /**
+     * Execute the callback.
+     * 
+     * @param WebPage $owner The page at which the callback belongs to.
+     */
+    public function call(WebPage $owner) {
+        if (!$this->isExecuted()) {
+            $paramsArr = array_merge([$owner], $this->params);
+            call_user_func_array($this->callback, $paramsArr);
+            $this->isExecuted = true;
+        }
+    }
+    /**
+     * Compare the callback with another one.
+     * 
+     * @param BeforeRenderCallback $other
+     * 
+     * @return int If current callback has higher priority, the method will return
+     * a positive number. Else if the two have same priority, zero is returned.
+     * Other than that, a negative value is returned if the callback has less
+     * priority.
+     */
+    public function compare($other): int {
+        return $this->getPriority() - $other->getPriority();
+    }
+    /**
+     * Returns the identifier of the callback.
+     * 
+     * @return int The identifier of the callback.
+     */
+    public function getID() : int {
+        return $this->id;
+    }
+    /**
+     * Returns the priority of the callback.
+     * 
+     * @return int Priority of the callback. Large number means that
+     * the callback has higher priority.
+     */
+    public function getPriority() : int {
+        return $this->priority;
+    }
+    /**
      * Checks if the callback was executed or not.
      * 
      * This method is used to tell if the method BeforeRenderCallback::call()
@@ -68,14 +110,6 @@ class BeforeRenderCallback implements Comparable {
         $this->id = $id;
     }
     /**
-     * Returns the identifier of the callback.
-     * 
-     * @return int The identifier of the callback.
-     */
-    public function getID() : int {
-        return $this->id;
-    }
-    /**
      * Sets the priority of the callback.
      * 
      * The priority must be a positive number in order to be set.
@@ -89,39 +123,4 @@ class BeforeRenderCallback implements Comparable {
             $this->priority = $priority;
         }
     }
-    /**
-     * Execute the callback.
-     * 
-     * @param WebPage $owner The page at which the callback belongs to.
-     */
-    public function call(WebPage $owner) {
-        if (!$this->isExecuted()) {
-            $paramsArr = array_merge([$owner], $this->params);
-            call_user_func_array($this->callback, $paramsArr);
-            $this->isExecuted = true;
-        }
-    }
-    /**
-     * Returns the priority of the callback.
-     * 
-     * @return int Priority of the callback. Large number means that
-     * the callback has higher priority.
-     */
-    public function getPriority() : int {
-        return $this->priority;
-    }
-    /**
-     * Compare the callback with another one.
-     * 
-     * @param BeforeRenderCallback $other
-     * 
-     * @return int If current callback has higher priority, the method will return
-     * a positive number. Else if the two have same priority, zero is returned.
-     * Other than that, a negative value is returned if the callback has less
-     * priority.
-     */
-    public function compare($other): int {
-        return $this->getPriority() - $other->getPriority();
-    }
-
 }

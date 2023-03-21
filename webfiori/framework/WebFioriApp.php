@@ -45,17 +45,6 @@ define('MICRO_START', microtime(true));
  */
 class WebFioriApp {
     /**
-     * 
-     * @var Runner
-     */
-    private static $CliRunner;
-    /**
-     * A constant that indicates that the status of the class is 'none'.
-     * 
-     * @since 1.3.7
-     */
-    const STATUS_NONE = 'NONE';
-    /**
      * A constant that indicates that the status of the class is 'initialized'.
      * 
      * @since 1.3.7
@@ -67,6 +56,12 @@ class WebFioriApp {
      * @since 1.3.7
      */
     const STATUS_INITIALIZING = 'INITIALIZING';
+    /**
+     * A constant that indicates that the status of the class is 'none'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_NONE = 'NONE';
     /**
      * 
      * @var Config
@@ -88,6 +83,11 @@ class WebFioriApp {
      * @since 1.0 
      */
     private static $classStatus = self::STATUS_NONE;
+    /**
+     * 
+     * @var Runner
+     */
+    private static $CliRunner;
     /**
      * A single instance of the class.
      * 
@@ -132,7 +132,7 @@ class WebFioriApp {
         $this->setHandlers();
         //Initialize CLI
         self::getRunner();
-        
+
         $this->initAppConfig();
 
 
@@ -211,11 +211,12 @@ class WebFioriApp {
      */
     public static function autoRegister(string $folder, callable $regCallback, string $suffix = null, array $constructorParams = [], array $otherParams = []) {
         $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
+
         if (!File::isDirectory($dir)) {
             //If directory is outside application folder.
             $dir = ROOT_PATH.DS.$folder;
         }
-        
+
         if (File::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
 
@@ -248,39 +249,12 @@ class WebFioriApp {
             }
         }
     }
-    private static function _autoRegisterHelper($options) {
-        $dir = $options['dir'];
-        $phpFile = $options['php-file'];
-        $folder = $options['folder'];
-        $className = $options['class-name'];
-        $otherParams = $options['params'];
-        $regCallback = $options['callback'];
-        $constructorParams = $options['constructor-params'];
-        $instanceNs = require_once $dir.DS.$phpFile;
-
-        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-            $instanceNs = '\\'.APP_DIR.'\\'.$folder;
-        }
-        $class = $instanceNs.'\\'.$className;
-        try {
-            $reflectionClass = new ReflectionClass($class);  
-             
-            $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
-
-            foreach ($otherParams as $param) {
-                $toPass[] = $param;
-            }
-            call_user_func_array($regCallback, $toPass);
-        } catch (Error $ex) {
-        }
-    }
     /**
      * Returns the instance which is used as main application configuration class.
      * 
      * @return Config
      */
-    public static function getAppConfig(): Config
-    {
+    public static function getAppConfig(): Config {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
@@ -295,8 +269,7 @@ class WebFioriApp {
      * 
      * @since 1.2.1
      */
-    public static function getAutoloader(): AutoLoader
-    {
+    public static function getAutoloader(): AutoLoader {
         return self::$AU;
     }
     /**
@@ -311,6 +284,71 @@ class WebFioriApp {
      */
     public static function getClassStatus() {
         return self::$classStatus;
+    }
+
+    /**
+     * Returns an instance which represents the class that is used to run the
+     * terminal.
+     *
+     * @return Runner
+     * @throws FileException
+     */
+    public static function getRunner() : Runner {
+        if (!class_exists(APP_DIR.'\ini\InitCommands')) {
+            ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
+        }
+
+        if (self::$CliRunner === null) {
+            self::$CliRunner = new Runner();
+
+            if (Runner::isCLI()) {
+                if (defined('CLI_HTTP_HOST')) {
+                    $host = CLI_HTTP_HOST;
+                } else {
+                    $host = '127.0.0.1';
+                    define('CLI_HTTP_HOST', $host);
+                }
+                $_SERVER['HTTP_HOST'] = $host;
+                $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+                if (defined('ROOT_PATH')) {
+                    $_SERVER['DOCUMENT_ROOT'] = ROOT_PATH;
+                }
+                $_SERVER['REQUEST_URI'] = '/';
+                putenv('HTTP_HOST='.$host);
+                putenv('REQUEST_URI=/');
+
+                if (defined('USE_HTTP') && USE_HTTP === true) {
+                    $_SERVER['HTTPS'] = 'no';
+                } else {
+                    $_SERVER['HTTPS'] = 'yes';
+                }
+            }
+            self::$CliRunner->setBeforeStart(function (Runner $r)
+            {
+                $commands = [
+                    '\\webfiori\\framework\\cli\commands\\WHelpCommand',
+                    '\\webfiori\\framework\\cli\\commands\\VersionCommand',
+                    '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CronCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CreateCommand',
+                    '\\webfiori\\framework\\cli\\commands\\AddCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
+                ];
+
+                foreach ($commands as $c) {
+                    $r->register(new $c());
+                }
+                $r->setDefaultCommand('help');
+                call_user_func(APP_DIR.'\ini\InitCommands::init');
+            });
+        }
+
+        return self::$CliRunner;
     }
     /**
      * Sets the configuration object that will be used to configure part of
@@ -334,8 +372,7 @@ class WebFioriApp {
      * @throws InitializationException
      * @since 1.0
      */
-    public static function start(): WebFioriApp
-    {
+    public static function start(): WebFioriApp {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
@@ -346,6 +383,32 @@ class WebFioriApp {
         }
 
         return self::$LC;
+    }
+    private static function _autoRegisterHelper($options) {
+        $dir = $options['dir'];
+        $phpFile = $options['php-file'];
+        $folder = $options['folder'];
+        $className = $options['class-name'];
+        $otherParams = $options['params'];
+        $regCallback = $options['callback'];
+        $constructorParams = $options['constructor-params'];
+        $instanceNs = require_once $dir.DS.$phpFile;
+
+        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+            $instanceNs = '\\'.APP_DIR.'\\'.$folder;
+        }
+        $class = $instanceNs.'\\'.$className;
+        try {
+            $reflectionClass = new ReflectionClass($class);  
+
+            $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
+
+            foreach ($otherParams as $param) {
+                $toPass[] = $param;
+            }
+            call_user_func_array($regCallback, $toPass);
+        } catch (Error $ex) {
+        }
     }
     private function _checkAppDir() {
         if (!defined('APP_DIR')) {
@@ -444,7 +507,6 @@ class WebFioriApp {
      * @throws FileException If the method was not able to Initialize configuration class.
      */
     private function initAppConfig() {
-
         if (!class_exists(APP_DIR.'\\config\\AppConfig')) {
             ConfigController::get()->createAppConfigFile();
         }
@@ -494,66 +556,29 @@ class WebFioriApp {
             Cron::registerJobs();
         }
     }
-
-    /**
-     * Returns an instance which represents the class that is used to run the
-     * terminal.
-     *
-     * @return Runner
-     * @throws FileException
-     */
-    public static function getRunner() : Runner {
-        if (!class_exists(APP_DIR.'\ini\InitCommands')) {
-            ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
-        }
-
-        if (self::$CliRunner === null) {
-            self::$CliRunner = new Runner();
-            if (Runner::isCLI()) {
-                if (defined('CLI_HTTP_HOST')) {
-                    $host = CLI_HTTP_HOST;
-                } else {
-                    $host = '127.0.0.1';
-                    define('CLI_HTTP_HOST', $host);
-                }
-                $_SERVER['HTTP_HOST'] = $host;
-                $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-
-                if (defined('ROOT_PATH')) {
-                    $_SERVER['DOCUMENT_ROOT'] = ROOT_PATH;
-                }
-                $_SERVER['REQUEST_URI'] = '/';
-                putenv('HTTP_HOST='.$host);
-                putenv('REQUEST_URI=/');
-
-                if (defined('USE_HTTP') && USE_HTTP === true) {
-                    $_SERVER['HTTPS'] = 'no';
-                } else {
-                    $_SERVER['HTTPS'] = 'yes';
-                }
-            }
-            self::$CliRunner->setBeforeStart(function (Runner $r) {
-                $commands = [
-                    '\\webfiori\\framework\\cli\commands\\WHelpCommand',
-                    '\\webfiori\\framework\\cli\\commands\\VersionCommand',
-                    '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
-                    '\\webfiori\\framework\\cli\\commands\\CronCommand',
-                    '\\webfiori\\framework\\cli\\commands\\CreateCommand',
-                    '\\webfiori\\framework\\cli\\commands\\AddCommand',
-                    '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
-                    '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
-                    '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
-                    '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
-                    '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
-                ];
-                foreach ($commands as $c) {
-                    $r->register(new $c());
-                }
-                $r->setDefaultCommand('help');
-                call_user_func(APP_DIR.'\ini\InitCommands::init');
-            });
-        }
-        return self::$CliRunner;
+    private function initFrameworkVersionInfo() {
+        /**
+         * A constant that represents version number of the framework.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION', '3.0.0-RC3');
+        /**
+         * A constant that tells the type of framework version.
+         * 
+         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION_TYPE', 'Beta');
+        /**
+         * The date at which the framework version was released.
+         * 
+         * The value of the constant will be a string in the format YYYY-MM-DD.
+         * 
+         * @since 2.1
+         */
+        define('WF_RELEASE_DATE', '2022-12-25');
     }
 
     /**
@@ -602,31 +627,6 @@ class WebFioriApp {
              */
             define('THEMES_PATH', $themesPath);
         }
-    }
-    private function initFrameworkVersionInfo() {
-        /**
-         * A constant that represents version number of the framework.
-         * 
-         * @since 2.1
-         */
-        define('WF_VERSION', '3.0.0-RC3');
-        /**
-         * A constant that tells the type of framework version.
-         * 
-         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
-         * 
-         * @since 2.1
-         */
-        define('WF_VERSION_TYPE', 'Beta');
-        /**
-         * The date at which the framework version was released.
-         * 
-         * The value of the constant will be a string in the format YYYY-MM-DD.
-         * 
-         * @since 2.1
-         */
-        define('WF_RELEASE_DATE', '2022-12-25');
-
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR.'\config\Env')) {

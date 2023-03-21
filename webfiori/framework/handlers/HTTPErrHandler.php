@@ -22,7 +22,7 @@ use webfiori\http\Response;
  *
  * @author Ibrahim
  */
-class HTTPErrHandler  extends AbstractHandler {
+class HTTPErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
      * 
@@ -43,7 +43,7 @@ class HTTPErrHandler  extends AbstractHandler {
         $exceptionView = new ServerErrView($this);
         Response::clear();
         $exceptionView->render();
-        
+
         if (!Response::isSent()) {
             Response::send();
         }
@@ -67,7 +67,7 @@ class HTTPErrHandler  extends AbstractHandler {
         } else {
             $routeType = Router::VIEW_ROUTE;
         }
-        
+
         return !($routeType == Router::API_ROUTE || defined('API_CALL'));
     }
     /**
@@ -78,5 +78,4 @@ class HTTPErrHandler  extends AbstractHandler {
     public function isShutdownHandler(): bool {
         return true;
     }
-
 }

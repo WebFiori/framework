@@ -58,19 +58,6 @@ class JobArgument implements JsonI {
         }
     }
     /**
-     * Sets a default value for the argument to use in case it was not
-     * provided.
-     * 
-     * @param string $default A string that represents the default value
-     * of the argument.
-     */
-    public function setDefault(string $default) {
-        if (strlen($default) == 0) {
-            return;
-        }
-        $this->default = $default;
-    }
-    /**
      * Returns the default value of the argument.
      * 
      * The default value is usually used if the argument has no value
@@ -114,6 +101,19 @@ class JobArgument implements JsonI {
      */
     public function getValue() {
         return $this->argVal;
+    }
+    /**
+     * Sets a default value for the argument to use in case it was not
+     * provided.
+     * 
+     * @param string $default A string that represents the default value
+     * of the argument.
+     */
+    public function setDefault(string $default) {
+        if (strlen($default) == 0) {
+            return;
+        }
+        $this->default = $default;
     }
     /**
      * Sets a description for the argument.

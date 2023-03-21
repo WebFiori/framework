@@ -2,8 +2,8 @@
 namespace app\jobs;
 
 use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\CronEmail;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\CronEmail;
 /**
  * A background process which was created using the command "create".
  *
@@ -18,7 +18,7 @@ class SuccessTestEveryMinute extends AbstractJob {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('Success Every Minute');
         $this->setDescription('The job will execute every day to send sales report to management.');
         $this->addExecutionArgs([
@@ -39,6 +39,15 @@ class SuccessTestEveryMinute extends AbstractJob {
         //$this->cron('* * * * *');
     }
     /**
+     * Execute a set of instructions after the job has finished to execute.
+     */
+    public function afterExec() {
+        //TODO: Implement the action to perform when the job finishes to execute.
+        //$email = new CronEmail('no-reply', [
+        //    'webfiori@example.com' => 'Ibrahim Ali'
+        //]);
+    }
+    /**
      * Execute the process.
      */
     public function execute() {
@@ -55,14 +64,5 @@ class SuccessTestEveryMinute extends AbstractJob {
      */
     public function onSuccess() {
         //TODO: Implement the action to perform when the job executes without errors.
-    }
-    /**
-     * Execute a set of instructions after the job has finished to execute.
-     */
-    public function afterExec() {
-        //TODO: Implement the action to perform when the job finishes to execute.
-        //$email = new CronEmail('no-reply', [
-        //    'webfiori@example.com' => 'Ibrahim Ali'
-        //]);
     }
 }

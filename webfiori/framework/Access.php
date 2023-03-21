@@ -65,8 +65,7 @@ class Access {
      * 
      * @return array An array that contains all privileges and groups info.
      */
-    public static function asArray(): array
-    {
+    public static function asArray(): array {
         $retVal = [];
 
         foreach (self::get()->userGroups as $group) {
@@ -104,8 +103,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function createPermissionsStr(User $user): string
-    {
+    public static function createPermissionsStr(User $user): string {
         return Access::get()->createPermissionsStrHelper2($user);
     }
     /**
@@ -165,8 +163,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function hasGroup(string $groupId): bool
-    {
+    public static function hasGroup(string $groupId): bool {
         return self::getGroup($groupId) !== null;
     }
     /**
@@ -186,8 +183,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function hasPrivilege(string $id,string $groupId = null): bool
-    {
+    public static function hasPrivilege(string $id,string $groupId = null): bool {
         return Access::get()->hasPrivilegeHelper($id,$groupId);
     }
     /**
@@ -208,8 +204,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function newGroup(string $groupId, $parentGroupId = null): bool
-    {
+    public static function newGroup(string $groupId, $parentGroupId = null): bool {
         return Access::get()->createGroupHelper($groupId,$parentGroupId);
     }
     /**
@@ -229,8 +224,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function newPrivilege(string $groupId, string $privilegeId): bool
-    {
+    public static function newPrivilege(string $groupId, string $privilegeId): bool {
         return Access::get()->createPrivilegeHelper($groupId, $privilegeId);
     }
     /**
@@ -252,8 +246,7 @@ class Access {
      * 
      * @since 1.0.1 
      */
-    public static function newPrivileges(string $groupId, array $prNamesArr): array
-    {
+    public static function newPrivileges(string $groupId, array $prNamesArr): array {
         $retVal = [];
         $count = count($prNamesArr);
 
@@ -276,8 +269,7 @@ class Access {
      * 
      * @since 1.0
      */
-    public static function privileges(string $groupId = null): array
-    {
+    public static function privileges(string $groupId = null): array {
         return Access::get()->getPrivilegesHelper($groupId);
     }
     /**
@@ -323,15 +315,14 @@ class Access {
      * @param PrivilegesGroup $group
      * @return array
      */
-    private function asArrayHelper(PrivilegesGroup $group): array
-    {
+    private function asArrayHelper(PrivilegesGroup $group): array {
         $retVal = [];
-        
+
         $retVal['group-id'] = $group->getID();
         $retVal['given-title'] = $group->getName();
         $retVal['child-groups'] = [];
         $retVal['privileges'] = [];
-        
+
         foreach ($group->childGroups() as $groupX) {
             $retVal['child-groups'][] = $this->asArrayHelper($groupX);
         }
@@ -352,8 +343,7 @@ class Access {
      * @return bool If a group was found which have the given 
      * ID, the method will return true.
      */
-    private function checkID(string $id, PrivilegesGroup $group): bool
-    {
+    private function checkID(string $id, PrivilegesGroup $group): bool {
         if ($group->getID() == $id) {
             return true;
         }
@@ -365,24 +355,8 @@ class Access {
 
         return $bool;
     }
-    private function isChildGroupHasPrivilege($prId, $groupId, $group): bool
-    {
-        $retVal = false;
 
-        foreach ($group->childGroups() as $g) {
-            $b = $this->hasPrivilegeHelper1($prId, $groupId, $g);
-
-            if ($b === true) {
-                $retVal = true;
-                break;
-            }
-        }
-
-        return $retVal;
-    }
-
-    private function createGroupHelper($groupId, $parentGroupID = null): bool
-    {
+    private function createGroupHelper($groupId, $parentGroupID = null): bool {
         $trimmedId = trim($groupId);
 
         if ($this->validateId($trimmedId)) {
@@ -410,17 +384,17 @@ class Access {
 
         return false;
     }
-    private function createPermissionsHelper2($userPrivileges, $groupsBelongsTo): string
-    {
+    private function createPermissionsHelper2($userPrivileges, $groupsBelongsTo): string {
         $str = '';
 
         if (count($groupsBelongsTo) == 0) {
             foreach ($userPrivileges as $privilege) {
                 $str .= $privilege->getID().'-1;';
             }
+
             return $str;
         }
-        
+
         foreach ($userPrivileges as $privilege) {
             $privilegeHasGroup = false;
 
@@ -440,24 +414,6 @@ class Access {
     }
 
     /**
-     *
-     * @param User $user
-     * @return string
-     */
-    private function createPermissionsStrHelper2(User $user): string
-    {
-        $str = '';
-        $groupsBelongsTo = [];
-
-        foreach ($this->userGroups as $group) {
-            $this->createPermissionsStrHelper($user, $group, $groupsBelongsTo, $str);
-        }
-        $str .= $this->createPermissionsHelper2($user->privileges(), $groupsBelongsTo);
-
-        return trim($str,';');
-    }
-
-    /**
      * @param User $user
      * @param PrivilegesGroup $group
      * @param array $arr
@@ -473,10 +429,28 @@ class Access {
                 $arr[] = $groupX;
                 $str .= 'G-'.$groupX->getID().';';
             }
+
             return;
         }
         $arr[] = $group;
         $str .= 'G-'.$group->getID().';';
+    }
+
+    /**
+     *
+     * @param User $user
+     * @return string
+     */
+    private function createPermissionsStrHelper2(User $user): string {
+        $str = '';
+        $groupsBelongsTo = [];
+
+        foreach ($this->userGroups as $group) {
+            $this->createPermissionsStrHelper($user, $group, $groupsBelongsTo, $str);
+        }
+        $str .= $this->createPermissionsHelper2($user->privileges(), $groupsBelongsTo);
+
+        return trim($str,';');
     }
     /**
      * 
@@ -485,8 +459,7 @@ class Access {
      * @return bool Description
      * @since 1.0
      */
-    private function createPrivilegeHelper(string $groupId, string $privilegeId): bool
-    {
+    private function createPrivilegeHelper(string $groupId, string $privilegeId): bool {
         if ($this->validateId($privilegeId)) {
             $pr = self::getPrivilege($privilegeId);
 
@@ -514,6 +487,19 @@ class Access {
         return false;
     }
     /**
+     * Returns a single instance of the class.
+     * @return Access
+     * @since 1.0
+     */
+    private static function get(): Access {
+        if (self::$access !== null) {
+            return self::$access;
+        }
+        self::$access = new Access();
+
+        return self::$access;
+    }
+    /**
      * 
      * @param string $groupId
      * @return PrivilegesGroup|null
@@ -531,6 +517,7 @@ class Access {
                 }
                 continue;
             }
+
             return $g;
         }
 
@@ -597,86 +584,8 @@ class Access {
 
         return null;
     }
-    private static function getPrivilegesInfoHelper(string $privilegesStr): array
-    {
-        $privilegesToHave = [];
-        $privilegesToNotHave = [];
-        $groupsBelongsTo = [];
-        $privilegesSplit = explode(';', $privilegesStr);
 
-        foreach ($privilegesSplit as $privilegeStr) {
-            $prSplit = explode('-', $privilegeStr);
-
-            if (count($prSplit) == 2) {
-                if ($prSplit[0] != 'G') {
-                    $privilegeId = $prSplit[0];
-
-                    if ($prSplit[1] != '1') {
-                        $privilegesToNotHave[] = $privilegeId;
-                    }
-                    //It means the user has the privilege.
-                    $privilegesToHave[] = $privilegeId;
-                    continue;
-                }
-                $groupsBelongsTo[] = $prSplit[1];
-            }
-        }
-        $retVal = [];
-        $retVal['privileges-to-have'] = $privilegesToHave;
-        $retVal['privileges-to-not-have'] = $privilegesToNotHave;
-        $retVal['groups-belongs-to'] = $groupsBelongsTo;
-        
-        return $retVal;
-    }
-    private function groupHasPrivilegeHelper($prId, $group): bool
-    {
-        $retVal = false;
-
-        foreach ($group->privileges() as $p) {
-            if ($p->getID() == $prId) {
-                $retVal = true;
-                break;
-            }
-        }
-
-        return $retVal;
-    }
-
-    private function hasPrivilegeHelper($privilegeId, $groupId) {
-        $retVal = false;
-
-        foreach ($this->userGroups as $g) {
-            $retVal = $this->hasPrivilegeHelper1($privilegeId, $groupId, $g);
-
-            if ($retVal === true) {
-                break;
-            }
-        }
-
-        return $retVal;
-    }
-
-    /**
-     *
-     * @param string $prId
-     * @param string $groupId
-     * @param PrivilegesGroup $group
-     * @return bool
-     */
-    private function hasPrivilegeHelper1(string $prId, string $groupId, PrivilegesGroup $group) : bool {
-
-        if ($groupId === null || $group->getID() != $groupId) {
-            if ($groupId !== null) {
-                return $this->isChildGroupHasPrivilege($prId, $groupId, $group);
-            }
-            return $this->groupHasPrivilegeHelper($prId, $group)
-                    || $this->isChildGroupHasPrivilege($prId, $groupId, $group);
-        }
-        return $this->groupHasPrivilegeHelper($prId, $group);
-    }
-
-    private function getPrivilegesHelper($groupId = null): array
-    {
+    private function getPrivilegesHelper($groupId = null): array {
         $prArr = [];
 
         foreach ($this->userGroups as $group) {
@@ -715,9 +624,98 @@ class Access {
             $this->getPrivilegesHelper1($g, $array,$groupId);
         }
     }
+    private static function getPrivilegesInfoHelper(string $privilegesStr): array {
+        $privilegesToHave = [];
+        $privilegesToNotHave = [];
+        $groupsBelongsTo = [];
+        $privilegesSplit = explode(';', $privilegesStr);
 
-    private function validateId($id): bool
-    {
+        foreach ($privilegesSplit as $privilegeStr) {
+            $prSplit = explode('-', $privilegeStr);
+
+            if (count($prSplit) == 2) {
+                if ($prSplit[0] != 'G') {
+                    $privilegeId = $prSplit[0];
+
+                    if ($prSplit[1] != '1') {
+                        $privilegesToNotHave[] = $privilegeId;
+                    }
+                    //It means the user has the privilege.
+                    $privilegesToHave[] = $privilegeId;
+                    continue;
+                }
+                $groupsBelongsTo[] = $prSplit[1];
+            }
+        }
+        $retVal = [];
+        $retVal['privileges-to-have'] = $privilegesToHave;
+        $retVal['privileges-to-not-have'] = $privilegesToNotHave;
+        $retVal['groups-belongs-to'] = $groupsBelongsTo;
+
+        return $retVal;
+    }
+    private function groupHasPrivilegeHelper($prId, $group): bool {
+        $retVal = false;
+
+        foreach ($group->privileges() as $p) {
+            if ($p->getID() == $prId) {
+                $retVal = true;
+                break;
+            }
+        }
+
+        return $retVal;
+    }
+
+    private function hasPrivilegeHelper($privilegeId, $groupId) {
+        $retVal = false;
+
+        foreach ($this->userGroups as $g) {
+            $retVal = $this->hasPrivilegeHelper1($privilegeId, $groupId, $g);
+
+            if ($retVal === true) {
+                break;
+            }
+        }
+
+        return $retVal;
+    }
+
+    /**
+     *
+     * @param string $prId
+     * @param string $groupId
+     * @param PrivilegesGroup $group
+     * @return bool
+     */
+    private function hasPrivilegeHelper1(string $prId, string $groupId, PrivilegesGroup $group) : bool {
+        if ($groupId === null || $group->getID() != $groupId) {
+            if ($groupId !== null) {
+                return $this->isChildGroupHasPrivilege($prId, $groupId, $group);
+            }
+
+            return $this->groupHasPrivilegeHelper($prId, $group)
+                    || $this->isChildGroupHasPrivilege($prId, $groupId, $group);
+        }
+
+        return $this->groupHasPrivilegeHelper($prId, $group);
+    }
+    private function isChildGroupHasPrivilege($prId, $groupId, $group): bool {
+        $retVal = false;
+
+        foreach ($group->childGroups() as $g) {
+            $b = $this->hasPrivilegeHelper1($prId, $groupId, $g);
+
+            if ($b === true) {
+                $retVal = true;
+                break;
+            }
+        }
+
+        return $retVal;
+    }
+
+    private function validateId($id): bool {
         $len = strlen($id);
 
         if ($len > 0) {
@@ -731,19 +729,5 @@ class Access {
         }
 
         return false;
-    }
-    /**
-     * Returns a single instance of the class.
-     * @return Access
-     * @since 1.0
-     */
-    private static function get(): Access
-    {
-        if (self::$access !== null) {
-            return self::$access;
-        }
-        self::$access = new Access();
-
-        return self::$access;
     }
 }

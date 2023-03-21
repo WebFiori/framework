@@ -17,6 +17,5 @@ use Exception;
  *
  * @author Ibrahim
  */
-class ArrayIndexOutOfBoundsException extends Exception{
-    
+class ArrayIndexOutOfBoundsException extends Exception {
 }

@@ -13,45 +13,40 @@ use webfiori\framework\writers\ClassWriter;
  */
 class CLIUtils {
     /**
-     * Reads the name of database table information and returns an instance of
-     * it.
+     * Select database connection and return its name as string.
      * 
-     * This method is used to get table class name from the argument '--table'.
-     * If the argument is not specified or invalid, the method will prompt the 
-     * user to enter class name.
+     * This method is used to get connection name from the argument '--connection'.
+     * If the argument is not specified, the method will prompt the user to select
+     * connection based on the connections stored in the class 'AppConfig' of
+     * the application. If no connections are stored in the class 'AppConfig',
+     * the method will simply return null.
      * 
      * @param CLICommand $c The command which is used to read inputs and send
-     * outputs. 
+     * outputs.
      * 
-     * @return Table The method will return an instance of the class if
-     * successfully created.
+     * @return ConnectionInfo|null If a connection was found, the method will return it's
+     * information as an object of type 'ConnectionInfo'. Other than that null is returned.
      */
-    public static function readTable(CLICommand $c) : Table {
-        $tableClassNameValidity = false;
-        $tableClassName = $c->getArgValue('--table');
-        $tableObj = null;
-        
-        do {
-            if ($tableClassName === null || strlen($tableClassName) == 0) {
-                $tableClassName = $c->getInput('Enter database table class name (include namespace):');
-            }
+    public static function getConnectionName(CLICommand $c) {
+        $connName = $c->getArgValue('--connection');
+        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
 
-            if (!class_exists($tableClassName)) {
-                $c->error('Class not found.');
-                $tableClassName = '';
-                continue;
-            }
-            $tableObj = new $tableClassName();
+        if (count($dbConnections) == 0) {
+            $c->warning('No database connections found in the class "'.APP_DIR.'\\AppConfig"!');
+            $c->info('Run the command "add" to add connections.');
 
-            if (!$tableObj instanceof Table) {
-                $c->error('The given class is not a child of the class "'.Table::class.'".');
-                $tableClassName = '';
-                continue;
-            }
-            $tableClassNameValidity = true;
-        } while (!$tableClassNameValidity);
-        
-        return $tableObj;
+            return null;
+        }
+
+        if (in_array($connName, $dbConnections)) {
+            return $connName;
+        } else if ($connName !== null) {
+            $c->error('No connection with name "'.$connName.'" was found!');
+        }
+
+        $name = $c->select('Select database connection:', $dbConnections, 0);
+
+        return WebFioriApp::getAppConfig()->getDBConnection($name);
     }
     /**
      * Reads and validates class name.
@@ -71,15 +66,15 @@ class CLIUtils {
         do {
             $c->readClassName($prompt, $suffix, $errMsg);
             $className = trim($c->getInput($prompt));
-            
+
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));
-                
+
                 if ($subSuffix != $suffix) {
                     $className .= $suffix;
                 }
             }
-            
+
             $isNameValid = ClassWriter::isValidClassName($className);
 
             if (!$isNameValid) {
@@ -117,39 +112,44 @@ class CLIUtils {
         return trim($ns,'\\');
     }
     /**
-     * Select database connection and return its name as string.
+     * Reads the name of database table information and returns an instance of
+     * it.
      * 
-     * This method is used to get connection name from the argument '--connection'.
-     * If the argument is not specified, the method will prompt the user to select
-     * connection based on the connections stored in the class 'AppConfig' of
-     * the application. If no connections are stored in the class 'AppConfig',
-     * the method will simply return null.
+     * This method is used to get table class name from the argument '--table'.
+     * If the argument is not specified or invalid, the method will prompt the 
+     * user to enter class name.
      * 
      * @param CLICommand $c The command which is used to read inputs and send
-     * outputs.
+     * outputs. 
      * 
-     * @return ConnectionInfo|null If a connection was found, the method will return it's
-     * information as an object of type 'ConnectionInfo'. Other than that null is returned.
+     * @return Table The method will return an instance of the class if
+     * successfully created.
      */
-    public static function getConnectionName(CLICommand $c) {
-        $connName = $c->getArgValue('--connection');
-        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
-        
-        if (count($dbConnections) == 0) {
-            $c->warning('No database connections found in the class "'.APP_DIR.'\\AppConfig"!');
-            $c->info('Run the command "add" to add connections.');
-            
-            return null;
-        }
-        
-        if (in_array($connName, $dbConnections)) {
-            return $connName;
-        } else if ($connName !== null) {
-            $c->error('No connection with name "'.$connName.'" was found!');
-        }
-        
-        $name = $c->select('Select database connection:', $dbConnections, 0);
-        
-        return WebFioriApp::getAppConfig()->getDBConnection($name);
+    public static function readTable(CLICommand $c) : Table {
+        $tableClassNameValidity = false;
+        $tableClassName = $c->getArgValue('--table');
+        $tableObj = null;
+
+        do {
+            if ($tableClassName === null || strlen($tableClassName) == 0) {
+                $tableClassName = $c->getInput('Enter database table class name (include namespace):');
+            }
+
+            if (!class_exists($tableClassName)) {
+                $c->error('Class not found.');
+                $tableClassName = '';
+                continue;
+            }
+            $tableObj = new $tableClassName();
+
+            if (!$tableObj instanceof Table) {
+                $c->error('The given class is not a child of the class "'.Table::class.'".');
+                $tableClassName = '';
+                continue;
+            }
+            $tableClassNameValidity = true;
+        } while (!$tableClassNameValidity);
+
+        return $tableObj;
     }
 }

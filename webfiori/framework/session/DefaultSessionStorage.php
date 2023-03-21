@@ -39,12 +39,15 @@ class DefaultSessionStorage implements SessionStorage {
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
-            set_error_handler(function (int $errno) {
+            set_error_handler(function (int $errno)
+            {
                 throw new SessionException('Unable to create sessions storage folder.', $errno);
             });
+
             if (!is_dir($sessionsStoragePath)) {
                 mkdir($sessionsStoragePath);
             }
+
             if (!is_dir($this->storeLoc)) {
                 mkdir($this->storeLoc);
             }

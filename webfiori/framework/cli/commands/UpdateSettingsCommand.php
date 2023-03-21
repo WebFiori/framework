@@ -30,13 +30,10 @@ class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-settings', [
             new CommandArgument('--w', 'An argument which is used to indicate what will be updated. '
-                . 'Possible values are: version, app-name, cron-pass, page-title, '
-                . 'page-description, primary-lang, title-sep, home-page, primary-theme,'
-                . 'admin-theme.', true),
+                .'Possible values are: version, app-name, cron-pass, page-title, '
+                .'page-description, primary-lang, title-sep, home-page, primary-theme,'
+                .'admin-theme.', true),
         ], 'Update application settings which are stored in the class "AppConfig".');
-    }
-    private function addOption(&$optArr, $key, $txt) {
-        $optArr[$key] = $txt;
     }
     public function exec() : int {
         $options = [];
@@ -51,19 +48,20 @@ class UpdateSettingsCommand extends CLICommand {
         $this->addOption($options,'primary-theme', 'Set primay theme.');
         $this->addOption($options,'admin-theme', 'Set admin theme.');
         $this->addOption($options,'q', 'Quit.');
-        
+
         $what = $this->getArgValue('--w');
         $answer = null;
+
         if ($what !== null) {
             $answer = isset($options[$what]) ? $options[$what] : null;
-            
+
             if ($answer === null) {
                 $this->warning('The argument --w has invalid value.');
             }
         }
-        
-        
-        
+
+
+
         if ($answer === null) {
             $answer = $this->select('What would you like to update?', $options, count($options) - 1);
         }
@@ -101,8 +99,10 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _setHome() {
         $routes = array_keys(Router::routes());
+
         if (count($routes) == 0) {
             $this->info('Router has no routes. Nothing to change.');
+
             return;
         }
         $home = $this->select('Select home page route:', $routes);
@@ -116,6 +116,7 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');
+
         if (strlen($newPass) == 0) {
             $newPass = 'NO_PASSWORD';
         } else {
@@ -197,6 +198,9 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         ConfigController::get()->updateAppVersionInfo($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
         $this->println('Version information successfully updated.');
+    }
+    private function addOption(&$optArr, $key, $txt) {
+        $optArr[$key] = $txt;
     }
     private function getThemeNs() {
         return $this->getInput('Enter theme class name with namespace:', null, new InputValidator(function ($themeNs)

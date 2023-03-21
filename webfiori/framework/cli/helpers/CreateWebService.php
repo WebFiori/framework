@@ -16,7 +16,6 @@ use webfiori\framework\writers\WebServiceWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
-use webfiori\framework\cli\helpers\CreateClassHelper;
 
 /**
  * A helper class for creating web services classes.
@@ -35,7 +34,7 @@ class CreateWebService extends CreateClassHelper {
 
         $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
-        
+
 
         $this->_setServiceName($serviceObj);
         $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));

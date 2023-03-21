@@ -1,5 +1,4 @@
 <?php
-
 namespace app;
 
 use webfiori\database\ConnectionInfo;
@@ -265,7 +264,7 @@ class AppConfig implements Config {
     public function getDBConnection(string $conName) {
         $conns = $this->getDBConnections();
         $trimmed = trim($conName);
-        
+
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
@@ -293,7 +292,7 @@ class AppConfig implements Config {
     public function getDefaultTitle(string $langCode) {
         $langs = $this->getTitles();
         $langCodeF = strtoupper(trim($langCode));
-        
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -310,6 +309,7 @@ class AppConfig implements Config {
     public function getDescription(string $langCode) {
         $langs = $this->getDescriptions();
         $langCodeF = strtoupper(trim($langCode));
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -399,7 +399,7 @@ class AppConfig implements Config {
     public function getWebsiteName(string $langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
-        
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -438,7 +438,7 @@ class AppConfig implements Config {
             'EN' => 'WebFiori',
             'AR' => 'ويب فيوري',
         ];
-    
+
         $this->defaultPageTitles = [
             'EN' => 'Hello World',
             'AR' => 'اهلا و سهلا',

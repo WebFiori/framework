@@ -117,7 +117,8 @@ class SessionDB extends DB {
      */
     public function getSessionsIDs($olderThan) {
         return $this->table('sessions')->select()->where('last-used', '<=', $olderThan)->execute()
-                ->map(function ($record) {
+                ->map(function ($record)
+                {
                     return $record['s_id'];
                 });
     }

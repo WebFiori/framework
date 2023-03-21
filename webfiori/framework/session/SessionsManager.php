@@ -202,7 +202,7 @@ class SessionsManager {
 
         if ($sid === false) {
             $sid = Request::getParam($seesionName);
-            
+
             if ($sid === null) {
                 return false;
             }
@@ -263,6 +263,7 @@ class SessionsManager {
         } catch (SessionException $e) {
             return false;
         }
+
         return true;
     }
     /**

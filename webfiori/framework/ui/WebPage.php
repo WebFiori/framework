@@ -236,6 +236,7 @@ class WebPage {
         $beforeRender = new BeforeRenderCallback($callable, $priority, $params);
         $beforeRender->setID($this->beforeRenderCallbacks->size() + 1);
         $this->beforeRenderCallbacks->add($beforeRender);
+
         return $beforeRender;
     }
     /**
@@ -320,15 +321,15 @@ class WebPage {
 
         if ($pageTheme === null) {
             $name = isset($nodeInfo['name']) ? trim((string)$nodeInfo['name']) : 'div';
-            
+
             if (strlen($name) == 0) {
                 $name = 'div';
             }
             $attrs = isset($nodeInfo['attributes']) && gettype($nodeInfo['attributes']) == 'array' ? $nodeInfo['attributes'] : [];
-            
+
             return new HTMLNode($name, $attrs);
         }
-        
+
         return $pageTheme->createHTMLNode($nodeInfo);
     }
     /**
@@ -433,6 +434,41 @@ class WebPage {
      */
     public function getLangCode() {
         return $this->contentLang;
+    }
+    /**
+     * Returns the content attribute of a meta given its name.
+     * 
+     * @param string $name The value of the attribute 'name' of the meta 
+     * tag. 
+     * 
+     * @return string If a meta tag which has the given name was found, 
+     * the method will return the value of the attribute 'content'. Other than
+     * that, the method will return empty string.
+     */
+    public function getMetaVal(string $name) : string {
+        $node = $this->getDocument()->getHeadNode()->getMeta($name);
+
+        if ($node !== null) {
+            return $node->getAttribute('content');
+        }
+
+        return '';
+    }
+    /**
+     * Returns the value of a parameter which exist in the path part of page URI.
+     * 
+     * When creating routes, some parts of the route might not be set
+     * for dynamic routes. The parts are usually defined using the syntax '{var-name}'.
+     * 
+     * @param string $paramName The name of the parameter. Note that it must 
+     * not include braces.
+     * 
+     * @return string|null The method will return the value of the 
+     * parameter if it was set. Other than that, the method will return null.
+     * 
+     */
+    public function getParameterValue(string $paramName) {
+        Router::getParameterValue($paramName);
     }
     /**
      * Returns an object which holds applied theme information.
@@ -602,34 +638,18 @@ class WebPage {
      */
     public function hasPrivilege(string $prId) : bool {
         $session = $this->getActiveSession();
-        
+
         if ($session == null) {
             return false;
         }
-        
+
         $user = $session->getUser();
-        
+
         if ($user === null) {
             return false;
         }
-        
+
         return $user->hasPrivilege($prId);
-    }
-    /**
-     * Returns the value of a parameter which exist in the path part of page URI.
-     * 
-     * When creating routes, some parts of the route might not be set
-     * for dynamic routes. The parts are usually defined using the syntax '{var-name}'.
-     * 
-     * @param string $paramName The name of the parameter. Note that it must 
-     * not include braces.
-     * 
-     * @return string|null The method will return the value of the 
-     * parameter if it was set. Other than that, the method will return null.
-     * 
-     */
-    public function getParameterValue(string $paramName) {
-        Router::getParameterValue($paramName);
     }
     /**
      * Sets the value of the property which is used to determine if the 
@@ -721,6 +741,7 @@ class WebPage {
      */
     public function render(bool $formatted = false, bool $returnResult = false) {
         $this->beforeRenderCallbacks->insertionSort(false);
+
         foreach ($this->beforeRenderCallbacks as $callbackObj) {
             $callbackObj->call($this);
         }
@@ -728,8 +749,10 @@ class WebPage {
         if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
             Response::write($this->getDocument()->toHTML($formatted));
+
             return null;
         }
+
         return $this->getDocument();
     }
     /**
@@ -809,25 +832,6 @@ class WebPage {
         }
     }
     /**
-     * Returns the content attribute of a meta given its name.
-     * 
-     * @param string $name The value of the attribute 'name' of the meta 
-     * tag. 
-     * 
-     * @return string If a meta tag which has the given name was found, 
-     * the method will return the value of the attribute 'content'. Other than
-     * that, the method will return empty string.
-     */
-    public function getMetaVal(string $name) : string {
-        $node = $this->getDocument()->getHeadNode()->getMeta($name);
-        
-        if ($node !== null) {
-            return $node->getAttribute('content');
-        }
-        
-        return '';
-    }
-    /**
      * Sets the description of the page.
      * 
      * @param string $val The description of the page. 
@@ -838,11 +842,12 @@ class WebPage {
      */
     public function setDescription(string $val) {
         $trimmed = trim($val);
-        
+
         if (strlen($trimmed) == 0) {
             $descNode = $this->document->getHeadNode()->getMeta('description');
             $this->document->getHeadNode()->removeChild($descNode);
             $this->description = null;
+
             return;
         }
         $this->description = $trimmed;
@@ -985,6 +990,7 @@ class WebPage {
             return;
         }
         $xthemeName = $themeNameOrClass === null ? ConfigController::get()->getBaseTheme() : $themeNameOrClass;
+
         if (strlen($xthemeName) === 0) {
             return;
         }
@@ -1005,20 +1011,20 @@ class WebPage {
 
             $this->document = new HTMLDoc();
             $this->document->setHeadNode($this->_getHead());
-            
+
             $body = new HTMLNode();
             $body->setID(self::MAIN_ELEMENTS[0]);
-            
+
             $this->document->setLanguage($this->getLangCode());
-            
+
             //Header first
             $this->document->addChild($this->_getComponent('getHeaderNode', self::MAIN_ELEMENTS[1]));
-            
+
             //Then body and inside it side and main
             $body->addChild($this->_getComponent('getAsideNode', self::MAIN_ELEMENTS[3]));
             $body->addChild($mainContentArea);
             $this->document->addChild($body);
-            
+
             //Finally, footer
             $this->document->addChild($this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]));
 
@@ -1135,9 +1141,11 @@ class WebPage {
 
             if ($langCodeFromRequest === null) {
                 $this->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
+
                 return;
             }
             $this->setLang($langCodeFromRequest);
+
             return;
         }
         $this->setLang($langCodeFromSession);
@@ -1151,8 +1159,8 @@ class WebPage {
         }
 
         if ($loadedTheme === null || ($node instanceof HTMLNode)) {
-            
             $node->setID($nodeId);
+
             return $node;
         }
 
@@ -1160,7 +1168,7 @@ class WebPage {
                     .'an instance of the class "webfiori\\ui\\HTMLNode".');
     }
 
-    
+
     private function _getHead() {
         $loadedTheme = $this->getTheme();
         $headNode = new HeadNode(
@@ -1168,6 +1176,7 @@ class WebPage {
             $this->getCanonical(),
             WebFioriApp::getAppConfig()->getBaseURL()
         );
+
         if ($loadedTheme !== null) {
             $headNode = $loadedTheme->getHeadNode();
 

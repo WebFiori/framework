@@ -63,7 +63,7 @@ class CronCommand extends CLICommand {
      */
     public function exec() : int {
         $retVal = -1;
-        
+
         if ($this->isArgProvided('--list')) {
             $this->listJobs();
             $retVal = 0;
@@ -92,6 +92,22 @@ class CronCommand extends CLICommand {
         }
 
         return $retVal;
+    }
+    public function listJobs() {
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
+
+        while ($job = $jobs->dequeue()) {
+            $num = $i < 10 ? '0'.$i : $i;
+            $this->println("--------- Job #$num ---------", [
+                'color' => 'light-blue',
+                'bold' => true
+            ]);
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
+        }
     }
     private function _checkJobArgs($jobName) {
         $job = Cron::getJob($jobName);
@@ -189,22 +205,6 @@ class CronCommand extends CLICommand {
             }
         } else {
             $this->println("    <NO ARGS>");
-        }
-    }
-    public function listJobs() {
-        $jobs = Cron::jobsQueue();
-        $i = 1;
-        $this->println("Number Of Jobs: ".$jobs->size());
-
-        while ($job = $jobs->dequeue()) {
-            $num = $i < 10 ? '0'.$i : $i;
-            $this->println("--------- Job #$num ---------", [
-                'color' => 'light-blue',
-                'bold' => true
-            ]);
-            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
-            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
-            $i++;
         }
     }
 }

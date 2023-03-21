@@ -61,14 +61,17 @@ class ListThemesCommand extends CLICommand {
                 $this->_printThemeObj($themeObj);
                 $index++;
             }
+
             return 0;
         }
+
         if (!isset($themesArr[$themeName])) {
             $this->error("No theme was registered which has the name '$themeName'.");
 
             return -1;
         }
         $this->_printThemeObj($themesArr[$themeName]);
+
         return 0;
     }
 
@@ -91,6 +94,7 @@ class ListThemesCommand extends CLICommand {
         if (strlen($var) == 0) {
             return '<NOT SET>';
         }
+
         return $var;
     }
 }

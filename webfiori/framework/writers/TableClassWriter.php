@@ -16,7 +16,6 @@ use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
-use webfiori\framework\writers\ClassWriter;
 
 /**
  * A class which is used to write database table classes.
@@ -73,69 +72,13 @@ class TableClassWriter extends ClassWriter {
     public function __construct($tableObj = null) {
         parent::__construct('NewTable', ROOT_PATH.DS.APP_DIR.DS.'database', APP_DIR.'\\database');
         $this->setSuffix('Table');
+
         if ($tableObj === null) {
             $this->setTableType('mysql');
+
             return;
         }
         $this->setTable($tableObj);
-        
-    }
-    /**
-     * Extract and return the name of table class based on associated table object.
-     * 
-     */
-    private function extractAndSetTableClassName() {
-        $clazz = get_class($this->getTable());
-        
-        $split = explode('\\', $clazz);
-        $count = count($split);
-        if ($count > 1) {
-            $this->setClassName($split[$count - 1]);
-            array_pop($split);
-            $this->setNamespace(implode('\\', $split));
-        } else {
-            $this->setClassName($split[0]);
-        }
-    }
-    /**
-     * Returns the table object which was associated with the writer.
-     * 
-     * @return Table
-     */
-    public function getTable() : Table {
-        return $this->tableObj;
-    }
-    /**
-     * Sets the entity class info which mapps to a record in the table.
-     * 
-     * @param string $className The name of the entity class.
-     * 
-     * @param string $namespace The namespace at which the entity class will
-     * belongs to.
-     * 
-     * @param string $path The location at which the entity class will be
-     * created at.
-     * 
-     * @param bool $imlJsonI If set to true, the entity class will implement the
-     * interface JsonI.
-     */
-    public function setEntityInfo(string $className, string $namespace, string $path, bool $imlJsonI) {
-        $this->entityMapper = new EntityMapper($this->tableObj, 
-                    $className, 
-                    $path, 
-                    $namespace);
-            $this->entityMapper->setUseJsonI($imlJsonI);
-    }
-    /**
-     * Sets the table that the writer will use in writing the table class.
-     * 
-     * @param Table $table
-     */
-    public function setTable(Table $table) {
-        $this->tableObj = $table;
-        if ($table !== null) {
-            $this->extractAndSetTableClassName();
-        }
     }
     /**
      * Returns the name entity class will be created.
@@ -182,6 +125,65 @@ class TableClassWriter extends ClassWriter {
         }
     }
     /**
+     * Returns the table object which was associated with the writer.
+     * 
+     * @return Table
+     */
+    public function getTable() : Table {
+        return $this->tableObj;
+    }
+    /**
+     * Sets the entity class info which mapps to a record in the table.
+     * 
+     * @param string $className The name of the entity class.
+     * 
+     * @param string $namespace The namespace at which the entity class will
+     * belongs to.
+     * 
+     * @param string $path The location at which the entity class will be
+     * created at.
+     * 
+     * @param bool $imlJsonI If set to true, the entity class will implement the
+     * interface JsonI.
+     */
+    public function setEntityInfo(string $className, string $namespace, string $path, bool $imlJsonI) {
+        $this->entityMapper = new EntityMapper($this->tableObj, 
+            $className, 
+            $path, 
+            $namespace);
+        $this->entityMapper->setUseJsonI($imlJsonI);
+    }
+    /**
+     * Sets the table that the writer will use in writing the table class.
+     * 
+     * @param Table $table
+     */
+    public function setTable(Table $table) {
+        $this->tableObj = $table;
+
+        if ($table !== null) {
+            $this->extractAndSetTableClassName();
+        }
+    }
+    /**
+     * Sets the type of database table engine.
+     * 
+     * @param string $type The name of database server. It can have one of the
+     * following values:
+     * <ul>
+     * <li>mssql</li>
+     * <li>mysql</li>
+     * </ul>
+     * 
+     */
+    public function setTableType(string $type) {
+        if ($type == 'mssql') {
+            $this->tableObj = new MSSQLTable();
+        } else if ($type == 'mysql') {
+            $this->tableObj = new MySQLTable();
+        }
+    }
+    /**
      * Write the query class.
      * 
      * This method will first attempt to create the query class. If it was created, 
@@ -196,6 +198,32 @@ class TableClassWriter extends ClassWriter {
 
         if ($this->entityMapper !== null) {
             $this->entityMapper->create();
+        }
+    }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
+        $this->append("/**\n"
+                ." * A class which represents the database table '".$this->tableObj->getNormalName()."'.\n"
+                ." * The table which is associated with this class will have the following columns:\n"
+                ." * <ul>"
+        );
+
+        foreach ($this->tableObj->getCols() as $key => $colObj) {
+            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
+        }
+        $this->append(" * </ul>\n */");
+    }
+
+    public function writeClassDeclaration() {
+        if ($this->tableObj instanceof MySQLTable) {
+            $this->append('class '.$this->getName().' extends MySQLTable {');
+        } else if ($this->tableObj instanceof MSSQLTable) {
+            $this->append('class '.$this->getName().' extends MSSQLTable {');
         }
     }
     private function _addCols() {
@@ -213,7 +241,7 @@ class TableClassWriter extends ClassWriter {
             $refTableNs = get_class($fkObj->getSource());
             $cName = $this->getNamespace().'\\'.$this->getName();
             $refTableClassName = '$this';
-            
+
             if ($cName != $refTableNs) {
                 $nsSplit = explode('\\', $refTableNs);
                 $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
@@ -254,9 +282,11 @@ class TableClassWriter extends ClassWriter {
                 $this->append("'scale' => '".$colObj->getScale()."',", 4);
             }
         }
+
         if ($colObj instanceof MSSQLColumn && $colObj->isIdentity()) {
             $this->append("'identity' => true,", 4);
         }
+
         if ($colObj->isPrimary()) {
             $this->append("'primary' => true,", 4);
 
@@ -271,10 +301,11 @@ class TableClassWriter extends ClassWriter {
 
         if ($colObj->getDefault() !== null) {
             $defaultVal = "'default' => '".$colObj->getDefault()."',";
+
             if ($dataType == 'bool' || $dataType == 'boolean') {
                 $defaultVal = $colObj->getDefault() === true ? "'default' => true," : "'default' => false,";
             } else if ($dataType == 'int' || $dataType == 'bigint' || $dataType == 'decimal' || $dataType == 'money') {
-                $defaultVal = "'default' => ".$colObj->getDefault().","; 
+                $defaultVal = "'default' => ".$colObj->getDefault().",";
             }
             $this->append($defaultVal, 4);
         }
@@ -304,26 +335,7 @@ class TableClassWriter extends ClassWriter {
         $this->_addFks();
         $this->append('}', 1);
     }
-    /**
-     * Sets the type of database table engine.
-     * 
-     * @param string $type The name of database server. It can have one of the
-     * following values:
-     * <ul>
-     * <li>mssql</li>
-     * <li>mysql</li>
-     * </ul>
-     * 
-     */
-    public function setTableType(string $type) {
-        if ($type == 'mssql') {
-            $this->tableObj = new MSSQLTable();
-        } else if ($type == 'mysql') {
-            $this->tableObj = new MySQLTable();
-        }
-    }
     private function addAllUse() {
-
         if ($this->tableObj instanceof MySQLTable) {
             $this->addUseStatement("webfiori\database\mysql\MySQLTable");
         } else if ($this->tableObj instanceof MSSQLTable) {
@@ -346,31 +358,22 @@ class TableClassWriter extends ClassWriter {
             }
         }
     }
+    /**
+     * Extract and return the name of table class based on associated table object.
+     * 
+     */
+    private function extractAndSetTableClassName() {
+        $clazz = get_class($this->getTable());
 
-    public function writeClassBody() {
-        $this->_writeConstructor();
-        $this->append('}');
-    }
+        $split = explode('\\', $clazz);
+        $count = count($split);
 
-    public function writeClassComment() {
-        $this->append("/**\n"
-                ." * A class which represents the database table '".$this->tableObj->getNormalName()."'.\n"
-                ." * The table which is associated with this class will have the following columns:\n"
-                ." * <ul>"
-                );
-
-        foreach ($this->tableObj->getCols() as $key => $colObj) {
-            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
-        }
-        $this->append(" * </ul>\n */");
-    }
-
-    public function writeClassDeclaration() {
-        if ($this->tableObj instanceof MySQLTable) {
-            $this->append('class '.$this->getName().' extends MySQLTable {');
-        } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->append('class '.$this->getName().' extends MSSQLTable {');
+        if ($count > 1) {
+            $this->setClassName($split[$count - 1]);
+            array_pop($split);
+            $this->setNamespace(implode('\\', $split));
+        } else {
+            $this->setClassName($split[0]);
         }
     }
-
 }

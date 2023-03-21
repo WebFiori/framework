@@ -22,7 +22,7 @@ use webfiori\framework\WebFioriApp;
  *
  * @author Ibrahim
  */
-class CLIErrHandler  extends AbstractHandler {
+class CLIErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
      * 
@@ -77,7 +77,7 @@ class CLIErrHandler  extends AbstractHandler {
         if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
             return true;
         }
-        
+
         return Runner::isCLI();
     }
     /**
@@ -88,5 +88,4 @@ class CLIErrHandler  extends AbstractHandler {
     public function isShutdownHandler(): bool {
         return true;
     }
-
 }

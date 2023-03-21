@@ -89,8 +89,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID(string $code): bool
-    {
+    public function setID(string $code): bool {
         $xid = trim($code);
         $len = strlen($xid);
 
@@ -116,8 +115,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function setName(string $name): bool
-    {
+    public function setName(string $name): bool {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {

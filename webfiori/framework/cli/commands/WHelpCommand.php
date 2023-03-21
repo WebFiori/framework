@@ -19,10 +19,9 @@ use webfiori\cli\commands\HelpCommand;
 class WHelpCommand extends HelpCommand {
     public function exec() : int {
         $argV = $this->getOwner()->getArgsVector();
-        
+
         if (count($argV) == 0) {
             $this->printLogo();
-            
         }
         $formattingOptions = [
             'color' => 'light-blue',
@@ -31,10 +30,10 @@ class WHelpCommand extends HelpCommand {
         $this->prints('WebFiori Framework ', $formattingOptions);
         $this->prints(' (c) Version ');
         $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", $formattingOptions);
+
         return parent::exec();
     }
     private function printLogo() {
-        
         $this->println('|\                /|');
         $this->println('| \      /\      / |              |  / \  |');
         $this->println('\  \    /  \    /  / __________   |\/   \/|');
@@ -45,6 +44,5 @@ class WHelpCommand extends HelpCommand {
         $this->println('     \/  /\  \/ /  /                  |    ');
         $this->println('      \ /  \ / /  /                   |    ');
         $this->println('       ______ /__/                    |    ');
-        
     }
 }

@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\CLICommandClassWriter;
-use webfiori\cli\InputValidator;
 /**
  * A helper class which is used to help in creating CLI command classes using CLI.
  *
@@ -40,8 +40,18 @@ class CreateCLIClassHelper extends CreateClassHelper {
         $this->getWriter()->setCommandName($commandName);
         $this->getWriter()->setCommandDescription($commandDesc);
         $this->getWriter()->setArgs($argsArr);
-        
+
         $this->writeClass();
+    }
+    private function _getCommandName() {
+        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
+        {
+            if (strlen($val) > 0 && strpos($val, ' ') === false) {
+                return true;
+            }
+
+            return false;
+        }));
     }
     private function getArgs() {
         $argsArr = [];
@@ -64,16 +74,6 @@ class CreateCLIClassHelper extends CreateClassHelper {
         }
 
         return $argsArr;
-    }
-    private function _getCommandName() {
-        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
-        {
-            if (strlen($val) > 0 && strpos($val, ' ') === false) {
-                return true;
-            }
-
-            return false;
-        }));
     }
     private function getFixedVals() {
         if (!$this->confirm('Does this argument have a fixed set of values?', false)) {

@@ -26,7 +26,7 @@ class CronJob extends AbstractJob {
      * @since 1.0 
      */
     private $events;
-    
+
 
     /**
      * Creates new instance of the class.
@@ -58,7 +58,7 @@ class CronJob extends AbstractJob {
         $this->events['on'] = [];
         $this->events['on']['func'] = null;
         $this->events['on']['params'] = [];
-        
+
         $this->events['on-failure'] = [];
         $this->events['on-failure']['func'] = null;
         $this->events['on-failure']['params'] = [];

@@ -60,6 +60,15 @@ class DatabaseSessionStorage implements SessionStorage {
         $this->dbController->gc();
     }
     /**
+     * Returns the instance at which the storage is using to send queries to
+     * database and read sessions.
+     * 
+     * @return SessionDB An instance of the class SessionDB.
+     */
+    public function getController() : SessionDB {
+        return $this->dbController;
+    }
+    /**
      * Reads session state.
      * 
      * 
@@ -97,14 +106,5 @@ class DatabaseSessionStorage implements SessionStorage {
      */
     public function save($sessionId, $serializedSession) {
         $this->dbController->saveSession($sessionId, $serializedSession);
-    }
-    /**
-     * Returns the instance at which the storage is using to send queries to
-     * database and read sessions.
-     * 
-     * @return SessionDB An instance of the class SessionDB.
-     */
-    public function getController() : SessionDB {
-        return $this->dbController;
     }
 }

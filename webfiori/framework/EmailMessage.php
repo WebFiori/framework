@@ -86,8 +86,10 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     public function setLang(string $lang = 'EN') : bool {
         if (parent::setLang($lang)) {
             $this->usingLanguage();
+
             return true;
         }
+
         return false;
     }
 

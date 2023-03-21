@@ -61,6 +61,7 @@ class APICallErrHandler extends AbstractHandler {
                 'type' => 'error',
             ]);
         }
+
         if (!Response::isSent()) {
             Response::clear();
             Response::setCode(500);
@@ -93,7 +94,7 @@ class APICallErrHandler extends AbstractHandler {
         } else {
             $routeType = Router::VIEW_ROUTE;
         }
-        
+
         return $routeType == Router::API_ROUTE || (defined('API_CALL') && API_CALL === true);
     }
     /**
@@ -104,5 +105,4 @@ class APICallErrHandler extends AbstractHandler {
     public function isShutdownHandler(): bool {
         return true;
     }
-
 }

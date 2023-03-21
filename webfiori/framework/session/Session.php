@@ -13,10 +13,10 @@ namespace webfiori\framework\session;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\User;
 use webfiori\framework\WebFioriApp;
+use webfiori\http\HttpCookie;
+use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\http\Request;
-use webfiori\http\HttpCookie;
 /**
  * A class that represents a session.
  *
@@ -72,7 +72,6 @@ class Session implements JsonI {
      * @since 1.0
      */
     const STATUS_RESUMED = 'status_resumed';
-    private $sessionCookie;
     /**
      * The IP address of the user who is using the session.
      * 
@@ -138,6 +137,7 @@ class Session implements JsonI {
      * @since 1.0 
      */
     private $sessionArr;
+    private $sessionCookie;
     private $sessionStatus;
     /**
      * An object of type 'User' that represents session user.
@@ -181,21 +181,22 @@ class Session implements JsonI {
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
         $this->sessionCookie = new HttpCookie();
         $this->sesstionUser = null;
-        
+
         $this->sessionStatus = self::STATUS_INACTIVE;
         $this->passedTime = 0;
         $this->langCode = '';
-        
-        
+
+
         if (isset($options['refresh'])) {
             $this->setIsRefresh($options['refresh']);
         } else {
             $this->setIsRefresh(false);
         }
-        
+
         if (!(isset($options['duration']) && $this->setDuration($options['duration']))) {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
+
         if ($this->getDuration() == 0) {
             $this->setIsRefresh(false);
         }
@@ -213,14 +214,13 @@ class Session implements JsonI {
         $this->ipAddr = Request::getClientIP();
         $this->getCookie()->setSameSite('Lax');
         Request::getUri()->getScheme();
-        
+
         if ((defined('USE_HTTP') && USE_HTTP === true) || Request::getUri()->getScheme() == 'http') {
             $this->getCookie()->setIsSecure(false);
         } else {
             $this->getCookie()->setIsSecure(true);
         }
         $this->getCookie()->setIsHttpOnly(true);
-        
     }
     /**
      * Returns a JSON string that represents the session.
@@ -266,6 +266,14 @@ class Session implements JsonI {
         }
     }
     /**
+     * Returns the cookie which is associated with the cookie.
+     * 
+     * @return HttpCookie An object that holds session cookie information.
+     */
+    public function getCookie() : HttpCookie {
+        return $this->sessionCookie;
+    }
+    /**
      * Returns a string which can be passed to the function 'header()' to set session 
      * cookie.
      * 
@@ -278,14 +286,6 @@ class Session implements JsonI {
      */
     public function getCookieHeader() : string {
         return $this->sessionCookie.'';
-    }
-    /**
-     * Returns the cookie which is associated with the cookie.
-     * 
-     * @return HttpCookie An object that holds session cookie information.
-     */
-    public function getCookie() : HttpCookie {
-        return $this->sessionCookie;
     }
     /**
      * Returns the amount of time at which the session will live for in seconds.
@@ -465,7 +465,7 @@ class Session implements JsonI {
 
             return isset($this->sessionArr[$trimmed]);
         }
-        
+
         return false;
     }
     /**
@@ -763,12 +763,13 @@ class Session implements JsonI {
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
 
             if (strlen($encrypted) > 0) {
-                set_error_handler(function ($errNo, $errStr) {
+                set_error_handler(function ($errNo, $errStr)
+                {
                     throw  new SessionException($errStr, $errNo);
                 });
                 $sesstionObj = unserialize($encrypted);
                 restore_error_handler();
-                
+
                 if ($sesstionObj instanceof Session) {
                     $this->sessionStatus = self::STATUS_RESUMED;
                     $this->_clone($sesstionObj);
@@ -777,7 +778,8 @@ class Session implements JsonI {
                 }
             }
         } else {
-            set_error_handler(function ($errNo, $errStr) {
+            set_error_handler(function ($errNo, $errStr)
+            {
                 throw  new SessionException($errStr, $errNo);
             });
             $sesstionObj = unserialize($serialized);
@@ -887,7 +889,7 @@ class Session implements JsonI {
             $langCodeFromReq = $this->_getLangFromRequest();
             $retVal = false;
             $isNullCode = $langCodeFromReq === null;
-            
+
             if ($isNullCode) {
                 if ($this->langCode != '') {
                     $retVal = false;
@@ -921,7 +923,7 @@ class Session implements JsonI {
         $this->sessionArr = [];
         $this->resumedAt = time();
         $this->startedAt = time();
-        
+
         $this->sessionStatus = self::STATUS_NEW;
         $this->_initLang();
     }
@@ -940,7 +942,7 @@ class Session implements JsonI {
             }
         }
         $this->getCookie()->setName($trimmed);
-        
+
         return true;
     }
 }

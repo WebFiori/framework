@@ -74,7 +74,7 @@ class PrivilegesGroup implements JsonI {
         $this->childGroups = [];
         $this->groupId = '';
         $this->groupName = '';
-        
+
         if (!$this->setID($gId)) {
             $this->setID('GROUP');
         }
@@ -203,6 +203,27 @@ class PrivilegesGroup implements JsonI {
         return $hasPr;
     }
     /**
+     * Checks if provided group ID is valid or not.
+     * 
+     * @param string $id The ID of the privilege or the group.
+     * 
+     * @return bool If valid, true is returned. False otherwise.
+     */
+    public static function isValidID(string $id) : bool {
+        $xid = trim($id);
+        $len = strlen($xid);
+
+        for ($x = 0 ; $x < $len ; $x++) {
+            $ch = $xid[$x];
+
+            if (!($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    /**
      * Sets the ID of the group.
      * 
      * The ID of the group can only consist of the following characters: [A-Z], 
@@ -230,7 +251,7 @@ class PrivilegesGroup implements JsonI {
                 return false;
             }
         }
-        
+
         $testInst = $parentG;
 
         while ($parentG !== null) {
@@ -240,35 +261,17 @@ class PrivilegesGroup implements JsonI {
                 $testInst = $parentG;
             }
         }
-        
+
         if ($testInst !== null) {
             $taken = $this->checkID($id, $testInst);
         }
-        
+
 
         if ($taken === true) {
             return false;
         }
         $this->groupId = trim($id);
-        return true;
-    }
-    /**
-     * Checks if provided group ID is valid or not.
-     * 
-     * @param string $id The ID of the privilege or the group.
-     * 
-     * @return bool If valid, true is returned. False otherwise.
-     */
-    public static function isValidID(string $id) : bool {
-        $xid = trim($id);
-        $len = strlen($xid);
-        for ($x = 0 ; $x < $len ; $x++) {
-            $ch = $xid[$x];
 
-            if (!($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
-                return false;
-            }
-        }
         return true;
     }
     /**
@@ -354,26 +357,6 @@ class PrivilegesGroup implements JsonI {
 
         return $j;
     }
-
-    /**
-     *
-     * @param string $id
-     * @param PrivilegesGroup $group
-     * @return bool
-     */
-    private function checkID(string $id, PrivilegesGroup $group): bool
-    {
-        if ($group->getID() == $id) {
-            return true;
-        }
-        $bool = false;
-
-        foreach ($group->childGroups() as $g) {
-            $bool = $bool || $this->checkID($id, $g);
-        }
-
-        return $bool;
-    }
     /**
      * Checks if a group has specific privilege or not.
      * 
@@ -414,5 +397,24 @@ class PrivilegesGroup implements JsonI {
                 return;
             }
         }
+    }
+
+    /**
+     *
+     * @param string $id
+     * @param PrivilegesGroup $group
+     * @return bool
+     */
+    private function checkID(string $id, PrivilegesGroup $group): bool {
+        if ($group->getID() == $id) {
+            return true;
+        }
+        $bool = false;
+
+        foreach ($group->childGroups() as $g) {
+            $bool = $bool || $this->checkID($id, $g);
+        }
+
+        return $bool;
     }
 }

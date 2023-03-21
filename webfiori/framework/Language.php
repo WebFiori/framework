@@ -47,17 +47,17 @@ class Language {
      */
     const DIR_RTL = 'rtl';
     /**
-     * An array that contains language definition.
-     * 
-     * @var array
-     */
-    private $languageVars;
-    /**
      * The current active translation object.
      * 
      * @var Language|null
      */
     private static $ActiveLang;
+    /**
+     * An array that contains language definition.
+     * 
+     * @var array
+     */
+    private $languageVars;
     /**
      * An associative array that contains loaded languages.
      * 
@@ -153,6 +153,7 @@ class Language {
                 if (!isset($this->languageVars[$subSplit[0]])) {
                     $this->languageVars[$subSplit[0]] = [];
                     $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
+
                     return;
                 }
                 $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
@@ -191,9 +192,6 @@ class Language {
         }
 
         return $toReturn;
-    }
-    private function replaceDot($path) {
-        return str_replace('.', '/', $path);
     }
     /**
      * Returns the active translation.
@@ -241,10 +239,9 @@ class Language {
      * @since 1.0
      */
     public static function getLabel(string $dir, string $langCode = null) {
-        
         if ($langCode === null) {
             $session = SessionsManager::getActiveSession();
-            
+
             if ($session !== null) {
                 $langCode = $session->getLangCode(true);
             } else {
@@ -255,13 +252,13 @@ class Language {
                 }
             }
         }
-        
+
         $active = self::getActive();
-        
+
         if ($active !== null && $active->getCode() == $langCode) {
             return $active->get($dir);
         }
-        
+
         return self::loadTranslation($langCode)->get($dir);
     }
     /**
@@ -316,6 +313,7 @@ class Language {
 
         if (isset(self::$loadedLangs[$uLangCode])) {
             self::$ActiveLang = self::$loadedLangs[$uLangCode];
+
             return self::getActive();
         } 
         $langClassName = APP_DIR.'\\langs\\Language'.$uLangCode;
@@ -328,13 +326,13 @@ class Language {
         if (!($class instanceof Language)) {
             throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
         }
-        
+
         if (!isset(self::$loadedLangs[$uLangCode])) {
             throw new MissingLangException('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
                     .'$addtoLoadedAfterCreate is set to true when creating the language object.');
         }
         self::$ActiveLang = self::$loadedLangs[$uLangCode];
-        
+
         return self::getActive();
     }
     /**
@@ -466,8 +464,7 @@ class Language {
      * 
      * @since 1.2 
      */
-    public static function unloadTranslation(string $langCode): bool
-    {
+    public static function unloadTranslation(string $langCode): bool {
         $uLangCode = strtoupper(trim($langCode));
 
         if (isset(self::$loadedLangs[$uLangCode])) {
@@ -487,6 +484,7 @@ class Language {
 
                 return $this->_create($subs, $top[$subs[$index]],++$index);
             }
+
             return $this->_create($subs, $top[$subs[$index]],++$index);
         }
 
@@ -506,8 +504,7 @@ class Language {
         return null;
     }
 
-    private function _set($subs,&$top,$var,$val,$index): bool
-    {
+    private function _set($subs,&$top,$var,$val,$index): bool {
         $count = count($subs);
 
         if ($index + 1 == $count) {
@@ -521,5 +518,8 @@ class Language {
         }
 
         return false;
+    }
+    private function replaceDot($path) {
+        return str_replace('.', '/', $path);
     }
 }

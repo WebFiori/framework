@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cron;
 
+use const DS;
 use Exception;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
@@ -23,7 +24,6 @@ use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use const DS;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -126,20 +126,6 @@ class Cron {
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
-    }
-    public static function reset() {
-        self::get()->timestamp = [
-            'month' => intval(date('m')),
-            'month-day' => intval(date('d')),
-            'week-day' => intval(date('w')),
-            'hour' => intval(date('H')),
-            'minute' => intval(date('i'))
-        ];
-        self::get()->jobsNamesArr = [];
-        self::get()->logsArray = [];
-        self::get()->isLogEnabled = false;
-        self::get()->cronJobsQueue = new Queue();
-        self::get()->_setPassword('');
     }
     /**
      * Returns an object that represents the job which is currently being executed.
@@ -276,6 +262,20 @@ class Cron {
         }
 
         return self::get()->_isLogEnabled();
+    }
+    /**
+     * Returns a singleton of the class.
+     * 
+     * @return Cron
+     * 
+     * @since 1.0
+     */
+    public static function get() {
+        if (self::$executer === null) {
+            self::$executer = new Cron();
+        }
+
+        return self::$executer;
     }
     /**
      * Returns a job given its name.
@@ -517,6 +517,20 @@ class Cron {
             });
         }
     }
+    public static function reset() {
+        self::get()->timestamp = [
+            'month' => intval(date('m')),
+            'month-day' => intval(date('d')),
+            'week-day' => intval(date('w')),
+            'hour' => intval(date('H')),
+            'minute' => intval(date('i'))
+        ];
+        self::get()->jobsNamesArr = [];
+        self::get()->logsArray = [];
+        self::get()->isLogEnabled = false;
+        self::get()->cronJobsQueue = new Queue();
+        self::get()->_setPassword('');
+    }
     /**
      * Check each scheduled job and run it if its time to run it.
      * 
@@ -557,7 +571,7 @@ class Cron {
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
         $cronPass = Cron::password();
-        
+
         if ($cronPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $cronPass) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
@@ -586,11 +600,12 @@ class Cron {
             }
         } else {
             $tempQ = new Queue();
-            
+
             while ($job = Cron::jobsQueue()->dequeue()) {
                 $tempQ->enqueue($job);
                 self::_runJob($retVal, $job, $xForce, $command);
             }
+
             while ($job = $tempQ->dequeue()) {
                 self::get()->cronJobsQueue->enqueue($job);
             }
@@ -625,7 +640,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setDayOfMonth(int $dayOfMonth) {
-
         if ($dayOfMonth >= 1 && $dayOfMonth <= 31) {
             self::get()->timestamp['month-day'] = $dayOfMonth;
         }
@@ -643,7 +657,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setDayOfWeek(int $val) {
-
         if ($val >= 0 && $val <= 6) {
             self::get()->timestamp['week-day'] = $val;
         }
@@ -661,7 +674,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setHour(int $hour) {
-
         if ($hour >= 0 && $hour <= 23) {
             self::get()->timestamp['hour'] = $hour;
         }
@@ -679,7 +691,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setMinute(int $minute) {
-
         if ($minute >= 0 && $minute <= 59) {
             self::get()->timestamp['minute'] = $minute;
         }
@@ -697,7 +708,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setMonth(int $month) {
-
         if ($month >= 1 && $month <= 12) {
             self::get()->timestamp['month'] = $month;
         }
@@ -801,20 +811,6 @@ class Cron {
         return $retVal;
     }
     /**
-     * Returns a singleton of the class.
-     * 
-     * @return Cron
-     * 
-     * @since 1.0
-     */
-    public static function get() {
-        if (self::$executer === null) {
-            self::$executer = new Cron();
-        }
-
-        return self::$executer;
-    }
-    /**
      * 
      * @return string
      * @since 1.0
@@ -864,7 +860,7 @@ class Cron {
             $logFile = $logsPath.DS.'cron.log';
             $file = new File($logFile);
             $file->create(true);
-            
+
             $this->_logExecHelper($forced, $job, $file);
         }
     }

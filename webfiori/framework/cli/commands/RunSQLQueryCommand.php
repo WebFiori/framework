@@ -68,26 +68,32 @@ class RunSQLQueryCommand extends CLICommand {
     private function _connectionBased($dbConnections) : int {
         $connName = $this->getArgValue('--connection');
         $file = $this->getArgValue('--file');
+
         if ($connName === null) {
             $connName = $this->select('Select database connection:', $dbConnections, 0);
         } else if (!in_array($connName, $dbConnections)) {
             $this->error('No connection with name "'.$connName.'" was found!');
+
             return -1;
         }
         $schema = new DB($connName);
+
         if ($file !== null) {
             $fileObj = new File($file);
-            
+
             if ($fileObj->isExist()) {
                 $fileObj->read();
+
                 if ($fileObj->getMIME() == 'application/sql') {
                     return $this->runFileQuery($schema, $fileObj);
                 } else {
                     $this->error('Provided file is not SQL file!');
+
                     return -1;
                 }
             } else {
                 $this->error('No such file: '.$file);
+
                 return -1;
             }
         }
@@ -126,14 +132,14 @@ class RunSQLQueryCommand extends CLICommand {
     }
     private function confirmExecute($schema) {
         $noConfirmExec = $this->isArgProvided('--no-confirm');
-        
+
         if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
             $this->println('The following query will be executed on the database:');
             $this->println($schema->getLastQuery(), [
                 'color' => 'blue'
             ]);
         }
-        
+
         if ($noConfirmExec) {
             return $this->executeQ($schema);
         }
@@ -142,6 +148,7 @@ class RunSQLQueryCommand extends CLICommand {
             return $this->executeQ($schema);
         } else {
             $this->info('Nothing to execute.');
+
             return 0;
         }
     }
@@ -184,12 +191,13 @@ class RunSQLQueryCommand extends CLICommand {
         if ($selected == 'Run general query.') {
             $query = $this->getInput('Please type in SQL query:');
             $schema->setQuery($query);
+
             return $this->confirmExecute($schema);
         } else if ($selected == 'Run query on table instance.') {
-
             $tableObj = CLIUtils::readTable($this);
-            
+
             $schema->addTable($tableObj);
+
             return $this->tableQuery($schema, $tableObj);
         } else if ($selected == 'Run query from file.') {
             return $this->queryFromFile($schema);
@@ -198,12 +206,14 @@ class RunSQLQueryCommand extends CLICommand {
     private function queryFromFile($schema) {
         $filePath = '';
         $file = null;
+
         while (!File::isFileExist($filePath)) {
             $filePath = $this->getInput('File path:');
-            
+
             if (File::isFileExist($filePath)) {
                 $file = new File($filePath);
                 $file->read();
+
                 if ($file->getMIME() == 'application/sql') {
                     break;
                 } else {
@@ -213,17 +223,14 @@ class RunSQLQueryCommand extends CLICommand {
                 $this->error('No such file!');
             }
         }
+
         return $this->runFileQuery($schema, $file);
-    }
-    private function runFileQuery(DB $schema, File $f) : int {
-        $schema->setQuery($f->getRawData());
-        return $this->confirmExecute($schema);
     }
 
     private function queryOnSchema(DB $schema) {
-    
         if ($this->isArgProvided('--create')) {
             $schema->createTables();
+
             return $this->confirmExecute($schema);
         }
         $options = [
@@ -234,11 +241,18 @@ class RunSQLQueryCommand extends CLICommand {
 
         if ($selected == 'Create Database.') {
             $schema->createTables();
+
             return $this->confirmExecute($schema);
         } else {
             $selectedTable = $this->select('Select database table:', array_keys($schema->getTables()));
+
             return $this->tableQuery($schema, $schema->getTable($selectedTable));
         }
+    }
+    private function runFileQuery(DB $schema, File $f) : int {
+        $schema->setQuery($f->getRawData());
+
+        return $this->confirmExecute($schema);
     }
     /**
      * 
@@ -248,6 +262,7 @@ class RunSQLQueryCommand extends CLICommand {
     private function tableQuery($schema, $tableObj) {
         if ($this->isArgProvided('--create')) {
             $schema->table($tableObj->getNormalName())->createTable();
+
             return $this->confirmExecute($schema);
         }
         $queryTypes = [
@@ -279,6 +294,7 @@ class RunSQLQueryCommand extends CLICommand {
             $schema->table($tableObj->getNormalName())->createTable();
             $schema->getQueryGenerator()->setQuery($query1."\n".$schema->getLastQuery(), true);
         }
+
         return $this->confirmExecute($schema);
     }
 }

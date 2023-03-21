@@ -15,7 +15,6 @@ use webfiori\framework\cron\Cron;
 use webfiori\framework\cron\CronEmail;
 use webfiori\framework\cron\CronJob;
 use webfiori\framework\cron\JobArgument;
-use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to write cron jobs classes.
  *
@@ -37,12 +36,15 @@ class CronJobClassWriter extends ClassWriter {
     public function __construct($jobName = '', $jobDesc = '', array $argsArr = []) {
         parent::__construct('NewJob', ROOT_PATH.DS.APP_DIR.DS.'jobs', APP_DIR.'\\jobs');
         $this->job = new CronJob();
+
         if (!$this->setJobName($jobName)) {
             $this->setJobName('New Job');
         }
+
         if (!$this->setJobDescription($jobDesc)) {
             $this->setJobDescription('No Description');
         }
+
         foreach ($argsArr as $jobArg) {
             $this->addArgument($jobArg);
         }
@@ -54,6 +56,14 @@ class CronJobClassWriter extends ClassWriter {
         ]);
     }
     /**
+     * Adds new execution argument to the job.
+     * 
+     * @param JobArgument $arg An object which holds argument information.
+     */
+    public function addArgument(JobArgument $arg) {
+        $this->getJob()->addExecutionArg($arg);
+    }
+    /**
      * Returns the object which holds the basic information of the job that will
      * be created.
      * 
@@ -63,26 +73,12 @@ class CronJobClassWriter extends ClassWriter {
         return $this->job;
     }
     /**
-     * Adds new execution argument to the job.
+     * Returns the description of the job.
      * 
-     * @param JobArgument $arg An object which holds argument information.
+     * @return string The description of the job. Default return value is 'No Description'.
      */
-    public function addArgument(JobArgument $arg) {
-        $this->getJob()->addExecutionArg($arg);
-    }
-    /**
-     * Sets the name of the job.
-     * 
-     * The name is a unique string which is used by each created job. It acts as
-     * an identifier for the job.
-     * 
-     * @param string $jobName The name of the job. Must be non-empty string.
-     * 
-     * @return bool If the name is set, the method will return true. Other then
-     * that, the method will return false.
-     */
-    public function setJobName(string $jobName) : bool {
-        return $this->getJob()->setJobName($jobName);
+    public function getJobDescription() : string {
+        return $this->getJob()->getDescription();
     }
     /**
      * Returns the name of the job.
@@ -91,14 +87,6 @@ class CronJobClassWriter extends ClassWriter {
      */
     public function getJobName() : string {
         return $this->getJob()->getJobName();
-    }
-    /**
-     * Returns the description of the job.
-     * 
-     * @return string The description of the job. Default return value is 'No Description'.
-     */
-    public function getJobDescription() : string {
-        return $this->getJob()->getDescription(); 
     }
     /**
      * Sets the description of the job.
@@ -114,43 +102,19 @@ class CronJobClassWriter extends ClassWriter {
     public function setJobDescription(string $jobDesc) : bool {
         return $this->getJob()->setDescription($jobDesc);
     }
-    private function _writeConstructor() {
-        $this->append([
-            '/**',
-            ' * Creates new instance of the class.',
-            ' */',
-            $this->f('__construct')
-        ], 1);
-        $this->append([
-            "parent::__construct('".$this->getJobName()."');",
-            "\$this->setDescription('". str_replace('\'', '\\\'', $this->getJobDescription())."');"
-        ], 2);
-        
-        $jobArgs = $this->getJob()->getArguments();
-        if (count($jobArgs) > 0) {
-            $this->append('$this->addExecutionArgs([', 2);
-
-            foreach ($jobArgs as $argObj) {
-                $this->append("'".$argObj->getName()."' => [", 3);
-                $this->append("'description' => '".str_replace('\'', '\\\'', $argObj->getDescription())."',", 4);
-                if ($argObj->getDefault() !== null) {
-                    $this->append("'default' => '".str_replace('\'', '\\\'', $argObj->getDefault())."',", 4);
-                }
-                $this->append("],", 3);
-            }
-            $this->append(']);', 2);
-        }
-        $this->append([
-            '// TODO: Specify the time at which the process will run at.',
-            '// You can use one of the following methods to specifiy the time:',
-            '//$this->dailyAt(4, 30);',
-            '//$this->everyHour();',
-            '//$this->everyMonthOn(1, \'00:00\');',
-            "//\$this->onMonth('jan', 15, '13:00');",
-            "//\$this->weeklyOn('sun', '23:00');",
-            "//\$this->cron('* * * * *');"
-        ], 2);
-        $this->append('}', 1);
+    /**
+     * Sets the name of the job.
+     * 
+     * The name is a unique string which is used by each created job. It acts as
+     * an identifier for the job.
+     * 
+     * @param string $jobName The name of the job. Must be non-empty string.
+     * 
+     * @return bool If the name is set, the method will return true. Other then
+     * that, the method will return false.
+     */
+    public function setJobName(string $jobName) : bool {
+        return $this->getJob()->setJobName($jobName);
     }
 
     public function writeClassBody() {
@@ -161,7 +125,7 @@ class CronJobClassWriter extends ClassWriter {
             ' */',
             $this->f('execute')
         ], 1);
-        
+
         $this->append('//TODO: Write the code that represents the process.', 2);
         $this->append([
             '}',
@@ -204,15 +168,16 @@ class CronJobClassWriter extends ClassWriter {
             ' *',
             " * The process will have the name '".$this->getJobName()."'."
         ]);
-        
+
         $argsPartArr = [];
         $args = $this->getJob()->getArguments();
+
         if (count($args) != 0) {
             $argsPartArr = [
                 ' * In addition, the proces have the following args:',
                 ' * <ul>'
             ];
-            
+
 
             foreach ($args as $argObj) {
                 $argsPartArr[] = " * <li>".$argObj->getName().": ".$argObj->getDescription()."</li>";
@@ -226,5 +191,44 @@ class CronJobClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends AbstractJob {');
     }
+    private function _writeConstructor() {
+        $this->append([
+            '/**',
+            ' * Creates new instance of the class.',
+            ' */',
+            $this->f('__construct')
+        ], 1);
+        $this->append([
+            "parent::__construct('".$this->getJobName()."');",
+            "\$this->setDescription('".str_replace('\'', '\\\'', $this->getJobDescription())."');"
+        ], 2);
 
+        $jobArgs = $this->getJob()->getArguments();
+
+        if (count($jobArgs) > 0) {
+            $this->append('$this->addExecutionArgs([', 2);
+
+            foreach ($jobArgs as $argObj) {
+                $this->append("'".$argObj->getName()."' => [", 3);
+                $this->append("'description' => '".str_replace('\'', '\\\'', $argObj->getDescription())."',", 4);
+
+                if ($argObj->getDefault() !== null) {
+                    $this->append("'default' => '".str_replace('\'', '\\\'', $argObj->getDefault())."',", 4);
+                }
+                $this->append("],", 3);
+            }
+            $this->append(']);', 2);
+        }
+        $this->append([
+            '// TODO: Specify the time at which the process will run at.',
+            '// You can use one of the following methods to specifiy the time:',
+            '//$this->dailyAt(4, 30);',
+            '//$this->everyHour();',
+            '//$this->everyMonthOn(1, \'00:00\');',
+            "//\$this->onMonth('jan', 15, '13:00');",
+            "//\$this->weeklyOn('sun', '23:00');",
+            "//\$this->cron('* * * * *');"
+        ], 2);
+        $this->append('}', 1);
+    }
 }

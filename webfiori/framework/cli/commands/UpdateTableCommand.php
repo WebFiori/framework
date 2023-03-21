@@ -36,15 +36,14 @@ class UpdateTableCommand extends CLICommand {
      * executed.
      */
     public function exec() : int {
-        
         $tableObj = CLIUtils::readTable($this);
-        
+
         $create = new CreateTableObj($this);
         $create->getWriter()->setTable($tableObj);
         $tableHelper = new TableObjHelper($create, $tableObj);
-        
-        
-        
+
+
+
         $whatToDo = $this->select('What operation whould you like to do with the table?', [
             'Add new column.',
             'Add foreign key.',
@@ -66,7 +65,7 @@ class UpdateTableCommand extends CLICommand {
         } else {
             $this->error('Option not implemented.');
         }
+
         return 0;
     }
-    
 }

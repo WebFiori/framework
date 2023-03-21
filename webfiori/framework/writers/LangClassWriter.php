@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\writers\ClassWriter;
 use webfiori\framework\Language;
 /**
  * A writer which is used to write any class that represents a language class.
@@ -68,5 +67,4 @@ class LangClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends Language {');
     }
-
 }

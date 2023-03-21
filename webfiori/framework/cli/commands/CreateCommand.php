@@ -37,32 +37,6 @@ class CreateCommand extends CLICommand {
             new CommandArgument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-    private function getWhat() {
-        $options = [];
-        $options['table'] = 'Database table class.';
-        $options['entity'] = 'Entity class from table.';
-        $options['web-service'] = 'Web service.';
-        $options['job'] = 'Background job.';
-        $options['middleware'] = 'Middleware.';
-        $options['command'] = 'CLI Command.';
-        $options['theme'] = 'Theme.';
-        $options['db'] = 'Database access class based on table.';
-        $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
-        $options['q'] = 'Quit.';
-        $what = $this->getArgValue('--c');
-        $answer = null;
-        if ($what !== null) {
-            $answer = isset($options[$what]) ? $options[$what] : null;
-            
-            if ($answer === null) {
-                $this->warning('The argument --c has invalid value.');
-            }
-        }
-        if ($answer === null) {
-            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-        }
-        return $answer;
-    }
     public function _createEntityFromQuery() {
         $tableObj = CLIUtils::readTable($this);
         $defaultNs = APP_DIR.'\\entity';
@@ -70,11 +44,12 @@ class CreateCommand extends CLICommand {
         $infoReader = new ClassInfoReader($this);
         $classInfo = $infoReader->readClassInfo($defaultNs);
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
-        
+
         $mapper = $tableObj->getEntityMapper();
+
         if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
             $addExtra = true;
-            
+
             while ($addExtra) {
                 if ($mapper->addAttribute($this->getInput('Enter attribute name:'))) {
                     $this->success('Attribute successfully added.');
@@ -95,9 +70,8 @@ class CreateCommand extends CLICommand {
         return 0;
     }
     public function exec() : int {
-        
         $answer = $this->getWhat();
-        
+
         if ($answer == 'Quit.') {
         } else if ($answer == 'Database table class.') {
             $create = new CreateTableObj($this);
@@ -126,7 +100,36 @@ class CreateCommand extends CLICommand {
         } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
             $create = new CreateFullRESTHelper($this);
         }
-        
+
         return 0;
+    }
+    private function getWhat() {
+        $options = [];
+        $options['table'] = 'Database table class.';
+        $options['entity'] = 'Entity class from table.';
+        $options['web-service'] = 'Web service.';
+        $options['job'] = 'Background job.';
+        $options['middleware'] = 'Middleware.';
+        $options['command'] = 'CLI Command.';
+        $options['theme'] = 'Theme.';
+        $options['db'] = 'Database access class based on table.';
+        $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
+        $options['q'] = 'Quit.';
+        $what = $this->getArgValue('--c');
+        $answer = null;
+
+        if ($what !== null) {
+            $answer = isset($options[$what]) ? $options[$what] : null;
+
+            if ($answer === null) {
+                $this->warning('The argument --c has invalid value.');
+            }
+        }
+
+        if ($answer === null) {
+            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+        }
+
+        return $answer;
     }
 }

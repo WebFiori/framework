@@ -54,11 +54,13 @@ class DB extends Database {
 
         if (!($conn instanceof ConnectionInfo)) {
             $connectionsArr = ConfigController::get()->getDatabaseConnections();
+
             foreach ($connectionsArr as $xCon) {
                 if ($xCon->getName() == $connName) {
                     $conn = $xCon;
                 }
             }
+
             if (!($conn instanceof ConnectionInfo)) {
                 throw new DatabaseException("No connection was found which has the name '$connName'.");
             }
@@ -86,13 +88,13 @@ class DB extends Database {
 
         if (($connType == 'mysql' && $table instanceof MySQLTable) 
          || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-
             foreach ($table->getForignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);
             }
 
             return parent::addTable($table, $updateOwnerDb);
         }
+
         return false;
     }
     /**

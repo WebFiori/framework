@@ -15,8 +15,8 @@ use webfiori\framework\ui\WebPage;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\ui\exceptions\InvalidNodeNameException;
-use webfiori\ui\HTMLNode;
 use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
 /**
  * A base class that is used to construct website UI.
  * 
@@ -108,16 +108,6 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeName;
-    /**
-     * 
-     * @var string 
-     */
-    private $themeUrl;
-    /**
-     * 
-     * @var string 
-     */
     private $themeAuthor;
     /**
      * 
@@ -128,7 +118,12 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeVersion;
+    private $themeDir;
+    /**
+     * 
+     * @var string 
+     */
+    private $themeDisc;
     /**
      * 
      * @var string 
@@ -143,12 +138,17 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeDisc;
+    private $themeName;
     /**
      * 
      * @var string 
      */
-    private $themeDir;
+    private $themeUrl;
+    /**
+     * 
+     * @var string 
+     */
+    private $themeVersion;
     /**
      * Creates new instance of the class using default values.
      * 
@@ -172,7 +172,6 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    
     public function __construct(string $themeName = '') {
         $this->themeAuthor = '';
         $this->themeAuthorUrl = '';
@@ -222,11 +221,24 @@ abstract class Theme implements JsonI {
      * @since 1.2.3
      */
     public function createHTMLNode(array $options = []) : HTMLNode {
-
         $nodeName = $options['name'] ?? 'div';
         $attributes = $options['attributes'] ?? [];
 
         return new HTMLNode($nodeName, $attributes);
+    }
+    /**
+     * Returns a string that represents the directory at which the theme exist 
+     * in the system.
+     * 
+     * This method is useful if the developer would like to load HTML file which 
+     * are part of the theme using the method HTMLNode::loadComponent().
+     * 
+     * @return string The string will be something like 'C:\Server\apache\htdocs\my-site\themes\myTheme\'.
+     * 
+     * @since 1.2.6
+     */
+    public function getAbsolutePath() : string {
+        return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 
@@ -277,6 +289,7 @@ abstract class Theme implements JsonI {
         if ($this->baseUrl === null) {
             return WebFioriApp::getAppConfig()->getBaseURL();
         }
+
         return $this->baseUrl;
     }
 
@@ -302,20 +315,6 @@ abstract class Theme implements JsonI {
      */
     public function getDescription() : string {
         return $this->themeDisc;
-    }
-    /**
-     * Returns a string that represents the directory at which the theme exist 
-     * in the system.
-     * 
-     * This method is useful if the developer would like to load HTML file which 
-     * are part of the theme using the method HTMLNode::loadComponent().
-     * 
-     * @return string The string will be something like 'C:\Server\apache\htdocs\my-site\themes\myTheme\'.
-     * 
-     * @since 1.2.6
-     */
-    public function getAbsolutePath() : string {
-        return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
      * Returns the name of the directory where all theme files are kept.

@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework;
 
+use webfiori\framework\session\SessionUser;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\framework\session\SessionUser;
 /**
  * A class that represents a system user.
  * 
@@ -150,8 +150,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function addPrivilege(string $privilegeId): bool
-    {
+    public function addPrivilege(string $privilegeId): bool {
         $p = Access::getPrivilege($privilegeId);
 
         if ($p != null) {
@@ -200,8 +199,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getEmail(): string
-    {
+    function getEmail(): string {
         return $this->email;
     }
     /**
@@ -244,8 +242,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getPassword(): string
-    {
+    function getPassword(): string {
         return $this->password;
     }
 
@@ -255,8 +252,7 @@ class User implements JsonI, SessionUser {
      * @return string
      * @since 1.4
      */
-    public function getRegDate(): string
-    {
+    public function getRegDate(): string {
         return $this->regDate;
     }
     /**
@@ -268,8 +264,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.6
      */
-    public function getResetCount(): int
-    {
+    public function getResetCount(): int {
         return $this->resetPassCounts;
     }
     /**
@@ -280,8 +275,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.0
      */
-    function getUserName(): string
-    {
+    function getUserName(): string {
         return $this->userName;
     }
     /**
@@ -293,8 +287,7 @@ class User implements JsonI, SessionUser {
      * @return bool If the user has one of the given privileges, the method 
      * will return true. Other than that, the method will return false.
      */
-    public function hasAnyPrivilege(array $privilegesIdsArr): bool
-    {
+    public function hasAnyPrivilege(array $privilegesIdsArr): bool {
         $hasPr = false;
 
         foreach ($privilegesIdsArr as $prId) {
@@ -341,8 +334,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function inGroup(string $groupId): bool
-    {
+    public function inGroup(string $groupId): bool {
         $g = Access::getGroup($groupId);
 
         if ($g instanceof PrivilegesGroup) {
@@ -359,8 +351,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7
      */
-    public function privileges(): array
-    {
+    public function privileges(): array {
         return $this->userPrivileges;
     }
     /**
@@ -381,8 +372,7 @@ class User implements JsonI, SessionUser {
      * 
      * @since 1.7.1
      */
-    public function removePrivilege(string $privilegeId): bool
-    {
+    public function removePrivilege(string $privilegeId): bool {
         $p = Access::getPrivilege($privilegeId);
 
         if ($p != null) {
@@ -553,14 +543,13 @@ class User implements JsonI, SessionUser {
      * @param PrivilegesGroup $group
      * @return bool
      */
-    private function _inGroup(PrivilegesGroup $group): bool
-    {
+    private function _inGroup(PrivilegesGroup $group): bool {
         $inGroup = true;
 
         if (count($group->privileges()) === 0) {
             return false;
         }
-        
+
         foreach ($group->privileges() as $groupPrivilege) {
             $inGroup = $inGroup && $this->hasPrivilege($groupPrivilege->getID());
         }

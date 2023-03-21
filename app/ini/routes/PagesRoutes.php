@@ -1,8 +1,5 @@
 <?php
-
 namespace app\ini\routes;
-
-use webfiori\framework\router\Router;
 
 class PagesRoutes {
     /**
@@ -11,6 +8,5 @@ class PagesRoutes {
      * @since 1.0
      */
     public static function create() {
-        
     }
 }

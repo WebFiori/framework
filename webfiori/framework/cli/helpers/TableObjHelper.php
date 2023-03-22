@@ -273,12 +273,12 @@ class TableObjHelper {
         $tableObj = $this->getTable();
         $helper = $this->getCreateHelper();
 
-        if ($tableObj->getForignKeysCount() == 0) {
+        if ($tableObj->getForeignKeysCount() == 0) {
             $helper->info('Selected table has no foreign keys.');
 
             return;
         }
-        $fks = $tableObj->getForignKeys();
+        $fks = $tableObj->getForeignKeys();
         $optionsArr = [];
 
         foreach ($fks as $fkObj) {
@@ -294,12 +294,12 @@ class TableObjHelper {
         $tableObj = $this->getTable();
         $helper = $this->getCreateHelper();
 
-        if ($tableObj->getForignKeysCount() == 0) {
+        if ($tableObj->getForeignKeysCount() == 0) {
             $helper->info('Selected table has no foreign keys.');
 
             return;
         }
-        $fks = $tableObj->getForignKeys();
+        $fks = $tableObj->getForeignKeys();
         $optionsArr = [];
 
         foreach ($fks as $fkObj) {

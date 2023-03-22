@@ -115,7 +115,7 @@ class DB extends Database {
     public function register(string $pathToScan) {
         WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db)
         {
-            foreach ($table->getForignKeys() as $fk) {
+            foreach ($table->getForeignKeys() as $fk) {
                 $db->addTable($fk->getSource(), false);
             }
             $db->addTable($table);

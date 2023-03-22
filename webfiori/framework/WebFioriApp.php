@@ -210,7 +210,7 @@ class WebFioriApp {
      * @since 1.3.6
      */
     public static function autoRegister(string $folder, callable $regCallback, string $suffix = null, array $constructorParams = [], array $otherParams = []) {
-        $dir = ROOT_PATH.DS.APP_DIR.DS.$folder;
+        $dir = APP_PATH.$folder;
 
         if (!File::isDirectory($dir)) {
             //If directory is outside application folder.
@@ -236,7 +236,7 @@ class WebFioriApp {
                         }
                     }
 
-                    self::_autoRegisterHelper([
+                    self::autoRegisterHelper([
                         'dir' => $dir, 
                         'php-file' => $phpFile, 
                         'folder' => $folder, 
@@ -384,7 +384,7 @@ class WebFioriApp {
 
         return self::$LC;
     }
-    private static function _autoRegisterHelper($options) {
+    private static function autoRegisterHelper($options) {
         $dir = $options['dir'];
         $phpFile = $options['php-file'];
         $folder = $options['folder'];

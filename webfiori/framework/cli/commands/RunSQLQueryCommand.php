@@ -165,8 +165,8 @@ class RunSQLQueryCommand extends CLICommand {
             return $ex->getCode();
         }
     }
-    private function fkQuery($schema, $selectedQuery, $tableObj) {
-        $keys = $tableObj->getForignKeys();
+    private function fkQuery($schema, $selectedQuery, Table $tableObj) {
+        $keys = $tableObj->getForeignKeys();
         $keysNamesArr = [];
 
         foreach ($keys as $fkObj) {
@@ -274,7 +274,7 @@ class RunSQLQueryCommand extends CLICommand {
             'Drop Column.'
         ];
 
-        if ($tableObj->getForignKeysCount() != 0) {
+        if ($tableObj->getForeignKeysCount() != 0) {
             $queryTypes[] = 'Add Forign Key.';
             $queryTypes[] = 'Drop Forign Key.';
         }

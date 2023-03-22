@@ -249,10 +249,11 @@ class User implements JsonI, SessionUser {
     /**
      * Returns the value of the property '$regDate'.
      *
-     * @return string
+     * @return string|null
+     * 
      * @since 1.4
      */
-    public function getRegDate(): string {
+    public function getRegDate() {
         return $this->regDate;
     }
     /**

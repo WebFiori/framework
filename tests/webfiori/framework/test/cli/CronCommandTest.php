@@ -169,7 +169,7 @@ class CronCommandTest extends TestCase {
             "Exception class: Error\n",
             "Exception message: Call to undefined method app\jobs\Fail2TestJob::undefined()\n",
             "Thrown in: Fail2TestJob\n",
-            "Line: 36\n",
+            "Line: 45\n",
             "Calling the method app\jobs\Fail2TestJob::onFail()\n",
             "Calling the method app\jobs\Fail2TestJob::afterExec()\n",
             "Check finished.\n",

@@ -162,10 +162,11 @@ class UserTest extends TestCase {
      */
     public function testSetResetCount() {
         $u = new User();
+        $this->assertEquals(0,$u->getResetCount());
         $u->setResetCount('1');
-        $this->assertEquals(0,$u->getResetCount());
+        $this->assertEquals(1,$u->getResetCount());
         $u->setResetCount(-1);
-        $this->assertEquals(0,$u->getResetCount());
+        $this->assertEquals(1,$u->getResetCount());
         $u->setResetCount(32);
         $this->assertEquals(32,$u->getResetCount());
     }

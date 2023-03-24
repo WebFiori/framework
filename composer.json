@@ -24,7 +24,7 @@
         "webfiori/ui":"v2.5.0",
         "webfiori/jsonx":"v3.2.1",
         "webfiori/http":"v3.3.2 ",
-        "webfiori/database":"v0.6.1",
+        "webfiori/database":"v0.7.0",
         "webfiori/mailer":"v1.0.4"
     },
     "require-dev": {

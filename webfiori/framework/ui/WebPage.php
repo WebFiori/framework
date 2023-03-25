@@ -1186,7 +1186,7 @@ class WebPage {
             }
         }
         $headNode->addMeta('charset','UTF-8',true);
-        $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+        $headNode->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
         $headNode->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 

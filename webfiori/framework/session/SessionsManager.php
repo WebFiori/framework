@@ -84,7 +84,7 @@ class SessionsManager {
 
         if ($active !== null) {
             $active->close();
-            self::_get()->activeSesstion = null;
+            self::getInstance()->activeSesstion = null;
         }
     }
     /**
@@ -99,7 +99,7 @@ class SessionsManager {
 
         if ($active !== null) {
             $active->kill();
-            self::_get()->activeSesstion = null;
+            self::getInstance()->activeSesstion = null;
         }
     }
     /**
@@ -132,15 +132,15 @@ class SessionsManager {
      * @since 1.0
      */
     public static function getActiveSession() {
-        if (self::_get()->activeSesstion !== null) {
-            return self::_get()->activeSesstion;
+        if (self::getInstance()->activeSesstion !== null) {
+            return self::getInstance()->activeSesstion;
         }
 
-        foreach (self::_get()->sesstionsArr as $sesstion) {
+        foreach (self::getInstance()->sesstionsArr as $sesstion) {
             $status = $sesstion->getStatus();
 
             if ($status == Session::STATUS_NEW || $status == Session::STATUS_RESUMED) {
-                self::_get()->activeSesstion = $sesstion;
+                self::getInstance()->activeSesstion = $sesstion;
 
                 return $sesstion;
             }
@@ -218,7 +218,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function getSessions() : array {
-        return self::_get()->sesstionsArr;
+        return self::getInstance()->sesstionsArr;
     }
     /**
      * Returns storage engine which is used to store sessions state.
@@ -228,7 +228,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function getStorage() : SessionStorage {
-        return self::_get()->sesstionStorage;
+        return self::getInstance()->sesstionStorage;
     }
     /**
      * Checks if the given session name has a cookie or not.
@@ -257,8 +257,8 @@ class SessionsManager {
         try {
             $trimmed = trim($sName);
 
-            if (!self::_checkLoadedSesstions($trimmed)) {
-                return self::_checkAndLoadFromCookie($trimmed);
+            if (!self::checkLoadedSesstions($trimmed)) {
+                return self::checkAndLoadFromCookie($trimmed);
             }
         } catch (SessionException $e) {
             return false;
@@ -288,7 +288,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function pauseAll() {
-        self::_get()->_pauseSessions();
+        self::getInstance()->pauseSessions();
     }
     /**
      * Retrieves the value of a session variable and removes it from the session.
@@ -336,9 +336,9 @@ class SessionsManager {
      * @since 1.0
      */
     public static function reset() {
-        self::_get()->sesstionsArr = [];
-        self::_get()->sesstionStorage = new DefaultSessionStorage();
-        self::_get()->activeSesstion = null;
+        self::getInstance()->sesstionsArr = [];
+        self::getInstance()->sesstionStorage = new DefaultSessionStorage();
+        self::getInstance()->activeSesstion = null;
     }
     /**
      * Sets session variable. 
@@ -376,7 +376,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function setStorage(SessionStorage $storage) {
-        self::_get()->sesstionStorage = $storage;
+        self::getInstance()->sesstionStorage = $storage;
     }
     /**
      * Starts new session or resumes an existing one.
@@ -402,15 +402,15 @@ class SessionsManager {
      * @throws SessionException If session name is missing or invalid.
      */
     public static function start(string $sessionName, array $options = []) {
-        self::_get()->_pauseSessions();
+        self::getInstance()->pauseSessions();
 
         if (!self::hasSession($sessionName)) {
             $options['name'] = $sessionName;
             $s = new Session($options);
             $s->start();
-            self::_get()->sesstionsArr[] = $s;
+            self::getInstance()->sesstionsArr[] = $s;
         } else {
-            foreach (self::_get()->sesstionsArr as $sesstionObj) {
+            foreach (self::getInstance()->sesstionsArr as $sesstionObj) {
                 if ($sesstionObj->getName() == $sessionName) {
                     $sesstionObj->start();
                 }
@@ -432,7 +432,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function validateStorage() {
-        foreach (self::_get()->sesstionsArr as $session) {
+        foreach (self::getInstance()->sesstionsArr as $session) {
             $status = $session->getStatus();
 
             if ($status == Session::STATUS_NEW ||
@@ -453,7 +453,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    private static function _checkAndLoadFromCookie($sName) {
+    private static function checkAndLoadFromCookie($sName) {
         $sId = self::getSessionIDFromRequest($sName);
 
         if ($sId !== false) {
@@ -464,7 +464,7 @@ class SessionsManager {
             $tempSesstion->start();
 
             if ($tempSesstion->getStatus() == Session::STATUS_RESUMED) {
-                self::_get()->sesstionsArr[] = $tempSesstion;
+                self::getInstance()->sesstionsArr[] = $tempSesstion;
 
                 return true;
             }
@@ -480,8 +480,8 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    private static function _checkLoadedSesstions($sName) {
-        foreach (self::_get()->sesstionsArr as $sesstionObj) {
+    private static function checkLoadedSesstions($sName) {
+        foreach (self::getInstance()->sesstionsArr as $sesstionObj) {
             if ($sesstionObj->getName() == $sName) {
                 return true;
             }
@@ -495,7 +495,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    private static function _get() {
+    private static function getInstance() {
         if (self::$inst === null) {
             self::$inst = new SessionsManager();
         }
@@ -505,7 +505,7 @@ class SessionsManager {
     /**
      * @since 1.0
      */
-    private function _pauseSessions() {
+    private function pauseSessions() {
         $this->activeSesstion = null;
 
         foreach ($this->sesstionsArr as $sesstion) {

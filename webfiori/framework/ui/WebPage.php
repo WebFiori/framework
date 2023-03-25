@@ -1047,7 +1047,7 @@ class WebPage {
     public function setTitle(string $val) {
         if ($val !== null) {
             $this->title = $val;
-            $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+            $this->document->getHeadNode()->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
         }
     }
     /**

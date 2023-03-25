@@ -273,7 +273,6 @@ class RunSQLCommandTest extends TestCase {
             "The following query will be executed on the database:\n",
             "create table if not exists `test` (\n".
             "    `id` int not null\n".
-            "\n".
             ")\n".
             "engine = InnoDB\n".
             "default charset = utf8mb4\n".
@@ -395,7 +394,6 @@ class RunSQLCommandTest extends TestCase {
             . "    `last_name` varchar(128) null collate utf8mb4_unicode_520_ci,\n"
             . "    `joining_date` datetime not null,\n"
             . "    `created_on` timestamp not null default now()\n"
-            . "\n"
             . ")\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
@@ -434,7 +432,6 @@ class RunSQLCommandTest extends TestCase {
             . "    `salary` decimal(10,2) not null default '0',\n"
             . "    `created_on` timestamp not null default now(),\n"
             . "    `last_updated` datetime null\n"
-            . "\n)"
             . "\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
@@ -488,8 +485,7 @@ class RunSQLCommandTest extends TestCase {
             . "    `salary` decimal(10,2) not null default '0',\n"
             . "    `created_on` timestamp not null default now(),\n"
             . "    `last_updated` datetime null\n"
-            . "\n)"
-            . "\n"
+            . ")\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",

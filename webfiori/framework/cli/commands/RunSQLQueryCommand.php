@@ -50,14 +50,14 @@ class RunSQLQueryCommand extends CLICommand {
         if (count($dbConnections) != 0) {
             if ($schema !== null) {
                 if (class_exists($schema)) {
-                    return $this->_schemaBased($schema);
+                    return $this->schemaBased($schema);
                 } else {
                     $this->warning('Schema not found: '.$schema);
 
-                    return $this->_connectionBased($dbConnections);
+                    return $this->connectionBased($dbConnections);
                 }
             } else {
-                return $this->_connectionBased($dbConnections);
+                return $this->connectionBased($dbConnections);
             }
         } else {
             $this->error('No database connections available. Add connections to application configuration or use the command "add".');
@@ -65,7 +65,7 @@ class RunSQLQueryCommand extends CLICommand {
             return -1;
         }
     }
-    private function _connectionBased($dbConnections) : int {
+    private function connectionBased($dbConnections) : int {
         $connName = $this->getArgValue('--connection');
         $file = $this->getArgValue('--file');
 
@@ -101,7 +101,7 @@ class RunSQLQueryCommand extends CLICommand {
 
         return $this->generalQuery($schema);
     }
-    private function _schemaBased($schema) {
+    private function schemaBased($schema) {
         $schemaInst = new $schema();
 
         if ($schemaInst instanceof DB) {

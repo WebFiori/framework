@@ -281,11 +281,11 @@ abstract class AbstractJob implements JsonI {
         $count = count($split);
 
         if ($count == 5) {
-            $minutesValidity = $this->_checkMinutes($split[0]);
-            $hoursValidity = $this->_checkHours($split[1]);
-            $daysOfMonthValidity = $this->_dayOfMonth($split[2]);
-            $monthValidity = $this->_checkMonth($split[3]);
-            $daysOfWeekValidity = $this->_checkDayOfWeek($split[4]);
+            $minutesValidity = $this->checkMinutesHelper($split[0]);
+            $hoursValidity = $this->checkHoursHelper($split[1]);
+            $daysOfMonthValidity = $this->dayOfMonthHelper($split[2]);
+            $monthValidity = $this->checkMonthHelper($split[3]);
+            $daysOfWeekValidity = $this->checkDayOfWeekHelper($split[4]);
 
             if (!($minutesValidity === false || 
                $hoursValidity === false || 
@@ -397,18 +397,18 @@ abstract class AbstractJob implements JsonI {
         if ($xForce || $this->isTime()) {
             //Called to set the values of job args
             $this->getArgsValues();
-            $isSuccessRun = $this->_callMethod('execute');
+            $isSuccessRun = $this->callMethod('execute');
             $retVal = true;
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
 
             if ($this->isSuccess()) {
-                $this->_callMethod('onSuccess');
-                $this->_callMethod('afterExec');
+                $this->callMethod('onSuccess');
+                $this->callMethod('afterExec');
 
                 return $retVal;
             }
-            $this->_callMethod('onFail');
-            $this->_callMethod('afterExec');
+            $this->callMethod('onFail');
+            $this->callMethod('afterExec');
         }
 
         return $retVal;
@@ -1054,13 +1054,13 @@ abstract class AbstractJob implements JsonI {
             }
 
             if ($dayNameOrNum >= 0 && $dayNameOrNum <= 6) {
-                return $this->_weeklyOn($dayNameOrNum, $time);
+                return $this->weeklyOnHelper($dayNameOrNum, $time);
             }
 
             return false;
         }
 
-        return $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
+        return $this->weeklyOnHelper(self::WEEK_DAYS[$uDayName], $time);
     }
     /**
      * Calls one of the abstract methods of the class.
@@ -1071,12 +1071,12 @@ abstract class AbstractJob implements JsonI {
      * 
      * @return null|boolean
      */
-    private function _callMethod($fName) {
+    private function callMethod($fName) {
         Cron::log('Calling the method '.get_class($this)."::$fName()");
         try {
             return $this->$fName();
         } catch (Throwable $ex) {
-            $this->_logExeException($ex, $fName);
+            $this->logExeException($ex, $fName);
 
             return false;
         }
@@ -1087,13 +1087,13 @@ abstract class AbstractJob implements JsonI {
      * @return boolean
      * @since 1.0
      */
-    private function _checkDayOfWeek($dayOfWeekField) {
+    private function checkDayOfWeekHelper($dayOfWeekField) {
         $isValidExpr = true;
         $split = explode(',', $dayOfWeekField);
         $dayAttrs = $this->createAttrs('day');
 
         foreach ($split as $subExpr) {
-            $exprType = $this->_getSubExprType($subExpr);
+            $exprType = $this->getSubExprType($subExpr);
 
             if ($exprType == self::ANY_VAL) {
                 $dayAttrs['every-day'] = true;
@@ -1136,13 +1136,13 @@ abstract class AbstractJob implements JsonI {
      * @return boolean
      * @since 1.0
      */
-    private function _checkHours($hoursField) {
+    private function checkHoursHelper($hoursField) {
         $isValidExpr = true;
         $split = explode(',', $hoursField);
         $hoursAttrs = $this->createAttrs('hour');
 
         foreach ($split as $subExpr) {
-            $exprType = $this->_getSubExprType($subExpr);
+            $exprType = $this->getSubExprType($subExpr);
 
             if ($exprType == self::ANY_VAL) {
                 $hoursAttrs['every-hour'] = true;
@@ -1168,7 +1168,7 @@ abstract class AbstractJob implements JsonI {
                 }
                 $hoursAttrs['every-x-hour'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if (!$this->_isNumber($subExpr)) {
+                if (!$this->isNumberHelper($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1194,13 +1194,13 @@ abstract class AbstractJob implements JsonI {
      * @return boolean|array
      * @since 1.0
      */
-    private function _checkMinutes($minutesField) {
+    private function checkMinutesHelper($minutesField) {
         $isValidExpr = true;
         $split = explode(',', $minutesField);
         $minuteAttrs = $this->createAttrs('minute');
 
         foreach ($split as $subExpr) {
-            $exprType = $this->_getSubExprType($subExpr);
+            $exprType = $this->getSubExprType($subExpr);
 
             if ($exprType == self::ANY_VAL) {
                 $minuteAttrs['every-minute'] = true;
@@ -1226,7 +1226,7 @@ abstract class AbstractJob implements JsonI {
                 }
                 $minuteAttrs['every-x-minute'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if (!$this->_isNumber($subExpr)) {
+                if (!$this->isNumberHelper($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1252,13 +1252,13 @@ abstract class AbstractJob implements JsonI {
      * @return boolean
      * @since 1.0
      */
-    private function _checkMonth($monthField) {
+    private function checkMonthHelper($monthField) {
         $isValidExpr = true;
         $split = explode(',', $monthField);
         $monthAttrs = $this->createAttrs('month');
 
         foreach ($split as $subExpr) {
-            $exprType = $this->_getSubExprType($subExpr);
+            $exprType = $this->getSubExprType($subExpr);
 
             if ($exprType == self::ANY_VAL) {
                 $monthAttrs['every-month'] = true;
@@ -1301,13 +1301,13 @@ abstract class AbstractJob implements JsonI {
      * @return boolean
      * @since 1.0
      */
-    private function _dayOfMonth($dayOfMonthField) {
+    private function dayOfMonthHelper($dayOfMonthField) {
         $isValidExpr = true;
         $split = explode(',', $dayOfMonthField);
         $monthDaysAttrs = $this->createAttrs('day');
 
         foreach ($split as $subExpr) {
-            $exprType = $this->_getSubExprType($subExpr);
+            $exprType = $this->getSubExprType($subExpr);
 
             if ($exprType == self::ANY_VAL) {
                 $monthDaysAttrs['every-day'] = true;
@@ -1347,7 +1347,7 @@ abstract class AbstractJob implements JsonI {
      * @return string
      * @since 1.0
      */
-    private function _getSubExprType($expr) {
+    private function getSubExprType($expr) {
         $retVal = self::ANY_VAL;
 
         if ($expr != '*') {
@@ -1389,7 +1389,7 @@ abstract class AbstractJob implements JsonI {
      * @param string $str
      * @return boolean
      */
-    private function _isNumber($str) {
+    private function isNumberHelper($str) {
         $len = strlen($str);
 
         if ($len != 0) {
@@ -1408,7 +1408,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @param \Throwable
      */
-    private function _logExeException(Throwable $ex, $meth = '') {
+    private function logExeException(Throwable $ex, $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
                 .'The output of the job might be not as expected.');
         Cron::log('Exception class: '.get_class($ex).'');
@@ -1423,7 +1423,7 @@ abstract class AbstractJob implements JsonI {
     }
 
 
-    private function _weeklyOn($day,$time) {
+    private function weeklyOnHelper($day,$time) {
         $timeSplit = explode(':', $time);
 
         if (count($timeSplit) == 2) {

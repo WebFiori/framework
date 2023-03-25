@@ -32,11 +32,11 @@ class CreateCronJob extends CreateClassHelper {
         parent::__construct($command, new CronJobClassWriter());
 
         $this->setClassInfo(APP_DIR.'\\jobs', 'Job');
-        $jobName = $this->_getJobName();
-        $jobDesc = $this->_getJobDesc();
+        $jobName = $this->getJobName();
+        $jobDesc = $this->getJobDesc();
 
         if ($this->confirm('Would you like to add arguments to the job?', false)) {
-            $this->_getArgs();
+            $this->getArgsHelper();
         }
 
         $this->getWriter()->setJobName($jobName);
@@ -44,7 +44,7 @@ class CreateCronJob extends CreateClassHelper {
 
         $this->writeClass();
     }
-    private function _getArgs() {
+    private function getArgsHelper() {
         $addToMore = true;
 
         while ($addToMore) {
@@ -60,7 +60,7 @@ class CreateCronJob extends CreateClassHelper {
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
     }
-    private function _getJobDesc() {
+    private function getJobDesc() {
         return $this->getInput('Provide short description of what does the job will do:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
@@ -70,7 +70,7 @@ class CreateCronJob extends CreateClassHelper {
             return false;
         }));
     }
-    private function _getJobName() {
+    private function getJobName() {
         return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
         {
             $temp = new CronJob();

@@ -58,7 +58,7 @@ class ListThemesCommand extends CLICommand {
                     'color' => 'light-blue',
                     'bold' => true
                 ]);
-                $this->_printThemeObj($themeObj);
+                $this->printThemeObj($themeObj);
                 $index++;
             }
 
@@ -70,12 +70,12 @@ class ListThemesCommand extends CLICommand {
 
             return -1;
         }
-        $this->_printThemeObj($themesArr[$themeName]);
+        $this->printThemeObj($themesArr[$themeName]);
 
         return 0;
     }
 
-    private function _printThemeObj($themeObj) {
+    private function printThemeObj($themeObj) {
         $spaceSize = 15;
         $len00 = $spaceSize - strlen('Theme Name');
         $len01 = $spaceSize - strlen('Author');

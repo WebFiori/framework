@@ -202,7 +202,7 @@ class TableClassWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
+        $this->writeConstructor();
         $this->append('}');
     }
 
@@ -226,15 +226,15 @@ class TableClassWriter extends ClassWriter {
             $this->append('class '.$this->getName().' extends MSSQLTable {');
         }
     }
-    private function _addCols() {
+    private function addColsHelper() {
         $this->append('$this->addColumns([', 2);
 
         foreach ($this->tableObj->getCols() as $key => $colObj) {
-            $this->_appendColObj($key, $colObj);
+            $this->appendColObj($key, $colObj);
         }
         $this->append(']);', 2);
     }
-    private function _addFks() {
+    private function addFksHelper() {
         $fks = $this->tableObj->getForeignKeys();
 
         foreach ($fks as $fkObj) {
@@ -261,7 +261,7 @@ class TableClassWriter extends ClassWriter {
      * 
      * @param MySQLColumn $colObj
      */
-    private function _appendColObj($key, $colObj) {
+    private function appendColObj($key, $colObj) {
         $dataType = $colObj->getDatatype();
         $this->append("'$key' => [", 3);
         $this->append("'type' => '".$colObj->getDatatype()."',", 4);
@@ -319,7 +319,7 @@ class TableClassWriter extends ClassWriter {
         }
         $this->append("],", 3);
     }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
@@ -331,8 +331,8 @@ class TableClassWriter extends ClassWriter {
         if ($this->tableObj->getComment() !== null) {
             $this->append('$this->setComment(\''.$this->tableObj->getComment().'\');', 2);
         }
-        $this->_addCols();
-        $this->_addFks();
+        $this->addColsHelper();
+        $this->addFksHelper();
         $this->append('}', 1);
     }
     private function addAllUse() {

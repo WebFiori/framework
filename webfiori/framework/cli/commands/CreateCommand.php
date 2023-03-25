@@ -37,7 +37,7 @@ class CreateCommand extends CLICommand {
             new CommandArgument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-    public function _createEntityFromQuery() {
+    public function createEntityFromQuery() {
         $tableObj = CLIUtils::readTable($this);
         $defaultNs = APP_DIR.'\\entity';
         $this->println('We need from you to give us entity class information.');
@@ -77,7 +77,7 @@ class CreateCommand extends CLICommand {
             $create = new CreateTableObj($this);
             $create->readClassInfo();
         } else if ($answer == 'Entity class from table.') {
-            $this->_createEntityFromQuery();
+            $this->createEntityFromQuery();
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
         } else if ($answer == 'Middleware.') {

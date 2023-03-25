@@ -118,7 +118,7 @@ class CronJobClassWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
+        $this->writeConstructor();
         $this->append([
             '/**',
             ' * Execute the process.',
@@ -191,7 +191,7 @@ class CronJobClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends AbstractJob {');
     }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',

@@ -72,7 +72,7 @@ class ThemeLoader {
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                    self::_scanDir($filesInDir, $pathToScan);
+                    self::scanDir($filesInDir, $pathToScan);
                 }
             } else {
                 throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
@@ -215,7 +215,7 @@ class ThemeLoader {
     /**
      * @throws Exception
      */
-    private static function _scanDir($filesInDir, $pathToScan) {
+    private static function scanDir($filesInDir, $pathToScan) {
         foreach ($filesInDir as $fileName) {
             $fileExt = substr($fileName, -4);
 

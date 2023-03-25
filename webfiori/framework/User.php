@@ -177,7 +177,7 @@ class User implements JsonI, SessionUser {
         $g = Access::getGroup($groupId);
 
         if ($g instanceof PrivilegesGroup) {
-            $this->_addToGroup($g);
+            $this->addToGroupHelper($g);
         }
     }
     /**
@@ -339,7 +339,7 @@ class User implements JsonI, SessionUser {
         $g = Access::getGroup($groupId);
 
         if ($g instanceof PrivilegesGroup) {
-            return $this->_inGroup($g);
+            return $this->inGroupHelper($g);
         }
 
         return false;
@@ -530,13 +530,13 @@ class User implements JsonI, SessionUser {
      * 
      * @param PrivilegesGroup $group
      */
-    private function _addToGroup(PrivilegesGroup $group) {
+    private function addToGroupHelper(PrivilegesGroup $group) {
         foreach ($group->privileges() as $p) {
             $this->addPrivilege($p->getID());
         }
 
         foreach ($group->childGroups() as $g) {
-            $this->_addToGroup($g);
+            $this->addToGroupHelper($g);
         }
     }
     /**
@@ -544,7 +544,7 @@ class User implements JsonI, SessionUser {
      * @param PrivilegesGroup $group
      * @return bool
      */
-    private function _inGroup(PrivilegesGroup $group): bool {
+    private function inGroupHelper(PrivilegesGroup $group): bool {
         $inGroup = true;
 
         if (count($group->privileges()) === 0) {
@@ -557,7 +557,7 @@ class User implements JsonI, SessionUser {
 
         if ($inGroup === true) {
             foreach ($group->childGroups() as $g) {
-                $inGroup = $inGroup && $this->_inGroup($g);
+                $inGroup = $inGroup && $this->inGroupHelper($g);
             }
         }
 

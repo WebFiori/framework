@@ -48,16 +48,16 @@ class AddCommand extends CLICommand {
         $answer = $this->select('What would you like to add?', $options, count($options) - 1);
 
         if ($answer == 'New database connection.') {
-            return $this->_addDbConnection();
+            return $this->addDbConnection();
         } else if ($answer == 'New SMTP connection.') {
-            return $this->_addSmtp();
+            return $this->addSmtp();
         } else if ($answer == 'New website language.') {
-            return $this->_addLang();
+            return $this->addLang();
         }
 
         return 0;
     }
-    private function _addDbConnection() {
+    private function addDbConnection() {
         $dbType = $this->select('Select database type:', ConnectionInfo::SUPPORTED_DATABASES);
 
         if ($dbType == 'mysql') {
@@ -94,12 +94,12 @@ class AddCommand extends CLICommand {
         } else {
             $this->error('Unable to connect to the database.');
             $this->error($addConnection->getMessage());
-            $this->_confirmAdd($connInfoObj);
+            $this->confirmAdd($connInfoObj);
         }
 
         return 0;
     }
-    private function _addLang() {
+    private function addLang() {
         $langCode = strtoupper(trim($this->getInput('Language code:')));
 
         if (strlen($langCode) != 2) {
@@ -128,7 +128,7 @@ class AddCommand extends CLICommand {
 
         return 0;
     }
-    private function _addSmtp() {
+    private function addSmtp() {
         $smtpConn = new SMTPAccount();
         $smtpConn->setServerAddress($this->getInput('SMTP Server address:', '127.0.0.1'));
         $smtpConn->setPort(25);
@@ -160,16 +160,16 @@ class AddCommand extends CLICommand {
                 $this->error('Unable to connect to SMTP server.');
                 $this->println('Error Information: '.$server->getLastResponse());
 
-                $this->_confirmAdd($smtpConn);
+                $this->confirmAdd($smtpConn);
             }
         } catch (Exception $ex) {
             $this->error('An exception with message "'.$ex->getMessage().'" was thrown while trying to connect.');
-            $this->_confirmAdd($smtpConn);
+            $this->confirmAdd($smtpConn);
         }
 
         return 0;
     }
-    private function _confirmAdd($smtpOrDbConn) {
+    private function confirmAdd($smtpOrDbConn) {
         if ($this->confirm('Would you like to store connection information anyway?', false)) {
             if ($smtpOrDbConn instanceof SMTPAccount) {
                 ConfigController::get()->updateOrAddEmailAccount($smtpOrDbConn);

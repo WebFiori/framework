@@ -107,7 +107,7 @@ class WebFioriApp {
     private function __construct() {
         $this->checkStdInOut();
         $this->initFrameworkVersionInfo();
-        $this->_checkAppDir();
+        $this->checkAppDir();
         /**
          * Change encoding of mb_ functions to UTF-8
          */
@@ -410,7 +410,7 @@ class WebFioriApp {
         } catch (Error $ex) {
         }
     }
-    private function _checkAppDir() {
+    private function checkAppDir() {
         if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application 

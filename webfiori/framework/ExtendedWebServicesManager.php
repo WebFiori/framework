@@ -44,7 +44,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     public function __construct(string $version = '1.0.0') {
         parent::__construct($version);
-        $this->_setTranslation();
+        $this->setTranslationHelper();
         $langCode = $this->getTranslation()->getCode();
         $generalDir = 'general';
         $this->createLangDir($generalDir);
@@ -415,7 +415,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     /**
      * Set the language at which the API is going to use for the response.
      */
-    private function _setTranslation() {
+    private function setTranslationHelper() {
         $reqMeth = Request::getMethod();
         $activeSession = SessionsManager::getActiveSession();
 

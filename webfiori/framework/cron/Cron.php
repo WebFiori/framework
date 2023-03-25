@@ -125,7 +125,7 @@ class Cron {
         $this->logsArray = [];
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
-        $this->_setPassword('');
+        $this->setPasswordHelper('');
     }
     /**
      * Returns an object that represents the job which is currently being executed.
@@ -258,10 +258,10 @@ class Cron {
      */
     public static function execLog($bool = null) : bool {
         if ($bool !== null) {
-            self::get()->_setLogEnabled($bool);
+            self::get()->setLogEnabledHelper($bool);
         }
 
-        return self::get()->_isLogEnabled();
+        return self::get()->isLogEnabledHelper();
     }
     /**
      * Returns a singleton of the class.
@@ -390,7 +390,7 @@ class Cron {
      * @since 1.0
      */
     public static function jobsQueue() : Queue {
-        return self::get()->_getQueue();
+        return self::get()->getQueueHelper();
     }
     /**
      * Appends a message to the array that contains logged messages.
@@ -498,10 +498,10 @@ class Cron {
      */
     public static function password($pass = null) : string {
         if ($pass !== null) {
-            self::get()->_setPassword($pass);
+            self::get()->setPasswordHelper($pass);
         }
 
-        return self::get()->_getPassword();
+        return self::get()->getPasswordHelper();
     }
     /**
      * Register any CRON job which exist in the folder 'jobs' of the application.
@@ -529,7 +529,7 @@ class Cron {
         self::get()->logsArray = [];
         self::get()->isLogEnabled = false;
         self::get()->cronJobsQueue = new Queue();
-        self::get()->_setPassword('');
+        self::get()->setPasswordHelper('');
     }
     /**
      * Check each scheduled job and run it if its time to run it.
@@ -591,7 +591,7 @@ class Cron {
             $job = self::getJob(trim($jobName));
 
             if ($job instanceof AbstractJob) {
-                self::_runJob($retVal, $job, $xForce, $command);
+                self::runJobHelper($retVal, $job, $xForce, $command);
             } else {
                 self::log("Error: No job which has the name '$jobName' is found.");
                 self::log('Check finished.');
@@ -603,7 +603,7 @@ class Cron {
 
             while ($job = Cron::jobsQueue()->dequeue()) {
                 $tempQ->enqueue($job);
-                self::_runJob($retVal, $job, $xForce, $command);
+                self::runJobHelper($retVal, $job, $xForce, $command);
             }
 
             while ($job = $tempQ->dequeue()) {
@@ -625,7 +625,7 @@ class Cron {
      * @since 1.0
      */
     public static function scheduleJob(AbstractJob $job) : bool {
-        return self::get()->_addJob($job);
+        return self::get()->addJobHelper($job);
     }
     /**
      * Sets the number of day in the month at which the scheduler started to 
@@ -794,7 +794,7 @@ class Cron {
      * @return type
      * @since 1.0
      */
-    private function _addJob($job) {
+    private function addJobHelper($job) {
         $retVal = false;
 
         if ($job instanceof AbstractJob) {
@@ -815,7 +815,7 @@ class Cron {
      * @return string
      * @since 1.0
      */
-    private function _getPassword() {
+    private function getPasswordHelper() {
         if ($this->accessPass == '') {
             return 'NO_PASSWORD';
         }
@@ -827,13 +827,13 @@ class Cron {
      * @return Queue
      * @since 1.0
      */
-    private function _getQueue() {
+    private function getQueueHelper() {
         return $this->cronJobsQueue;
     }
-    private function _isLogEnabled() {
+    private function isLogEnabledHelper() {
         return $this->isLogEnabled;
     }
-    private function _logExecHelper($forced, $job, File $file) {
+    private function logExecHelper($forced, $job, File $file) {
         if ($forced) {
             $file->setRawData('Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
 
@@ -854,14 +854,14 @@ class Cron {
         $file->write();
     }
 
-    private function _logJobExecution($job,$forced = false) {
+    private function logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
             $file = new File($logFile);
             $file->create(true);
 
-            $this->_logExecHelper($forced, $job, $file);
+            $this->logExecHelper($forced, $job, $file);
         }
     }
     /**
@@ -870,7 +870,7 @@ class Cron {
      * @param AbstractJob $job
      * @param type $xForce
      */
-    private static function _runJob(&$retVal, $job, $xForce, CronCommand $command = null) {
+    private static function runJobHelper(&$retVal, $job, $xForce, CronCommand $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
                 $job->setCommand($command);
@@ -886,11 +886,11 @@ class Cron {
                     }
                 }
             }
-            self::get()->_setActiveJob($job);
+            self::get()->setActiveJobHelper($job);
         }
 
         if ($job->exec($xForce)) {
-            self::get()->_logJobExecution($job,$xForce);
+            self::get()->logJobExecution($job,$xForce);
             $retVal['executed-count']++;
 
             if ($job->isSuccess() === true) {
@@ -899,21 +899,21 @@ class Cron {
                 $retVal['failed'][] = $job->getJobName();
             }
         }
-        self::get()->_setActiveJob(null);
+        self::get()->setActiveJobHelper(null);
     }
     /**
      * 
      * @param AbstractJob|null $job
      * @since 1.0.4
      */
-    private function _setActiveJob($job) {
+    private function setActiveJobHelper($job) {
         $this->activeJob = $job;
 
         if ($job !== null) {
             self::log('Active job: "'.$job->getJobName().'" ...');
         }
     }
-    private function _setLogEnabled(bool $bool) {
+    private function setLogEnabledHelper(bool $bool) {
         $this->isLogEnabled = $bool;
     }
     /**
@@ -921,7 +921,7 @@ class Cron {
      * @param type $pass
      * @since 1.0
      */
-    private function _setPassword(string $pass) {
+    private function setPasswordHelper(string $pass) {
         $this->accessPass = $pass;
     }
 }

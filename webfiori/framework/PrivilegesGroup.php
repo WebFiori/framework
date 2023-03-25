@@ -192,7 +192,7 @@ class PrivilegesGroup implements JsonI {
 
         if (!$hasPr && $checkChildGroups === true) {
             foreach ($this->childGroups() as $g) {
-                $hasPr = $this->_hasPrivilege($g, $p);
+                $hasPr = $this->hasPrivilegeHelper($g, $p);
 
                 if ($hasPr) {
                     break;
@@ -320,7 +320,7 @@ class PrivilegesGroup implements JsonI {
                 return true;
             }
         } else if ($this->parentGroup !== null) {
-            $this->parentGroup->_removeChildGroup($this->getID());
+            $this->parentGroup->removeChildGroupHelper($this->getID());
             $this->parentGroup = null;
 
             return true;
@@ -364,7 +364,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @param Privilege $p The privilege that will be checked. 
      */
-    private function _hasPrivilege(PrivilegesGroup $group, Privilege $p) {
+    private function hasPrivilegeHelper(PrivilegesGroup $group, Privilege $p) {
         $hasPr = false;
 
         foreach ($group->privileges() as $privilege) {
@@ -376,7 +376,7 @@ class PrivilegesGroup implements JsonI {
 
         if (!$hasPr) {
             foreach ($group->childGroups() as $g) {
-                $hasPr = $this->_hasPrivilege($g, $p);
+                $hasPr = $this->hasPrivilegeHelper($g, $p);
 
                 if ($hasPr === true) {
                     break;
@@ -387,7 +387,7 @@ class PrivilegesGroup implements JsonI {
         return $hasPr;
     }
 
-    private function _removeChildGroup($gId) {
+    private function removeChildGroupHelper($gId) {
         for ($x = 0 ; $x < count($this->childGroups()) ; $x++) {
             $xG = $this->childGroups[$x];
 

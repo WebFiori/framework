@@ -113,13 +113,13 @@ abstract class ClassWriter {
      */
     public function append($strOrArr, $tabsCount = 0) {
         if (gettype($strOrArr) != 'array') {
-            $this->_a($strOrArr, $tabsCount);
+            $this->a($strOrArr, $tabsCount);
 
             return;
         }
 
         foreach ($strOrArr as $str) {
-            $this->_a($str, $tabsCount);
+            $this->a($str, $tabsCount);
         }
     }
     /**
@@ -436,7 +436,7 @@ abstract class ClassWriter {
         }
         $this->append($useClassesArr);
     }
-    private function _a($str, $tapsCount) {
+    private function a($str, $tapsCount) {
         $tabStr = str_repeat('    ', $tapsCount);
         $this->classAsStr .= $tabStr.$str."\n";
     }

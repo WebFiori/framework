@@ -36,11 +36,11 @@ class CreateWebService extends CreateClassHelper {
 
 
 
-        $this->_setServiceName($serviceObj);
+        $this->setServiceName($serviceObj);
         $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
 
         if ($this->confirm('Would you like to add request parameters to the service?', false)) {
-            $this->_addParamsToService($serviceObj);
+            $this->addParamsToService($serviceObj);
         }
 
         $this->println('Creating the class...');
@@ -51,13 +51,13 @@ class CreateWebService extends CreateClassHelper {
      * 
      * @param AbstractWebService $serviceObj
      */
-    private function _addParamsToService($serviceObj) {
+    private function addParamsToService($serviceObj) {
         $addMore = true;
 
         do {
             $paramObj = new RequestParameter('h');
             $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
-            $this->_setParamName($paramObj);
+            $this->setParamName($paramObj);
             $added = $serviceObj->addParameter($paramObj);
             $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));
 
@@ -73,7 +73,7 @@ class CreateWebService extends CreateClassHelper {
      * 
      * @param RequestParameter $paramObj
      */
-    private function _setParamName($paramObj) {
+    private function setParamName($paramObj) {
         $validName = false;
 
         do {
@@ -89,7 +89,7 @@ class CreateWebService extends CreateClassHelper {
      * 
      * @param WebService $serviceObj
      */
-    private function _setServiceName($serviceObj) {
+    private function setServiceName($serviceObj) {
         $validName = false;
 
         do {

@@ -29,7 +29,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new CLICommandClassWriter());
         $this->setClassInfo(APP_DIR.'\\commands', 'Command');
-        $commandName = $this->_getCommandName();
+        $commandName = $this->getCommandName();
         $commandDesc = $this->getInput('Give a short description of the command:');
 
         if ($command->confirm('Would you like to add arguments to the command?', false)) {
@@ -43,7 +43,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
 
         $this->writeClass();
     }
-    private function _getCommandName() {
+    private function getCommandName() {
         return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0 && strpos($val, ' ') === false) {

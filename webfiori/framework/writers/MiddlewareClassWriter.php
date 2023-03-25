@@ -129,7 +129,7 @@ class MiddlewareClassWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
+        $this->writeConstructor();
         $this->append([
             '/**',
             ' * Execute a set of instructions before accessing the application.',
@@ -184,7 +184,7 @@ class MiddlewareClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends AbstractMiddleware {');
     }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',

@@ -123,8 +123,8 @@ class WebServiceWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
-        $this->_implementMethods();
+        $this->writeConstructor();
+        $this->implementMethods();
         $this->append('}');
     }
 
@@ -135,7 +135,7 @@ class WebServiceWriter extends ClassWriter {
             "/**",
             " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
         ]);
-        $this->_writeServiceDoc($this->servicesObj);
+        $this->writeServiceDoc($this->servicesObj);
         $this->append(" */");
     }
 
@@ -146,7 +146,7 @@ class WebServiceWriter extends ClassWriter {
      * 
      * @param RequestParameter $param
      */
-    private function _appendParam($param) {
+    private function appendParam($param) {
         $this->append("'".$param->getName()."' => [", 3);
         $this->append("'type' => '".$param->getType()."',", 4);
 
@@ -174,17 +174,17 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('],', 3);
     }
-    private function _appendParams($paramsArray) {
+    private function appendParams($paramsArray) {
         if (count($paramsArray) !== 0) {
             $this->append('$this->addParameters([', 2);
 
             foreach ($paramsArray as $paramObj) {
-                $this->_appendParam($paramObj);
+                $this->appendParam($paramObj);
             }
             $this->append(']);', 2);
         }
     }
-    private function _implementMethods() {
+    private function implementMethods() {
         $name = $this->servicesObj->getName();
         $this->append([
             "/**",
@@ -220,7 +220,7 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('}', 1);
     }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
@@ -229,10 +229,10 @@ class WebServiceWriter extends ClassWriter {
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
-        $this->_appendParams($this->servicesObj->getParameters());
+        $this->appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
     }
-    private function _writeServiceDoc($service) {
+    private function writeServiceDoc($service) {
         $docArr = [];
 
         if (count($service->getParameters()) != 0) {

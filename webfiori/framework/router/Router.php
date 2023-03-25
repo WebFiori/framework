@@ -226,7 +226,7 @@ class Router {
     public static function addRoute(array $options) : bool {
         $options['type'] = Router::CUSTOMIZED;
 
-        return Router::get()->_addRoute($options);
+        return Router::get()->addRouteHelper1($options);
     }
     /**
      * Adds new route to a web services set.
@@ -279,9 +279,9 @@ class Router {
      */
     public static function api(array $options) : bool {
         $options['type'] = Router::API_ROUTE;
-        self::_addToMiddlewareGroup($options, 'api');
+        self::addToMiddlewareGroup($options, 'api');
 
-        return Router::get()->_addRoute($options);
+        return Router::get()->addRouteHelper1($options);
     }
     /**
      * Returns the base URI which is used to create routes.
@@ -354,9 +354,9 @@ class Router {
      */
     public static function closure(array $options) : bool {
         $options['type'] = Router::CLOSURE_ROUTE;
-        self::_addToMiddlewareGroup($options, 'closure');
+        self::addToMiddlewareGroup($options, 'closure');
 
-        return Router::get()->_addRoute($options);
+        return Router::get()->addRouteHelper1($options);
     }
     /**
      * Returns the value of the base URI which is appended to the path.
@@ -419,7 +419,7 @@ class Router {
      * @since 1.3.3
      */
     public static function getUriObj(string $path) {
-        return self::get()->_getUriObj($path);
+        return self::get()->getUriObjHelper($path);
     }
     /**
      * Returns an object of type 'RouterUri' which contains URL route information.
@@ -435,7 +435,7 @@ class Router {
      */
     public static function getUriObjByURL(string $url) {
         try {
-            self::get()->_resolveUrl($url, false);
+            self::get()->resolveUrlHelper($url, false);
 
             return self::getRouteUri();
         } catch (Error $ex) {
@@ -456,7 +456,7 @@ class Router {
      */
     public static function hasRoute(string $path) {
         $routesArr = self::get()->routes;
-        $trimmed = self::get()->_fixUriPath($path);
+        $trimmed = self::get()->fixUriPath($path);
 
         return isset($routesArr['static'][$trimmed]) || isset($routesArr['variable'][$trimmed]);
     }
@@ -478,7 +478,7 @@ class Router {
             $urlSet->setIsQuotedAttribute(true);
             $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
             ->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-            $routes = Router::get()->_getRoutes();
+            $routes = Router::get()->getRoutesHelper();
 
             foreach ($routes['static'] as $route) {
                 if ($route->isInSiteMap()) {
@@ -631,7 +631,7 @@ class Router {
      * @since 1.3.7
      */
     public static function removeRoute(string $path) : bool {
-        $pathFix = self::base().self::get()->_fixUriPath($path);
+        $pathFix = self::base().self::get()->fixUriPath($path);
         $retVal = false;
 
         if (isset(self::get()->routes['static'][$pathFix])) {
@@ -656,7 +656,7 @@ class Router {
      * @since 1.2
      */
     public static function route(string $uri) {
-        Router::get()->_resolveUrl($uri);
+        Router::get()->resolveUrlHelper($uri);
     }
     /**
      * Returns an associative array of all available routes.
@@ -669,11 +669,11 @@ class Router {
     public static function routes() : array {
         $routesArr = [];
 
-        foreach (Router::get()->_getRoutes()['static'] as $routeUri) {
+        foreach (Router::get()->getRoutesHelper()['static'] as $routeUri) {
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
 
-        foreach (Router::get()->_getRoutes()['variable'] as $routeUri) {
+        foreach (Router::get()->getRoutesHelper()['variable'] as $routeUri) {
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
 
@@ -716,7 +716,7 @@ class Router {
      * @since 1.3.8
      */
     public static function setOnNotFound($func) {
-        self::get()->_setOnNotFound($func);
+        self::get()->setOnNotFoundHelper($func);
     }
     /**
      * Adds an object of type 'RouterUri' as new route.
@@ -730,7 +730,7 @@ class Router {
      * @since 1.3.2
      */
     public static function uriObj(RouterUri $routerUri) : bool {
-        if ($routerUri instanceof RouterUri && !self::get()->_hasRoute($routerUri->getPath())) {
+        if ($routerUri instanceof RouterUri && !self::get()->hasRouteHelper($routerUri->getPath())) {
             if ($routerUri->hasVars()) {
                 self::get()->routes['variable'] = $routerUri;
             } else {
@@ -792,13 +792,13 @@ class Router {
      * 
      * @since 1.0
      */
-    private function _addRoute(array $options) {
+    private function addRouteHelper1(array $options) {
         if (isset($options['routes'])) {
-            $routesArr = $this->_addRoutesGroup($options);
+            $routesArr = $this->addRoutesGroupHelper($options);
             $added = true;
 
             foreach ($routesArr as $route) {
-                $added = $added && $this->_addRoute($route);
+                $added = $added && $this->addRouteHelper1($route);
             }
 
             return $added;
@@ -807,7 +807,7 @@ class Router {
         if (!isset($options['route-to'])) {
             return false;
         } else {
-            $options = $this->_checkOptionsArr($options);
+            $options = $this->checkOptionsArr($options);
             $routeType = $options['type'];
         }
 
@@ -815,12 +815,12 @@ class Router {
             $routeType == self::VIEW_ROUTE || 
             $routeType == self::CUSTOMIZED || 
             $routeType == self::CLOSURE_ROUTE)) {
-            return $this->_addRouteHelper($options);
+            return $this->addRouteHelper0($options);
         }
 
         return false;
     }
-    private function _addRouteHelper($options) {
+    private function addRouteHelper0($options) {
         $routeTo = $options['route-to'];
         $caseSensitive = $options['case-sensitive'];
         $routeType = $options['type'];
@@ -835,7 +835,7 @@ class Router {
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
         $routeUri->setAction($options['action']);
 
-        if (!$this->_hasRoute($routeUri)) {
+        if (!$this->hasRouteHelper($routeUri)) {
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
             } else {
@@ -869,16 +869,16 @@ class Router {
 
         return false;
     }
-    private function _addRoutesGroup($options, &$routesToAddArr = []) {
+    private function addRoutesGroupHelper($options, &$routesToAddArr = []) {
         $subRoutes = isset($options['routes']) && gettype($options['routes']) == 'array' ? $options['routes'] : [];
 
         foreach ($subRoutes as $subRoute) {
             if (isset($subRoute['path'])) {
-                $this->_copyOptionsToSub($options, $subRoute);
+                $this->copyOptionsToSub($options, $subRoute);
                 $subRoute['path'] = $options['path'].'/'.$subRoute['path'];
 
                 if (isset($subRoute['routes']) && gettype($subRoute['routes']) == 'array') {
-                    $this->_addRoutesGroup($subRoute, $routesToAddArr);
+                    $this->addRoutesGroupHelper($subRoute, $routesToAddArr);
                 } else {
                     $routesToAddArr[] = $subRoute;
                 }
@@ -890,13 +890,13 @@ class Router {
                 'path' => $options['path'],
                 'route-to' => $options['route-to']
             ];
-            $this->_copyOptionsToSub($options, $sub);
+            $this->copyOptionsToSub($options, $sub);
             $routesToAddArr[] = $sub;
         }
 
         return $routesToAddArr;
     }
-    private static function _addToMiddlewareGroup(&$options, $groupName) {
+    private static function addToMiddlewareGroup(&$options, $groupName) {
         if (isset($options['middleware'])) {
             if (gettype($options['middleware']) == 'array') {
                 $options['middleware'][] = $groupName;
@@ -915,7 +915,7 @@ class Router {
      * 
      * @return array
      */
-    private function _checkOptionsArr($options) {
+    private function checkOptionsArr($options) {
         $routeTo = $options['route-to'];
 
         if (isset($options['case-sensitive'])) {
@@ -951,7 +951,7 @@ class Router {
         }
         $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
                 $options['closure-params'] : [];
-        $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
+        $path = isset($options['path']) ? $this->fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
         $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
 
@@ -976,11 +976,11 @@ class Router {
             'languages' => $languages,
             'vars-values' => $varValues,
             'middleware' => $mdArr,
-            'methods' => $this->_getRequestMethods($options),
+            'methods' => $this->getRequestMethodsHelper($options),
             'action' => $action
         ];
     }
-    private function _copyOptionsToSub($options, &$subRoute) {
+    private function copyOptionsToSub($options, &$subRoute) {
         if (!isset($subRoute['case-sensitive'])) {
             if (isset($options['case-sensitive'])) {
                 $caseSensitive = $options['case-sensitive'] === true;
@@ -1045,7 +1045,7 @@ class Router {
             $subRoute['languages'] = $languages;
         }
 
-        $reqMethArr = $this->_getRequestMethods($options);
+        $reqMethArr = $this->getRequestMethodsHelper($options);
 
         if (isset($subRoute['methods'])) {
             if (gettype($subRoute['methods']) != 'array') {
@@ -1060,7 +1060,7 @@ class Router {
             $subRoute['methods'] = $reqMethArr;
         }
     }
-    private function _fixFilePath($path) {
+    private function fixFilePath($path) {
         if (strlen($path) != 0 && $path != '/') {
             $path00 = str_replace('/', DS, $path);
             $path01 = str_replace('\\', DS, $path00);
@@ -1091,7 +1091,7 @@ class Router {
      * 
      * @since 1.1
      */
-    private function _fixUriPath($path) {
+    private function fixUriPath($path) {
         if (strlen($path) != 0 && $path != '/') {
             if ($path[strlen($path) - 1] == '/' || $path[0] == '/') {
                 while ($path[0] == '/' || $path[strlen($path) - 1] == '/') {
@@ -1109,7 +1109,7 @@ class Router {
 
         return $path;
     }
-    private function _getFileDirAndName($absDir) {
+    private function getFileDirAndName($absDir) {
         $expl = explode(DS, $absDir);
         $fileName = $expl[count($expl) - 1];
         $dir = substr($absDir, 0, strlen($absDir) - strlen($fileName));
@@ -1129,7 +1129,7 @@ class Router {
      * array will be empty. Other than that, the array will have request 
      * methods as strings.
      */
-    private function _getRequestMethods($options) {
+    private function getRequestMethodsHelper($options) {
         $requestMethodsArr = [];
 
         if (isset($options['methods'])) {
@@ -1163,7 +1163,7 @@ class Router {
      * 
      * @since 1.2
      */
-    private function _getRoutes() {
+    private function getRoutesHelper() {
         return $this->routes;
     }
     /**
@@ -1177,7 +1177,7 @@ class Router {
      * 
      * @since 1.3.3
      */
-    private function _getUriObj($path) {
+    private function getUriObjHelper($path) {
         if (isset($this->routes['static'][$path])) {
             return $this->routes['static'][$path];
         } else {
@@ -1198,7 +1198,7 @@ class Router {
      * 
      * @since 1.1
      */
-    private function _hasRoute($uriObj) {
+    private function hasRouteHelper($uriObj) {
         $path = $uriObj->getPath();
 
         if (!$uriObj->isCaseSensitive()) {
@@ -1220,16 +1220,16 @@ class Router {
      * 
      * @since 1.1
      */
-    private function _isDirectoryAVar($dir) {
+    private function isDirectoryAVar($dir) {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
     /**
      * 
      * @param RouterUri $route
      */
-    private function _loadResource($route) {
+    private function loadResourceHelper($route) {
         $file = $route->getRouteTo();
-        $info = $this->_getFileDirAndName($file);
+        $info = $this->getFileDirAndName($file);
         $fileObj = new File($info['name'], $info['dir']);
         $fileObj->read();
 
@@ -1281,7 +1281,7 @@ class Router {
      * 
      * @since 1.0
      */
-    private function _resolveUrl($uri, $loadResource = true) {
+    private function resolveUrlHelper($uri, $loadResource = true) {
         $this->uriObj = null;
 
         if (self::routesCount() != 0) {
@@ -1291,12 +1291,12 @@ class Router {
                 $this->redirectToNonWWW($routeUri);
             }
             //first, search for the URI wuthout checking parameters
-            if ($this->_searchRoute($routeUri, $uri, $loadResource)) {
+            if ($this->searchRoute($routeUri, $uri, $loadResource)) {
                 return;
             }
             //if no route found, try to replace parameters with values 
             //note that query string vars are optional.
-            if ($this->_searchRoute($routeUri, $uri, $loadResource, true)) {
+            if ($this->searchRoute($routeUri, $uri, $loadResource, true)) {
                 return;
             }
 
@@ -1319,7 +1319,7 @@ class Router {
      * @return type
      * @throws RoutingException
      */
-    private function _routeFound($route, $loadResource) {
+    private function routeFound($route, $loadResource) {
         if ($route->isRequestMethodAllowed()) {
             $this->uriObj = $route;
             $route->getMiddlewar()->insertionSort(false);
@@ -1356,15 +1356,15 @@ class Router {
                     $routeType = $route->getType();
 
                     if ($routeType == self::VIEW_ROUTE || $routeType == self::CUSTOMIZED || $routeType == self::API_ROUTE) {
-                        $file = ROOT_PATH.$routeType.$this->_fixFilePath($file);
+                        $file = ROOT_PATH.$routeType.$this->fixFilePath($file);
                     } else {
-                        $file = ROOT_PATH.$this->_fixFilePath($file);
+                        $file = ROOT_PATH.$this->fixFilePath($file);
                     }
 
                     if (gettype($file) == 'string' && file_exists($file)) {
                         if ($loadResource === true) {
                             $route->setRoute($file);
-                            $this->_loadResource($route);
+                            $this->loadResourceHelper($route);
                         }
                     } else {
                         if ($loadResource === true) {
@@ -1405,7 +1405,7 @@ class Router {
      * @param type $withVars
      * @return boolean
      */
-    private function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
+    private function searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
         $pathArray = $routeUri->getPathArray();
         $requestMethod = Request::getMethod();
         $indexToSearch = 'static';
@@ -1428,17 +1428,17 @@ class Router {
 
                 if ($isEqual) {
                     $route->setRequestedUri($uri);
-                    $this->_routeFound($route, $loadResource);
+                    $this->routeFound($route, $loadResource);
 
                     return true;
                 }
             }
         } else {
             foreach ($this->routes['variable'] as $route) {
-                $this->_setUriVars($route, $pathArray, $requestMethod);
+                $this->setUriVarsHelper($route, $pathArray, $requestMethod);
 
                 if ($route->isAllParametersSet() && $route->setRequestedUri($uri)) {
-                    $this->_routeFound($route, $loadResource);
+                    $this->routeFound($route, $loadResource);
 
                     return true;
                 }
@@ -1455,10 +1455,8 @@ class Router {
      * 
      * @since 1.0
      */
-    private function _setOnNotFound($function) {
-        if (is_callable($function)) {
-            $this->onNotFound = $function;
-        }
+    private function setOnNotFoundHelper(callable $function) {
+        $this->onNotFound = $function;
     }
     /**
      * 
@@ -1469,7 +1467,7 @@ class Router {
      * 
      * @param string $requestMethod
      */
-    private function _setUriVars(RouterUri $uriRouteObj, $requestedPathArr, $requestMethod) {
+    private function setUriVarsHelper(RouterUri $uriRouteObj, $requestedPathArr, $requestMethod) {
         $routePathArray = $uriRouteObj->getPathArray();
         $pathVarsCount = count($routePathArray);
         $requestedPathPartsCount = count($requestedPathArr);
@@ -1479,7 +1477,7 @@ class Router {
                 break;
             }
 
-            if ($this->_isDirectoryAVar($routePathArray[$x])) {
+            if ($this->isDirectoryAVar($routePathArray[$x])) {
                 $varName = trim($routePathArray[$x], '{}');
 
                 if ($varName[strlen($varName) - 1] == '?') {
@@ -1601,9 +1599,9 @@ class Router {
     private static function view($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::VIEW_ROUTE;
-            self::_addToMiddlewareGroup($options, 'web');
+            self::addToMiddlewareGroup($options, 'web');
 
-            return Router::get()->_addRoute($options);
+            return Router::get()->addRouteHelper1($options);
         }
 
         return false;

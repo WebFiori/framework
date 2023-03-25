@@ -127,7 +127,7 @@ class CLICommandClassWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
+        $this->writeConstructor();
 
         $this->append([
             '/**',
@@ -169,7 +169,7 @@ class CLICommandClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends CLICommand {');
     }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',

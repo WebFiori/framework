@@ -768,7 +768,7 @@ class ConfigController {
         $cFile = new File('AppConfig.php', APP_PATH.'config');
         $cFile->remove();
 
-        $this->_writeAppConfigAttrs($cFile);
+        $this->writeAppConfigAttrs($cFile);
 
         $this->writeAppConfigConstructor($cFile);
 
@@ -1137,17 +1137,17 @@ class ConfigController {
         $this->a($cFile, "        \$this->dbConnections = [];");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->_writeDbCon($cFile);
+        $this->writeDbCon($cFile);
         $this->writeSiteInfo($cFile);
         $this->writeSmtpConn($cFile);
-        $this->_writeAppVersionInfo($cFile);
+        $this->writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
         require_once APP_PATH.'config'.DS.'AppConfig.php';
     }
-    private function _writeAppConfigAttrs($cFile) {
+    private function writeAppConfigAttrs($cFile) {
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
         $this->a($cFile, "namespace ".APP_DIR."\\config;");
@@ -1311,7 +1311,7 @@ class ConfigController {
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$webSiteNames;");
     }
-    private function _writeAppVersionInfo($cFile) {
+    private function writeAppVersionInfo($cFile) {
         $this->a($cFile, [
             $this->docStart,
             $this->since10,
@@ -1330,11 +1330,11 @@ class ConfigController {
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeCronPass($cFile) {
+    private function writeCronPass($cFile) {
         $password = $this->getCRONPassword();
         $this->a($cFile, "        \$this->cronPass = '".$password."';");
     }
-    private function _writeDbCon($cFile) {
+    private function writeDbCon($cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
@@ -1359,7 +1359,7 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeSiteTitles($cFile) {
+    private function writeSiteTitles($cFile) {
         $titlesArr = $this->getTitles();
         $this->a($cFile, "        \$this->defaultPageTitles = [");
 
@@ -1511,7 +1511,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
 
-        $this->_writeCronPass($cFile);
+        $this->writeCronPass($cFile);
 
         $this->a($cFile, $this->blockEnd, 1);
     }
@@ -1583,7 +1583,7 @@ class ConfigController {
         $this->a($cFile, "    private function initSiteInfo() {");
 
         $this->writeSiteNames($cFile);
-        $this->_writeSiteTitles($cFile);
+        $this->writeSiteTitles($cFile);
         $this->writeSiteDescriptions($cFile);
 
         $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");

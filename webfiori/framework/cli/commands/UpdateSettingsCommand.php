@@ -69,35 +69,35 @@ class UpdateSettingsCommand extends CLICommand {
         if ($answer == 'Quit.') {
             return 0;
         } else if ($answer == 'Update application name.') {
-            $this->_updateName();
+            $this->updateName();
         } else if ($answer == 'Update default page title.') {
-            $this->_updateTitle();
+            $this->updateTitle();
         } else if ($answer == 'Update CRON password.') {
-            $this->_updateCronPass();
+            $this->updateCronPass();
         } else if ($answer == 'Change title separator.') {
-            $this->_updateTitleSep();
+            $this->updateTitleSep();
         } else if ($answer == 'Update default page description.') {
-            $this->_updateDescription();
+            $this->updateDescription();
         } else if ($answer == 'Change primary language.') {
-            $this->_updatePrimaryLang();
+            $this->updatePrimaryLang();
         } else if ($answer == 'Set primay theme.') {
-            $this->_setPrimaryTheme();
+            $this->setPrimaryTheme();
         } else if ($answer == 'Set admin theme.') {
-            $this->_setAdminTheme();
+            $this->setAdminTheme();
         } else if ($answer == 'Set home page.') {
-            $this->_setHome();
+            $this->setHome();
         } else if ($answer == 'Update application version info.') {
-            $this->_updateVersionInfo();
+            $this->updateVersionInfo();
         }
 
         return 0;
     }
-    private function _setAdminTheme() {
+    private function setAdminTheme() {
         $classNs = $this->getThemeNs();
         ConfigController::get()->updateSiteInfo(['admin-theme' => $classNs]);
         $this->success('Admin theme successfully updated.');
     }
-    private function _setHome() {
+    private function setHome() {
         $routes = array_keys(Router::routes());
 
         if (count($routes) == 0) {
@@ -109,12 +109,12 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['home-page' => substr($home, strlen(Router::base()) + 1)]);
         $this->success('Home page successfully updated.');
     }
-    private function _setPrimaryTheme() {
+    private function setPrimaryTheme() {
         $classNs = $this->getThemeNs();
         ConfigController::get()->updateSiteInfo(['base-theme' => $classNs]);
         $this->success('Primary theme successfully updated.');
     }
-    private function _updateCronPass() {
+    private function updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');
 
         if (strlen($newPass) == 0) {
@@ -125,7 +125,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateCronPassword($newPass);
         $this->success('Password successfully updated.');
     }
-    private function _updateDescription() {
+    private function updateDescription() {
         $lang = $this->whichLang();
         $newName = $this->getInput('Enter new description:', null, new InputValidator(function ($val)
         {
@@ -136,7 +136,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['descriptions' => $descriptions]);
         $this->success('Description successfully updated.');
     }
-    private function _updateName() {
+    private function updateName() {
         $lang = $this->whichLang();
         $newName = $this->getInput('Enter new name:', null, new InputValidator(function ($val)
         {
@@ -147,13 +147,13 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['website-names' => $names]);
         $this->println('Name successfully updated.');
     }
-    private function _updatePrimaryLang() {
+    private function updatePrimaryLang() {
         $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
         $newPrimary = $this->select('Select new primary language:', $langs);
         ConfigController::get()->updateSiteInfo(['primary-lang' => $newPrimary]);
         $this->success('Primary language successfully updated.');
     }
-    private function _updateTitle() {
+    private function updateTitle() {
         $lang = $this->whichLang();
         $newName = $this->getInput('Enter new title:', null, new InputValidator(function ($val)
         {
@@ -164,7 +164,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['titles' => $titles]);
         $this->success('Title successfully updated.');
     }
-    private function _updateTitleSep() {
+    private function updateTitleSep() {
         $newSep = $this->getInput('Enter new title separator string:', '|', new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
@@ -172,7 +172,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['title-sep' => $newSep]);
         $this->success('Title separator successfully updated.');
     }
-    private function _updateVersionInfo() {
+    private function updateVersionInfo() {
         $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;

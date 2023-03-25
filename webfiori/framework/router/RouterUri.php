@@ -283,7 +283,7 @@ class RouterUri extends Uri {
         $retVal = [];
 
         if (!$this->hasParameters()) {
-            $retVal[] = $this->_buildSitemapNode($this->getUri());
+            $retVal[] = $this->buildSitemapNode($this->getUri());
 
             return $retVal;
         }
@@ -425,7 +425,7 @@ class RouterUri extends Uri {
     public function setRequestedUri(string $uri) {
         $reuested = new Uri($uri);
 
-        if ($this->_comparePath($reuested)) {
+        if ($this->comparePathHelper($reuested)) {
             $this->requestedUri = $reuested;
 
             return true;
@@ -501,10 +501,10 @@ class RouterUri extends Uri {
                 $this->_($uriWithVarsReplaced, $uriVars, $varIndex + 1, $nodesArr);
                 continue;
             }
-            $nodesArr[] = $this->_buildSitemapNode($uriWithVarsReplaced);
+            $nodesArr[] = $this->buildSitemapNode($uriWithVarsReplaced);
         }
     }
-    private function _buildSitemapNode($uri) {
+    private function buildSitemapNode($uri) {
         $node = new HTMLNode('url');
         $node->addChild('loc', [], false)->text($uri);
 
@@ -521,15 +521,15 @@ class RouterUri extends Uri {
      * 
      * @since 1.0
      */
-    private function _comparePath(Uri $requestedUri) {
+    private function comparePathHelper(Uri $requestedUri) {
         $requestedArr = $requestedUri->getComponents();
 
         $originalPath = $this->getPathArray();
         $requestedPath = $requestedArr['path'];
 
-        return $this->_comparePathHelper($originalPath, $requestedPath);
+        return $this->comparePathHelper($originalPath, $requestedPath);
     }
-    private function _comparePathHelper($originalPath, $requestedPath) {
+    private function comparePathHelper($originalPath, $requestedPath) {
         $count = count($originalPath);
         $requestedCount = count($requestedPath);
 

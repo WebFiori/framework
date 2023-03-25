@@ -425,7 +425,7 @@ class RouterUri extends Uri {
     public function setRequestedUri(string $uri) {
         $reuested = new Uri($uri);
 
-        if ($this->comparePathHelper($reuested)) {
+        if ($this->compareUriPathHelper($reuested)) {
             $this->requestedUri = $reuested;
 
             return true;
@@ -521,7 +521,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.0
      */
-    private function comparePathHelper(Uri $requestedUri) {
+    private function compareUriPathHelper(Uri $requestedUri) {
         $requestedArr = $requestedUri->getComponents();
 
         $originalPath = $this->getPathArray();

@@ -68,7 +68,7 @@ class SessionDB extends DB {
     public function getChunksCount($sId) {
         $resultSet = $this->table('session_data')
                 ->selectCount()
-                ->where('s-id', '=', $sId)
+                ->where('s-id', $sId)
                 ->execute();
         $row = $resultSet->getRows()[0];
 
@@ -89,7 +89,7 @@ class SessionDB extends DB {
      * @since 1.0
      */
     public function getSession($sId) {
-        $this->table('session_data')->select()->where('s-id', '=', $sId)
+        $this->table('session_data')->select()->where('s-id', $sId)
                 ->orderBy(['chunk-number' => 'a'])->execute();
         $resultSet = $this->getLastResultSet();
 
@@ -116,7 +116,7 @@ class SessionDB extends DB {
      * @since 1.0
      */
     public function getSessionsIDs($olderThan) {
-        return $this->table('sessions')->select()->where('last-used', '<=', $olderThan)->execute()
+        return $this->table('sessions')->select()->where('last-used', $olderThan, '<=')->execute()
                 ->map(function ($record)
                 {
                     return $record['s_id'];
@@ -133,7 +133,7 @@ class SessionDB extends DB {
      * @since 2.1.1
      */
     public function isSessionExist($sId) {
-        $resultSet = $this->table('sessions')->select()->where('s-id', '=', $sId)->execute();
+        $resultSet = $this->table('sessions')->select()->where('s-id', $sId)->execute();
 
         return $resultSet->getRowsCount() == 1;
     }
@@ -145,8 +145,8 @@ class SessionDB extends DB {
      * @since 1.0
      */
     public function removeSession($sId) {
-        $this->table('session_data')->delete()->where('s-id', '=', $sId)->execute();
-        $this->table('sessions')->delete()->where('s-id', '=', $sId)->execute();
+        $this->table('session_data')->delete()->where('s-id', $sId)->execute();
+        $this->table('sessions')->delete()->where('s-id', $sId)->execute();
     }
     /**
      * Store session state.
@@ -162,7 +162,7 @@ class SessionDB extends DB {
         if ($this->isSessionExist($sId)) {
             $this->table('sessions')->update([
                 'last-used' => date('Y-m-d H:i:s')
-            ])->where('s-id', '=', $sId)
+            ])->where('s-id', $sId)
               ->execute();
         } else {
             $this->table('sessions')->insert([
@@ -171,7 +171,7 @@ class SessionDB extends DB {
                 'started-at' => date('Y-m-d H:i:s'),
             ])->execute();
         }
-        $this->_storeChunks($sId, base64_encode($session));
+        $this->storeChunks($sId, base64_encode($session));
     }
     /**
      * Split session data into smaller chunks.
@@ -179,7 +179,7 @@ class SessionDB extends DB {
      * @param type $data
      * @return type
      */
-    private function _getChunks($data) {
+    private function getChunks($data) {
         $retVal = [];
         $index = 0;
         $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
@@ -208,17 +208,17 @@ class SessionDB extends DB {
      * @param type $chunksCount
      * @param type $startNumber
      */
-    private function _removeExtraChunks($sId, $chunksCount, $startNumber) {
+    private function removeExtraChunks($sId, $chunksCount, $startNumber) {
         for ($x = 0 ; $x < $chunksCount ; $x++) {
             $this->table('session_data')
-                    ->delete()->where('s-id', '=', $sId)
-                    ->andWhere('chunk-number', '=', $startNumber)
+                    ->delete()->where('s-id', $sId)
+                    ->andWhere('chunk-number', $startNumber)
                     ->execute();
             $startNumber++;
         }
     }
-    private function _storeChunks($sId, $data) {
-        $chunks = $this->_getChunks($data);
+    private function storeChunks($sId, $data) {
+        $chunks = $this->getChunks($data);
         $currentChunksCount = $this->getChunksCount($sId);
 
         for ($x = 0 ; $x < count($chunks) ; $x++) {
@@ -233,8 +233,8 @@ class SessionDB extends DB {
                 $this->table('session_data')
                         ->update([
                             'data' => $chunks[$x]
-                        ])->where('s-id', '=', $sId)
-                        ->andWhere('chunk-number', '=', $x);
+                        ])->where('s-id', $sId)
+                        ->andWhere('chunk-number', $x);
                 $this->execute();
             }
         }
@@ -242,7 +242,7 @@ class SessionDB extends DB {
 
         if ($currentChunksCount > $newChunksCount) {
             $chunksCountToRemove = $currentChunksCount - $newChunksCount;
-            $this->_removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount + 1);
+            $this->removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount + 1);
         }
     }
 }

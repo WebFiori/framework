@@ -29,22 +29,23 @@ class CLIUtils {
      */
     public static function getConnectionName(CLICommand $c) {
         $connName = $c->getArgValue('--connection');
-        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+        $dbConnections = WebFioriApp::getAppConfig()->getDBConnections();
+        $dbConnectionsNames = array_keys($dbConnections);
 
-        if (count($dbConnections) == 0) {
+        if (count($dbConnectionsNames) == 0) {
             $c->warning('No database connections found in the class "'.APP_DIR.'\\AppConfig"!');
             $c->info('Run the command "add" to add connections.');
 
             return null;
         }
 
-        if (in_array($connName, $dbConnections)) {
-            return $connName;
+        if (in_array($connName, $dbConnectionsNames)) {
+            return $dbConnections[$connName];
         } else if ($connName !== null) {
             $c->error('No connection with name "'.$connName.'" was found!');
         }
 
-        $name = $c->select('Select database connection:', $dbConnections, 0);
+        $name = $c->select('Select database connection:', $dbConnectionsNames, 0);
 
         return WebFioriApp::getAppConfig()->getDBConnection($name);
     }
@@ -60,8 +61,7 @@ class CLIUtils {
      * 
      * @return string A string that represents a valid class name.
      */
-    public static function readName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:') : string {
-        $isNameValid = false;
+    public static function readClassName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
 
         do {
             $c->readClassName($prompt, $suffix, $errMsg);
@@ -97,8 +97,7 @@ class CLIUtils {
      * 
      * @return string A validated string that represents a namespace.
      */
-    public static function readNamespace(CLICommand $c, string $defaultNs = '\\', $prompt = 'Enter class namespace:') : string {
-        $isNameValid = false;
+    public static function readNamespace(CLICommand $c, string $defaultNs = '\\', string $prompt = 'Enter class namespace:') : string {
 
         do {
             $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));

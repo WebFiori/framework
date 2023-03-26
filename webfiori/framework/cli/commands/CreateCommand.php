@@ -23,7 +23,7 @@ use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
 /**
- * A command which is used to automate some of the common tasks such as 
+ * A command which is used to automate some common tasks such as
  * creating table classes or controllers.
  * Note that this feature is Experimental and might have issues. Also, it 
  * might be removed in the future.
@@ -37,7 +37,7 @@ class CreateCommand extends CLICommand {
             new CommandArgument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-    public function createEntityFromQuery() {
+    public function createEntityFromQuery(): int {
         $tableObj = CLIUtils::readTable($this);
         $defaultNs = APP_DIR.'\\entity';
         $this->println('We need from you to give us entity class information.');
@@ -73,6 +73,7 @@ class CreateCommand extends CLICommand {
         $answer = $this->getWhat();
 
         if ($answer == 'Quit.') {
+            return 0;
         } else if ($answer == 'Database table class.') {
             $create = new CreateTableObj($this);
             $create->readClassInfo();
@@ -80,14 +81,19 @@ class CreateCommand extends CLICommand {
             $this->createEntityFromQuery();
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
+            $create->readClassInfo();
         } else if ($answer == 'Middleware.') {
             $create = new CreateMiddleware($this);
+            $create->readClassInfo();
         } else if ($answer == 'CLI Command.') {
             $create = new CreateCLIClassHelper($this);
-        } else if ($answer == 'Background job.') {
+            $create->readClassInfo();
+        } else if ($answer == 'Background Task.') {
             $create = new CreateCronJob($this);
+            $create->readClassInfo();
         } else if ($answer == 'Theme.') {
             $create = new CreateThemeHelper($this);
+            $create->readClassInfo();
         } else if ($answer == 'Database access class based on table.') {
             $create = new CreateDBAccessHelper($this);
             $create->setTable(CLIUtils::readTable($this));
@@ -99,6 +105,7 @@ class CreateCommand extends CLICommand {
             $create->writeClass();
         } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
             $create = new CreateFullRESTHelper($this);
+            $create->readInfo();
         }
 
         return 0;
@@ -108,7 +115,7 @@ class CreateCommand extends CLICommand {
         $options['table'] = 'Database table class.';
         $options['entity'] = 'Entity class from table.';
         $options['web-service'] = 'Web service.';
-        $options['job'] = 'Background job.';
+        $options['job'] = 'Background Task.';
         $options['middleware'] = 'Middleware.';
         $options['command'] = 'CLI Command.';
         $options['theme'] = 'Theme.';
@@ -119,7 +126,7 @@ class CreateCommand extends CLICommand {
         $answer = null;
 
         if ($what !== null) {
-            $answer = isset($options[$what]) ? $options[$what] : null;
+            $answer = $options[$what] ?? null;
 
             if ($answer === null) {
                 $this->warning('The argument --c has invalid value.');

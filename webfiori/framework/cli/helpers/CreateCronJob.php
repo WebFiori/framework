@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use InvalidArgumentException;
 use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cron\CronJob;
@@ -24,13 +25,20 @@ use webfiori\framework\writers\CronJobClassWriter;
  */
 class CreateCronJob extends CreateClassHelper {
     /**
+     * @var CronJobClassWriter
+     */
+    private $jobWriter;
+    /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new CronJobClassWriter());
+        $this->jobWriter = $this->getWriter();
 
+    }
+    public function readClassInfo() {
         $this->setClassInfo(APP_DIR.'\\jobs', 'Job');
         $jobName = $this->getJobName();
         $jobDesc = $this->getJobDesc();
@@ -39,8 +47,8 @@ class CreateCronJob extends CreateClassHelper {
             $this->getArgsHelper();
         }
 
-        $this->getWriter()->setJobName($jobName);
-        $this->getWriter()->setJobDescription($jobDesc);
+        $this->jobWriter->setJobName($jobName);
+        $this->jobWriter->setJobDescription($jobDesc);
 
         $this->writeClass();
     }
@@ -50,17 +58,17 @@ class CreateCronJob extends CreateClassHelper {
         while ($addToMore) {
             try {
                 $argObj = new JobArgument($this->getInput('Enter argument name:'));
-                $argObj->setDescription($this->getInput('Descripe the use of the argument:', ''));
+                $argObj->setDescription($this->getInput('Describe the use of the argument:', ''));
                 $argObj->setDefault($this->getInput('Default value:', ''));
 
-                $this->getWriter()->addArgument($argObj);
-            } catch (\InvalidArgumentException $ex) {
+                $this->jobWriter->addArgument($argObj);
+            } catch (InvalidArgumentException $ex) {
                 $this->error($ex->getMessage());
             }
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
     }
-    private function getJobDesc() {
+    private function getJobDesc(): string {
         return $this->getInput('Provide short description of what does the job will do:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
@@ -70,7 +78,7 @@ class CreateCronJob extends CreateClassHelper {
             return false;
         }));
     }
-    private function getJobName() {
+    private function getJobName() : string {
         return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
         {
             $temp = new CronJob();

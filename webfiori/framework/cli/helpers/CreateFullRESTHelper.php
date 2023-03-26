@@ -14,6 +14,7 @@ use webfiori\database\ConnectionInfo;
 use webfiori\database\EntityMapper;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\database\Table;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DBClassWriter;
@@ -32,7 +33,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
      * 
      * @var DBClassWriter
      */
-    private $dbObjWritter;
+    private $dbObjWriter;
     /**
      * 
      * @var TableClassWriter
@@ -46,7 +47,10 @@ class CreateFullRESTHelper extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command);
 
-        $connection = CLIUtils::getConnectionName($command);
+
+    }
+    public function readInfo() {
+        $connection = CLIUtils::getConnectionName($this->getCommand());
 
         if ($connection === null) {
             $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
@@ -54,10 +58,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
             $dbType = $connection->getDatabaseType();
         }
 
+        $tempTable = new MySQLTable();
 
-        if ($dbType == 'mysql') {
-            $tempTable = new MySQLTable();
-        } else if ($dbType == 'mssql') {
+        if ($dbType == 'mssql') {
             $tempTable = new MSSQLTable();
         }
         $this->tableObjWriter = new TableClassWriter($tempTable);
@@ -71,14 +74,14 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $t->getEntityMapper()->setEntityName($this->tableObjWriter->getEntityName());
         $t->getEntityMapper()->setNamespace($this->tableObjWriter->getEntityNamespace());
         $t->getEntityMapper()->setPath($this->tableObjWriter->getEntityPath());
-        $this->dbObjWritter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
+        $this->dbObjWriter = new DBClassWriter($this->tableObjWriter->getEntityName().'DB', $this->tableObjWriter->getNamespace(), $t);
 
         if ($connection !== null) {
-            $this->dbObjWritter->setConnection($connection->getName());
+            $this->dbObjWriter->setConnection($connection->getName());
         }
 
         if ($this->confirm('Would you like to have update methods for every single column?', false)) {
-            $this->dbObjWritter->includeColumnsUpdate();
+            $this->dbObjWriter->includeColumnsUpdate();
         }
         $this->readAPIInfo();
         $this->createEntity();
@@ -87,7 +90,6 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->writeServices();
         $this->println("Done.");
     }
-
     public function getEntityName() : string {
         return $this->tableObjWriter->getEntityName();
     }
@@ -99,8 +101,8 @@ class CreateFullRESTHelper extends CreateClassHelper {
         return $this->tableObjWriter->getTable();
     }
     private function addDeleteGetProcessCode(WebServiceWriter $w, $uniqueParamsArr, $type) {
-        $dbClassName = $this->dbObjWritter->getName();
-        $entityName = $this->dbObjWritter->getEntityName();
+        $dbClassName = $this->dbObjWriter->getName();
+        $entityName = $this->dbObjWriter->getEntityName();
         $paramsStrArr = [];
 
         foreach ($uniqueParamsArr as $p) {
@@ -131,7 +133,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
     }
     private function createDbClass() {
         $this->println("Creating database access class...");
-        $this->dbObjWritter->writeClass();
+        $this->dbObjWriter->writeClass();
     }
     private function createEntity() {
         $this->println("Creating entity class...");
@@ -142,7 +144,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Creating database table class...");
         $this->tableObjWriter->writeClass();
     }
-    private function getAPIParamType($colDatatype) {
+    private function getAPIParamType($colDatatype): string {
         if ($colDatatype == 'int') {
             return 'int';
         }
@@ -157,7 +159,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
 
         return 'string';
     }
-    private function getServiceSuffix($entityName) {
+    private function getServiceSuffix($entityName): string {
         $suffix = '';
 
         for ($x = 0 ; $x < strlen($entityName) ; $x++) {
@@ -200,13 +202,13 @@ class CreateFullRESTHelper extends CreateClassHelper {
     }
     private function IncludeAPISetProps(WebServiceWriter $w, $type) {
         $t = $this->getTable();
-        $w->addProcessCode('$entity = new '.$t->getEntityMapper()->getEntityName().'();', 2);
+        $w->addProcessCode('$entity = new '.$t->getEntityMapper()->getEntityName().'();');
 
         foreach ($t->getColsKeys() as $paramName) {
-            $w->addProcessCode('$entity->'.EntityMapper::mapToMethodName($paramName, 's').'($this->getParamVal(\''.$paramName.'\'));', 2);
+            $w->addProcessCode('$entity->'.EntityMapper::mapToMethodName($paramName, 's').'($this->getParamVal(\''.$paramName.'\'));');
         }
-        $dbClassName = $this->dbObjWritter->getName();
-        $entityName = $this->dbObjWritter->getEntityName();
+        $dbClassName = $this->dbObjWriter->getName();
+        $entityName = $this->dbObjWriter->getEntityName();
         $w->addProcessCode("");
 
         if ($type == 'Add') {
@@ -296,7 +298,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
                 'method' => 'get' 
             ]
         ];
-        $w = $this->dbObjWritter;
+        $w = $this->dbObjWriter;
 
         if ($w->isColumnUpdateIncluded()) {
             $uniqueCols = $this->tableObjWriter->getTable()->getUniqueColsKeys();
@@ -327,7 +329,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
 
 
             $writer = new WebServiceWriter($service);
-            $writer->addUseStatement($this->dbObjWritter->getName(true));
+            $writer->addUseStatement($this->dbObjWriter->getName(true));
             $writer->addUseStatement($t->getEntityMapper()->getEntityName(true));
             $writer->addUseStatement(Json::class);
             $writer->setNamespace($this->apisNs);
@@ -377,8 +379,8 @@ class CreateFullRESTHelper extends CreateClassHelper {
                         'default' => 10
                     ]
                 ]);
-                $dbClassName = $this->dbObjWritter->getName();
-                $entityName = $this->dbObjWritter->getEntityName();
+                $dbClassName = $this->dbObjWriter->getName();
+                $entityName = $this->dbObjWriter->getEntityName();
                 $writer->addProcessCode([
                     "\$pageNumber = \$this->getParamVal('page');",
                     "\$pageSize = \$this->getParamVal('size');",

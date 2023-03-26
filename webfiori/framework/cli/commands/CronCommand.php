@@ -16,7 +16,7 @@ use webfiori\framework\cron\AbstractJob;
 use webfiori\framework\cron\Cron;
 /**
  * A CLI command which is related to executing 
- * background jobs or performing operations on them..
+ * background jobs or performing operations on them.
  *
  * @author Ibrahim
  * @version 1.0
@@ -41,7 +41,7 @@ class CronCommand extends CLICommand {
         parent::__construct('cron', [
             new CommandArgument('p', 'CRON password. If it is set in CRON, then it must be provided here.', true),
             new CommandArgument('--list', 'List all scheduled CRON jobs.', true),
-            new CommandArgument('--check', 'Run a check aginst all jobs to check if it is time to execute them or not.', true),
+            new CommandArgument('--check', 'Run a check against all jobs to check if it is time to execute them or not.', true),
             new CommandArgument('--force', 'Force a specific job to execute.', true),
             new CommandArgument('--job-name', 'The name of the job that will be forced to execute or to show its arguments.', true),
             new CommandArgument('--show-job-args', 'If this one is provided with job name and a job has custom execution args, they will be shown.', true),
@@ -117,7 +117,7 @@ class CronCommand extends CLICommand {
             $this->setArgs($args, $job);
         }
     }
-    private function force() {
+    private function force(): int {
         $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p').'';
         $retVal = -1;

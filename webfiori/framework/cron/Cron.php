@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cron;
 
+use const DS;
 use Exception;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
@@ -23,13 +24,12 @@ use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use const DS;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
- * formate in crontab:
+ * format in crontab:
  * <p><code>* * * * *  /usr/bin/php path/to/webfiori --cron check p=&lt;password&gt;</code></p>
  * Where &lt;password&gt; is the password 
  * that was set by the developer to protect the jobs from unauthorized access. 
@@ -78,18 +78,18 @@ class Cron {
      * 
      * @since 1.0
      */
-    private static $executer;
+    private static $jobsManager;
     /**
      * A variable that is set to true if job execution log is enabled.
      * 
-     * @var boolean
+     * @var bool
      * 
      * @since 1.0.1 
      */
     private $isLogEnabled;
     /**
      *
-     * @var type 
+     * @var array 
      * 
      * @since 1.0.9
      */
@@ -125,21 +125,7 @@ class Cron {
         $this->logsArray = [];
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
-        $this->_setPassword('');
-    }
-    public static function reset() {
-        self::get()->timestamp = [
-            'month' => intval(date('m')),
-            'month-day' => intval(date('d')),
-            'week-day' => intval(date('w')),
-            'hour' => intval(date('H')),
-            'minute' => intval(date('i'))
-        ];
-        self::get()->jobsNamesArr = [];
-        self::get()->logsArray = [];
-        self::get()->isLogEnabled = false;
-        self::get()->cronJobsQueue = new Queue();
-        self::get()->_setPassword('');
+        $this->setPasswordHelper('');
     }
     /**
      * Returns an object that represents the job which is currently being executed.
@@ -172,15 +158,18 @@ class Cron {
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
      * 
-     * @return boolean If the job was created and scheduled, the method will 
+     * @return bool If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public static function createJob(string $when = '*/5 * * * *', string $jobName = '', $function = '', array $funcParams = []) : bool {
+    public static function createJob(string $when = '*/5 * * * *', string $jobName = '', callable $function = null, array $funcParams = []) : bool {
         try {
             $job = new CronJob($when);
-            $job->setOnExecution($function, $funcParams);
+            
+            if ($function !== null) {
+                $job->setOnExecution($function, $funcParams);
+            }
 
             if (strlen($jobName) > 0) {
                 $job->setJobName($jobName);
@@ -194,8 +183,8 @@ class Cron {
     /**
      * Creates a daily job to execute every day at specific hour and minute.
      * 
-     * @param string $time A time in the form 'hh:mm'. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * @param string $time A time in the form 'HH:MM'. HH can have any value
+     * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
      * 
      * @param string $name An optional name for the job. Can be null.
      * 
@@ -203,14 +192,14 @@ class Cron {
      * time to run the job.
      * 
      * @param array $funcParams An optional array of parameters which will be passed to 
-     * the callback that will be executed when its time to execute the job.
+     * the callback that will be executed when it's time to execute the job.
      * 
-     * @return boolean If the job was created and scheduled, the method will 
+     * @return bool If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public static function dailyJob(string $time, string $name, callable $func, array $funcParams = []) {
+    public static function dailyJob(string $time, string $name, callable $func, array $funcParams = []): bool {
         $split = explode(':', $time);
 
         if (count($split) == 2 && is_callable($func)) {
@@ -262,20 +251,34 @@ class Cron {
      * execution log is enabled, a log file with the name 'cron.log' will be 
      * created in the folder '/logs'.
      * 
-     * @param boolean $bool If set to true, a log file that contains the details 
+     * @param bool|null $bool If set to true, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
      * is null.
      * 
-     * @return boolean If logging is enabled, the method will return true.
+     * @return bool If logging is enabled, the method will return true.
      * 
      * @since 1.0.1
      */
-    public static function execLog($bool = null) : bool {
+    public static function execLog(bool $bool = null) : bool {
         if ($bool !== null) {
-            self::get()->_setLogEnabled($bool);
+            self::get()->setLogEnabledHelper($bool);
         }
 
-        return self::get()->_isLogEnabled();
+        return self::get()->isLogEnabledHelper();
+    }
+    /**
+     * Returns a singleton of the class.
+     * 
+     * @return Cron
+     * 
+     * @since 1.0
+     */
+    public static function get(): Cron {
+        if (self::$jobsManager === null) {
+            self::$jobsManager = new Cron();
+        }
+
+        return self::$jobsManager;
     }
     /**
      * Returns a job given its name.
@@ -390,7 +393,7 @@ class Cron {
      * @since 1.0
      */
     public static function jobsQueue() : Queue {
-        return self::get()->_getQueue();
+        return self::get()->getQueueHelper();
     }
     /**
      * Appends a message to the array that contains logged messages.
@@ -452,18 +455,18 @@ class Cron {
      * 
      * @param string $name The name of cron job.
      * 
-     * @param callable $func A function that will be executed when its time to 
+     * @param callable $func A function that will be executed when it's time to
      * run the job.
      * 
      * @param array $funcParams An optional array of parameters which will be 
      * passed to job function.
      * 
-     * @return boolean If the job was scheduled, the method will return true. 
+     * @return bool If the job was scheduled, the method will return true. 
      * If not, the method will return false.
      * 
      * @since 1.0.3
      */
-    public static function monthlyJob(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []) {
+    public static function monthlyJob(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool{
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
@@ -488,7 +491,7 @@ class Cron {
      * The provided password must be 'sha256' hashed string. It is recommended 
      * to hash the password externally then use the hash inside your code.
      * 
-     * @param string $pass If not null, the password will be updated to the 
+     * @param string|null $pass If not null, the password will be updated to the
      * given one.
      * 
      * @return string If the password is set, the method will return it. 
@@ -496,12 +499,12 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function password($pass = null) : string {
+    public static function password(string $pass = null) : string {
         if ($pass !== null) {
-            self::get()->_setPassword($pass);
+            self::get()->setPasswordHelper($pass);
         }
 
-        return self::get()->_getPassword();
+        return self::get()->getPasswordHelper();
     }
     /**
      * Register any CRON job which exist in the folder 'jobs' of the application.
@@ -517,8 +520,22 @@ class Cron {
             });
         }
     }
+    public static function reset() {
+        self::get()->timestamp = [
+            'month' => intval(date('m')),
+            'month-day' => intval(date('d')),
+            'week-day' => intval(date('w')),
+            'hour' => intval(date('H')),
+            'minute' => intval(date('i'))
+        ];
+        self::get()->jobsNamesArr = [];
+        self::get()->logsArray = [];
+        self::get()->isLogEnabled = false;
+        self::get()->cronJobsQueue = new Queue();
+        self::get()->setPasswordHelper('');
+    }
     /**
-     * Check each scheduled job and run it if its time to run it.
+     * Check each scheduled job and run it if it's time to run it.
      * 
      * @param string $pass If cron password is set, this value must be 
      * provided. The given value will be hashed inside the body of the 
@@ -528,10 +545,10 @@ class Cron {
      * @param string|null $jobName An optional job name. If specified, only 
      * the given job will be checked. Default is null.
      * 
-     * @param boolean $force If this attribute is set to true and a job name 
+     * @param bool $force If this attribute is set to true and a job name 
      * was provided, the job will be forced to execute. Default is false.
      * 
-     * @param CronCommand $command If cron is run from CLI, this parameter is 
+     * @param CronCommand|null $command If cron is run from CLI, this parameter is
      * provided to set custom execution attributes of a job.
      * 
      * @return string|array If cron password is set and the given one is 
@@ -551,13 +568,13 @@ class Cron {
      * 
      * @since 1.0.6
      */
-    public static function run(string $pass = '', string $jobName = null, bool $force = false, $command = null) {
+    public static function run(string $pass = '', string $jobName = null, bool $force = false, CronCommand $command = null) {
         self::get()->command = $command;
         self::log('Running job(s) check...');
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
         $cronPass = Cron::password();
-        
+
         if ($cronPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $cronPass) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
@@ -573,11 +590,11 @@ class Cron {
         ];
 
         if ($jobName !== null) {
-            self::log("Forceing job '$jobName' to execute...");
+            self::log("Forcing job '$jobName' to execute...");
             $job = self::getJob(trim($jobName));
 
             if ($job instanceof AbstractJob) {
-                self::_runJob($retVal, $job, $xForce, $command);
+                self::runJobHelper($retVal, $job, $xForce, $command);
             } else {
                 self::log("Error: No job which has the name '$jobName' is found.");
                 self::log('Check finished.');
@@ -586,11 +603,12 @@ class Cron {
             }
         } else {
             $tempQ = new Queue();
-            
+
             while ($job = Cron::jobsQueue()->dequeue()) {
                 $tempQ->enqueue($job);
-                self::_runJob($retVal, $job, $xForce, $command);
+                self::runJobHelper($retVal, $job, $xForce, $command);
             }
+
             while ($job = $tempQ->dequeue()) {
                 self::get()->cronJobsQueue->enqueue($job);
             }
@@ -605,12 +623,12 @@ class Cron {
      * 
      * @param AbstractJob $job An instance of the class 'AbstractJob'.
      * 
-     * @return boolean If the job is added, the method will return true.
+     * @return bool If the job is added, the method will return true.
      * 
      * @since 1.0
      */
     public static function scheduleJob(AbstractJob $job) : bool {
-        return self::get()->_addJob($job);
+        return self::get()->addJobHelper($job);
     }
     /**
      * Sets the number of day in the month at which the scheduler started to 
@@ -625,7 +643,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setDayOfMonth(int $dayOfMonth) {
-
         if ($dayOfMonth >= 1 && $dayOfMonth <= 31) {
             self::get()->timestamp['month-day'] = $dayOfMonth;
         }
@@ -643,7 +660,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setDayOfWeek(int $val) {
-
         if ($val >= 0 && $val <= 6) {
             self::get()->timestamp['week-day'] = $val;
         }
@@ -661,7 +677,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setHour(int $hour) {
-
         if ($hour >= 0 && $hour <= 23) {
             self::get()->timestamp['hour'] = $hour;
         }
@@ -679,7 +694,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setMinute(int $minute) {
-
         if ($minute >= 0 && $minute <= 59) {
             self::get()->timestamp['minute'] = $minute;
         }
@@ -697,7 +711,6 @@ class Cron {
      * @since 1.1.1
      */
     public static function setMonth(int $month) {
-
         if ($month >= 1 && $month <= 12) {
             self::get()->timestamp['month'] = $month;
         }
@@ -743,10 +756,10 @@ class Cron {
     /**
      * Creates a job that will be executed on specific time weekly.
      * 
-     * @param string $time A string in the format 'd-hh:mm'. 'd' can be a number 
+     * @param string $time A string in the format 'D-HH:MM'. 'D' can be a number
      * between 0 and 6 inclusive or a 3 characters day name such as 'sun'. 0 is 
      * for Sunday and 6 is for Saturday.
-     * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
+     * 'HH' can have any value between 0 and 23 inclusive. MM can have any value
      * between 0 and 59 inclusive.
      * 
      * @param string $name An optional name for the job. Can be null.
@@ -757,12 +770,12 @@ class Cron {
      * @param array $funcParams An optional array of parameters which will be passed to 
      * the function.
      * 
-     * @return boolean If the job was created and scheduled, the method will 
+     * @return bool If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public static function weeklyJob(string $time, string $name, callable $func, array $funcParams = []) {
+    public static function weeklyJob(string $time, string $name, callable $func, array $funcParams = []): bool {
         $split1 = explode('-', $time);
 
         if (count($split1) == 2) {
@@ -781,10 +794,10 @@ class Cron {
     /**
      * 
      * @param AbstractJob $job
-     * @return type
+     * @return bool
      * @since 1.0
      */
-    private function _addJob($job) {
+    private function addJobHelper(AbstractJob $job): bool {
         $retVal = false;
 
         if ($job instanceof AbstractJob) {
@@ -801,25 +814,11 @@ class Cron {
         return $retVal;
     }
     /**
-     * Returns a singleton of the class.
-     * 
-     * @return Cron
-     * 
-     * @since 1.0
-     */
-    public static function get() {
-        if (self::$executer === null) {
-            self::$executer = new Cron();
-        }
-
-        return self::$executer;
-    }
-    /**
      * 
      * @return string
      * @since 1.0
      */
-    private function _getPassword() {
+    private function getPasswordHelper(): string {
         if ($this->accessPass == '') {
             return 'NO_PASSWORD';
         }
@@ -831,50 +830,47 @@ class Cron {
      * @return Queue
      * @since 1.0
      */
-    private function _getQueue() {
+    private function getQueueHelper(): Queue {
         return $this->cronJobsQueue;
     }
-    private function _isLogEnabled() {
+    private function isLogEnabledHelper(): bool {
         return $this->isLogEnabled;
     }
-    private function _logExecHelper($forced, $job, File $file) {
+    private function logExecHelper($forced, $job, File $file) {
         if ($forced) {
             $file->setRawData('Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
 
-            if ($job->isSuccess()) {
-                $file->setRawData('Execution status: Successfully completed.'."\n");
-            } else {
-                $file->setRawData('Execution status: Failed to completed.'."\n");
-            }
         } else {
             $file->setRawData('Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
 
-            if ($job->isSuccess()) {
-                $file->setRawData('Execution status: Successfully completed.'."\n");
-            } else {
-                $file->setRawData('Execution status: Failed to completed.'."\n");
-            }
+        }
+        if ($job->isSuccess()) {
+            $file->setRawData('Execution status: Successfully completed.'."\n");
+        } else {
+            $file->setRawData('Execution status: Failed to completed.'."\n");
         }
         $file->write();
     }
 
-    private function _logJobExecution($job,$forced = false) {
+    private function logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
             $file = new File($logFile);
             $file->create(true);
-            
-            $this->_logExecHelper($forced, $job, $file);
+
+            $this->logExecHelper($forced, $job, $file);
         }
     }
+
     /**
-     * 
-     * @param type $retVal
+     *
+     * @param array $retVal
      * @param AbstractJob $job
-     * @param type $xForce
+     * @param bool $xForce
+     * @param CronCommand|null $command
      */
-    private static function _runJob(&$retVal, $job, $xForce, CronCommand $command = null) {
+    private static function runJobHelper(array &$retVal, AbstractJob $job, bool $xForce, CronCommand $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
                 $job->setCommand($command);
@@ -890,11 +886,11 @@ class Cron {
                     }
                 }
             }
-            self::get()->_setActiveJob($job);
+            self::get()->setActiveJobHelper($job);
         }
 
         if ($job->exec($xForce)) {
-            self::get()->_logJobExecution($job,$xForce);
+            self::get()->logJobExecution($job,$xForce);
             $retVal['executed-count']++;
 
             if ($job->isSuccess() === true) {
@@ -903,29 +899,29 @@ class Cron {
                 $retVal['failed'][] = $job->getJobName();
             }
         }
-        self::get()->_setActiveJob(null);
+        self::get()->setActiveJobHelper();
     }
     /**
      * 
      * @param AbstractJob|null $job
      * @since 1.0.4
      */
-    private function _setActiveJob($job) {
+    private function setActiveJobHelper(AbstractJob $job = null) {
         $this->activeJob = $job;
 
         if ($job !== null) {
             self::log('Active job: "'.$job->getJobName().'" ...');
         }
     }
-    private function _setLogEnabled(bool $bool) {
+    private function setLogEnabledHelper(bool $bool) {
         $this->isLogEnabled = $bool;
     }
     /**
      * 
-     * @param type $pass
+     * @param string $pass
      * @since 1.0
      */
-    private function _setPassword(string $pass) {
+    private function setPasswordHelper(string $pass) {
         $this->accessPass = $pass;
     }
 }

@@ -10,13 +10,14 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use Exception;
-use webfiori\database\ConnectionInfo;
 use webfiori\cli\CLICommand;
-use webfiori\framework\ConfigController;
-use webfiori\framework\DB;
+use webfiori\database\ConnectionInfo;
+use webfiori\database\DatabaseException;
+use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\email\SMTPServer;
+use webfiori\framework\ConfigController;
+use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\writers\LangClassWriter;
 
@@ -48,23 +49,24 @@ class AddCommand extends CLICommand {
         $answer = $this->select('What would you like to add?', $options, count($options) - 1);
 
         if ($answer == 'New database connection.') {
-            return $this->_addDbConnection();
+            return $this->addDbConnection();
         } else if ($answer == 'New SMTP connection.') {
-            return $this->_addSmtp();
+            return $this->addSmtp();
         } else if ($answer == 'New website language.') {
-            return $this->_addLang();
+            return $this->addLang();
         }
 
         return 0;
     }
-    private function _addDbConnection() {
+    private function addDbConnection(): int {
         $dbType = $this->select('Select database type:', ConnectionInfo::SUPPORTED_DATABASES);
-        if ($dbType == 'mysql') {
-            $connInfoObj = new ConnectionInfo('mysql', 'roor', 'pass', 'ok');
-        } else if ($dbType == 'mssql') {
-            $connInfoObj = new ConnectionInfo('mssql', 'roor', 'pass', 'ok');
+
+        $connInfoObj = new ConnectionInfo('mysql', 'root', 'pass', 'ok');
+
+        if ($dbType == 'mssql') {
+            $connInfoObj = new ConnectionInfo('mssql', 'root', 'pass', 'ok');
         }
-        
+
         $connInfoObj->setHost($this->getInput('Database host:', '127.0.0.1'));
         $connInfoObj->setPort($this->getInput('Port number:', 3306));
         $connInfoObj->setUsername($this->getInput('Username:'));
@@ -84,7 +86,7 @@ class AddCommand extends CLICommand {
                 $addConnection = $this->tryConnect($connInfoObj);
             }
         } 
-        
+
         if ($addConnection === true) {
             $this->success('Connected. Adding the connection...');
 
@@ -93,21 +95,12 @@ class AddCommand extends CLICommand {
         } else {
             $this->error('Unable to connect to the database.');
             $this->error($addConnection->getMessage());
-            $this->_confirmAdd($connInfoObj);
+            $this->confirmAdd($connInfoObj);
         }
+
         return 0;
     }
-    private function tryConnect($connectionInfo) {
-        $db = new DB($connectionInfo);
-        
-        try {
-            $db->getConnection();
-            return true;
-        } catch (Exception $ex) {
-            return $ex;
-        }
-    }
-    private function _addLang() {
+    private function addLang(): int {
         $langCode = strtoupper(trim($this->getInput('Language code:')));
 
         if (strlen($langCode) != 2) {
@@ -133,14 +126,15 @@ class AddCommand extends CLICommand {
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
                 .'is created at "'.APP_DIR.'\langs" for that language.');
+
         return 0;
     }
-    private function _addSmtp() {
+    private function addSmtp(): int {
         $smtpConn = new SMTPAccount();
         $smtpConn->setServerAddress($this->getInput('SMTP Server address:', '127.0.0.1'));
         $smtpConn->setPort(25);
         $addr = $smtpConn->getAddress();
-        
+
         if ($addr == 'smtp.outlook.com'
             || $addr == 'outlook.office365.com'
             || $addr == 'smtp.office365.com') {
@@ -160,25 +154,23 @@ class AddCommand extends CLICommand {
 
         try {
             if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
-                $this->success('Connectd. Adding connection information...');
+                $this->success('Connected. Adding connection information...');
                 ConfigController::get()->updateOrAddEmailAccount($smtpConn);
                 $this->success('Connection information was stored in application configuration.');
-
-                
             } else {
                 $this->error('Unable to connect to SMTP server.');
                 $this->println('Error Information: '.$server->getLastResponse());
 
-                $this->_confirmAdd($smtpConn);
+                $this->confirmAdd($smtpConn);
             }
-        } catch (Exception $ex) {
+        } catch (SMTPException $ex) {
             $this->error('An exception with message "'.$ex->getMessage().'" was thrown while trying to connect.');
-            $this->_confirmAdd($smtpConn);
+            $this->confirmAdd($smtpConn);
         }
-        
+
         return 0;
     }
-    private function _confirmAdd($smtpOrDbConn) {
+    private function confirmAdd($smtpOrDbConn) {
         if ($this->confirm('Would you like to store connection information anyway?', false)) {
             if ($smtpOrDbConn instanceof SMTPAccount) {
                 ConfigController::get()->updateOrAddEmailAccount($smtpOrDbConn);
@@ -186,6 +178,17 @@ class AddCommand extends CLICommand {
                 ConfigController::get()->addOrUpdateDBConnection($smtpOrDbConn);
             }
             $this->success('Connection information was stored in application configuration.');
+        }
+    }
+    private function tryConnect($connectionInfo) {
+
+        try {
+            $db = new DB($connectionInfo);
+            $db->getConnection();
+
+            return true;
+        } catch (DatabaseException $ex) {
+            return $ex;
         }
     }
 }

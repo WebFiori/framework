@@ -12,7 +12,6 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\ThemeClassWriter;
-use webfiori\framework\cli\helpers\CreateClassHelper;
 /**
  * Description of CreateTheme
  *
@@ -27,9 +26,12 @@ class CreateThemeHelper extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new ThemeClassWriter('New Theme'));
 
+
+    }
+    public function readClassInfo() {
         $this->setClassInfo('themes', 'Theme');
 
-        $command->println('Creating theme at "'.$this->getWriter()->getPath().'"...');
+        $this->println('Creating theme at "'.$this->getWriter()->getPath().'"...');
         $this->writeClass();
     }
 }

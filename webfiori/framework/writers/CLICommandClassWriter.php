@@ -10,17 +10,15 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\writers\ClassWriter;
-
 /**
  * A class which is used to write CLI Commands classes.
  *
  * @author Ibrahim
  */
 class CLICommandClassWriter extends ClassWriter {
-    private $name;
-    private $desc;
     private $args;
+    private $desc;
+    private $name;
     /**
      * Creates new instance of the class.
      * 
@@ -54,13 +52,13 @@ class CLICommandClassWriter extends ClassWriter {
         ]);
     }
     /**
-     * Returns a string that represents the description of the command.
+     * Returns an array that represents the arguments of the command.
      * 
-     * @return string A string that represents the description of the command.
-     * Default is empty string.
+     * @return array An array that represents the arguments of the command.
+     * Default is empty array.
      */
-    public function getDescription() : string {
-        return $this->desc;
+    public function getArgs() : array {
+        return $this->args;
     }
     /**
      * Returns a string that represents the name of the command.
@@ -72,13 +70,13 @@ class CLICommandClassWriter extends ClassWriter {
         return $this->name;
     }
     /**
-     * Returns an array that represents the arguments of the command.
+     * Returns a string that represents the description of the command.
      * 
-     * @return array An array that represents the arguments of the command.
-     * Default is empty array.
+     * @return string A string that represents the description of the command.
+     * Default is empty string.
      */
-    public function getArgs() : array {
-        return $this->args;
+    public function getDescription() : string {
+        return $this->desc;
     }
     /**
      * Sets the array that will represents the arguments of the command.
@@ -95,6 +93,7 @@ class CLICommandClassWriter extends ClassWriter {
      */
     public function setCommandDescription(string $desc) {
         $trimmed = trim($desc);
+
         if (strlen($desc) == 0) {
             return;
         }
@@ -113,55 +112,23 @@ class CLICommandClassWriter extends ClassWriter {
      */
     public function setCommandName(string $name) : bool {
         $trimmed = trim($name);
+
         if (strlen($trimmed) == 0) {
             return false;
         }
+
         if (!strpos($trimmed, ' ')) {
             $this->name = $trimmed;
+
             return true;
         }
+
         return false;
-    }
-    private function _writeConstructor() {
-        $this->append([
-            '/**',
-            ' * Creates new instance of the class.',
-            ' */',
-            $this->f('__construct')
-        ], 1);
-
-        if (count($this->args) > 0) {
-            $this->append(["parent::__construct('$this->name', ["], 2);
-
-            foreach ($this->args as $argArr) {
-                $this->append("'".$argArr['name']."' => [", 3);
-
-                if (strlen($argArr['description']) != 0) {
-                    $this->append("'description' => '".str_replace("'", "\'", $argArr['description'])."',", 4);
-                }
-                $this->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
-
-                if (count($argArr['values']) != 0) {
-                    $this->append("'values' => [", 4);
-
-                    foreach ($argArr['values'] as $val) {
-                        $this->append("'".str_replace("'", "\'", $val)."',", 5);
-                    }
-                    $this->append("]", 4);
-                }
-                $this->append("],", 3);
-            }
-            $this->append("], '".str_replace("'", "\'", $this->desc)."');", 2);
-        } else {
-            $this->append("parent::__construct('$this->name', '".str_replace("'", "\'", $this->desc)."');", 2);
-        }
-
-        $this->append('}', 1);
     }
 
     public function writeClassBody() {
-        $this->_writeConstructor();
-        
+        $this->writeConstructor();
+
         $this->append([
             '/**',
             ' * Execute the command.',
@@ -202,5 +169,40 @@ class CLICommandClassWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends CLICommand {');
     }
+    private function writeConstructor() {
+        $this->append([
+            '/**',
+            ' * Creates new instance of the class.',
+            ' */',
+            $this->f('__construct')
+        ], 1);
 
+        if (count($this->args) > 0) {
+            $this->append(["parent::__construct('$this->name', ["], 2);
+
+            foreach ($this->args as $argArr) {
+                $this->append("'".$argArr['name']."' => [", 3);
+
+                if (strlen($argArr['description']) != 0) {
+                    $this->append("'description' => '".str_replace("'", "\'", $argArr['description'])."',", 4);
+                }
+                $this->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
+
+                if (count($argArr['values']) != 0) {
+                    $this->append("'values' => [", 4);
+
+                    foreach ($argArr['values'] as $val) {
+                        $this->append("'".str_replace("'", "\'", $val)."',", 5);
+                    }
+                    $this->append("]", 4);
+                }
+                $this->append("],", 3);
+            }
+            $this->append("], '".str_replace("'", "\'", $this->desc)."');", 2);
+        } else {
+            $this->append("parent::__construct('$this->name', '".str_replace("'", "\'", $this->desc)."');", 2);
+        }
+
+        $this->append('}', 1);
+    }
 }

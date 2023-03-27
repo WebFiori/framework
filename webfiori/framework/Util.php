@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework;
 
+use webfiori\framework\cli\Runner;
 use webfiori\framework\ui\MessageBox;
 use webfiori\http\Response;
-use webfiori\framework\cli\Runner;
 /**
  * Framework utility class.
  * 
@@ -394,7 +394,7 @@ class Util {
 
         if (function_exists('apache_request_headers')) {
             $headers = apache_request_headers();
-            
+
             foreach ($headers as $k => $v) {
                 $retVal[strtolower($k)] = filter_var($v, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             }

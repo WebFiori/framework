@@ -17,7 +17,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '   ',
             'ok\\y\\Super',
             'app\\database\\TestTable',
@@ -86,7 +86,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'app\\database\\TestTable',
             '2',
             'id',
@@ -166,7 +166,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'app\\database\\Test2Table',
             '4',
             '0',
@@ -208,7 +208,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'app\\database\\TestTable',
             '4',
         ]);
@@ -234,7 +234,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'app\\database\\TestTable',
             '1',
             'app\\database\\Test2Table',
@@ -305,7 +305,7 @@ class UpdateTableCommandTest extends TestCase {
             'webfiori',
             'update-table',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'app\\database\\TestTable',
             '3',
             '0',

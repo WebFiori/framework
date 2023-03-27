@@ -25,12 +25,22 @@ interface SessionUser {
     public function getId() : int;
     /**
      * Checks if a user has privilege or not given its ID.
-     * 
-     * @param string $privilegeId The ID of the privilege.
-     * 
+     *
+     * @param string $privilege The ID of the privilege.
+     *
      * @return bool The method should be implemented in a way that it returns
      * true if the user has specified privilege. False if not.
-     * 
+     *
      */
-    public function hasPrivilege(string $pr) : bool;
+    public function hasPrivilege(string $privilege) : bool;
+    /**
+     * Checks if the user has one of multiple privileges.
+     *
+     * @param array $privilegesArr An array that contains the IDs of the
+     * privileges.
+     *
+     * @return bool If the user has one of the given privileges, the method
+     * will return true. Other than that, the method will return false.
+     */
+    public function hasAnyPrivilege(array $privilegesArr) : bool;
 }

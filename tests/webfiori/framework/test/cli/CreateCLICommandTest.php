@@ -20,7 +20,7 @@ class CreateCLICommandTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '5',
             'NewCLI',
             'app\commands',
@@ -36,7 +36,7 @@ class CreateCLICommandTest extends CreateTestCase {
             "0: Database table class.\n",
             "1: Entity class from table.\n",
             "2: Web service.\n",
-            "3: Background job.\n",
+            "3: Background Task.\n",
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
@@ -63,7 +63,7 @@ class CreateCLICommandTest extends CreateTestCase {
             'create',
             '--c' => 'command'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'DoIt',
             'app\commands',
             'do-it',

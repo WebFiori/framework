@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cron\webUI;
 
+use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 
 /**
@@ -35,34 +36,37 @@ class TasksTable extends HTMLNode {
             'item-key' => "name",
             ':search' => 'search'
         ]);
-        
+
         $this->createInfoCol();
         $this->addIsTimeSlot('is_minute');
         $this->addIsTimeSlot('is_hour');
         $this->addIsTimeSlot('is_day_of_week');
         $this->addIsTimeSlot('is_month');
         $this->addIsTimeSlot('is_day_of_month');
-        
+
         $this->createExpansionArea();
         $this->createActions();
-        
-        
     }
-    private function createInfoCol() {
-        $info = $this->addChild('template', [
-            '#item.info' => '{ item }'
+
+    /**
+     *
+     * @param string $slot
+     * @throws InvalidNodeNameException
+     */
+    private function addIsTimeSlot(string $slot) {
+        $template = $this->addChild('template', [
+            '#item.time.'.$slot => '{ item }'
         ]);
-        $vTooltip = $info->addChild('v-tooltip', [
-            'bottom'
-        ]);
-        $vTooltip->addChild('template', [
-            '#activator' => '{ on, attrs }',
-        ])->addChild('v-icon', [
-            'v-bind' => "attrs",
-            'v-on' => "on",
+        $template->addChild('v-chip', [
+            'v-if' => 'item.time.'.$slot,
+            'color' => 'green',
             'small'
-        ])->text('mdi-information');
-        $vTooltip->addChild('span')->text('{{ item.description }}');
+        ])->text('Yes');
+        $template->addChild('v-chip', [
+            'v-else',
+            'color' => 'red',
+            'small'
+        ])->text('No');
     }
 
     private function createActions() {
@@ -91,7 +95,7 @@ class TasksTable extends HTMLNode {
             'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('div');
         $card->addChild('h3')->text('Job Arguments');
-        
+
         $textField = $card->addChild('div', [
             'v-if' => 'item.args.length !== 0'
         ])->addChild('v-text-field', [
@@ -117,25 +121,20 @@ class TasksTable extends HTMLNode {
             'v-else'
         ])->text('No Arguments.');
     }
-
-        /**
-     * 
-     * @param HTMLNode $table
-     * @param type $slot
-     */
-    private function addIsTimeSlot($slot) {
-        $template = $this->addChild('template', [
-            '#item.time.'.$slot => '{ item }'
+    private function createInfoCol() {
+        $info = $this->addChild('template', [
+            '#item.info' => '{ item }'
         ]);
-        $template->addChild('v-chip', [
-            'v-if' => 'item.time.'.$slot,
-            'color' => 'green',
+        $vTooltip = $info->addChild('v-tooltip', [
+            'bottom'
+        ]);
+        $vTooltip->addChild('template', [
+            '#activator' => '{ on, attrs }',
+        ])->addChild('v-icon', [
+            'v-bind' => "attrs",
+            'v-on' => "on",
             'small'
-        ])->text('Yes');
-        $template->addChild('v-chip', [
-            'v-else',
-            'color' => 'red',
-            'small'
-        ])->text('No');
+        ])->text('mdi-information');
+        $vTooltip->addChild('span')->text('{{ item.description }}');
     }
 }

@@ -11,12 +11,11 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\exceptions\SessionException;
-use webfiori\framework\User;
 use webfiori\framework\WebFioriApp;
+use webfiori\http\HttpCookie;
+use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\http\Request;
-use webfiori\http\HttpCookie;
 /**
  * A class that represents a session.
  *
@@ -39,7 +38,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    const STATUS_EXPIERED = 'status_expiered';
+    const STATUS_EXPIRED = 'status_expired';
     /**
      * A constant that indicates the session was initialized but not started or 
      * resumed.
@@ -72,7 +71,6 @@ class Session implements JsonI {
      * @since 1.0
      */
     const STATUS_RESUMED = 'status_resumed';
-    private $sessionCookie;
     /**
      * The IP address of the user who is using the session.
      * 
@@ -138,6 +136,7 @@ class Session implements JsonI {
      * @since 1.0 
      */
     private $sessionArr;
+    private $sessionCookie;
     private $sessionStatus;
     /**
      * An object of type 'User' that represents session user.
@@ -146,7 +145,7 @@ class Session implements JsonI {
      * 
      * @since 1.0 
      */
-    private $sesstionUser;
+    private $sessionUser;
 
     /**
      * The timestamp at which the session was started in as Unix timestamp.
@@ -180,32 +179,33 @@ class Session implements JsonI {
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
         $this->sessionCookie = new HttpCookie();
-        $this->sesstionUser = null;
-        
+        $this->sessionUser = null;
+
         $this->sessionStatus = self::STATUS_INACTIVE;
         $this->passedTime = 0;
         $this->langCode = '';
-        
-        
+
+
         if (isset($options['refresh'])) {
             $this->setIsRefresh($options['refresh']);
         } else {
             $this->setIsRefresh(false);
         }
-        
+
         if (!(isset($options['duration']) && $this->setDuration($options['duration']))) {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
+
         if ($this->getDuration() == 0) {
             $this->setIsRefresh(false);
         }
         $tempSName = isset($options['name']) ? trim($options['name']) : '';
 
-        if (!$this->_setName($tempSName)) {
+        if (!$this->setNameHelper($tempSName)) {
             throw new SessionException('Invalid session name: \''.$tempSName.'\'.');
         }
 
-        $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID());
+        $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : self::generateSessionID($tempSName));
         $this->resumedAt = 0;
         $this->startedAt = 0;
         $this->sessionArr = [];
@@ -213,14 +213,13 @@ class Session implements JsonI {
         $this->ipAddr = Request::getClientIP();
         $this->getCookie()->setSameSite('Lax');
         Request::getUri()->getScheme();
-        
+
         if ((defined('USE_HTTP') && USE_HTTP === true) || Request::getUri()->getScheme() == 'http') {
             $this->getCookie()->setIsSecure(false);
         } else {
             $this->getCookie()->setIsSecure(true);
         }
         $this->getCookie()->setIsHttpOnly(true);
-        
     }
     /**
      * Returns a JSON string that represents the session.
@@ -266,6 +265,14 @@ class Session implements JsonI {
         }
     }
     /**
+     * Returns the cookie which is associated with the cookie.
+     * 
+     * @return HttpCookie An object that holds session cookie information.
+     */
+    public function getCookie() : HttpCookie {
+        return $this->sessionCookie;
+    }
+    /**
      * Returns a string which can be passed to the function 'header()' to set session 
      * cookie.
      * 
@@ -278,14 +285,6 @@ class Session implements JsonI {
      */
     public function getCookieHeader() : string {
         return $this->sessionCookie.'';
-    }
-    /**
-     * Returns the cookie which is associated with the cookie.
-     * 
-     * @return HttpCookie An object that holds session cookie information.
-     */
-    public function getCookie() : HttpCookie {
-        return $this->sessionCookie;
     }
     /**
      * Returns the amount of time at which the session will live for in seconds.
@@ -319,9 +318,9 @@ class Session implements JsonI {
     /**
      * Returns session language code.
      * 
-     * @param boolean $forceUpdate Set to true if the language is set and want to 
+     * @param bool $forceUpdate Set to true if the language is set and want to 
      * reset it. The reset process depends on the attribute 
-     * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
+     * 'lang'. It can be sent via 'get' request, 'post' request or a cookie. If
      * no language code is provided and the parameter '$forceUpdate' is set 
      * to true, 'EN' will be used. If the given 
      * language code is not in the given array and the parameter '$forceUpdate' is set 
@@ -332,8 +331,8 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getLangCode(bool $forceUpdate = false) : string {
-        $this->_initLang($forceUpdate);
+    public function getLangCode(bool $forceUpdate = false) {
+        $this->initLang($forceUpdate);
 
         return $this->langCode;
     }
@@ -358,13 +357,14 @@ class Session implements JsonI {
     public function getPassedTime() : int {
         return $this->passedTime;
     }
+
     /**
      * Returns number of seconds remaining before the session timeout.
-     * 
-     * @return int If the session is persistent or set to refresh for every request, 
-     * the method will return 0. Other than that, it will return remaining time. 
+     *
+     * @return int If the session is persistent or set to refresh for every request,
+     * the method will return 0. Other than that, it will return remaining time.
      * If the session has no remaining time, it will return -1.
-     * 
+     *
      * @since 1.0
      */
     public function getRemainingTime() : int {
@@ -400,7 +400,7 @@ class Session implements JsonI {
         return 0;
     }
     /**
-     * Returns the time at at which the session was started at.
+     * Returns the time at which the session was started at.
      * 
      * @return int The method will return the time in seconds. If the session 
      * is not running, the method will return 0.
@@ -433,7 +433,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function getUser() {
-        return $this->sesstionUser;
+        return $this->sessionUser;
     }
     /**
      * Returns an associative array that contains all session variables.
@@ -454,8 +454,8 @@ class Session implements JsonI {
      * 
      * @param string $varName The name of the variable that has the value.
      * 
-     * @return boolean If the value exist, the method will return true. Other 
-     * than that, the method will return false.
+     * @return bool If the value exist, the method will return true.
+     * Other than that, the method will return false.
      * 
      * @since 1.0
      */
@@ -465,7 +465,7 @@ class Session implements JsonI {
 
             return isset($this->sessionArr[$trimmed]);
         }
-        
+
         return false;
     }
     /**
@@ -474,7 +474,7 @@ class Session implements JsonI {
      * A session is persistent if its duration is greater than 0 minutes (has a 
      * duration).
      * 
-     * @return boolean If the session cookie is persistent, the method will return true. 
+     * @return bool If the session cookie is persistent, the method will return true. 
      * false otherwise.
      * 
      * @since 1.0
@@ -488,10 +488,9 @@ class Session implements JsonI {
      * This method must be called only after calling the method 'SessionManager::initSession()'. 
      * or it will throw an exception.
      * 
-     * @return boolean true If session timeout time will be refreshed with every request. 
+     * @return bool true If session timeout time will be refreshed with every request. 
      * false if not.
-     * 
-     * @throws SessionException If the session is not running. 
+     *
      * 
      * @since 1.5
      */
@@ -501,7 +500,7 @@ class Session implements JsonI {
     /**
      * Checks if the session is started and running or not.
      * 
-     * @return If the status of the session is Session::STATUS_NEW or Session::STATUS_RESUMED, 
+     * @return bool If the status of the session is Session::STATUS_NEW or Session::STATUS_RESUMED,
      * the method will return true. Other than that, the method will return false.
      * 
      * @since 1.0
@@ -543,7 +542,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function reGenerateID() : string {
-        $this->getCookie()->setValue($this->_generateSessionID());
+        $this->getCookie()->setValue($this->generateSessionID($this->getName()));
 
         return $this->getCookie()->getValue();
     }
@@ -552,7 +551,7 @@ class Session implements JsonI {
      * 
      * @param string $varName The name of the variable.
      * 
-     * @return boolean If the value was deleted, the method will return true. 
+     * @return bool If the value was deleted, the method will return true. 
      * If the variable does not exist or the variable does not exist, the method 
      * will return false.
      * 
@@ -580,7 +579,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function serialize() : string {
-        $serializedSesstion = serialize($this);
+        $serializedSession = serialize($this);
         $cipherMeth = 'aes-256-ctr';
 
         //Need to do more research about the security of this approach.
@@ -595,10 +594,10 @@ class Session implements JsonI {
 
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            return openssl_encrypt($serializedSesstion, $cipherMeth, $key,0, $iv);
+            return openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
         }
 
-        return $serializedSesstion;
+        return $serializedSession;
     }
     /**
      * Sets session variable. 
@@ -607,9 +606,9 @@ class Session implements JsonI {
      * 
      * @param string $name The name of the variable. Must be non-empty string.
      * 
-     * @param mixed $val The value of the variable. It can be any thing.
+     * @param mixed $val The value of the variable. It can be anything.
      * 
-     * @return boolean If the variable is set, the method will return true. If 
+     * @return bool If the variable is set, the method will return true. If 
      * not, the method will return false.
      * 
      * @since 1.0
@@ -630,24 +629,24 @@ class Session implements JsonI {
     /**
      * Sets session duration.
      * 
-     * Note that this method will also updates the 'expires' attribute of session 
+     * Note that this method will also update the 'expires' attribute of session
      * cookie. Also, note that if the new duration less than the passed time, 
      * the session will expire.
      * 
      * @param float $time Session duration in minutes.
      * 
-     * @return boolean If session duration is updated, the method will return true. 
+     * @return bool If session duration is updated, the method will return true. 
      * False otherwise.
      * 
      * @since 1.0
      */
     public function setDuration(float $time) : bool {
-        $asFloat = floatval($time);
+        $asFloat = $time;
 
         if ($asFloat >= 0) {
             $this->lifeTime = $asFloat;
             $this->sessionCookie->setExpires($asFloat);
-            $this->_checkIfExpired();
+            $this->checkIfExpired();
 
             return true;
         }
@@ -658,7 +657,7 @@ class Session implements JsonI {
      * Sets if the session timeout will be refreshed with every request 
      * or not.
      * 
-     * @param boolean $bool If set to true, timeout time will be refreshed. 
+     * @param bool $bool If set to true, timeout time will be refreshed. 
      * Note that the property will be updated only if the session is running.
      * 
      * @since 1.0
@@ -688,28 +687,30 @@ class Session implements JsonI {
      */
     public function setUser(SessionUser $userObj) {
         if ($this->isRunning()) {
-            $this->sesstionUser = $userObj;
+            $this->sessionUser = $userObj;
         }
     }
+
     /**
      * Resumes or starts new session.
-     * 
-     * This method works as follows, it tries to read a session from sessions 
-     * storage using the ID of the session. If a session is found, it will 
-     * populate the instance with session values taken from the storage. If no 
-     * session was found, the method will initialize new one. 
-     * 
+     *
+     * This method works as follows, it tries to read a session from sessions
+     * storage using the ID of the session. If a session is found, it will
+     * populate the instance with session values taken from the storage. If no
+     * session was found, the method will initialize new one.
+     *
+     * @throws SessionException
      * @since 1.0
      */
     public function start() {
         if (!$this->isRunning()) {
-            $seesionStr = SessionsManager::getStorage()->read($this->getId());
+            $sessionStr = SessionsManager::getStorage()->read($this->getId());
 
-            if ($this->getStatus() == self::STATUS_KILLED || $seesionStr === null || !$this->unserialize($seesionStr)) {
+            if ($this->getStatus() == self::STATUS_KILLED || $sessionStr === null || !$this->deserialize($sessionStr)) {
                 $this->reGenerateID();
-                $this->_initNewSesstionVars();
+                $this->initNewSessionVars();
             } else {
-                $this->_checkIfExpired();
+                $this->checkIfExpired();
             }
         }
     }
@@ -737,18 +738,20 @@ class Session implements JsonI {
             'vars' => $this->getVars()
         ]);
     }
+
     /**
-     * Unserialize a session and restore its data in the instance at which the 
+     * Deserialize a session and restore its data in the instance at which the
      * method is called on.
-     * 
+     *
      * @param string $serialized The serialized session as string.
-     * 
-     * @return boolean If the Unserialize was successfully completed, the method 
-     * will return true. If Unserialize fails, the method will return false.
-     * 
+     *
+     * @return bool If the Un-serialize was successfully completed, the method
+     * will return true. If Deserialize fails, the method will return false.
+     *
+     * @throws SessionException
      * @since 1.0
      */
-    public function unserialize(string $serialized) {
+    public function deserialize(string $serialized): bool {
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
@@ -763,29 +766,31 @@ class Session implements JsonI {
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
 
             if (strlen($encrypted) > 0) {
-                set_error_handler(function ($errNo, $errStr) {
+                set_error_handler(function ($errNo, $errStr)
+                {
                     throw  new SessionException($errStr, $errNo);
                 });
-                $sesstionObj = unserialize($encrypted);
+                $sessionObj = unserialize($encrypted);
                 restore_error_handler();
-                
-                if ($sesstionObj instanceof Session) {
+
+                if ($sessionObj instanceof Session) {
                     $this->sessionStatus = self::STATUS_RESUMED;
-                    $this->_clone($sesstionObj);
+                    $this->cloneHelper($sessionObj);
 
                     return true;
                 }
             }
         } else {
-            set_error_handler(function ($errNo, $errStr) {
+            set_error_handler(function ($errNo, $errStr)
+            {
                 throw  new SessionException($errStr, $errNo);
             });
-            $sesstionObj = unserialize($serialized);
+            $sessionObj = unserialize($serialized);
             restore_error_handler();
 
-            if ($sesstionObj instanceof Session) {
+            if ($sessionObj instanceof Session) {
                 $this->sessionStatus = self::STATUS_RESUMED;
-                $this->_clone($sesstionObj);
+                $this->cloneHelper($sessionObj);
 
                 return true;
             }
@@ -793,23 +798,23 @@ class Session implements JsonI {
 
         return false;
     }
-    private function _checkIfExpired() {
+    private function checkIfExpired() {
         if ($this->getRemainingTime() < 0) {
             SessionsManager::getStorage()->remove($this->getId());
-            $this->sessionStatus = self::STATUS_EXPIERED;
+            $this->sessionStatus = self::STATUS_EXPIRED;
             $this->sessionCookie->kill();
         } else if ($this->isRefresh()) {
             $this->sessionCookie->setExpires($this->getDuration());
         }
     }
-    private function _clone(Session $session) {
+    private function cloneHelper(Session $session) {
         $this->startedAt = $session->startedAt;
         $this->sessionCookie = $session->sessionCookie;
         $this->sessionArr = $session->sessionArr;
         $this->isRef = $session->isRef;
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
-        $langCodeR = $this->_getLangFromRequest();
+        $langCodeR = $this->getLangFromRequest();
 
         if ($langCodeR) {
             $this->langCode = $this->getLangCode(true);
@@ -817,37 +822,36 @@ class Session implements JsonI {
             $this->langCode = $session->langCode;
         }
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
-        $this->sesstionUser = $session->sesstionUser;
+        $this->sessionUser = $session->sessionUser;
     }
     /**
      * Generate a random session ID.
+     * 
+     * @param string|null $sessionName The name of the session.
      * 
      * @return string A new random session ID.
      * 
      * @since 1.0
      */
-    private function _generateSessionID() {
-        $date = date(DATE_ISO8601);
+    public static function generateSessionID(string $sessionName = null): string {
+        $date = date('Y-m-d\TH:i:sO');
         $hash = hash('sha256', $date);
         $salt = time() + call_user_func(self::$randFunc, 0, 100);
 
-        return hash('sha256',$hash.$salt.$this->getName());
+        return hash('sha256',$hash.$salt.$sessionName);
     }
     /**
      * 
      * @return string|null
      */
-    private function _getLangFromRequest() {
+    private function getLangFromRequest() {
         $langIdx = 'lang';
-
-        //if not in $_GET, check $_POST
         $lang = Request::getParam($langIdx);
-
-        //If not in $_POST, check cookie.
-        if (!$lang || $lang == null) {
+        
+        if ($lang === null) {
             $lang = filter_input(INPUT_COOKIE, $langIdx);
 
-            if (!$lang || $lang == null) {
+            if ($lang === null) {
                 $lang = null;
             }
         }
@@ -858,40 +862,38 @@ class Session implements JsonI {
      * Initialize session language. 
      * 
      * The initialization depends on the attribute 'lang'. 
-     * It can be send via 'get' request, 'post' request or a cookie. 
+     * It can be sent via 'get' request, 'post' request or a cookie. 
      * If the given language code is not in the given array, 
      * The used value will depend on the existence of the class 'AppConfig'. 
-     * If it is exist, The value that is returned by AppConfig::getPrimaryLanguage()' .
+     * If it is existed, The value that is returned by AppConfig::getPrimaryLanguage()' .
      * If not, 'EN' is used by default.
-     * Also if the language is set before, it will not be updated unless the 
+     * Also, if the language is set before, it will not be updated unless the 
      * parameter '$forceUpdate' is set to true.
      * 
-     * @param boolean $forceUpdate Set to true if the language is set and want to 
+     * @param bool $forceUpdate Set to true if the language is set and want to 
      * reset it. Default is false.
      * 
-     * @return boolean The method will return true if the language is set or 
+     * @return void The method will return true if the language is set or
      * updated. Other than that, the method will return false. Default is true which 
      * happens when session is not running.
      * 
      * @since 1.2
      */
-    private function _initLang($forceUpdate = false) {
+    private function initLang(bool $forceUpdate = false) {
         if ($this->isRunning()) {
             if ($this->langCode != '' && !$forceUpdate) {
-                return false;
+                return;
             }
             //the value of default language.
             //used in case no language found 
             //in $_GET['lang'], $_POST['lang'] or in cookie
             $defaultLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
-            $langCodeFromReq = $this->_getLangFromRequest();
-            $retVal = false;
+            $langCodeFromReq = $this->getLangFromRequest();
+            $isLangSet = false;
             $isNullCode = $langCodeFromReq === null;
-            
+
             if ($isNullCode) {
-                if ($this->langCode != '') {
-                    $retVal = false;
-                } else {
+                if ($this->langCode == '') {
                     $langCodeFromReq = $defaultLang;
                 }
             }
@@ -901,31 +903,24 @@ class Session implements JsonI {
 
                 if (strlen($langU) == 2) {
                     $this->langCode = $langU;
-                    $retVal = true;
+                    $isLangSet = true;
                 }
 
-                if (!$retVal && $this->langCode == '') {
+                if (!$isLangSet && $this->langCode == '') {
                     $this->langCode = $defaultLang;
-                    $retVal = true;
-                } else {
-                    $retVal = false;
                 }
             }
-
-            return $retVal;
         }
-
-        return true;
     }
-    private function _initNewSesstionVars() {
+    private function initNewSessionVars() {
         $this->sessionArr = [];
         $this->resumedAt = time();
         $this->startedAt = time();
-        
+
         $this->sessionStatus = self::STATUS_NEW;
-        $this->_initLang();
+        $this->initLang();
     }
-    private function _setName($name) {
+    private function setNameHelper($name): bool {
         $trimmed = trim($name);
 
         if (strlen($trimmed) == 0) {
@@ -940,7 +935,7 @@ class Session implements JsonI {
             }
         }
         $this->getCookie()->setName($trimmed);
-        
+
         return true;
     }
 }

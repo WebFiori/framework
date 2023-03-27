@@ -16,7 +16,7 @@ use webfiori\framework\cron\AbstractJob;
 use webfiori\framework\cron\Cron;
 /**
  * A CLI command which is related to executing 
- * background jobs or performing operations on them..
+ * background jobs or performing operations on them.
  *
  * @author Ibrahim
  * @version 1.0
@@ -41,7 +41,7 @@ class CronCommand extends CLICommand {
         parent::__construct('cron', [
             new CommandArgument('p', 'CRON password. If it is set in CRON, then it must be provided here.', true),
             new CommandArgument('--list', 'List all scheduled CRON jobs.', true),
-            new CommandArgument('--check', 'Run a check aginst all jobs to check if it is time to execute them or not.', true),
+            new CommandArgument('--check', 'Run a check against all jobs to check if it is time to execute them or not.', true),
             new CommandArgument('--force', 'Force a specific job to execute.', true),
             new CommandArgument('--job-name', 'The name of the job that will be forced to execute or to show its arguments.', true),
             new CommandArgument('--show-job-args', 'If this one is provided with job name and a job has custom execution args, they will be shown.', true),
@@ -63,7 +63,7 @@ class CronCommand extends CLICommand {
      */
     public function exec() : int {
         $retVal = -1;
-        
+
         if ($this->isArgProvided('--list')) {
             $this->listJobs();
             $retVal = 0;
@@ -76,16 +76,16 @@ class CronCommand extends CLICommand {
                 if ($result == 'INV_PASS') {
                     $this->error("Provided password is incorrect");
                 } else {
-                    $this->_printExcResult($result);
+                    $this->printExcResult($result);
                     $retVal = 0;
                 }
             } else {
                 $this->error("The argument 'p' is missing. It must be provided if cron password is set.");
             }
         } else if ($this->isArgProvided('--force')) {
-            $retVal = $this->_force();
+            $retVal = $this->force();
         } else if ($this->isArgProvided('--show-job-args')) {
-            $this->_showJobArgs();
+            $this->showJobArgs();
             $retVal = 0;
         } else {
             $this->info("At least one of the options '--check', '--force' or '--show-job-args' must be provided.");
@@ -93,15 +93,31 @@ class CronCommand extends CLICommand {
 
         return $retVal;
     }
-    private function _checkJobArgs($jobName) {
+    public function listJobs() {
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
+
+        while ($job = $jobs->dequeue()) {
+            $num = $i < 10 ? '0'.$i : $i;
+            $this->println("--------- Job #$num ---------", [
+                'color' => 'light-blue',
+                'bold' => true
+            ]);
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
+        }
+    }
+    private function checkJobArgs($jobName) {
         $job = Cron::getJob($jobName);
         $args = $job->getExecArgsNames();
 
         if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {
-            $this->_setArgs($args, $job);
+            $this->setArgs($args, $job);
         }
     }
-    private function _force() {
+    private function force(): int {
         $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p').'';
         $retVal = -1;
@@ -115,7 +131,7 @@ class CronCommand extends CLICommand {
         if ($jobName == 'Cancel') {
             $retVal = 0;
         } else {
-            $this->_checkJobArgs($jobName);
+            $this->checkJobArgs($jobName);
             $result = Cron::run($cPass,$jobName.'',true, $this);
 
             if ($result == 'INV_PASS') {
@@ -123,14 +139,14 @@ class CronCommand extends CLICommand {
             } else if ($result == 'JOB_NOT_FOUND') {
                 $this->error("No job was found which has the name '".$jobName."'");
             } else {
-                $this->_printExcResult($result);
+                $this->printExcResult($result);
                 $retVal = 0;
             }
         }
 
         return $retVal;
     }
-    private function _printExcResult($result) {
+    private function printExcResult($result) {
         $this->println("Total number of jobs: ".$result['total-jobs']);
         $this->println("Executed Jobs: ".$result['executed-count']);
         $this->println("Successfully finished jobs:");
@@ -154,7 +170,7 @@ class CronCommand extends CLICommand {
             }
         }
     }
-    private function _setArgs($argsArr, AbstractJob $job) {
+    private function setArgs($argsArr, AbstractJob $job) {
         $setArg = true;
         $index = 0;
         $count = count($argsArr);
@@ -172,7 +188,7 @@ class CronCommand extends CLICommand {
             $index++;
         } while ($setArg);
     }
-    private function _showJobArgs() {
+    private function showJobArgs() {
         $jobName = $this->getArgValue('--job-name');
 
         if ($jobName === null) {
@@ -189,22 +205,6 @@ class CronCommand extends CLICommand {
             }
         } else {
             $this->println("    <NO ARGS>");
-        }
-    }
-    public function listJobs() {
-        $jobs = Cron::jobsQueue();
-        $i = 1;
-        $this->println("Number Of Jobs: ".$jobs->size());
-
-        while ($job = $jobs->dequeue()) {
-            $num = $i < 10 ? '0'.$i : $i;
-            $this->println("--------- Job #$num ---------", [
-                'color' => 'light-blue',
-                'bold' => true
-            ]);
-            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
-            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
-            $i++;
         }
     }
 }

@@ -2,8 +2,8 @@
 namespace app\jobs;
 
 use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\CronEmail;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\CronEmail;
 /**
  * A background process which was created using the command "create".
  *
@@ -18,7 +18,7 @@ class SuccessTestJob extends AbstractJob {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('Success 1');
         $this->setDescription('The job will execute every day to send sales report to management.');
         $this->addExecutionArgs([
@@ -40,12 +40,21 @@ class SuccessTestJob extends AbstractJob {
         //$this->cron('* * * * *');
     }
     /**
+     * Execute a set of instructions after the job has finished to execute.
+     */
+    public function afterExec() {
+        //TODO: Implement the action to perform when the job finishes to execute.
+        //$email = new CronEmail('no-reply', [
+        //    'webfiori@example.com' => 'Ibrahim Ali'
+        //]);
+    }
+    /**
      * Execute the process.
      */
     public function execute() {
         $this->getCommand()->println('Start: '.$this->getArgValue('start'));
         $this->getCommand()->println('End: '.$this->getArgValue('end'));
-        
+
         if ($this->isForced()) {
             $this->getCommand()->println('The job was forced.');
         }
@@ -61,14 +70,5 @@ class SuccessTestJob extends AbstractJob {
      */
     public function onSuccess() {
         //TODO: Implement the action to perform when the job executes without errors.
-    }
-    /**
-     * Execute a set of instructions after the job has finished to execute.
-     */
-    public function afterExec() {
-        //TODO: Implement the action to perform when the job finishes to execute.
-        //$email = new CronEmail('no-reply', [
-        //    'webfiori@example.com' => 'Ibrahim Ali'
-        //]);
     }
 }

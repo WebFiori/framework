@@ -20,7 +20,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'not-exist'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -46,7 +46,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'not-exist'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -72,7 +72,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'app\\database\\Test2Table.php'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -98,7 +98,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            
         ]);
         
@@ -124,7 +124,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'y'
         ]);
         
@@ -154,7 +154,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'n'
         ]);
         
@@ -181,7 +181,7 @@ class RunSQLCommandTest extends TestCase {
             'webfiori',
             'run-query',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             '0',
             'select * from hello;',
@@ -221,7 +221,7 @@ class RunSQLCommandTest extends TestCase {
             '--connection' => 'testing-connection-2',
             '--file' => 'app\\database\\sql-file.sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
            'n'
         ]);
         
@@ -248,7 +248,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--show-sql'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             'app\database\TestTable',
             '0'
@@ -273,7 +273,6 @@ class RunSQLCommandTest extends TestCase {
             "The following query will be executed on the database:\n",
             "create table if not exists `test` (\n".
             "    `id` int not null\n".
-            "\n".
             ")\n".
             "engine = InnoDB\n".
             "default charset = utf8mb4\n".
@@ -299,7 +298,7 @@ class RunSQLCommandTest extends TestCase {
             '--no-confirm',
             '--table' => 'app\\database\\TestTable'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             '1'
         ]);
@@ -340,7 +339,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--connection' => 'testing-connection',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'drop table test2_x;',
             'y'
@@ -375,7 +374,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--schema' => \tables\Schema::class
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'y',
         ]);
@@ -395,7 +394,6 @@ class RunSQLCommandTest extends TestCase {
             . "    `last_name` varchar(128) null collate utf8mb4_unicode_520_ci,\n"
             . "    `joining_date` datetime not null,\n"
             . "    `created_on` timestamp not null default now()\n"
-            . "\n"
             . ")\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
@@ -421,7 +419,7 @@ class RunSQLCommandTest extends TestCase {
             '--schema' => \tables\Schema2::class,
             '--create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'y',
         ]);
         $code = $runner->start();
@@ -434,8 +432,7 @@ class RunSQLCommandTest extends TestCase {
             . "    `salary` decimal(10,2) not null default '0',\n"
             . "    `created_on` timestamp not null default now(),\n"
             . "    `last_updated` datetime null\n"
-            . "\n)"
-            . "\n"
+            . ")\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",
@@ -459,7 +456,7 @@ class RunSQLCommandTest extends TestCase {
             'run-query',
             '--schema' => \tables\Schema2::class,
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '1',
             "0",
             "2",
@@ -488,8 +485,7 @@ class RunSQLCommandTest extends TestCase {
             . "    `salary` decimal(10,2) not null default '0',\n"
             . "    `created_on` timestamp not null default now(),\n"
             . "    `last_updated` datetime null\n"
-            . "\n)"
-            . "\n"
+            . ")\n"
             . "engine = InnoDB\n"
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",

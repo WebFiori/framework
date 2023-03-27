@@ -53,12 +53,14 @@ class DB extends Database {
         $conn = WebFioriApp::getAppConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
-            $conns = ConfigController::get()->getDatabaseConnections();
-            foreach ($conns as $xCon) {
+            $connectionsArr = ConfigController::get()->getDatabaseConnections();
+
+            foreach ($connectionsArr as $xCon) {
                 if ($xCon->getName() == $connName) {
                     $conn = $xCon;
                 }
             }
+
             if (!($conn instanceof ConnectionInfo)) {
                 throw new DatabaseException("No connection was found which has the name '$connName'.");
             }
@@ -81,27 +83,24 @@ class DB extends Database {
      * 
      * @since 1.0
      */
-    public function addTable(Table $table, bool $updateOwnerDb = true) {
+    public function addTable(Table $table, bool $updateOwnerDb = true) : bool {
         $connType = $this->getConnectionInfo()->getDatabaseType();
 
         if (($connType == 'mysql' && $table instanceof MySQLTable) 
          || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-
-            foreach ($table->getForignKeys() as $fk) {
+            foreach ($table->getForeignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);
             }
 
             return parent::addTable($table, $updateOwnerDb);
         }
+
         return false;
     }
     /**
      * Auto-register database tables which exist on a specific directory.
      * 
-     * Note that the statement 'return __NAMESPACE__' should be included at the 
-     * end of the table class for auto-register to work. If the statement 
-     * does not exist, the method will assume that the path is the namespace of 
-     * the classes. Also, the classes which represents tables must be suffixed 
+     * Note that the classes which represents tables must be suffixed
      * with the word 'Table' (e.g. UsersTable). Also, the registration will depend 
      * on the database that the connection is for. For example, if the connection 
      * is for MySQL database, then only tables of type 'MySQLTable'.
@@ -116,7 +115,7 @@ class DB extends Database {
     public function register(string $pathToScan) {
         WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db)
         {
-            foreach ($table->getForignKeys() as $fk) {
+            foreach ($table->getForeignKeys() as $fk) {
                 $db->addTable($fk->getSource(), false);
             }
             $db->addTable($table);

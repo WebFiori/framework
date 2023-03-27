@@ -20,7 +20,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'SuperCoolJob',
             'app\jobs',
@@ -36,7 +36,7 @@ class CreateJobTest extends CreateTestCase {
             "0: Database table class.\n",
             "1: Entity class from table.\n",
             "2: Web service.\n",
-            "3: Background job.\n",
+            "3: Background Task.\n",
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
@@ -65,7 +65,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'SuperCoolJob',
             'app\jobs',
@@ -83,7 +83,7 @@ class CreateJobTest extends CreateTestCase {
             "0: Database table class.\n",
             "1: Entity class from table.\n",
             "2: Web service.\n",
-            "3: Background job.\n",
+            "3: Background Task.\n",
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
@@ -114,7 +114,7 @@ class CreateJobTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '3',
             'NewRound',
             'app\jobs',
@@ -132,7 +132,7 @@ class CreateJobTest extends CreateTestCase {
             "0: Database table class.\n",
             "1: Entity class from table.\n",
             "2: Web service.\n",
-            "3: Background job.\n",
+            "3: Background Task.\n",
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
@@ -164,7 +164,7 @@ class CreateJobTest extends CreateTestCase {
             'create',
             '--c' => 'job'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'SendDailyReport',
             'app\jobs',
             'Send Sales Report',
@@ -190,14 +190,14 @@ class CreateJobTest extends CreateTestCase {
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
             "Enter argument name:\n",
-            "Descripe the use of the argument: Enter = ''\n",
+            "Describe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
             "Enter argument name:\n",
             "Error: Invalid argument name: end?\n",
             "Would you like to add more arguments?(y/N)\n",
             "Enter argument name:\n",
-            "Descripe the use of the argument: Enter = ''\n",
+            "Describe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",

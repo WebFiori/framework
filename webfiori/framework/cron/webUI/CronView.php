@@ -16,6 +16,7 @@ use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\json\Json;
+use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 /**
@@ -50,9 +51,9 @@ class CronView extends WebPage {
         }
         $this->setTitle($title);
         $this->setDescription($description);
-        $defaltSiteLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+        $defaultSiteLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
-        $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
+        $siteName = $siteNames[$defaultSiteLang] ?? null;
 
         if ($siteName !== null) {
             $this->setWebsiteName($siteName);
@@ -84,22 +85,24 @@ class CronView extends WebPage {
             $view->getDocument()->getHeadNode()->addChild($code);
         }, 1000);
     }
+
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.
-     * 
+     *
      * @param string $model The vue model which is used to make the dialig visible.
-     * 
-     * @param string $titleModel A string that represents the model which is used 
+     *
+     * @param string $titleModel A string that represents the model which is used
      * to set the title.
-     * 
+     *
      * @param string $messageModel The name of the model that will hold dialog
      * message.
-     * 
-     * @param string $closeAction The name of the method which will be invoked 
+     *
+     * @param string $closeAction The name of the method which will be invoked
      * when close button is clicked.
-     * 
-     * @param array $iconProps An optional array that holds icon props. the 
+     *
+     * @param array $iconProps An optional array that holds icon props. the
      * array can have two indices: 'model' and 'color-model'.
+     * @throws InvalidNodeNameException
      */
     public function createVDialog($model, $titleModel, $messageModel, $closeAction, $iconProps = []) {
         $dialog = new HTMLNode('v-dialog');
@@ -220,6 +223,8 @@ class CronView extends WebPage {
         $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css');
         $this->addJS('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js');
         $this->addJS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js');
-        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.x.x/AJAXRequest.js', [], false);
+        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.x.x/AJAXRequest.js', [
+            'revision' => true
+        ]);
     }
 }

@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\Language;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 use webfiori\http\Request;
@@ -43,9 +42,9 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * 
      * @since 1.0
      */
-    public function __construct($version = '1.0.0') {
+    public function __construct(string $version = '1.0.0') {
         parent::__construct($version);
-        $this->_setTranslation();
+        $this->setTranslationHelper();
         $langCode = $this->getTranslation()->getCode();
         $generalDir = 'general';
         $this->createLangDir($generalDir);
@@ -134,7 +133,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * 
      * @since 1.1
      */
-    public function contentTypeNotSupported($cType = '') {
+    public function contentTypeNotSupported(string $cType = '') {
         $message = $this->get('general/content-not-supported');
         $this->sendResponse($message, self::$E, 404,'"request-content-type":"'.$cType.'"');
     }
@@ -151,7 +150,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * 
      * @since 1.0
      */
-    public function createLangDir($dir) {
+    public function createLangDir(string $dir) {
         $this->getTranslation()->createDirectory($dir);
     }
     /**
@@ -209,8 +208,8 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * 
      * @since 1.0
      */
-    public function get($dir) {
-        return $this->getTranslation()->get($dir);
+    public function get(string $dir) {
+        return Language::getLabel($dir);
     }
     /**
      * Returns an associative array that contains HTTP authorization header 
@@ -416,7 +415,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     /**
      * Set the language at which the API is going to use for the response.
      */
-    private function _setTranslation() {
+    private function setTranslationHelper() {
         $reqMeth = Request::getMethod();
         $activeSession = SessionsManager::getActiveSession();
 

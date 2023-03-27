@@ -13,8 +13,6 @@ namespace webfiori\framework;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\Language;
-use webfiori\framework\WebFioriApp;
 
 /**
  * A class that can be used to write HTML formatted Email messages.
@@ -72,26 +70,32 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     public function getTranslation() {
         return $this->tr;
     }
-    
+
     /**
      * Sets the display language of the email.
-     * 
-     * The length of the given string must be 2 characters in order to set the 
+     *
+     * The length of the given string must be 2 characters in order to set the
      * language code.
-     * 
-     * @param string $lang a two digit language code such as AR or EN. Default 
+     *
+     * @param string $lang a two digit language code such as AR or EN. Default
      * value is 'EN'.
-     * 
+     *
+     * @throws MissingLangException
      * @since 1.0.5
      */
     public function setLang(string $lang = 'EN') : bool {
         if (parent::setLang($lang)) {
             $this->usingLanguage();
+
             return true;
         }
+
         return false;
     }
-    
+
+    /**
+     * @throws MissingLangException
+     */
     private function usingLanguage() {
         if ($this->getLang() !== null) {
             try {

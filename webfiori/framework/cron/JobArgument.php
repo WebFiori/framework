@@ -50,7 +50,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($name, $desc = '') {
+    public function __construct(string $name, string $desc = '') {
         $this->setName($name);
 
         if (!$this->setDescription($desc)) {
@@ -58,25 +58,12 @@ class JobArgument implements JsonI {
         }
     }
     /**
-     * Sets a default value for the argument to use in case it was not
-     * provided.
-     * 
-     * @param string $default A string that represents the default value
-     * of the argument.
-     */
-    public function setDefault(string $default) {
-        if (strlen($default) == 0) {
-            return;
-        }
-        $this->default = $default;
-    }
-    /**
      * Returns the default value of the argument.
      * 
      * The default value is usually used if the argument has no value
      * provided.
      * 
-     * @return string|null If default value is set, its returned as string.
+     * @return string|null If default value is set, it's returned as string.
      * Other than that, null is returned.
      */
     public function getDefault() {
@@ -116,6 +103,19 @@ class JobArgument implements JsonI {
         return $this->argVal;
     }
     /**
+     * Sets a default value for the argument to use in case it was not
+     * provided.
+     * 
+     * @param string $default A string that represents the default value
+     * of the argument.
+     */
+    public function setDefault(string $default) {
+        if (strlen($default) == 0) {
+            return;
+        }
+        $this->default = $default;
+    }
+    /**
      * Sets a description for the argument.
      * 
      * @param string $desc A string that describes how the argument will affect 
@@ -126,7 +126,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDescription(string $desc) {
+    public function setDescription(string $desc): bool {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {

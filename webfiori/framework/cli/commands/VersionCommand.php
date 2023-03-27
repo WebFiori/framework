@@ -31,6 +31,7 @@ class VersionCommand extends CLICommand {
         $this->println(WF_RELEASE_DATE);
         $this->prints("Version Type: ", $formattingOptions);
         $this->println(WF_VERSION_TYPE);
+
         return 0;
     }
 }

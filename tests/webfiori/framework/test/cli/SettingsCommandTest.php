@@ -12,7 +12,7 @@ class SettingsCommandTest extends TestCase {
      */
     public function test00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'show-settings'

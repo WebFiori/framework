@@ -46,7 +46,7 @@ class ForceCronExecutionService extends AbstractWebService {
             $infoJ->add('failed', $result['failed']);
             $infoJ->addArray('log', Cron::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);
-        } else if ($result == 'JOB_NOT_FOUND'){
+        } else if ($result == 'JOB_NOT_FOUND') {
             $infoJ = new Json([
                 'message' => 'No job was found which has the name "'.$jobName.'".',
                 'type' => WebServicesManager::E

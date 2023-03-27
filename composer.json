@@ -14,15 +14,19 @@
     ],
     "require": {
         "php": ">=7.0",
-        "webfiori/err":"v1.0.5",
-        "webfiori/cli":"v1.0.10",
-        "webfiori/file":"v1.2.2",
-        "webfiori/collections":"v1.1.1",
-        "webfiori/ui":"v2.4.0",
-        "webfiori/jsonx":"v3.1.5",
-        "webfiori/http":"v3.2.20 ",
-        "webfiori/database":"v0.5.4",
-        "webfiori/mailer":"v1.0.2"
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*",
+        "ext-openssl": "*",
+        "webfiori/err":"v1.0.6",
+        "webfiori/cli":"v1.1.1",
+        "webfiori/file":"v1.3.1",
+        "webfiori/collections":"v1.1.3",
+        "webfiori/ui":"v2.5.1",
+        "webfiori/jsonx":"v3.2.1",
+        "webfiori/http":"v3.3.2 ",
+        "webfiori/database":"v0.7.0",
+        "webfiori/mailer":"v1.0.4"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

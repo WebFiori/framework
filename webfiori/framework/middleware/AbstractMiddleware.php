@@ -89,7 +89,7 @@ abstract class AbstractMiddleware implements Comparable {
     /**
      * Adds the middleware to more than one group.
      * 
-     * @param array $groupsArr An array that contains the mames of the groups.
+     * @param array $groupsArr An array that contains the names of the groups.
      * 
      * @since 1.0
      */
@@ -211,7 +211,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function setName(string $name) {
+    public function setName(string $name): bool {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
@@ -235,6 +235,6 @@ abstract class AbstractMiddleware implements Comparable {
      * @since 1.0
      */
     public function setPriority(int $priority) {
-        $this->priority = intval($priority);
+        $this->priority = $priority;
     }
 }

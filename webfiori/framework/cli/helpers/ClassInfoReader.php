@@ -14,7 +14,6 @@ use InvalidArgumentException;
 use webfiori\cli\CLICommand;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\Util;
-use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to read class information as prompt from any input stream
  * which is set by the class 'Runner'.
@@ -36,6 +35,31 @@ class ClassInfoReader {
     public function __construct(CLICommand $owner) {
         $this->ownerCommand = $owner;
     }
+
+    /**
+     * Reads and returns a string that represents the name of the class that will be created.
+     * 
+     * @param string|null $suffix An optional string to append to the name of the class
+     * if it does not exist. For example, If the user input is 'Users' and the
+     * value of the suffix is 'Table', the returned value will be 'UsersTable'.
+     * 
+     * @return string A string that represents the name of the class.
+     */
+    public function getName($suffix = null, $errMsg = 'Invalid class name is given.') {
+        return $this->getOwner()->readClassName('Enter a name for the new class:', $suffix, $errMsg);
+    }
+    /**
+     * Reads and returns a string that represents the namespace at which the class
+     * will be added to.
+     * 
+     * @param string $defaultNs A default value for the namespace.
+     * 
+     * @return string A string that represents the namespace at which the class
+     * will be added to.
+     */
+    public function getNamespace($defaultNs) {
+        return CLIUtils::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
+    }
     /**
      * Returns the command that owns the instance.
      * 
@@ -43,16 +67,6 @@ class ClassInfoReader {
      */
     public function getOwner() {
         return $this->ownerCommand;
-    }
-    /**
-     * Constructs class path based on its namespace.
-     */
-    private function getPath($default) {
-        $fixedPath = ROOT_PATH.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
-        if (!Util::isDirectory($fixedPath, true)) {
-            throw new InvalidArgumentException("Unable to create class at $default");
-        }
-        return $fixedPath;
     }
     /**
      * Prompts the user to enter class information including name, namespace and path.
@@ -108,28 +122,15 @@ class ClassInfoReader {
         ];
     }
     /**
-     * Reads and returns a string that represents the namespace at which the class
-     * will be added to.
-     * 
-     * @param string $defaultNs A default value for the namespace.
-     * 
-     * @return string A string that represents the namespace at which the class
-     * will be added to.
+     * Constructs class path based on its namespace.
      */
-    public function getNamespace($defaultNs) {
-        return CLIUtils::readNamespace($this->getOwner(), $defaultNs, 'Enter an optional namespace for the class:');
-    }
-    
-    /**
-     * Reads and returns a string that represents the name of the class that will be created.
-     * 
-     * @param string|null $suffix An optional string to append to the name of the class
-     * if it does not exist. For example, If the user input is 'Users' and the
-     * value of the suffix is 'Table', the returned value will be 'UsersTable'.
-     * 
-     * @return string A string that represents the name of the class.
-     */
-    public function getName($suffix = null, $errMsg = 'Invalid class name is given.') {
-        return $this->getOwner()->readClassName('Enter a name for the new class:', $suffix, $errMsg);
+    private function getPath($default) {
+        $fixedPath = ROOT_PATH.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
+
+        if (!Util::isDirectory($fixedPath, true)) {
+            throw new InvalidArgumentException("Unable to create class at $default");
+        }
+
+        return $fixedPath;
     }
 }

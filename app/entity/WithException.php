@@ -1,5 +1,6 @@
 <?php
 namespace app\entity;
+
 /**
  * Description of WithException
  *

@@ -20,8 +20,6 @@ use webfiori\file\File;
  * @version 1.0.1
  */
 abstract class ClassWriter {
-    private $suffix;
-    private $useArr;
     /**
      * The generated class as string.
      * 
@@ -50,6 +48,8 @@ abstract class ClassWriter {
      * @since 1.0 
      */
     private $path;
+    private $suffix;
+    private $useArr;
     /**
      * Creates new instance of the class.
      * 
@@ -68,6 +68,7 @@ abstract class ClassWriter {
     public function __construct(string $name = 'NewClass', string $path = ROOT_PATH, string $namespace = '\\') {
         $this->suffix = '';
         $this->useArr = [];
+
         if (!$this->setClassName($name)) {
             $this->setClassName('NewClass');
         }
@@ -79,89 +80,134 @@ abstract class ClassWriter {
         if (!$this->setNamespace($namespace)) {
             $this->setNamespace('\\');
         }
-        
     }
     /**
-     * Sets a string as a suffix to the class name.
+     * Adds a single or multiple classes to be included in the 'use' section of the
+     * class.
      * 
-     * @param string $classNameSuffix A string to append to class name such as 'Table' or
-     * 'Service'. It must be a string which is considered as valid class name.
-     * 
-     * @return bool If set, the method will return true. False otherises.
+     * @param string|array $classesToUse A string or array of strings that
+     * contains the names of the classes with namespace.
      */
-    public function setSuffix(string $classNameSuffix) : bool {
-        if (self::isValidClassName($classNameSuffix)) {
-            $this->suffix = $classNameSuffix;
-            $this->className = $this->fixClassName($this->className);
-            return true;
+    public function addUseStatement($classesToUse) {
+        if (gettype($classesToUse) == 'array') {
+            foreach ($classesToUse as $class) {
+                if (!in_array($class, $this->useArr)) {
+                    $this->useArr[] = trim($class,'\\');
+                }
+            }
+        } else if (!in_array($classesToUse, $this->useArr)) {
+            $this->useArr[] = trim($classesToUse,'\\');
         }
-        return false;
     }
-    private function fixClassName($className) {
-        $classSuffix = $this->getSuffix();
-        if ($classSuffix == '') {
-            return $className;
-        }
-        $subSuffix = substr($className, strlen($className) - strlen($classSuffix));
+    /**
+     * Appends a string or array of strings to the string that represents the
+     * body of the class.
+     * 
+     * @param string $strOrArr The string that will be appended. At the end of the string 
+     * a new line character will be appended. This can also be an array of strings.
+     * 
+     * @param int $tabsCount The number of tabs that will be added to the string. 
+     * A tab is represented as 4 spaces.
+     * 
+     * @since 1.0
+     */
+    public function append($strOrArr, $tabsCount = 0) {
+        if (gettype($strOrArr) != 'array') {
+            $this->a($strOrArr, $tabsCount);
 
-        if ($subSuffix == $classSuffix) {
-            return substr($className, 0, -strlen($classSuffix));
-        }
-        return $className;
-    }
-
-    /**
-     * Sets the namespace of the class that will be created.
-     * 
-     * @param string $namespace
-     * 
-     * @return boolean If the namespace is successfully set, the method will return true.
-     * Other than that, false is returned.
-     */
-    public function setNamespace(string $namespace) {
-        $trimmed = trim($namespace);
-        
-        if (!self::isValidNamespace($trimmed)) {
-            return false;
-        }
-        $this->ns = $trimmed;
-        
-        return true;
-    }
-    /**
-     * Sets the location at which the class will be created on.
-     * 
-     * @param string $path A string that represents folder path.
-     * 
-     * @return boolean If the path is successfully set, the method will return true.
-     * Other than that, false is returned.
-     */
-    public function setPath(string $path) : bool {
-        $trimmed = trim($path);
-        
-        if (strlen($trimmed) == 0) {
-            return false;
-        }
-        $this->path = $path;
-        return true;
-    }
-    /**
-     * Sets the name of the class will be created on.
-     * 
-     * @param string $name A string that represents class name.
-     * 
-     * @return boolean If the name is successfully set, the method will return true.
-     * Other than that, false is returned.
-     */
-    public function setClassName(string $name) : bool {
-        $trimmed = trim($name);
-        if (self::isValidClassName($trimmed)) {
-            $this->className = $this->fixClassName($trimmed);
-            
-            return true;
+            return;
         }
 
-        return false;
+        foreach ($strOrArr as $str) {
+            $this->a($str, $tabsCount);
+        }
+    }
+    /**
+     * Adds method definition to the class.
+     * 
+     * @param string $funcName The name of the method.
+     * 
+     * @param array $argsArr An associative array of method arguments. The
+     * indices of the array are parameters names and values are types of
+     * parameters.
+     * 
+     * @param string|null $returns An optional name of return type.
+     * 
+     * @return string The method will create method definition string and return
+     * it.
+     */
+    public function f($funcName, $argsArr = [], $returns = null) {
+        $argsPart = '(';
+
+        foreach ($argsArr as $argName => $argType) {
+            if (strlen($argsPart) != 1) {
+                $argsPart .= ', '.$argType.' $'.$argName;
+                continue;
+            }
+            $argsPart .= $argType.' $'.$argName;
+        }
+        $argsPart .= ')';
+
+        if ($returns !== null) {
+            $argsPart .= ' : '.$returns;
+        }
+
+        return 'public function '.$funcName.$argsPart.' {';
+    }
+    /**
+     * Returns the absolute path of the class that will be created.
+     * 
+     * @return string The absolute path of the file that holds class information.
+     * 
+     * @since 1.0.1
+     */
+    public function getAbsolutePath() : string {
+        return $this->getPath().DS.$this->getName().'.php';
+    }
+    /**
+     * Returns the name of the class that will be created.
+     * 
+     * Note that the suffix will be appended to the name of the class
+     * if it is set.
+     * 
+     * @param bool $withNs If this argument is set to true, the namespace of
+     * the class will be pre-appended tp class name.
+     * 
+     * @return string The name of the class that will be created. Default is
+     * 'NewClass'
+     * 
+     * @since 1.0
+     */
+    public function getName(bool $withNs = false) : string {
+        $retVal = $this->className.$this->getSuffix();
+
+        if ($withNs) {
+            return '\\'.$this->getNamespace().'\\'.$retVal;
+        }
+
+        return $retVal;
+    }
+    /**
+     * Returns the namespace at which the generated class will be added to.
+     * 
+     * @return string The namespace at which the generated class will be added to.
+     * default is '\' which is the global namespace.
+     * 
+     * @since 1.0
+     */
+    public function getNamespace() : string {
+        return $this->ns;
+    }
+    /**
+     * Returns the location at which the class will be created on.
+     * 
+     * @return string The location at which the class will be created on.
+     * default is the value of the contstant ROOT_PATH
+     * 
+     * @since 1.0
+     */
+    public function getPath() : string {
+        return $this->path;
     }
     /**
      * Returns the string that will be appended to the name of the class.
@@ -171,6 +217,44 @@ abstract class ClassWriter {
      */
     public function getSuffix() : string {
         return $this->suffix;
+    }
+    /**
+     * Returns an array that contains all classes which will be included
+     * in the 'use' part of the class.
+     * 
+     * @return array An array of strings.
+     */
+    public function getUseStatements() : array {
+        return $this->useArr;
+    }
+    /**
+     * Checks if a given string represents a valid class name or not.
+     * 
+     * @param string $name A string to check such as 'My_Super_Class'.
+     * 
+     * @return bool If the given string is a valid class name, the method
+     * will return true. False otherwise.
+     */
+    public static function isValidClassName(string $name) : bool {
+        $len = strlen($name);
+
+        if ($len > 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $name[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * Checks if provided string represents a valid namespace or not.
@@ -205,126 +289,11 @@ abstract class ClassWriter {
         return true;
     }
     /**
-     * Checks if a given string represents a valid class name or not.
-     * 
-     * @param string $name A string to check such as 'My_Super_Class'.
-     * 
-     * @return bool If the given string is a valid class name, the method
-     * will return true. False otherwise.
+     * Remove the class at which the writer represents.
      */
-    public static function isValidClassName(string $name) : bool {
-        $len = strlen($name);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $name[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-    /**
-     * Appends a string or array of strings to the string that represents the
-     * body of the class.
-     * 
-     * @param string $strOrArr The string that will be appended. At the end of the string 
-     * a new line character will be appended. This can also be an array of strings.
-     * 
-     * @param int $tabsCount The number of tabs that will be added to the string. 
-     * A tab is represented as 4 spaces.
-     * 
-     * @since 1.0
-     */
-    public function append($strOrArr, $tabsCount = 0) {
-        if (gettype($strOrArr) != 'array') {
-            $this->_a($strOrArr, $tabsCount);
-            return;
-        }
-        foreach ($strOrArr as $str) {
-            $this->_a($str, $tabsCount);
-        }
-    }
-    /**
-     * Adds method definition to the class.
-     * 
-     * @param string $funcName The name of the method.
-     * 
-     * @param array $argsArr An associative array of method arguments. The
-     * indices of the array are parameters names and values are types of
-     * parameters.
-     * 
-     * @param string|null $returns An optional name of return type.
-     * 
-     * @return string The method will create method definition string and return
-     * it.
-     */
-    public function f($funcName, $argsArr = [], $returns = null) {
-        $argsPart = '(';
-        foreach ($argsArr as $argName => $argType) {
-            if (strlen($argsPart) != 1) {
-                $argsPart .= ', '.$argType.' $'.$argName;
-                continue;
-            }
-            $argsPart .= $argType.' $'.$argName;
-        }
-        $argsPart .= ')';
-        if ($returns !== null) {
-            $argsPart .= ' : '.$returns;
-        }
-        return 'public function '.$funcName.$argsPart.' {';
-    }
-    /**
-     * Writes the top section of the class that contains class comment.
-     */
-    public abstract function writeClassComment();
-    public abstract function writeClassDeclaration();
-    public abstract function writeClassBody();
-    /**
-     * Writes the section of the class that contains the 'use' classes.
-     */
-    public function writeUseStatements() {
-        $useClassesArr = [];
-        foreach ($this->useArr as $className) {
-            $useClassesArr[] = 'use '.$className.';';
-        }
-        $this->append($useClassesArr);
-    }
-    /**
-     * Returns an array that contains all classes which will be included
-     * in the 'use' part of the class.
-     * 
-     * @return array An array of strings.
-     */
-    public function getUseStatements() : array {
-        return $this->useArr;
-    }
-    /**
-     * Adds a single or multiple classes to be included in the 'use' section of the
-     * class.
-     * 
-     * @param string|array $classesToUse A string or array of strings that
-     * contains the names of the classes with namespace.
-     */
-    public function addUseStatement($classesToUse) {
-        if (gettype($classesToUse) == 'array') {
-            foreach ($classesToUse as $class) {
-                if (!in_array($class, $this->useArr)) {
-                    $this->useArr[] = trim($class,'\\');
-                }
-            }
-        } else if (!in_array($classesToUse, $this->useArr)) {
-            $this->useArr[] = trim($classesToUse,'\\');
-        }
+    public function removeClass() {
+        $classFile = new File($this->getAbsolutePath());
+        $classFile->remove();
     }
     /**
      * Removes a single use statement.
@@ -334,9 +303,8 @@ abstract class ClassWriter {
      */
     public function removeUseStatement(string $classToRemove) {
         $temp = [];
-        
+
         foreach ($this->getUseStatements() as $stm) {
-            
             if ($stm !== $classToRemove) {
                 $temp[] = $stm;
             }
@@ -344,84 +312,78 @@ abstract class ClassWriter {
         $this->useArr = $temp;
     }
     /**
-     * Appends the string that represents the start of PHP class.
+     * Sets the name of the class will be created on.
      * 
-     * The method will add the tag '&lt;php?' in addition to namespace declaration.
+     * @param string $name A string that represents class name.
+     * 
+     * @return boolean If the name is successfully set, the method will return true.
+     * Other than that, false is returned.
      */
-    public function writeNsDeclaration() {
-        $nsStr = $this->getNamespace() != '\\' ? 'namespace '.$this->getNamespace().";" : '';
-        $this->append([
-            '<?php',
-            $nsStr,
-            ''
-        ]);
-    }
-    private function _a($str, $tapsCount) {
-        $tabStr = str_repeat('    ', $tapsCount);
-        $this->classAsStr .= $tabStr.$str."\n";
-    }
-    /**
-     * Returns the absolute path of the class that will be created.
-     * 
-     * @return string The absolute path of the file that holds class information.
-     * 
-     * @since 1.0.1
-     */
-    public function getAbsolutePath() : string {
-        return $this->getPath().DS.$this->getName().'.php';
-    }
-    /**
-     * Returns the name of the class that will be created.
-     * 
-     * Note that the suffix will be appended to the name of the class
-     * if it is set.
-     * 
-     * @param bool $withNs If this argument is set to true, the namespace of
-     * the class will be pre-appended tp class name.
-     * 
-     * @return string The name of the class that will be created. Default is
-     * 'NewClass'
-     * 
-     * @since 1.0
-     */
-    public function getName(bool $withNs = false) : string {
-        
-        $retVal = $this->className.$this->getSuffix();
-        
-        if ($withNs) {
-            return '\\'.$this->getNamespace().'\\'.$retVal;
-             
+    public function setClassName(string $name) : bool {
+        $trimmed = trim($name);
+
+        if (self::isValidClassName($trimmed)) {
+            $this->className = $this->fixClassName($trimmed);
+
+            return true;
         }
-        return $retVal;
+
+        return false;
+    }
+
+    /**
+     * Sets the namespace of the class that will be created.
+     * 
+     * @param string $namespace
+     * 
+     * @return boolean If the namespace is successfully set, the method will return true.
+     * Other than that, false is returned.
+     */
+    public function setNamespace(string $namespace) {
+        $trimmed = trim($namespace);
+
+        if (!self::isValidNamespace($trimmed)) {
+            return false;
+        }
+        $this->ns = $trimmed;
+
+        return true;
     }
     /**
-     * Returns the namespace at which the generated class will be added to.
+     * Sets the location at which the class will be created on.
      * 
-     * @return string The namespace at which the generated class will be added to.
-     * default is '\' which is the global namespace.
+     * @param string $path A string that represents folder path.
      * 
-     * @since 1.0
+     * @return boolean If the path is successfully set, the method will return true.
+     * Other than that, false is returned.
      */
-    public function getNamespace() : string {
-        return $this->ns;
+    public function setPath(string $path) : bool {
+        $trimmed = trim($path);
+
+        if (strlen($trimmed) == 0) {
+            return false;
+        }
+        $this->path = $path;
+
+        return true;
     }
     /**
-     * Returns the location at which the class will be created on.
+     * Sets a string as a suffix to the class name.
      * 
-     * @return string The location at which the class will be created on.
-     * default is the value of the contstant ROOT_PATH
+     * @param string $classNameSuffix A string to append to class name such as 'Table' or
+     * 'Service'. It must be a string which is considered as valid class name.
      * 
-     * @since 1.0
+     * @return bool If set, the method will return true. False otherises.
      */
-    public function getPath() : string {
-        return $this->path;
-    }
-    /**
-     * Remove the class at which the writer represents.
-     */
-    public function removeClass() {
-        $classFile = new File($this->getAbsolutePath());
-        $classFile->remove();
+    public function setSuffix(string $classNameSuffix) : bool {
+        if (self::isValidClassName($classNameSuffix)) {
+            $this->suffix = $classNameSuffix;
+            $this->className = $this->fixClassName($this->className);
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * Write the new class to a .php file.
@@ -443,5 +405,53 @@ abstract class ClassWriter {
         $classFile->setRawData($this->classAsStr);
         $classFile->create(true);
         $classFile->write();
+    }
+    public abstract function writeClassBody();
+    /**
+     * Writes the top section of the class that contains class comment.
+     */
+    public abstract function writeClassComment();
+    public abstract function writeClassDeclaration();
+    /**
+     * Appends the string that represents the start of PHP class.
+     * 
+     * The method will add the tag '&lt;php?' in addition to namespace declaration.
+     */
+    public function writeNsDeclaration() {
+        $nsStr = $this->getNamespace() != '\\' ? 'namespace '.$this->getNamespace().";" : '';
+        $this->append([
+            '<?php',
+            $nsStr,
+            ''
+        ]);
+    }
+    /**
+     * Writes the section of the class that contains the 'use' classes.
+     */
+    public function writeUseStatements() {
+        $useClassesArr = [];
+
+        foreach ($this->useArr as $className) {
+            $useClassesArr[] = 'use '.$className.';';
+        }
+        $this->append($useClassesArr);
+    }
+    private function a($str, $tapsCount) {
+        $tabStr = str_repeat('    ', $tapsCount);
+        $this->classAsStr .= $tabStr.$str."\n";
+    }
+    private function fixClassName($className) {
+        $classSuffix = $this->getSuffix();
+
+        if ($classSuffix == '') {
+            return $className;
+        }
+        $subSuffix = substr($className, strlen($className) - strlen($classSuffix));
+
+        if ($subSuffix == $classSuffix) {
+            return substr($className, 0, -strlen($classSuffix));
+        }
+
+        return $className;
     }
 }

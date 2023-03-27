@@ -11,7 +11,6 @@
 namespace webfiori\framework\ui;
 
 use webfiori\error\AbstractHandler;
-use webfiori\framework\ui\WebPage;
 use webfiori\ui\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or 
@@ -31,7 +30,7 @@ class ServerErrView extends WebPage {
      */
     public function __construct(AbstractHandler $throwableOrErr) {
         parent::__construct();
-        
+
         $this->setTitle('Server Error');
         $this->changeDom();
         $this->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
@@ -39,7 +38,8 @@ class ServerErrView extends WebPage {
         $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);
         $this->addJs('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js', [], false);
         $this->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false);
-        $this->addBeforeRender(function (WebPage $p) {
+        $this->addBeforeRender(function (WebPage $p)
+        {
             $p->getDocument()->getBody()->addChild('script', [
                 'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/server-err.js',
                 'type' => 'text/javascript'
@@ -54,6 +54,7 @@ class ServerErrView extends WebPage {
             'prominent',
             'type' => "error"
         ]);
+
         if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
             $hNode->addChild('v-row', [
                 'align' => "center"
@@ -76,6 +77,7 @@ class ServerErrView extends WebPage {
                 'dense'
             ]);
             $index = 0;
+
             foreach ($throwableOrErr->getTrace() as $traceEntry) {
                 $traceList->addChild('v-list-item')->addChild('v-list-item-title')->text('#'.$index.' '.$traceEntry.'');
                 $index++;

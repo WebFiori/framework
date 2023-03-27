@@ -13,3 +13,4 @@ app/storage
 php-cs-fixer-v2.phar
 app/sto
 app/config/*
+.idea/*

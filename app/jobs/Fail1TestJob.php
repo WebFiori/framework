@@ -2,8 +2,8 @@
 namespace app\jobs;
 
 use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\CronEmail;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\CronEmail;
 /**
  * A background process which was created using the command "create".
  *
@@ -18,7 +18,7 @@ class Fail1TestJob extends AbstractJob {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('Fail 1');
         // TODO: Specify the time at which the process will run at.
         // You can use one of the following methods to specifiy the time:
@@ -30,6 +30,15 @@ class Fail1TestJob extends AbstractJob {
         //$this->cron('* * * * *');
     }
     /**
+     * Execute a set of instructions after the job has finished to execute.
+     */
+    public function afterExec() {
+        //TODO: Implement the action to perform when the job finishes to execute.
+        //$email = new CronEmail('no-reply', [
+        //    'webfiori@example.com' => 'Ibrahim Ali'
+        //]);
+    }
+    /**
      * Execute the process.
      */
     public function execute() {
@@ -39,21 +48,11 @@ class Fail1TestJob extends AbstractJob {
      * Execute a set of instructions when the job failed to complete without errors.
      */
     public function onFail() {
-        
     }
     /**
      * Execute a set of instructions when the job completed without errors.
      */
     public function onSuccess() {
         //TODO: Implement the action to perform when the job executes without errors.
-    }
-    /**
-     * Execute a set of instructions after the job has finished to execute.
-     */
-    public function afterExec() {
-        //TODO: Implement the action to perform when the job finishes to execute.
-        //$email = new CronEmail('no-reply', [
-        //    'webfiori@example.com' => 'Ibrahim Ali'
-        //]);
     }
 }

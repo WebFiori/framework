@@ -16,7 +16,7 @@ class ListThemesCommandTest extends TestCase {
     public function test00() {
         
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-themes'
@@ -46,7 +46,7 @@ class ListThemesCommandTest extends TestCase {
     public function test01() {
         
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-themes',
@@ -68,7 +68,7 @@ class ListThemesCommandTest extends TestCase {
     public function test02() {
         
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-themes',

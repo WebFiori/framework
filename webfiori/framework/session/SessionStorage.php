@@ -33,7 +33,7 @@ interface SessionStorage {
      * when session state is loaded. The string will be later 
      * unserialized by sessions manager.
      * 
-     * @param string $sesstionId The unique identifier of the session.
+     * @param string $sessionId The unique identifier of the session.
      * 
      * @return string|null The method should return a string that represents the 
      * session. If no session was found which has the given ID, the method 
@@ -41,15 +41,15 @@ interface SessionStorage {
      * 
      * @since 1.0
      */
-    public function read($sesstionId);
+    public function read(string $sessionId);
     /**
      * Kill a session and remove its state from the storage.
      * 
-     * @param string $sesstionId The unique identifier of the session.
+     * @param string $sessionId The unique identifier of the session.
      * 
      * @since 1.0
      */
-    public function remove($sesstionId);
+    public function remove(string $sessionId);
     /**
      * Store session state.
      * 
@@ -62,5 +62,5 @@ interface SessionStorage {
      * 
      * @since 1.0
      */
-    public function save($sessionId, $serializedSession);
+    public function save(string $sessionId, string $serializedSession);
 }

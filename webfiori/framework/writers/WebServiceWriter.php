@@ -11,7 +11,6 @@
 namespace webfiori\framework\writers;
 
 use webfiori\framework\EAbstractWebService;
-use webfiori\framework\writers\ClassWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
 
@@ -22,12 +21,12 @@ use webfiori\http\RequestParameter;
  * @version 1.0
  */
 class WebServiceWriter extends ClassWriter {
+    private $processCode;
     /**
      *
      * @var AbstractWebService
      */
     private $servicesObj;
-    private $processCode;
     /**
      * Creates new instance of the class.
      * 
@@ -47,16 +46,43 @@ class WebServiceWriter extends ClassWriter {
      */
     public function __construct($webServicesObj = null) {
         parent::__construct('NewWebService', ROOT_PATH.DS.APP_DIR.DS.'apis', APP_DIR.'\\apis');
-        
+
         $this->setSuffix('Service');
         $this->addUseStatement(EAbstractWebService::class);
         $this->servicesObj = new ServiceHolder();
-        
+
         if ($webServicesObj instanceof AbstractWebService) {
             $this->servicesObj = $webServicesObj;
-            
         }
         $this->processCode = [];
+    }
+    public function addProcessCode($lineOrLines, $tab = 2) {
+        $arrToAdd = [
+            'tab-size' => $tab,
+            'lines' => []
+        ];
+
+        if (gettype($lineOrLines) == 'array') {
+            foreach ($lineOrLines as $l) {
+                $arrToAdd['lines'][] = $l;
+            }
+        } else {
+            $arrToAdd['lines'][] = $lineOrLines;
+        }
+        $this->processCode[] = $arrToAdd;
+    }
+    /**
+     * Adds new request method.
+     * 
+     * The value that will be passed to this method can be any string 
+     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It 
+     * can be in upper case or lower case.
+     * 
+     * @param string $meth The request method.
+     * 
+     */
+    public function addRequestMethod($meth) {
+        $this->servicesObj->addRequestMethod($meth);
     }
     /**
      * Adds new request parameter.
@@ -95,24 +121,32 @@ class WebServiceWriter extends ClassWriter {
     public function addRequestParam($options) : bool {
         return $this->servicesObj->addParameter($options);
     }
-    /**
-     * Adds new request method.
-     * 
-     * The value that will be passed to this method can be any string 
-     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It 
-     * can be in upper case or lower case.
-     * 
-     * @param string $meth The request method.
-     * 
-     */
-    public function addRequestMethod($meth) {
-        $this->servicesObj->addRequestMethod($meth);
+
+    public function writeClassBody() {
+        $this->writeConstructor();
+        $this->implementMethods();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
+        $this->append([
+            "",
+            '',
+            "/**",
+            " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
+        ]);
+        $this->writeServiceDoc($this->servicesObj);
+        $this->append(" */");
+    }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends EAbstractWebService {');
     }
     /**
      * 
      * @param RequestParameter $param
      */
-    private function _appendParam($param) {
+    private function appendParam($param) {
         $this->append("'".$param->getName()."' => [", 3);
         $this->append("'type' => '".$param->getType()."',", 4);
 
@@ -122,6 +156,7 @@ class WebServiceWriter extends ClassWriter {
 
         if ($param->getDefault() !== null) {
             $toAppend = "'default' => ".$param->getDefault().",";
+
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
                 $toAppend = "'default' => '".$param->getDefault()."',";
             } else if ($param->getType() == 'boolean') {
@@ -139,7 +174,17 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('],', 3);
     }
-    private function _implementMethods() {
+    private function appendParams($paramsArray) {
+        if (count($paramsArray) !== 0) {
+            $this->append('$this->addParameters([', 2);
+
+            foreach ($paramsArray as $paramObj) {
+                $this->appendParam($paramObj);
+            }
+            $this->append(']);', 2);
+        }
+    }
+    private function implementMethods() {
         $name = $this->servicesObj->getName();
         $this->append([
             "/**",
@@ -164,6 +209,7 @@ class WebServiceWriter extends ClassWriter {
             " */",
             $this->f('processRequest'),
         ], 1);
+
         if (count($this->processCode) == 0) {
             $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
             $this->append('$this->getManager()->serviceNotImplemented();', 2);
@@ -174,21 +220,7 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('}', 1);
     }
-    public function addProcessCode($lineOrLines, $tab = 2) {
-        $arrToAdd = [
-            'tab-size' => $tab,
-            'lines' => []
-        ];
-        if (gettype($lineOrLines) == 'array') {
-            foreach ($lineOrLines as $l) {
-                $arrToAdd['lines'][] = $l;
-            }
-        } else {
-            $arrToAdd['lines'][] = $lineOrLines;
-        }
-        $this->processCode[] = $arrToAdd;
-    }
-    private function _writeConstructor() {
+    private function writeConstructor() {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
@@ -197,21 +229,12 @@ class WebServiceWriter extends ClassWriter {
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
-        $this->_appendParams($this->servicesObj->getParameters());
+        $this->appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
     }
-    private function _appendParams($paramsArray) {
-        if (count($paramsArray) !== 0) {
-            $this->append('$this->addParameters([', 2);
-            
-            foreach ($paramsArray as $paramObj) {
-                $this->_appendParam($paramObj);
-            }
-            $this->append(']);', 2);
-        }
-    }
-    private function _writeServiceDoc($service) {
+    private function writeServiceDoc($service) {
         $docArr = [];
+
         if (count($service->getParameters()) != 0) {
             $docArr[] = " * This service has the following parameters:";
             $docArr[] = ' * <ul>';
@@ -223,26 +246,4 @@ class WebServiceWriter extends ClassWriter {
             $this->append($docArr);
         }
     }
-
-    public function writeClassBody() {
-        $this->_writeConstructor();
-        $this->_implementMethods();
-        $this->append('}');
-    }
-
-    public function writeClassComment() {
-        $this->append([
-            "",
-            '',
-            "/**",
-            " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
-        ]);
-        $this->_writeServiceDoc($this->servicesObj);
-        $this->append(" */");
-    }
-
-    public function writeClassDeclaration() {
-        $this->append('class '.$this->getName().' extends EAbstractWebService {');
-    }
-
 }

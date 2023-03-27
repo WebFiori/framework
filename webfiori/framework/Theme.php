@@ -14,10 +14,11 @@ use ReflectionClass;
 use webfiori\framework\ui\WebPage;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\ui\HTMLNode;
+use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
 /**
- * A base class that is used to construct web site UI.
+ * A base class that is used to construct website UI.
  * 
  * A theme is a way to change the look and feel of all pages in 
  * a website. It can be used to unify all UI components and 
@@ -107,16 +108,6 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeName;
-    /**
-     * 
-     * @var string 
-     */
-    private $themeUrl;
-    /**
-     * 
-     * @var string 
-     */
     private $themeAuthor;
     /**
      * 
@@ -127,7 +118,12 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeVersion;
+    private $themeDir;
+    /**
+     * 
+     * @var string 
+     */
+    private $themeDisc;
     /**
      * 
      * @var string 
@@ -142,12 +138,17 @@ abstract class Theme implements JsonI {
      * 
      * @var string 
      */
-    private $themeDisc;
+    private $themeName;
     /**
      * 
      * @var string 
      */
-    private $themeDir;
+    private $themeUrl;
+    /**
+     * 
+     * @var string 
+     */
+    private $themeVersion;
     /**
      * Creates new instance of the class using default values.
      * 
@@ -166,12 +167,11 @@ abstract class Theme implements JsonI {
      * <li>Theme images directory name will be set to 'images'</li>
      * </ul>
      * 
-     * @param $themeName The name of the theme. The name is used to load the 
+     * @param $themeName string The name of the theme. The name is used to load the 
      * theme. For that reason, it must be unique.
      * 
      * @since 1.0
      */
-    
     public function __construct(string $themeName = '') {
         $this->themeAuthor = '';
         $this->themeAuthorUrl = '';
@@ -199,32 +199,46 @@ abstract class Theme implements JsonI {
 
     /**
      * Creates an instance of 'HTMLNode' given an array of options.
-     * 
-     * The developer can override this method to make it create custom HTML 
-     * elements which can be re-used across web pages. By default, the method 
+     *
+     * The developer can override this method to make it create custom HTML
+     * elements which can be re-used across web pages. By default, the method
      * will create a &lt;div&gt; element.
-     * A use case for this method would be as 
-     * follows, the developer would like to create different type of input 
-     * elements. One possible option in the passed array would be 'input-type'. 
-     * By checking this option in the body of the method, the developer can return 
+     * A use case for this method would be as
+     * follows, the developer would like to create different type of input
+     * elements. One possible option in passed array would be 'input-type'.
+     * By checking this option in the body of the method, the developer can return
      * different types of input elements.
-     * 
-     * @param array $options An array of options that developer can specify. Default 
-     * implementation of the method accepts two options, the option 'name' 
-     * which represents the name of HTML tag (such as 'div') and the option 
+     *
+     * @param array $options An array of options that developer can specify. Default
+     * implementation of the method accepts two options, the option 'name'
+     * which represents the name of HTML tag (such as 'div') and the option
      * 'attributes' which is a sub array that contains tag attributes.
-     * 
-     * @return HTMLNode The developer must implement this method in away that 
-     * makes it return an instance of the class 'HTMLNode'. 
-     * 
+     *
+     * @return HTMLNode The developer must implement this method in away that
+     * makes it return an instance of the class 'HTMLNode'.
+     *
+     * @throws InvalidNodeNameException
      * @since 1.2.3
      */
     public function createHTMLNode(array $options = []) : HTMLNode {
-
-        $nodeName = isset($options['name']) ? $options['name'] : 'div';
-        $attributes = isset($options['attributes']) ? $options['attributes'] : [];
+        $nodeName = $options['name'] ?? 'div';
+        $attributes = $options['attributes'] ?? [];
 
         return new HTMLNode($nodeName, $attributes);
+    }
+    /**
+     * Returns a string that represents the directory at which the theme exist 
+     * in the system.
+     * 
+     * This method is useful if the developer would like to load HTML file which 
+     * are part of the theme using the method HTMLNode::loadComponent().
+     * 
+     * @return string The string will be something like 'C:\Server\apache\htdocs\my-site\themes\myTheme\'.
+     * 
+     * @since 1.2.6
+     */
+    public function getAbsolutePath() : string {
+        return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 
@@ -232,7 +246,7 @@ abstract class Theme implements JsonI {
      * The developer must implement this method such that it returns an 
      * object of type 'HTMLNode'. Aside section of the page will 
      * contain advertisements most of the time. Sometimes, it can contain aside menu for 
-     * the web site or widgets.
+     * the website or widgets.
      * 
      * @return HTMLNode An object of type 'HTMLNode'. If the theme has no aside 
      * section, the method might return null.
@@ -252,9 +266,9 @@ abstract class Theme implements JsonI {
         return $this->themeAuthor;
     }
     /**
-     * Returns the URL which takes the users to author's web site.
+     * Returns the URL which takes the users to author's website.
      * 
-     * @return string The URL which takes users to author's web site. 
+     * @return string The URL which takes users to author's website. 
      * If author URL is not set, the method will return empty string.
      * 
      * @since 1.1
@@ -275,6 +289,7 @@ abstract class Theme implements JsonI {
         if ($this->baseUrl === null) {
             return WebFioriApp::getAppConfig()->getBaseURL();
         }
+
         return $this->baseUrl;
     }
 
@@ -300,20 +315,6 @@ abstract class Theme implements JsonI {
      */
     public function getDescription() : string {
         return $this->themeDisc;
-    }
-    /**
-     * Returns a string that represents the directory at which the theme exist 
-     * in the system.
-     * 
-     * This method is useful if the developer would like to load HTML file which 
-     * are part of the theme using the method HTMLNode::loadComponent().
-     * 
-     * @return string The string will be something like 'C:\Server\apache\htdocs\my-site\themes\myTheme\'.
-     * 
-     * @since 1.2.6
-     */
-    public function getAbsolutePath() : string {
-        return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
      * Returns the name of the directory where all theme files are kept.
@@ -350,7 +351,7 @@ abstract class Theme implements JsonI {
      * 
      * The developer must implement this method such that it returns an 
      * object of type 'HTMLNode'. Header section of the page usually include a 
-     * main navigation menu, web site name and web site logo. More complex 
+     * main navigation menu, website name and website logo. More complex 
      * layout can include other things such as a search bar, notifications 
      * area and user profile picture. If the page does not have a header 
      * section, the developer can make this method return null.
@@ -447,9 +448,9 @@ abstract class Theme implements JsonI {
         return $this->page;
     }
     /**
-     * Returns A URL which should point to theme web site.
+     * Returns A URL which should point to theme website.
      * 
-     * @return string A URL which should point to theme web site. Usually, 
+     * @return string A URL which should point to theme website. Usually, 
      * this one is the same as author URL.If it is not set, the method will 
      * return empty string.
      * 
@@ -538,7 +539,7 @@ abstract class Theme implements JsonI {
     /**
      * Sets the URL to the theme author. It can be the same as Theme URL.
      * 
-     * @param string $authorUrl The URL to the author's web site.
+     * @param string $authorUrl The URL to the author's website.
      * 
      * @since 1.0
      */
@@ -715,11 +716,11 @@ abstract class Theme implements JsonI {
         $this->page = $page;
     }
     /**
-     * Sets the URL of theme designer web site. 
+     * Sets the URL of theme designer website. 
      * 
      * Theme URL can be the same as author URL.
      * 
-     * @param string $url The URL to theme designer web site.
+     * @param string $url The URL to theme designer website.
      * 
      * @since 1.0
      */

@@ -217,7 +217,7 @@ class AccessTest extends TestCase{
      */
     public function testResolvePrivilegesStr00($str){
         $user = new User();
-        Access::resolvePriviliges($str, $user);
+        Access::resolvePrivileges($str, $user);
         $this->assertTrue($user->hasPrivilege('REVERSE_INVOICE'));
         $this->assertTrue($user->hasPrivilege('RESET_PASSWORD_SELF'));
         $this->assertTrue($user->inGroup('ADMINS'));
@@ -256,7 +256,7 @@ class AccessTest extends TestCase{
             'SUB_OF_PR_1','SUB_OF_PR_2','SUB_OF_PR_3'
         ]);
         $user = new User();
-        Access::resolvePriviliges('G-SUB_OF_SUB;SUB_PR_1-0;SUB_PR_3-1;TOP_PR_2-1', $user);
+        Access::resolvePrivileges('G-SUB_OF_SUB;SUB_PR_1-0;SUB_PR_3-1;TOP_PR_2-1', $user);
 
         $this->assertTrue($user->hasPrivilege('SUB_OF_PR_1'));
         $this->assertTrue($user->hasPrivilege('SUB_OF_PR_2'));
@@ -295,12 +295,5 @@ class AccessTest extends TestCase{
         $user->addPrivilege('SUB_OF_PR_2');
         $privilegesStr = Access::createPermissionsStr($user);
         $this->assertEquals('SUB_PR_3-1;SUB_PR_2-1;SUB_OF_PR_2-1',$privilegesStr);
-    }
-    /**
-     * @test
-     */
-    public function testCreatePrivilegesStr05() {
-        $privilegesStr = Access::createPermissionsStr('');
-        $this->assertEquals('',$privilegesStr);
     }
 }

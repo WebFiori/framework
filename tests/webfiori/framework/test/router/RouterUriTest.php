@@ -396,7 +396,7 @@ class RouterUriTest extends TestCase {
         $uri = new RouterUri('https://www3.programmingacademia.com:80/test', '');
         \webfiori\framework\middleware\MiddlewareManager::register(new \TestMiddleware());
         $uri->addMiddleware('global');
-        $this->assertEquals(1, $uri->getMiddlewar()->size());
+        $this->assertEquals(1, $uri->getMiddleware()->size());
         $this->assertFalse($uri->isDynamic());
     }
 }

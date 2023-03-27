@@ -58,21 +58,24 @@ class ListThemesCommand extends CLICommand {
                     'color' => 'light-blue',
                     'bold' => true
                 ]);
-                $this->_printThemeObj($themeObj);
+                $this->printThemeObj($themeObj);
                 $index++;
             }
+
             return 0;
         }
+
         if (!isset($themesArr[$themeName])) {
             $this->error("No theme was registered which has the name '$themeName'.");
 
             return -1;
         }
-        $this->_printThemeObj($themesArr[$themeName]);
+        $this->printThemeObj($themesArr[$themeName]);
+
         return 0;
     }
 
-    private function _printThemeObj($themeObj) {
+    private function printThemeObj($themeObj) {
         $spaceSize = 15;
         $len00 = $spaceSize - strlen('Theme Name');
         $len01 = $spaceSize - strlen('Author');
@@ -91,6 +94,7 @@ class ListThemesCommand extends CLICommand {
         if (strlen($var) == 0) {
             return '<NOT SET>';
         }
+
         return $var;
     }
 }

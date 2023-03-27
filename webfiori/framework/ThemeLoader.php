@@ -10,8 +10,11 @@
  */
 namespace webfiori\framework;
 
+use Exception;
+use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
+use webfiori\http\Response;
 
 
 /**
@@ -46,28 +49,30 @@ class ThemeLoader {
     private static $loadedThemes = [];
     private function __construct() {
     }
+
     /**
-     * Returns an array that contains the meta data of all available themes. 
-     * 
-     * This method will return an associative array. The key is the theme 
+     * Returns an array that contains the metadata of all available themes.
+     *
+     * This method will return an associative array. The key is the theme
      * name and the value is an object of type Theme that contains theme info.
-     * 
-     * @return array An associative array that contains all themes information. The name 
+     *
+     * @return array An associative array that contains all themes information. The name
      * of the theme will be the key and the value is an object of type 'Theme'.
-     * 
+     *
+     * @throws Exception
      * @since 1.0
      */
-    public static function getAvailableThemes() {
+    public static function getAvailableThemes(): array {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            
+
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH.DS), ['..', '.']);
-                
+
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                    self::_scanDir($filesInDir, $pathToScan);
+                    self::scanDir($filesInDir, $pathToScan);
                 }
             } else {
                 throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
@@ -85,7 +90,7 @@ class ThemeLoader {
      * 
      * @since 1.0
      */
-    public static function getLoadedThemes() {
+    public static function getLoadedThemes(): array {
         return self::$loadedThemes;
     }
     /**
@@ -99,25 +104,27 @@ class ThemeLoader {
      * 
      * @since 1.0
      */
-    public static function isThemeLoaded($themeName) {
+    public static function isThemeLoaded(string $themeName): bool {
         return isset(self::$loadedThemes[$themeName]) === true;
     }
+
     /**
      * Adds routes to all themes resource files (JavaSecript, CSS and images).
-     * 
-     * The method will check for themes resources directories if set or not. 
-     * If set, it will scan each directory and add a route to it. For CSS and 
-     * JavaScript files, the routes will depend on the directory at which the 
-     * files are placed on. Assuming that the domain is 'example.com' and the 
-     * name of theme directory is 'my-theme' and the directory at which CSS 
-     * files are placed on is CSS, then any CSS file can be accessed using 
-     * 'https://example.com/my-theme/css/my-file.css'. For any other resources, 
-     * they can be accessed directly. Assuming that we have an 
-     * image file somewhere in images directory of the theme. The 
-     * image can be accessed as follows: 'https://example.com/my-image.png'. Note that 
-     * CSS, JS and images directories of the theme must be set to correctly create 
+     *
+     * The method will check for themes resources directories if set or not.
+     * If set, it will scan each directory and add a route to it. For CSS and
+     * JavaScript files, the routes will depend on the directory at which the
+     * files are placed on. Assuming that the domain is 'example.com' and the
+     * name of theme directory is 'my-theme' and the directory at which CSS
+     * files are placed on is CSS, then any CSS file can be accessed using
+     * 'https://example.com/my-theme/css/my-file.css'. For any other resources,
+     * they can be accessed directly. Assuming that we have an
+     * image file somewhere in images directory of the theme. The
+     * image can be accessed as follows: 'https://example.com/my-image.png'. Note that
+     * CSS, JS and images directories of the theme must be set to correctly create
      * the routes.
-     * 
+     *
+     * @throws Exception
      * @since 1.0.1
      */
     public static function registerResourcesRoutes() {
@@ -140,31 +147,34 @@ class ThemeLoader {
     public static function resetLoaded() {
         self::$loadedThemes = [];
     }
+
     /**
      * Loads a theme given its name or class name.
-     * 
-     * If the given name is null or empty string, the method will load the default theme as 
+     *
+     * If the given name is null or empty string, the method will load the default theme as
      * specified by the method AppConfig::getBaseThemeName().
-     * 
-     * @param string $themeName The name of the theme. This also can be the name of 
-     * theme class including its namespace (e.g. Theme::class). 
-     * 
-     * @return Theme The method will return an object of type Theme once the 
-     * theme is loaded. The object will contain all theme information. If provided 
+     *
+     * @param string|null $themeName The name of the theme. This also can be the name of
+     * theme class including its namespace (e.g. Theme::class).
+     *
+     * @return Theme The method will return an object of type Theme once the
+     * theme is loaded. The object will contain all theme information. If provided
      * theme name is empty string, the method will return null.
-     * 
-     * @throws NoSuchThemeException The method will throw 
+     *
+     * @throws NoSuchThemeException The method will throw
+     * @throws Exception
      * an exception if no theme was found which has the given name.
-     * 
+     *
      * @since 1.0
      */
-    public static function usingTheme($themeName = null) {
+    public static function usingTheme(string $themeName = null) {
         $trimmedName = trim((string)$themeName);
 
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {
             $themeName = ConfigController::get()->getBaseTheme();
+
             if (strlen($themeName) == 0) {
                 return null;
             }
@@ -201,7 +211,11 @@ class ThemeLoader {
             return $themeToLoad;
         }
     }
-    private static function _scanDir($filesInDir, $pathToScan) {
+
+    /**
+     * @throws Exception
+     */
+    private static function scanDir($filesInDir, $pathToScan) {
         foreach ($filesInDir as $fileName) {
             $fileExt = substr($fileName, -4);
 

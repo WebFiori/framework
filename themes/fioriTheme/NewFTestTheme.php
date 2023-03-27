@@ -4,10 +4,6 @@ namespace themes\fioriTheme;
 use webfiori\framework\Theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use themes\fioriTheme\AsideSection;
-use themes\fioriTheme\FooterSection;
-use themes\fioriTheme\HeadSection;
-use themes\fioriTheme\HeaderSection;
 class NewFTestTheme extends Theme {
     /**
      * Creates new instance of the class.
@@ -25,49 +21,15 @@ class NewFTestTheme extends Theme {
         //$this->setCssDirName('css');
         //$this->setJsDirName('js');
         //$this->setImagesDirName('images');
-        $this->setBeforeLoaded(function (Theme $theme, string $txt) {
-            $theme->setAfterLoaded(function (Theme $theme, string $txt2) {
+        $this->setBeforeLoaded(function (Theme $theme, string $txt)
+        {
+            $theme->setAfterLoaded(function (Theme $theme, string $txt2)
+            {
                 $div = $theme->getPage()->insert('div');
                 $div->text($txt2);
                 $div->setID('my-div');
             }, [$txt]);
         }, ['My Name Is Super Hero']);
-        
-    }
-    /**
-     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
-     *
-     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside
-     * section, the method might return null.
-     */
-    public function getAsideNode() : HTMLNode {
-        return new AsideSection();
-    }
-    /**
-     * Returns an object of type 'HTMLNode' that represents footer section of the page.
-     *
-     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer
-     * section, the method might return null.
-     */
-    public function getFooterNode() : HTMLNode {
-        return new FooterSection();
-    }
-    /**
-     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.
-     *
-     * @return HeadNode
-     */
-    public function getHeadNode() : HeadNode {
-        return new HeadSection();
-    }
-    /**
-     * Returns an object of type HTMLNode that represents header section of the page.
-     *
-     * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header
-     * section, the method might return null.
-     */
-    public function getHeaderNode() : HTMLNode {
-        return new HeaderSection();
     }
     public function createHTMLNode(array $options = []) : HTMLNode {
         $nodeType = isset($options['type']) ? $options['type'] : '';
@@ -238,7 +200,44 @@ class NewFTestTheme extends Theme {
                 }
             }
         }
+
         return parent::createHTMLNode($options);
     }
+    /**
+     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
+     *
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside
+     * section, the method might return null.
+     */
+    public function getAsideNode() : HTMLNode {
+        return new AsideSection();
+    }
+    /**
+     * Returns an object of type 'HTMLNode' that represents footer section of the page.
+     *
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer
+     * section, the method might return null.
+     */
+    public function getFooterNode() : HTMLNode {
+        return new FooterSection();
+    }
+    /**
+     * Returns an object of type HTMLNode that represents header section of the page.
+     *
+     * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header
+     * section, the method might return null.
+     */
+    public function getHeaderNode() : HTMLNode {
+        return new HeaderSection();
+    }
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.
+     *
+     * @return HeadNode
+     */
+    public function getHeadNode() : HeadNode {
+        return new HeadSection();
+    }
 }
+
 return __NAMESPACE__;

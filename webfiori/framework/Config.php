@@ -79,7 +79,7 @@ interface Config {
     /**
      * Returns the name of base theme that is used in website pages.
      * 
-     * Usually, this theme is used for the normally visitors of the web site.
+     * Usually, this theme is used for the normally visitors of the website.
      * 
      * @return string The name of base theme that is used in website pages.
      * This also can be the class name of the theme.
@@ -91,7 +91,7 @@ interface Config {
      * Returns the base URL that is used to fetch resources.
      * 
      * The return value of this method is usually used by the tag 'base'
-     * of web site pages.
+     * of website pages.
      * 
      * @return string the base URL.
      * 
@@ -144,7 +144,7 @@ interface Config {
      */
     public function getDBConnections() : array;
     /**
-     * Returns the global title of the web site that will be
+     * Returns the global title of the website that will be
      * used as default page title.
      * 
      * @param string $langCode Language code such as 'AR' or 'EN'.
@@ -157,7 +157,7 @@ interface Config {
      */
     public function getDefaultTitle(string $langCode);
     /**
-     * Returns the global description of the web site that will be
+     * Returns the global description of the website that will be
      * used as default page description.
      * 
      * @param string $langCode Language code such as 'AR' or 'EN'.

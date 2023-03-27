@@ -12,7 +12,6 @@ namespace webfiori\framework\writers;
 
 use webfiori\file\File;
 use webfiori\framework\Theme;
-use webfiori\framework\writers\ClassWriter;
 use webfiori\ui\HeadNode;
 /**
  * A class which is used to create basic theme skeleton.
@@ -21,44 +20,6 @@ use webfiori\ui\HeadNode;
  */
 class ThemeClassWriter extends ClassWriter {
     private $name;
-    public function writeUseStatements() {
-        parent::writeUseStatements();
-        $this->addUseStatement([
-                Theme::class
-        ]);
-        if (PHP_VERSION_ID <= 70333) {
-            $this->addUseStatement([
-                    HeadNode::class
-            ]);
-        }
-        $this->addUseStatement([
-            'webfiori\\ui\\HTMLNode',
-            $this->getNamespace().'\\AsideSection',
-            $this->getNamespace().'\\FooterSection',
-            $this->getNamespace().'\\HeadSection',
-            $this->getNamespace().'\\HeaderSection',
-        ]);
-        $useArr = [];
-        foreach ($this->getUseStatements() as $className) {
-            $useArr[] = 'use '.$className.';';
-        }
-        $this->append($useArr);
-    }
-    /**
-     * Removes the 4 classes that represents the components of the theme.
-     */
-    public function removeComponents() {
-        $components = [
-            $this->getNamespace().'\\AsideSection.php',
-            $this->getNamespace().'\\FooterSection.php',
-            $this->getNamespace().'\\HeadSection.php',
-            $this->getNamespace().'\\HeaderSection.php',
-        ];
-        foreach ($components as $c) {
-            $classFile = new File(ROOT_PATH.'\\'.$c);
-            $classFile->remove();
-        }
-    }
     /**
      * Creates new instance of the class.
      * 
@@ -72,25 +33,11 @@ class ThemeClassWriter extends ClassWriter {
      */
     public function __construct(string $themeName = '') {
         parent::__construct('NewTheme', ROOT_PATH.DS.APP_DIR.DS.'themes', APP_DIR.'\\themes\\new');
+
         if (!$this->setThemeName($themeName)) {
             $this->setThemeName('New Theme');
         }
         $this->setSuffix('Theme');
-    }
-    /**
-     * Sets the name of the theme.
-     * 
-     * @param string $name A non empty string that must be unique to the theme.
-     * 
-     * @return bool If set, the method will return true. False otherwise.
-     */
-    public function setThemeName(string $name) : bool {
-        $trimmed = trim($name);
-        if (strlen($trimmed) > 0) {
-            $this->name = $trimmed;
-            return true;
-        }
-        return false;
     }
     /**
      * Returns the name of the theme.
@@ -101,12 +48,39 @@ class ThemeClassWriter extends ClassWriter {
     public function getThemeName() : string {
         return $this->name;
     }
-    private function writeComponent(string $className, string $extends, string $classComment, string $todoTxt) {
-        $writer = new ThemeComponentWriter($extends, $classComment, $todoTxt);
-        $writer->setPath($this->getPath());
-        $writer->setNamespace($this->getNamespace());
-        $writer->setClassName($className);
-        $writer->writeClass();
+    /**
+     * Removes the 4 classes that represents the components of the theme.
+     */
+    public function removeComponents() {
+        $components = [
+            $this->getNamespace().'\\AsideSection.php',
+            $this->getNamespace().'\\FooterSection.php',
+            $this->getNamespace().'\\HeadSection.php',
+            $this->getNamespace().'\\HeaderSection.php',
+        ];
+
+        foreach ($components as $c) {
+            $classFile = new File(ROOT_PATH.'\\'.$c);
+            $classFile->remove();
+        }
+    }
+    /**
+     * Sets the name of the theme.
+     * 
+     * @param string $name A non empty string that must be unique to the theme.
+     * 
+     * @return bool If set, the method will return true. False otherwise.
+     */
+    public function setThemeName(string $name) : bool {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) > 0) {
+            $this->name = $trimmed;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function writeClassBody() {
@@ -162,8 +136,9 @@ class ThemeClassWriter extends ClassWriter {
             '/**',
             " * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.",
             ' *',
-            
+
         ], 1);
+
         if (PHP_VERSION_ID <= 70333) {
             $this->append([
                 " * @return HeadNode",
@@ -198,11 +173,41 @@ class ThemeClassWriter extends ClassWriter {
     }
 
     public function writeClassComment() {
-        
     }
 
     public function writeClassDeclaration() {
         $this->append("class ".$this->getName().' extends Theme {');
     }
+    public function writeUseStatements() {
+        parent::writeUseStatements();
+        $this->addUseStatement([
+                Theme::class
+        ]);
 
+        if (PHP_VERSION_ID <= 70333) {
+            $this->addUseStatement([
+                    HeadNode::class
+            ]);
+        }
+        $this->addUseStatement([
+            'webfiori\\ui\\HTMLNode',
+            $this->getNamespace().'\\AsideSection',
+            $this->getNamespace().'\\FooterSection',
+            $this->getNamespace().'\\HeadSection',
+            $this->getNamespace().'\\HeaderSection',
+        ]);
+        $useArr = [];
+
+        foreach ($this->getUseStatements() as $className) {
+            $useArr[] = 'use '.$className.';';
+        }
+        $this->append($useArr);
+    }
+    private function writeComponent(string $className, string $extends, string $classComment, string $todoTxt) {
+        $writer = new ThemeComponentWriter($extends, $classComment, $todoTxt);
+        $writer->setPath($this->getPath());
+        $writer->setNamespace($this->getNamespace());
+        $writer->setClassName($className);
+        $writer->writeClass();
+    }
 }

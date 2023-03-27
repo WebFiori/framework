@@ -27,7 +27,7 @@ class APICallErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
      * 
-     * This method will set the name of the handler to 'API Call Errors Handler'.
+     * This method will set the name of the handler to 'API Call Errors Handler.
      */
     public function __construct() {
         parent::__construct();
@@ -61,6 +61,7 @@ class APICallErrHandler extends AbstractHandler {
                 'type' => 'error',
             ]);
         }
+
         if (!Response::isSent()) {
             Response::clear();
             Response::setCode(500);
@@ -93,7 +94,7 @@ class APICallErrHandler extends AbstractHandler {
         } else {
             $routeType = Router::VIEW_ROUTE;
         }
-        
+
         return $routeType == Router::API_ROUTE || (defined('API_CALL') && API_CALL === true);
     }
     /**
@@ -104,5 +105,4 @@ class APICallErrHandler extends AbstractHandler {
     public function isShutdownHandler(): bool {
         return true;
     }
-
 }

@@ -16,7 +16,7 @@ class CronCommandTest extends TestCase {
      */
     public function test00() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron'
@@ -32,7 +32,7 @@ class CronCommandTest extends TestCase {
     public function test01() {
         Cron::password(hash('sha256', '123456'));
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -56,7 +56,7 @@ class CronCommandTest extends TestCase {
      */
     public function test02() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -72,7 +72,7 @@ class CronCommandTest extends TestCase {
      */
     public function test03() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -103,7 +103,7 @@ class CronCommandTest extends TestCase {
      */
     public function test04() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -123,7 +123,7 @@ class CronCommandTest extends TestCase {
             "4: Success 1\n",
             "5: Cancel <--\n",
             "Running job(s) check...\n",
-            "Forceing job 'Fail 1' to execute...\n",
+            "Forcing job 'Fail 1' to execute...\n",
             "Active job: \"Fail 1\" ...\n",
             "Calling the method app\jobs\Fail1TestJob::execute()\n",
             "Calling the method app\jobs\Fail1TestJob::onFail()\n",
@@ -142,7 +142,7 @@ class CronCommandTest extends TestCase {
      */
     public function test05() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '1'
         ]);
         $runner->setArgsVector([
@@ -162,14 +162,14 @@ class CronCommandTest extends TestCase {
             "4: Success 1\n",
             "5: Cancel <--\n",
             "Running job(s) check...\n",
-            "Forceing job 'Fail 2' to execute...\n",
+            "Forcing job 'Fail 2' to execute...\n",
             "Active job: \"Fail 2\" ...\n",
             "Calling the method app\jobs\Fail2TestJob::execute()\n",
             "WARNING: An exception was thrown while performing the operation app\jobs\Fail2TestJob::execute. The output of the job might be not as expected.\n",
             "Exception class: Error\n",
             "Exception message: Call to undefined method app\jobs\Fail2TestJob::undefined()\n",
             "Thrown in: Fail2TestJob\n",
-            "Line: 36\n",
+            "Line: 45\n",
             "Calling the method app\jobs\Fail2TestJob::onFail()\n",
             "Calling the method app\jobs\Fail2TestJob::afterExec()\n",
             "Check finished.\n",
@@ -186,7 +186,7 @@ class CronCommandTest extends TestCase {
      */
     public function test06() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -201,7 +201,7 @@ class CronCommandTest extends TestCase {
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Running job(s) check...\n",
-            "Forceing job 'Success 1' to execute...\n",
+            "Forcing job 'Success 1' to execute...\n",
             "Active job: \"Success 1\" ...\n",
             "Calling the method app\jobs\SuccessTestJob::execute()\n",
             "Start: 2021-07-08\n",
@@ -224,7 +224,7 @@ class CronCommandTest extends TestCase {
     public function test07() {
         $runner = WebFioriApp::getRunner();
         Cron::execLog(true);
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -241,7 +241,7 @@ class CronCommandTest extends TestCase {
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Running job(s) check...\n",
-            "Forceing job 'Success 1' to execute...\n",
+            "Forcing job 'Success 1' to execute...\n",
             "Active job: \"Success 1\" ...\n",
             "Calling the method app\jobs\SuccessTestJob::execute()\n",
             "Start: 2021\n",
@@ -268,7 +268,7 @@ class CronCommandTest extends TestCase {
         Cron::password('123456');
         Cron::registerJobs();
         
-        $runner->setInput([
+        $runner->setInputs([
             'N'
         ]);
         $runner->setArgsVector([
@@ -294,7 +294,7 @@ class CronCommandTest extends TestCase {
      */
     public function test09() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             
         ]);
         $runner->setArgsVector([
@@ -316,7 +316,7 @@ class CronCommandTest extends TestCase {
      */
     public function test10() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput([
+        $runner->setInputs([
             '0'
         ]);
         $runner->setArgsVector([
@@ -342,7 +342,7 @@ class CronCommandTest extends TestCase {
      */
     public function test11() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -373,7 +373,7 @@ class CronCommandTest extends TestCase {
      */
     public function test12() {
         $runner = WebFioriApp::getRunner();
-        $runner->setInput();
+        $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'cron',
@@ -395,7 +395,7 @@ class CronCommandTest extends TestCase {
         Cron::password(hash('sha256', '123456'));
         Cron::registerJobs();
         
-        $runner->setInput([
+        $runner->setInputs([
             'Y',
             '2021-01-01',
             '2020-01-01'
@@ -424,7 +424,7 @@ class CronCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertEquals([
             'Running job(s) check...',
-            "Forceing job 'Success 1' to execute...",
+            "Forcing job 'Success 1' to execute...",
             "Active job: \"Success 1\" ...",
             "Calling the method app\jobs\SuccessTestJob::execute()",
             "Calling the method app\jobs\SuccessTestJob::onSuccess()",

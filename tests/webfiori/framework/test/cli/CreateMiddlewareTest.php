@@ -20,7 +20,7 @@ class MiddlewareTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '4',
             'NewCoolMd',
             'app\middleware',
@@ -36,7 +36,7 @@ class MiddlewareTest extends CreateTestCase {
             "0: Database table class.\n",
             "1: Entity class from table.\n",
             "2: Web service.\n",
-            "3: Background job.\n",
+            "3: Background Task.\n",
             "4: Middleware.\n",
             "5: CLI Command.\n",
             "6: Theme.\n",
@@ -63,7 +63,7 @@ class MiddlewareTest extends CreateTestCase {
             'create',
             '--c' => 'middleware'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'NewCool',
             'app\middleware',
             'Check is cool',

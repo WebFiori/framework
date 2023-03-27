@@ -53,34 +53,34 @@ class StarterPage extends WebPage {
             'cols' => 12,
         ])->addChild('v-row');
         $this->createCard('https://webfiori.com/learn',
-                'mdi-book-open-variant', 
-                'Learn', 
-                'Documentation is always the first place where developers can find what they need.'
-                .'The framework has good documentation base which is still in development and '
-                .'content is added and revewed regularly. '
-                .'Whether you are new to WebFiori framework or have some '
-                .'experience with it, we recommend the '
-                .'documentation as they will help in a way or another.',
-                $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
+            'mdi-book-open-variant', 
+            'Learn', 
+            'Documentation is always the first place where developers can find what they need.'
+            .'The framework has good documentation base which is still in development and '
+            .'content is added and revewed regularly. '
+            .'Whether you are new to WebFiori framework or have some '
+            .'experience with it, we recommend the '
+            .'documentation as they will help in a way or another.',
+            $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/docs/webfiori',
-                'mdi-book-check-outline',
-                'API Reference', 
-                'This reference has all information about core framework classes that a developer '
-                .'might need to have specific functionality. In addition to that, it describes all '
-                .'uses of every public class attribute and method. It can be handy when developers starts '
-                .'using advanced features of the framework.',
-                $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
+            'mdi-book-check-outline',
+            'API Reference', 
+            'This reference has all information about core framework classes that a developer '
+            .'might need to have specific functionality. In addition to that, it describes all '
+            .'uses of every public class attribute and method. It can be handy when developers starts '
+            .'using advanced features of the framework.',
+            $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/contribute',
-                'mdi-comment-plus-outline', 
-                'Support The Project', 
-                'Want to help in development of the framework or contribute? This place is for you. It holds '
-                .'basic instructions on how you may help in supporting the framework in many ways.',
-                $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
+            'mdi-comment-plus-outline', 
+            'Support The Project', 
+            'Want to help in development of the framework or contribute? This place is for you. It holds '
+            .'basic instructions on how you may help in supporting the framework in many ways.',
+            $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
     }
     private function createCard($link, $icon, $cardTitle, $paragraph, \webfiori\ui\HTMLNode $el) {
         $card = $el->addChild('v-card', [
             'hover',
-            
+
         ]);
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'

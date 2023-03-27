@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\cli\helpers;
 
+use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\CLICommandClassWriter;
-use webfiori\cli\InputValidator;
 /**
  * A helper class which is used to help in creating CLI command classes using CLI.
  *
@@ -22,28 +22,45 @@ use webfiori\cli\InputValidator;
  */
 class CreateCLIClassHelper extends CreateClassHelper {
     /**
+     * @var CLICommandClassWriter
+     */
+    private $cliWriter;
+    /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new CLICommandClassWriter());
+        $this->cliWriter = $this->getWriter();
+    }
+    public function readClassInfo() {
         $this->setClassInfo(APP_DIR.'\\commands', 'Command');
-        $commandName = $this->_getCommandName();
+        $commandName = $this->getCommandName();
         $commandDesc = $this->getInput('Give a short description of the command:');
 
-        if ($command->confirm('Would you like to add arguments to the command?', false)) {
+        if ($this->getCommand()->confirm('Would you like to add arguments to the command?', false)) {
             $argsArr = $this->getArgs();
         } else {
             $argsArr = [];
         }
-        $this->getWriter()->setCommandName($commandName);
-        $this->getWriter()->setCommandDescription($commandDesc);
-        $this->getWriter()->setArgs($argsArr);
-        
+        $this->cliWriter->setCommandName($commandName);
+        $this->cliWriter->setCommandDescription($commandDesc);
+        $this->cliWriter->setArgs($argsArr);
+
         $this->writeClass();
     }
-    private function getArgs() {
+    private function getCommandName(): string {
+        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
+        {
+            if (strlen($val) > 0 && strpos($val, ' ') === false) {
+                return true;
+            }
+
+            return false;
+        }));
+    }
+    private function getArgs() : array {
         $argsArr = [];
         $addToMore = true;
 
@@ -55,7 +72,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
                 $argArr['name'] = $groupName;
             }
             $argArr['description'] = $this->getInput('Describe this argument and how to use it:', '');
-            $argArr['values'] = $this->getFixedVals();
+            $argArr['values'] = $this->getFixedValues();
             $argArr['optional'] = $this->confirm('Is this argument optional or not?', true);
             $argArr['default'] = $this->getInput('Enter default value:');
 
@@ -65,34 +82,24 @@ class CreateCLIClassHelper extends CreateClassHelper {
 
         return $argsArr;
     }
-    private function _getCommandName() {
-        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
-        {
-            if (strlen($val) > 0 && strpos($val, ' ') === false) {
-                return true;
-            }
-
-            return false;
-        }));
-    }
-    private function getFixedVals() {
+    private function getFixedValues() : array {
         if (!$this->confirm('Does this argument have a fixed set of values?', false)) {
             return [];
         }
-        $addVals = true;
-        $valsArr = [];
+        $addValues = true;
+        $valuesArr = [];
 
-        while ($addVals) {
+        while ($addValues) {
             $val = $this->getInput('Enter the value:');
 
-            if (!in_array($val, $valsArr)) {
-                $valsArr[] = $val;
+            if (!in_array($val, $valuesArr)) {
+                $valuesArr[] = $val;
             } else {
                 $this->info('Given value was already added.');
             }
-            $addVals = $this->confirm('Would you like to add more values?', false);
+            $addValues = $this->confirm('Would you like to add more values?', false);
         }
 
-        return $valsArr;
+        return $valuesArr;
     }
 }

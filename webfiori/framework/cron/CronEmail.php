@@ -37,7 +37,7 @@ class CronEmail extends EmailMessage {
      * Creates new instance of the class.
      * 
      * @param string $sendAccName The name of SMTP account that will be 
-     * used to send the message. Note that it must be exist in the class 
+     * used to send the message. Note that it must be existed in the class
      * 'MailConfig'.
      * 
      * @param array $receivers An associative array of receivers. The 
@@ -46,7 +46,7 @@ class CronEmail extends EmailMessage {
      * 
      * @since 1.0
      */
-    public function __construct($sendAccName, $receivers = []) {
+    public function __construct($sendAccName, array $receivers = []) {
         parent::__construct($sendAccName);
         $activeJob = Cron::activeJob();
 
@@ -87,7 +87,7 @@ class CronEmail extends EmailMessage {
             $paragraph->addTextNode($text, false);
             $this->insert($paragraph);
             $this->insert('p')->text('Technical Info:');
-            $this->insert($this->_createJobInfoTable($activeJob));
+            $this->insert($this->createJobInfoTable($activeJob));
             $logTxt = '';
 
             foreach (Cron::getLogArray() as $logEntry) {
@@ -105,34 +105,34 @@ class CronEmail extends EmailMessage {
      * @param AbstractJob $job
      * @return HTMLNode
      */
-    private function _createJobInfoTable($job) {
+    private function createJobInfoTable(AbstractJob $job): HTMLNode {
         $jobTable = new HTMLNode('table');
         $jobTable->setStyle([
             'border-collapse' => 'collapse'
         ]);
         $jobTable->setAttribute('border', 1);
-        $jobTable->addChild($this->_createTableRow('Job Name:', $job->getJobName()));
-        $jobTable->addChild($this->_createTableRow('Exprssion:', $job->getExpression()));
-        $jobTable->addChild($this->_createTableRow('Check Started:', Cron::timestamp()));
-        $jobTable->addChild($this->_createTableRow('Run Time:', date('Y-m-d H:i:s')));
-        $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
-        $jobTable->addChild($this->_createTableRow('Framework Version:', WF_VERSION));
-        $jobTable->addChild($this->_createTableRow('Framework Release Date:', WF_RELEASE_DATE));
-        $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_PATH));
-        $jobTable->addChild($this->_createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
-        $jobTable->addChild($this->_createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
-        $jobTable->addChild($this->_createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
-        $jobTable->addChild($this->_createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
+        $jobTable->addChild($this->createTableRow('Job Name:', $job->getJobName()));
+        $jobTable->addChild($this->createTableRow('Expression:', $job->getExpression()));
+        $jobTable->addChild($this->createTableRow('Check Started:', Cron::timestamp()));
+        $jobTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));
+        $jobTable->addChild($this->createTableRow('PHP Version:', PHP_VERSION));
+        $jobTable->addChild($this->createTableRow('Framework Version:', WF_VERSION));
+        $jobTable->addChild($this->createTableRow('Framework Release Date:', WF_RELEASE_DATE));
+        $jobTable->addChild($this->createTableRow('Root Directory:', ROOT_PATH));
+        $jobTable->addChild($this->createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
+        $jobTable->addChild($this->createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
+        $jobTable->addChild($this->createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
+        $jobTable->addChild($this->createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
 
         if ($job->isSuccess()) {
-            $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
+            $jobTable->addChild($this->createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
         } else {
-            $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:red">Failed</b>'));
+            $jobTable->addChild($this->createTableRow('Exit Status:', '<b style="color:red">Failed</b>'));
         }
 
         return $jobTable;
     }
-    private function _createTableRow($label, $info) {
+    private function createTableRow($label, $info) {
         $row = new TableRow();
         $row->addCell('<b>'.$label.'</b>');
         $row->addCell($info);

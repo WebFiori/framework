@@ -22,7 +22,7 @@ class CreateRESTTest extends CreateTestCase {
             'create',
             '--c' => 'rest'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'SuperUser',
             'app\\entity\\super',
@@ -150,7 +150,7 @@ class CreateRESTTest extends CreateTestCase {
             'create',
             '--c' => 'rest'
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             '0',
             'SuperUserX',
             'app\\entity\\super',
@@ -286,7 +286,7 @@ class CreateRESTTest extends CreateTestCase {
             'create',
             '--c' => 'rest',
         ]);
-        $runner->setInput([
+        $runner->setInputs([
             'Super Connection',
             'SuperUserX9',
             'app\\entity\\super',

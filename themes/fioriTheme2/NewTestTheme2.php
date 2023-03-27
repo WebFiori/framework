@@ -4,10 +4,6 @@ namespace themes\fioriTheme2;
 use webfiori\framework\Theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use themes\fioriTheme2\AsideSection;
-use themes\fioriTheme2\FooterSection;
-use themes\fioriTheme2\HeadSection;
-use themes\fioriTheme2\HeaderSection;
 class NewTestTheme2 extends Theme {
     /**
      * Creates new instance of the class.
@@ -22,10 +18,12 @@ class NewTestTheme2 extends Theme {
         $this->setLicenseName('MIT');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setUrl('https://my-theme-side.com');
-        $this->setBeforeLoaded(function (Theme $theme) {
+        $this->setBeforeLoaded(function (Theme $theme)
+        {
             $theme->setDescription('This theme is in before loaded.');
         });
-        $this->setAfterLoaded(function (Theme $theme) {
+        $this->setAfterLoaded(function (Theme $theme)
+        {
             $paragraph = $theme->getPage()->insert('p');
             $paragraph->text('Theme is loaded.');
             $paragraph->setID('theme-after-loaded-el');
@@ -50,14 +48,6 @@ class NewTestTheme2 extends Theme {
         return new FooterSection();
     }
     /**
-     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.
-     *
-     * @return HeadNode
-     */
-    public function getHeadNode() : HeadNode {
-        return new HeadSection();
-    }
-    /**
      * Returns an object of type HTMLNode that represents header section of the page.
      *
      * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header
@@ -66,5 +56,14 @@ class NewTestTheme2 extends Theme {
     public function getHeaderNode() : HTMLNode {
         return new HeaderSection();
     }
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.
+     *
+     * @return HeadNode
+     */
+    public function getHeadNode() : HeadNode {
+        return new HeadSection();
+    }
 }
+
 return __NAMESPACE__;

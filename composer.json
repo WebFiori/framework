@@ -17,6 +17,7 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
+        "ext-openssl": "*",
         "webfiori/err":"v1.0.6",
         "webfiori/cli":"v1.1.1",
         "webfiori/file":"v1.3.1",
@@ -25,7 +26,8 @@
         "webfiori/jsonx":"v3.2.1",
         "webfiori/http":"v3.3.2 ",
         "webfiori/database":"v0.7.0",
-        "webfiori/mailer":"v1.0.4"
+        "webfiori/mailer":"v1.0.4",
+
     },
     "require-dev": {
         "phpunit/phpunit": "*"

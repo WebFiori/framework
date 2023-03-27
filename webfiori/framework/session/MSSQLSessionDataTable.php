@@ -50,5 +50,3 @@ class MSSQLSessionDataTable extends MSSQLTable {
         $this->addReference(new MSSQLSessionsTable(), ['s-id'], 'session_data_fk', 'cascade', 'cascade');
     }
 }
-
-return __NAMESPACE__;

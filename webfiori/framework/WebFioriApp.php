@@ -160,7 +160,7 @@ class WebFioriApp {
                 $uriObj = Router::getRouteUri();
 
                 if ($uriObj !== null) {
-                    foreach ($uriObj->getMiddlewar() as $mw) {
+                    foreach ($uriObj->getMiddleware() as $mw) {
                         $mw->afterSend(Request::get(), Response::get());
                     }
                 }
@@ -177,9 +177,9 @@ class WebFioriApp {
             $uriObj = Router::getRouteUri();
 
             if ($uriObj !== null) {
-                $uriObj->getMiddlewar()->insertionSort();
+                $uriObj->getMiddleware()->insertionSort();
 
-                foreach ($uriObj->getMiddlewar() as $mw) {
+                foreach ($uriObj->getMiddleware() as $mw) {
                     $mw->after(Request::get(), Response::get());
                 }
             }

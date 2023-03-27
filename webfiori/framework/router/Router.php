@@ -13,6 +13,7 @@ namespace webfiori\framework\router;
 use Error;
 use Exception;
 use webfiori\cli\Runner;
+use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\ui\HTTPCodeView;
@@ -1155,7 +1156,7 @@ class Router {
      * 
      * @since 1.2
      */
-    private function getRoutesHelper() {
+    private function getRoutesHelper() : array  {
         return $this->routes;
     }
     /**
@@ -1169,7 +1170,7 @@ class Router {
      * 
      * @since 1.3.3
      */
-    private function getUriObjHelper($path) {
+    private function getUriObjHelper(string $path) {
         if (isset($this->routes['static'][$path])) {
             return $this->routes['static'][$path];
         } else {
@@ -1218,8 +1219,9 @@ class Router {
     /**
      * 
      * @param RouterUri $route
+     * @throws FileException
      */
-    private function loadResourceHelper($route) {
+    private function loadResourceHelper(RouterUri $route) {
         $file = $route->getRouteTo();
         $info = $this->getFileDirAndName($file);
         $fileObj = new File($info['name'], $info['dir']);
@@ -1314,9 +1316,9 @@ class Router {
     private function routeFound(RouterUri $route, bool $loadResource) {
         if ($route->isRequestMethodAllowed()) {
             $this->uriObj = $route;
-            $route->getMiddlewar()->insertionSort(false);
+            $route->getMiddleware()->insertionSort(false);
 
-            foreach ($route->getMiddlewar() as $mw) {
+            foreach ($route->getMiddleware() as $mw) {
                 $mw->before(Request::get(), Response::get());
             }
 

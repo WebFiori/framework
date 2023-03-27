@@ -25,7 +25,8 @@ use webfiori\framework\DB;
 class SessionDB extends DB {
     /**
      * Creates new instance of the class.
-     * 
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
     public function __construct() {
@@ -35,17 +36,19 @@ class SessionDB extends DB {
         $this->addTable(new MSSQLSessionDataTable());
         $this->addTable(new MySQLSessionDataTable());
     }
+
     /**
-     * Clears the sessions which are older than the constant 'SESSION_GC' or 
+     * Clears the sessions which are older than the constant 'SESSION_GC' or
      * older than 30 days if the constant is not defined.
-     * 
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
     public function gc() {
         if (defined('SESSION_GC') && SESSION_GC > 0) {
             $olderThan = time() - SESSION_GC;
         } else {
-            //Clear any sesstion which is older than 30 days
+            //Clear any session which is older than 30 days
             $olderThan = time() - 60 * 60 * 24 * 30;
         }
         $date = date('Y-m-d H:i:s', $olderThan);
@@ -55,17 +58,19 @@ class SessionDB extends DB {
             $this->removeSession($id);
         }
     }
+
     /**
      * Returns the number of data chunks a session has.
-     * 
+     *
      * @param string $sId The ID of the session.
-     * 
+     *
      * @return int If the session does not exist, the method will return 0.
      * Other than that, it will return data chunks count.
-     * 
+     *
+     * @throws DatabaseException
      * @since 2.1.1
      */
-    public function getChunksCount($sId) {
+    public function getChunksCount(string $sId): int {
         $resultSet = $this->table('session_data')
                 ->selectCount()
                 ->where('s-id', $sId)
@@ -78,17 +83,19 @@ class SessionDB extends DB {
 
         return 0;
     }
+
     /**
      * Returns a record that holds session data given Its ID.
-     * 
+     *
      * @param string $sId The ID of the session.
-     * 
-     * @return string This method will return a string which holds serialized 
-     * session info.
-     * 
+     *
+     * @return string|null This method will return a string which holds serialized
+     * session info. If no session has given ID exist, null is returned.
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
-    public function getSession($sId) {
+    public function getSession(string $sId) {
         $this->table('session_data')->select()->where('s-id', $sId)
                 ->orderBy(['chunk-number' => 'a'])->execute();
         $resultSet = $this->getLastResultSet();
@@ -103,62 +110,69 @@ class SessionDB extends DB {
             return base64_decode($retVal);
         }
     }
+
     /**
-     * Returns an array that holds the IDs of sessions which are older than 
+     * Returns an array that holds the IDs of sessions which are older than
      * specific date and time.
-     * 
-     * @param string $olderThan A date-time string in the format 'YYYY-MM-DD HH:MM:SS'. 
+     *
+     * @param string $olderThan A date-time string in the format 'YYYY-MM-DD HH:MM:SS'.
      * This also can only be a date.
-     * 
-     * @return array An array that holds the IDs of sessions which are older than 
+     *
+     * @return array An array that holds the IDs of sessions which are older than
      * given date.
-     * 
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
-    public function getSessionsIDs($olderThan) {
+    public function getSessionsIDs(string $olderThan): array {
         return $this->table('sessions')->select()->where('last-used', $olderThan, '<=')->execute()
-                ->map(function ($record)
-                {
+                ->map(function ($record) {
                     return $record['s_id'];
-                });
+                })->toArray();
     }
+
     /**
      * Checks if a session which has the given ID exist or not in the database.
-     * 
+     *
      * @param string $sId The unique identifier of the session.
-     * 
-     * @return boolean If a session which has the given ID exist, the method will 
+     *
+     * @return bool If a session which has the given ID exist, the method will
      * return true. Other than that, the method will return false.
-     * 
+     *
+     * @throws DatabaseException
      * @since 2.1.1
      */
-    public function isSessionExist($sId) {
+    public function isSessionExist(string $sId): bool {
         $resultSet = $this->table('sessions')->select()->where('s-id', $sId)->execute();
 
         return $resultSet->getRowsCount() == 1;
     }
+
     /**
      * Removes a session from the database given its ID.
-     * 
+     *
      * @param string $sId The ID of the session.
-     * 
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
-    public function removeSession($sId) {
+    public function removeSession(string $sId) {
         $this->table('session_data')->delete()->where('s-id', $sId)->execute();
         $this->table('sessions')->delete()->where('s-id', $sId)->execute();
     }
+
     /**
      * Store session state.
-     * 
+     *
      * @param string $sId The ID of the session.
-     * 
-     * @param string $session A string that holds serialized 
+     *
+     * @param string $session A string that holds serialized
      * session info.
-     * 
+     *
+     * @throws DatabaseException
      * @since 1.0
      */
-    public function saveSession($sId, $session) {
+    public function saveSession(string $sId, string $session) {
         if ($this->isSessionExist($sId)) {
             $this->table('sessions')->update([
                 'last-used' => date('Y-m-d H:i:s')
@@ -176,10 +190,10 @@ class SessionDB extends DB {
     /**
      * Split session data into smaller chunks.
      * 
-     * @param type $data
-     * @return type
+     * @param string $data
+     * @return array
      */
-    private function getChunks($data) {
+    private function getChunks(string $data) : array {
         $retVal = [];
         $index = 0;
         $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
@@ -200,15 +214,17 @@ class SessionDB extends DB {
 
         return $retVal;
     }
+
     /**
-     * This method is used to remove any extra chunks which remains in the 
+     * This method is used to remove any extra chunks which remains in the
      * database after updating a session.
-     * 
-     * @param type $sId
-     * @param type $chunksCount
-     * @param type $startNumber
+     *
+     * @param string $sId
+     * @param int $chunksCount
+     * @param int $startNumber
+     * @throws DatabaseException
      */
-    private function removeExtraChunks($sId, $chunksCount, $startNumber) {
+    private function removeExtraChunks(string $sId, int $chunksCount, int $startNumber) {
         for ($x = 0 ; $x < $chunksCount ; $x++) {
             $this->table('session_data')
                     ->delete()->where('s-id', $sId)
@@ -217,6 +233,10 @@ class SessionDB extends DB {
             $startNumber++;
         }
     }
+
+    /**
+     * @throws DatabaseException
+     */
     private function storeChunks($sId, $data) {
         $chunks = $this->getChunks($data);
         $currentChunksCount = $this->getChunksCount($sId);

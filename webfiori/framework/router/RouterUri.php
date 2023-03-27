@@ -48,7 +48,7 @@ class RouterUri extends Uri {
     private $assignedMiddlewareList;
     /**
      * 
-     * @var type 
+     * @var array 
      * @since 1.2
      */
     private $closureParams = [];
@@ -56,15 +56,15 @@ class RouterUri extends Uri {
      * A boolean value that is set to true if the URI will be included in 
      * generated site map.
      * 
-     * @var boolean 
+     * @var bool 
      * 
      * @since 1.3
      */
     private $incInSiteMap;
     /**
-     * A boolean which is set to true if URI is case sensitive.
+     * A boolean which is set to true if URI is case-sensitive.
      * 
-     * @var boolean 
+     * @var bool 
      * 
      * @since 1.0
      */
@@ -73,7 +73,7 @@ class RouterUri extends Uri {
     /**
      * Set to true if the resource that the route points to is dynamic (PHP file or code).
      * 
-     * @var boolean
+     * @var bool
      * 
      * @since 1.3.7 
      */
@@ -117,7 +117,7 @@ class RouterUri extends Uri {
      * to. This can be an absolute path to a file, a closure or class
      * name.
      * 
-     * @param bool $caseSensitive A boolean. If the URI is case sensitive, 
+     * @param bool $caseSensitive A boolean. If the URI is case-sensitive, 
      * then this value must be set to true. False if not. Default is true.
      * 
      * @param array $closureParams If the closure needs to use parameters, 
@@ -200,13 +200,13 @@ class RouterUri extends Uri {
     public function getClassName() : string {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
-            $pathExpl = explode(DS, $path);
+            $pathExplode = explode(DS, $path);
 
-            if (count($pathExpl) >= 1) {
-                $expld = explode('.', $pathExpl[count($pathExpl) - 1]);
+            if (count($pathExplode) >= 1) {
+                $fileNameExplode = explode('.', $pathExplode[count($pathExplode) - 1]);
 
-                if (count($expld) == 2 && $expld[1] == 'php') {
-                    return $expld[0];
+                if (count($fileNameExplode) == 2 && $fileNameExplode[1] == 'php') {
+                    return $fileNameExplode[0];
                 }
             }
         }
@@ -242,7 +242,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.4.0
      */
-    public function getMiddlewar() : LinkedList {
+    public function getMiddleware() : LinkedList {
         return $this->assignedMiddlewareList;
     }
 
@@ -315,7 +315,7 @@ class RouterUri extends Uri {
     /**
      * Checks if the URI has WWW in the host part or not.
      * 
-     * @return boolean If the URI has WWW in the host, the method will return 
+     * @return bool If the URI has WWW in the host, the method will return 
      * true. Other than that, it will return false.
      * 
      * @since 1.3.4
@@ -327,10 +327,10 @@ class RouterUri extends Uri {
         return $www == 'www';
     }
     /**
-     * Returns the value of the property that tells if the URI is case sensitive 
+     * Returns the value of the property that tells if the URI is case-sensitive 
      * or not.
      * 
-     * @return boolean  True if URI case sensitive. False if not. Default is false.
+     * @return bool  True if URI case-sensitive. False if not. Default is false.
      * 
      * @since 1.0
      */
@@ -342,7 +342,7 @@ class RouterUri extends Uri {
      * 
      * A resource is considered as dynamic if it is a PHP code or a PHP file.
      * 
-     * @return boolean If the resource is dynamic, the method will return true. 
+     * @return bool If the resource is dynamic, the method will return true. 
      * other than that, the method will return false.
      * 
      * @since 1.3.7
@@ -353,7 +353,7 @@ class RouterUri extends Uri {
     /**
      * Checks if the URI will be included in auto-generated site map or not.
      * 
-     * @return boolean If the URI will be included, the method will return 
+     * @return bool If the URI will be included, the method will return 
      * true. Default is false.
      * 
      * @since 1.3
@@ -387,12 +387,12 @@ class RouterUri extends Uri {
         $this->closureParams = $arr;
     }
     /**
-     * Make the URI case sensitive or not.
+     * Make the URI case-sensitive or not.
      * 
      * This is mainly used in case the developer would like to use the 
      * URI in routing.
      *  
-     * @param boolean $caseSensitive True to make it case sensitive. False to 
+     * @param bool $caseSensitive True to make it case-sensitive. False to 
      * not.
      * 
      * @since 1.0 
@@ -403,7 +403,7 @@ class RouterUri extends Uri {
     /**
      * Sets the value of the property '$incInSiteMap'.
      * 
-     * @param boolean $bool If true is given, the URI will be included 
+     * @param bool $bool If true is given, the URI will be included 
      * in site map.
      * 
      * @since 1.3
@@ -416,17 +416,17 @@ class RouterUri extends Uri {
      * 
      * @param string $uri A string that represents requested URI.
      * 
-     * @return boolean If the requested URI is a match with the original URI which 
+     * @return bool If the requested URI is a match with the original URI which 
      * is stored in the object, it will be set and the method will return true. 
      * Other than that, the method will return false.
      * 
      * @since 1.0
      */
-    public function setRequestedUri(string $uri) {
-        $reuested = new Uri($uri);
+    public function setRequestedUri(string $uri): bool {
+        $requested = new Uri($uri);
 
-        if ($this->compareUriPathHelper($reuested)) {
-            $this->requestedUri = $reuested;
+        if ($this->compareUriPathHelper($requested)) {
+            $this->requestedUri = $requested;
 
             return true;
         }
@@ -450,8 +450,8 @@ class RouterUri extends Uri {
         if (!is_callable($routeTo) && $type != 'object' && !class_exists($routeTo)) {
             $cleaned = str_replace('\\', DS, $routeTo);
             $xRouteTo = str_replace('/', DS, $cleaned);
-            $expl = explode('.', $routeTo);
-            $extension = $expl[count($expl) - 1];
+            $explode = explode('.', $routeTo);
+            $extension = $explode[count($explode) - 1];
 
             if ($extension != 'php') {
                 $this->isDynamic = false;
@@ -504,9 +504,9 @@ class RouterUri extends Uri {
             $nodesArr[] = $this->buildSitemapNode($uriWithVarsReplaced);
         }
     }
-    private function buildSitemapNode($uri) {
+    private function buildSitemapNode($uri): HTMLNode {
         $node = new HTMLNode('url');
-        $node->addChild('loc', [], false)->text($uri);
+        $node->addChild('loc')->text($uri);
 
         foreach ($this->getLanguages() as $langCode) {
             $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$uri.'?lang='.$langCode.'"/>', false);
@@ -514,14 +514,16 @@ class RouterUri extends Uri {
 
         return $node;
     }
+
     /**
      * Validate the path part of original URI and the requested one.
-     * 
-     * @return boolean
-     * 
+     *
+     * @param Uri $requestedUri
+     * @return bool
+     *
      * @since 1.0
      */
-    private function compareUriPathHelper(Uri $requestedUri) {
+    private function compareUriPathHelper(Uri $requestedUri): bool {
         $requestedArr = $requestedUri->getComponents();
 
         $originalPath = $this->getPathArray();
@@ -529,7 +531,7 @@ class RouterUri extends Uri {
 
         return $this->comparePathHelper($originalPath, $requestedPath);
     }
-    private function comparePathHelper($originalPath, $requestedPath) {
+    private function comparePathHelper($originalPath, $requestedPath): bool {
         $count = count($originalPath);
         $requestedCount = count($requestedPath);
 

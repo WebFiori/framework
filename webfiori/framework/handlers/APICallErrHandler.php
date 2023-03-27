@@ -27,7 +27,7 @@ class APICallErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
      * 
-     * This method will set the name of the handler to 'API Call Errors Handler'.
+     * This method will set the name of the handler to 'API Call Errors Handler.
      */
     public function __construct() {
         parent::__construct();

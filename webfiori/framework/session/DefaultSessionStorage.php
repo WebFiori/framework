@@ -11,6 +11,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\cli\Runner;
+use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\exceptions\SessionException;
 /**
@@ -57,7 +58,7 @@ class DefaultSessionStorage implements SessionStorage {
     /**
      * Removes all inactive sessions.
      * 
-     * This method will check if the constant 'SESSION_GC' is exist and its value 
+     * This method will check if the constant 'SESSION_GC' is existed and its value
      * is valid. If exist and valid, it will be used as reference for removing 
      * old sessions. If it does not exist, the method will remove any inactive 
      * session which is older than 30 days.
@@ -73,7 +74,7 @@ class DefaultSessionStorage implements SessionStorage {
         if (defined('SESSION_GC') && SESSION_GC > 0) {
             $olderThan = time() - SESSION_GC;
         } else {
-            //Clear any sesstion which is older than 30 days
+            //Clear any session which is older than 30 days
             $olderThan = time() - 60 * 60 * 24 * 30;
         }
 
@@ -86,28 +87,30 @@ class DefaultSessionStorage implements SessionStorage {
         }
     }
     /**
-     * Checks if sessions storage location is exist and writable.
+     * Checks if sessions storage location is existed and writable.
      * 
-     * @return bolean If sessions storage location exist and is writable, 
+     * @return bool If sessions storage location exist and is writable,
      * the method will return true.
      * 
      * @since 1.0.1
      */
-    public function isStorageDirExist() {
+    public function isStorageDirExist(): bool {
         return file_exists($this->storeLoc) && is_writable($this->storeLoc);
     }
+
     /**
      * Reads a session from session file.
-     * 
+     *
      * @param string $sessionId The ID of the session.
-     * 
-     * @return string|null If the method successfully accessed session state, 
-     * the method will return a string that represents the session. Other than that, 
+     *
+     * @return string|null If the method successfully accessed session state,
+     * the method will return a string that represents the session. Other than that,
      * the method will return null.
-     * 
+     *
+     * @throws FileException
      * @since 1.0
      */
-    public function read($sessionId) {
+    public function read(string $sessionId) {
         if (!$this->isStorageDirExist()) {
             return null;
         }
@@ -126,25 +129,27 @@ class DefaultSessionStorage implements SessionStorage {
      * 
      * @since 1.0
      */
-    public function remove($sessionId) {
+    public function remove(string $sessionId) {
         if ($this->isStorageDirExist()) {
             unlink($this->storeLoc.DS.$sessionId);
         }
     }
+
     /**
      * Stores session state to a file.
-     * 
-     * @param Session $sessionId The session that will be stored.
-     * 
-     * @param string $session The session that will be stored.
-     * 
+     *
+     * @param string $sessionId The session that will be stored.
+     *
+     * @param string $serializedSession The session that will be stored.
+     *
+     * @throws FileException
      * @since 1.0
      */
-    public function save($sessionId, $session) {
+    public function save(string $sessionId, string $serializedSession) {
         if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__')) && $this->isStorageDirExist()) {
             //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
-            $file->setRawData($session);
+            $file->setRawData($serializedSession);
             $file->create();
             $file->write();
         }

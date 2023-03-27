@@ -163,10 +163,13 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function createJob(string $when = '*/5 * * * *', string $jobName = '', $function = '', array $funcParams = []) : bool {
+    public static function createJob(string $when = '*/5 * * * *', string $jobName = '', callable $function = null, array $funcParams = []) : bool {
         try {
             $job = new CronJob($when);
-            $job->setOnExecution($function, $funcParams);
+            
+            if ($function !== null) {
+                $job->setOnExecution($function, $funcParams);
+            }
 
             if (strlen($jobName) > 0) {
                 $job->setJobName($jobName);

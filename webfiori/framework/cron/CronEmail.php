@@ -37,7 +37,7 @@ class CronEmail extends EmailMessage {
      * Creates new instance of the class.
      * 
      * @param string $sendAccName The name of SMTP account that will be 
-     * used to send the message. Note that it must be exist in the class 
+     * used to send the message. Note that it must be existed in the class
      * 'MailConfig'.
      * 
      * @param array $receivers An associative array of receivers. The 
@@ -46,7 +46,7 @@ class CronEmail extends EmailMessage {
      * 
      * @since 1.0
      */
-    public function __construct($sendAccName, $receivers = []) {
+    public function __construct($sendAccName, array $receivers = []) {
         parent::__construct($sendAccName);
         $activeJob = Cron::activeJob();
 
@@ -105,14 +105,14 @@ class CronEmail extends EmailMessage {
      * @param AbstractJob $job
      * @return HTMLNode
      */
-    private function createJobInfoTable($job) {
+    private function createJobInfoTable(AbstractJob $job): HTMLNode {
         $jobTable = new HTMLNode('table');
         $jobTable->setStyle([
             'border-collapse' => 'collapse'
         ]);
         $jobTable->setAttribute('border', 1);
         $jobTable->addChild($this->createTableRow('Job Name:', $job->getJobName()));
-        $jobTable->addChild($this->createTableRow('Exprssion:', $job->getExpression()));
+        $jobTable->addChild($this->createTableRow('Expression:', $job->getExpression()));
         $jobTable->addChild($this->createTableRow('Check Started:', Cron::timestamp()));
         $jobTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));
         $jobTable->addChild($this->createTableRow('PHP Version:', PHP_VERSION));

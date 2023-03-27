@@ -50,7 +50,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($name, $desc = '') {
+    public function __construct(string $name, string $desc = '') {
         $this->setName($name);
 
         if (!$this->setDescription($desc)) {
@@ -63,7 +63,7 @@ class JobArgument implements JsonI {
      * The default value is usually used if the argument has no value
      * provided.
      * 
-     * @return string|null If default value is set, its returned as string.
+     * @return string|null If default value is set, it's returned as string.
      * Other than that, null is returned.
      */
     public function getDefault() {
@@ -126,7 +126,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDescription(string $desc) {
+    public function setDescription(string $desc): bool {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {

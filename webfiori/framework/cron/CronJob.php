@@ -10,6 +10,8 @@
  */
 namespace webfiori\framework\cron;
 
+use Exception;
+
 /**
  * A class that represents a cron job.
  * This class used to provide basic implementation for the class 'AbstractJob'. 
@@ -30,11 +32,9 @@ class CronJob extends AbstractJob {
 
     /**
      * Creates new instance of the class.
-     * 
-     * @param string $jobName The name of the job.
-     * 
-     * @param string $when A cron expression. An exception will be thrown if 
-     * the given expression is invalid. 
+     *
+     * @param string $when A cron expression. An exception will be thrown if
+     * the given expression is invalid.
      * The parts of the expression are as follows:
      * <ul>
      * <li>First part is minutes (0-59)</li>
@@ -44,12 +44,8 @@ class CronJob extends AbstractJob {
      * <li>Last part is day of the week (0-6)</li>
      * </ul>
      * Default is '* * * * *' which means run the job every minute.
-     * 
-     * @param string $description A description for the job. Shown in CRON
-     * web interface or CLI.
-     * 
+     *
      * @throws Exception
-     * 
      * @since 1.0
      */
     public function __construct(string $when = '* * * * *') {
@@ -90,10 +86,10 @@ class CronJob extends AbstractJob {
 
     /**
      * Returns a callable which represents the code that will be 
-     * executed when its time to run the job.
+     * executed when it's time to run the job.
      * 
-     * @return Callable|null A callable which represents the code that will be 
-     * executed when its time to run the job.
+     * @return callable|null A callable which represents the code that will be
+     * executed when it's time to run the job.
      * 
      * @since 1.0.3
      */
@@ -127,7 +123,7 @@ class CronJob extends AbstractJob {
      * 
      * @since 1.0
      */
-    public function setOnExecution($func,$funcParams = []) {
+    public function setOnExecution(callable $func, array $funcParams = []) {
         if (is_callable($func)) {
             $this->events['on']['func'] = $func;
 
@@ -146,7 +142,7 @@ class CronJob extends AbstractJob {
      * 
      * @since 1.0.5
      */
-    public function setOnFailure($func, array $params = []) {
+    public function setOnFailure(callable $func, array $params = []) {
         if (is_callable($func)) {
             $this->events['on-failure']['func'] = $func;
 

@@ -191,8 +191,8 @@ class Router {
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
      * will be initiated when a request is made to the route. Note that if the PHP file that 
-     * the route is pointing to represents an API, no need to add this option. Default is false.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * the route is pointing to represent an API, no need to add this option. Default is false.</li>
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -211,13 +211,13 @@ class Router {
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
      * <li><b>action</b>: If the class that the route is pointing to 
-     * represents a controller, this index can have the value of the 
+     * represent a controller, this index can have the value of the
      * action that will be performed (the name of the class method).</li>
      * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
-     * @return boolean The method will return true if the route was created. 
+     * @return bool The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * 
@@ -252,9 +252,9 @@ class Router {
      * <li><b>route-to</b>: The path to the API file. The root folder for 
      * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
      * value of this parameter must be '/get-user-profile.php'. If the API is in a 
-     * sub-directory inside the APIs directory, then the name of the 
+     * subdirectory inside the APIs directory, then the name of the
      * directory must be included.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -271,7 +271,7 @@ class Router {
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
-     * @return boolean The method will return true if the route was created. 
+     * @return bool The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * 
@@ -321,7 +321,7 @@ class Router {
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
      * will be initiated when a request is made to the route. Default is false.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -346,7 +346,7 @@ class Router {
      * </ul>
      * 
      * 
-     * @return boolean The method will return true if the route was created. 
+     * @return bool The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false. Also, if <b>'route-to'</b> is not a function, the method will return false.
      * 
@@ -379,7 +379,7 @@ class Router {
      * 
      * @return string|null The method will return the value of the 
      * parameter if it was set. If it is not set or routing is still not yet 
-     * happend, the method will return null.
+     * happened, the method will return null.
      * 
      * @since 1.3.9
      */
@@ -449,12 +449,12 @@ class Router {
      * 
      * @param string $path The path which will be checked (such as '/path1/path2')
      * 
-     * @return boolean The method will return true if the given path 
+     * @return bool The method will return true if the given path 
      * has a route.
      * 
      * @since 1.3.8
      */
-    public static function hasRoute(string $path) {
+    public static function hasRoute(string $path): bool{
         $routesArr = self::get()->routes;
         $trimmed = self::get()->fixUriPath($path);
 
@@ -544,9 +544,9 @@ class Router {
      * <li><b>route-to</b>: The path to the view file. The root folder for 
      * all views is '/pages'. If the view name is 'view-user.php', then the 
      * value of this parameter must be '/view-user.php'. If the view is in a 
-     * sub-directory inside the views directory, then the name of the 
+     * subdirectory inside pages directory, then the name of the
      * directory must be included.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -568,7 +568,7 @@ class Router {
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
-     * @return boolean The method will return true if the route was created. 
+     * @return bool The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * 
@@ -625,7 +625,7 @@ class Router {
      * 
      * @param string $path The path part of route URI.
      * 
-     * @return boolean If the route is removed, the method will return 
+     * @return bool If the route is removed, the method will return 
      * true. If not, The method will return false.
      * 
      * @since 1.3.7
@@ -715,7 +715,7 @@ class Router {
      * 
      * @since 1.3.8
      */
-    public static function setOnNotFound($func) {
+    public static function setOnNotFound(callable $func) {
         self::get()->setOnNotFoundHelper($func);
     }
     /**
@@ -723,14 +723,14 @@ class Router {
      * 
      * @param RouterUri $routerUri An object of type 'RouterUri'.
      * 
-     * @return boolean If the object is added as new route, the method will 
+     * @return bool If the object is added as new route, the method will 
      * return true. If the given parameter is not an instance of 'RouterUri' 
      * or a route is already added, The method will return false.
      * 
      * @since 1.3.2
      */
     public static function uriObj(RouterUri $routerUri) : bool {
-        if ($routerUri instanceof RouterUri && !self::get()->hasRouteHelper($routerUri->getPath())) {
+        if (!self::get()->hasRouteHelper($routerUri->getPath())) {
             if ($routerUri->hasVars()) {
                 self::get()->routes['variable'] = $routerUri;
             } else {
@@ -749,11 +749,11 @@ class Router {
      * array can have the following indices:
      * <ul>
      * <li><b>path</b>: The path part of the URI (e.g. '/en/one/two'). If not 
-     * given, the route will represents home page of the website. Its possible 
+     * given, the route will represent home page of the website. It's possible
      * to add parameters to the path using this syntax: '/en/{var-one}/two/{var-two}'. 
      * The value of the parameter can be accessed later through the 
      * array $_GET or the array $_POST.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -767,11 +767,11 @@ class Router {
      * values:
      * <ul>
      * <li><b>Router::VIEW_ROUTE</b>: If the PHP file is inside the folder 
-     * '/pages' or in other sub-directory under the same folder.</li>
+     * '/pages' or in other subdirectory under the same folder.</li>
      * <li><b>Router::API_ROUTE</b> : If the PHP file is inside the folder '/apis' 
-     * or in other sub-directory under the same folder.</li>
+     * or in other subdirectory under the same folder.</li>
      * <li><b>Router::CUSTOMIZED</b> : If the PHP file is inside the root folder or in 
-     * other sub-directory under the root.</li>
+     * other subdirectory under the root.</li>
      * <li><b>Router::CLOSURE_ROUTE</b> If the route is a closure.</li>
      * </ul></li>
      * <li><b>is-api</b>: If this parameter is set to true, the route will be 
@@ -786,13 +786,13 @@ class Router {
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
-     * @return boolean If the route is added, the method will return true. 
+     * @return bool If the route is added, the method will return true. 
      * The method one return false only in two cases, either the route type 
      * is not correct or a similar route was already added.
      * 
      * @since 1.0
      */
-    private function addRouteHelper1(array $options) {
+    private function addRouteHelper1(array $options): bool {
         if (isset($options['routes'])) {
             $routesArr = $this->addRoutesGroupHelper($options);
             $added = true;
@@ -820,7 +820,7 @@ class Router {
 
         return false;
     }
-    private function addRouteHelper0($options) {
+    private function addRouteHelper0($options): bool {
         $routeTo = $options['route-to'];
         $caseSensitive = $options['case-sensitive'];
         $routeType = $options['type'];
@@ -915,7 +915,7 @@ class Router {
      * 
      * @return array
      */
-    private function checkOptionsArr($options) {
+    private function checkOptionsArr(array $options): array {
         $routeTo = $options['route-to'];
 
         if (isset($options['case-sensitive'])) {
@@ -924,13 +924,9 @@ class Router {
             $caseSensitive = true;
         }
 
-        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+        $routeType = $options['type'] ?? Router::CUSTOMIZED;
 
-        if (isset($options['in-sitemap'])) {
-            $incInSiteMap = $options['in-sitemap'];
-        } else {
-            $incInSiteMap = false;
-        }
+        $incInSiteMap = $options['in-sitemap'] ?? false;
 
         if (isset($options['middleware'])) {
             if (gettype($options['middleware']) == 'array') {
@@ -990,14 +986,10 @@ class Router {
             $subRoute['case-sensitive'] = $caseSensitive;
         }
 
-        $subRoute['type'] = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+        $subRoute['type'] = $options['type'] ?? Router::CUSTOMIZED;
 
         if (!isset($subRoute['in-sitemap'])) {
-            if (isset($options['in-sitemap'])) {
-                $incInSiteMap = $options['in-sitemap'];
-            } else {
-                $incInSiteMap = false;
-            }
+            $incInSiteMap = $options['in-sitemap'] ?? false;
             $subRoute['in-sitemap'] = $incInSiteMap;
         }
 
@@ -1091,7 +1083,7 @@ class Router {
      * 
      * @since 1.1
      */
-    private function fixUriPath($path) {
+    private function fixUriPath(string $path): string {
         if (strlen($path) != 0 && $path != '/') {
             if ($path[strlen($path) - 1] == '/' || $path[0] == '/') {
                 while ($path[0] == '/' || $path[strlen($path) - 1] == '/') {
@@ -1109,9 +1101,9 @@ class Router {
 
         return $path;
     }
-    private function getFileDirAndName($absDir) {
-        $expl = explode(DS, $absDir);
-        $fileName = $expl[count($expl) - 1];
+    private function getFileDirAndName($absDir): array {
+        $explode = explode(DS, $absDir);
+        $fileName = $explode[count($explode) - 1];
         $dir = substr($absDir, 0, strlen($absDir) - strlen($fileName));
 
         return [
@@ -1129,7 +1121,7 @@ class Router {
      * array will be empty. Other than that, the array will have request 
      * methods as strings.
      */
-    private function getRequestMethodsHelper($options) {
+    private function getRequestMethodsHelper(array $options): array {
         $requestMethodsArr = [];
 
         if (isset($options['methods'])) {
@@ -1193,12 +1185,12 @@ class Router {
      * 
      * @param RouterUri $path The path which will be checked (such as '/path1/path2')
      * 
-     * @return boolean The method will return true if the given path 
+     * @return bool The method will return true if the given path 
      * has a route.
      * 
      * @since 1.1
      */
-    private function hasRouteHelper($uriObj) {
+    private function hasRouteHelper($uriObj): bool {
         $path = $uriObj->getPath();
 
         if (!$uriObj->isCaseSensitive()) {
@@ -1214,13 +1206,13 @@ class Router {
     /**
      * Checks if a directory name is a parameter or not.
      * 
-     * @param type $dir
+     * @param string $dir
      * 
-     * @return boolean
+     * @return bool
      * 
      * @since 1.1
      */
-    private function isDirectoryAVar($dir) {
+    private function isDirectoryAVar(string $dir): bool {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
     /**
@@ -1268,20 +1260,20 @@ class Router {
      * 
      * If the router has no routes, the router will send back a '418 - I'm A 
      * Teapot' response. If the route is available but the file that the 
-     * router is routing to does not exist, a '500 - Server Error' Response 
+     * router is routing to do not exist, a '500 - Server Error' Response
      * with the message 'The resource 'a_resource' was available but its route is not configured correctly.' is 
      * sent back. If the route is not found, The router will call the function 
      * that was set by the user in case a route is not found.
      * 
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
      * 
-     * @param boolean $loadResource If set to true, the resource that represents the 
+     * @param bool $loadResource If set to true, the resource that represents the 
      * route will be loaded. If false, the route will be only resolved. Default 
      * is true.
      * 
      * @since 1.0
      */
-    private function resolveUrlHelper($uri, $loadResource = true) {
+    private function resolveUrlHelper(string $uri, bool $loadResource = true) {
         $this->uriObj = null;
 
         if (self::routesCount() != 0) {
@@ -1290,7 +1282,7 @@ class Router {
             if ($routeUri->hasWWW() && defined('NO_WWW') && NO_WWW === true) {
                 $this->redirectToNonWWW($routeUri);
             }
-            //first, search for the URI wuthout checking parameters
+            //first, search for the URI without checking parameters
             if ($this->searchRoute($routeUri, $uri, $loadResource)) {
                 return;
             }
@@ -1312,14 +1304,14 @@ class Router {
             }
         }
     }
+
     /**
-     * 
+     *
      * @param RouterUri $route
-     * @param type $loadResource
-     * @return type
+     * @param bool $loadResource
      * @throws RoutingException
      */
-    private function routeFound($route, $loadResource) {
+    private function routeFound(RouterUri $route, bool $loadResource) {
         if ($route->isRequestMethodAllowed()) {
             $this->uriObj = $route;
             $route->getMiddlewar()->insertionSort(false);
@@ -1368,12 +1360,12 @@ class Router {
                         }
                     } else {
                         if ($loadResource === true) {
-                            $message = 'The resource "'.Request::getRequestedURI().'" was availble. '
+                            $message = 'The resource "'.Request::getRequestedURI().'" was available. '
                             .'but its route is not configured correctly. '
                             .'The resource which the route is pointing to was not found.';
 
                             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                $message = 'The resource "'.Request::getRequestedURI().'" was availble. '
+                                $message = 'The resource "'.Request::getRequestedURI().'" was available. '
                                 .'but its route is not configured correctly. '
                                 .'The resource which the route is pointing to was not found ('.$file.').';
                             }
@@ -1397,15 +1389,17 @@ class Router {
             }
         }
     }
+
     /**
-     * 
+     *
      * @param RouterUri $routeUri
-     * @param type $uri
-     * @param type $loadResource
-     * @param type $withVars
-     * @return boolean
+     * @param string $uri
+     * @param bool $loadResource
+     * @param bool $withVars
+     * @return bool
+     * @throws RoutingException
      */
-    private function searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
+    private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
         $pathArray = $routeUri->getPathArray();
         $requestMethod = Request::getMethod();
         $indexToSearch = 'static';
@@ -1467,7 +1461,7 @@ class Router {
      * 
      * @param string $requestMethod
      */
-    private function setUriVarsHelper(RouterUri $uriRouteObj, $requestedPathArr, $requestMethod) {
+    private function setUriVarsHelper(RouterUri $uriRouteObj, array $requestedPathArr, string $requestMethod) {
         $routePathArray = $uriRouteObj->getPathArray();
         $pathVarsCount = count($routePathArray);
         $requestedPathPartsCount = count($requestedPathArr);
@@ -1504,7 +1498,7 @@ class Router {
      * 
      * @since 1.0
      */
-    private static function get() {
+    private static function get(): Router {
         if (self::$router != null) {
             return self::$router;
         }
@@ -1517,7 +1511,7 @@ class Router {
      * 
      * @param RouterUri $uriObj
      */
-    private function redirectToNonWWW($uriObj) {
+    private function redirectToNonWWW(RouterUri $uriObj) {
         Response::setCode(301);
         $path = '';
 
@@ -1564,9 +1558,9 @@ class Router {
      * <li><b>route-to</b>: The path to the view file. The root folder for 
      * all views is '/pages'. If the view name is 'view-user.php', then the 
      * value of this parameter must be '/view-user.php'. If the view is in a 
-     * sub-directory inside the views directory, then the name of the 
+     * subdirectory inside pages directory, then the name of the
      * directory must be included.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
@@ -1588,7 +1582,7 @@ class Router {
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
-     * @return boolean The method will return true if the route was created. 
+     * @return bool The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * 
@@ -1596,7 +1590,7 @@ class Router {
      * 
      * @deprecated since version 1.3.12
      */
-    private static function view($options) {
+    private static function view(array $options): bool {
         if (gettype($options) == 'array') {
             $options['type'] = Router::VIEW_ROUTE;
             self::addToMiddlewareGroup($options, 'web');

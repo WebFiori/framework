@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\cron\webUI;
 
+use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 
 /**
@@ -47,12 +48,12 @@ class TasksTable extends HTMLNode {
         $this->createActions();
     }
 
-        /**
-         * 
-         * @param HTMLNode $table
-         * @param type $slot
-         */
-    private function addIsTimeSlot($slot) {
+    /**
+     *
+     * @param string $slot
+     * @throws InvalidNodeNameException
+     */
+    private function addIsTimeSlot(string $slot) {
         $template = $this->addChild('template', [
             '#item.time.'.$slot => '{ item }'
         ]);

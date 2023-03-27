@@ -36,7 +36,7 @@ class HTTPErrHandler extends AbstractHandler {
      * Handles the exception.
      * 
      * The handler will simply show a server error page with error details
-     * if the constant WF_VERPOSE is set to true. If not, it will show
+     * if the constant WF_VERBOSE is set to true. If not, it will show
      * general server error message.
      */
     public function handle() {

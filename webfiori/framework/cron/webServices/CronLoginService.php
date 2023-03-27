@@ -40,12 +40,12 @@ class CronLoginService extends AbstractWebService {
             if ($inputHash == $cronPass) {
                 SessionsManager::start('cron-session');
                 SessionsManager::set('cron-login-status', true);
-                $this->sendResponse('Success', 'info', 200);
+                $this->sendResponse('Success', 'info');
             } else {
                 $this->sendResponse('Incorrect password', 'error', 404);
             }
         } else {
-            $this->sendResponse('Success', 'info', 200);
+            $this->sendResponse('Success', 'info');
         }
     }
 }

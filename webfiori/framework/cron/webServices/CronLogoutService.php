@@ -13,7 +13,7 @@ namespace webfiori\framework\cron\webServices;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 /**
- * A service which is used to logout user in CRON web interface.
+ * A service which is used to log out user in CRON web interface.
  *
  * @author Ibrahim
  */

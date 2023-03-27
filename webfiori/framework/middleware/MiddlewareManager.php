@@ -31,7 +31,7 @@ class MiddlewareManager {
         $this->middlewareList = new LinkedList();
     }
     /**
-     * Returns a set of meddalewares that belongs to a specific group.
+     * Returns a set of middlewares that belongs to a specific group.
      * 
      * @param string $groupName The name of the group.
      * 
@@ -41,7 +41,7 @@ class MiddlewareManager {
      * 
      * @since 1.0
      */
-    public static function getGroup($groupName) {
+    public static function getGroup(string $groupName) {
         $list = new LinkedList();
         $mdList = self::get()->middlewareList;
 
@@ -56,7 +56,7 @@ class MiddlewareManager {
     /**
      * Returns a registered middleware given its name.
      * 
-     * @param strin $name The name of the middleware.
+     * @param string $name The name of the middleware.
      * 
      * @return AbstractMiddleware|null If a middleware with the given name is 
      * found, the method will return it. Other than that, the method will return 
@@ -64,7 +64,7 @@ class MiddlewareManager {
      * 
      * @since 1.0
      */
-    public static function getMiddleware($name) {
+    public static function getMiddleware(string $name) {
         $mdList = self::get()->middlewareList;
 
         foreach ($mdList as $mw) {
@@ -90,7 +90,7 @@ class MiddlewareManager {
      * 
      * @since 1.0
      */
-    public static function remove($name) {
+    public static function remove(string $name) {
         $manager = self::get();
         $mw = $manager->getMiddleware($name);
 

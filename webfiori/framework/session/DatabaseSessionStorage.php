@@ -28,13 +28,23 @@ class DatabaseSessionStorage implements SessionStorage {
      * @var SessionDB 
      */
     private $dbController;
+
     /**
      * Creates new instance of the class
-     * 
+     *
+     * @throws SessionException
      * @since 1.0
      */
     public function __construct() {
-        $this->dbController = new SessionDB();
+        try {
+            $this->dbController = new SessionDB();
+        } catch (DatabaseException $ex) {
+            if ($ex->getMessage() == "No connection was found which has the name 'sessions-connection'.") {
+                throw new SessionException("Connection 'sessions-connection' was not found in application configuration.");
+            } else {
+                throw $ex;
+            }
+        }
     }
     /**
      * Drop the tables which are used to store session information.

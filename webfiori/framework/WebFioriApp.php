@@ -151,7 +151,7 @@ class WebFioriApp {
 
         $this->initMiddleware();
         $this->initRoutes();
-        $this->initCRON();
+        $this->initScheduler();
         Response::beforeSend(function ()
         {
             register_shutdown_function(function()
@@ -188,7 +188,8 @@ class WebFioriApp {
         self::$classStatus = self::STATUS_INITIALIZED;
     }
     /**
-     * Register CLI commands or cron jobs.
+     * Register CLI commands or background tasks.
+     * 
      * @param string $folder The name of the folder that contains the jobs or 
      * commands. It must be a folder inside 'app' folder or the folder which is defined 
      * by the constant 'APP_DIR'.
@@ -538,19 +539,19 @@ class WebFioriApp {
     /**
      * @throws FileException
      */
-    private function initCRON() {
+    private function initScheduler() {
         $uriObj = new RouterUri(Request::getRequestedURI(), '');
         $pathArr = $uriObj->getPathArray();
 
-        if (!class_exists(APP_DIR.'\ini\InitCron')) {
-            ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
+        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
+            ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
         }
 
-        if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && in_array('cron', $pathArr))) {
-            if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
+        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('cron', $pathArr))) {
+            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
                 TasksManager::initRoutes();
             }
-            TasksManager::password($this->appConfig->getCRONPassword());
+            TasksManager::password($this->appConfig->getSchedulerPassword());
             //initialize cron jobs only if in CLI or cron is enabled through HTTP.
             call_user_func(APP_DIR.'\ini\InitCron::init');
             TasksManager::registerJobs();

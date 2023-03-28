@@ -249,7 +249,7 @@ class AppConfig implements Config {
      * 
      * @return string Password hash or the string 'NO_PASSWORD' if there is no password.
      */
-    public function getCRONPassword() : string {
+    public function getSchedulerPassword() : string {
         return $this->cronPass;
     }
     /**

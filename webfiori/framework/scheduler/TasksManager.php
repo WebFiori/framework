@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\scheduler;
 
 use const DS;
 use Exception;
@@ -17,9 +17,9 @@ use webfiori\cli\Runner;
 use webfiori\collections\Queue;
 use webfiori\file\File;
 use webfiori\framework\cli\commands\CronCommand;
-use webfiori\framework\cron\webServices\TasksServicesManager;
-use webfiori\framework\cron\webUI\TasksLoginPage;
-use webfiori\framework\cron\webUI\ListTasksPage;
+use webfiori\framework\scheduler\webServices\TasksServicesManager;
+use webfiori\framework\scheduler\webUI\TasksLoginPage;
+use webfiori\framework\scheduler\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
@@ -30,7 +30,7 @@ use webfiori\framework\WebFioriApp;
  * It is used to create tasks, schedule them and execute them. In order to run 
  * the tasks automatically, the developer must add an entry in the following 
  * format in crontab:
- * <p><code>* * * * *  /usr/bin/php path/to/webfiori --cron check p=&lt;password&gt;</code></p>
+ * <p><code>* * * * *  /usr/bin/php path/to/webfiori --scheduler check p=&lt;password&gt;</code></p>
  * Where &lt;password&gt; is the password 
  * that was set by the developer to protect the tasks from unauthorized access. 
  * If no password is set, then it can be removed from the command.
@@ -64,15 +64,15 @@ class TasksManager {
      */
     private $command;
     /**
-     * A queue which contains all cron tasks.
+     * A queue which contains all tasks.
      * 
      * @var Queue 
      * 
      * @since 1.0
      */
-    private $cronJobsQueue;
+    private $tasksQueue;
     /**
-     * An instance of 'Cron'
+     * An instance of this class
      * 
      * @var TasksManager 
      * 
@@ -124,14 +124,14 @@ class TasksManager {
         $this->tasksNamesArr = [];
         $this->logsArray = [];
         $this->isLogEnabled = false;
-        $this->cronJobsQueue = new Queue();
+        $this->tasksQueue = new Queue();
         $this->setPasswordHelper('');
     }
     /**
      * Returns an object that represents the task which is currently being executed.
      * 
      * @return BaseTask|null If there is a task which is being executed, the 
-     * method will return an object of type 'CronJob' that represent it. 
+     * method will return as an object. 
      * If no task is being executed, the method will return null.
      * 
      * @since 1.0.4
@@ -218,7 +218,7 @@ class TasksManager {
     /**
      * Returns the number of current day in the current  month as integer.
      * 
-     * This method is used by the class 'CronJob' to validate cron task 
+     * This method is used by the class 'AbstractTask' to validate task 
      * execution time.
      * 
      * @return int An integer that represents current day number in 
@@ -232,7 +232,7 @@ class TasksManager {
     /**
      * Returns the number of current day in the current  week as integer.
      * 
-     * This method is used by the class 'CronJob' to validate cron task 
+     * This method is used by the class 'AbstractTask' to validate task 
      * execution time. The method will always return a value between 0 and 6 
      * inclusive. 0 Means Sunday and 6 is for Saturday.
      * 
@@ -248,7 +248,7 @@ class TasksManager {
      * Enable or disable logging for tasks execution. 
      * 
      * This method is also used to check if logging is enabled or not. If 
-     * execution log is enabled, a log file with the name 'cron.log' will be 
+     * execution log is enabled, a log file with the name 'tasks.log' will be 
      * created in the folder '/logs'.
      * 
      * @param bool|null $bool If set to true, a log file that contains the details 
@@ -286,7 +286,7 @@ class TasksManager {
      * @param string $taskName The name of the task.
      * 
      * @return BaseTask|null If a task which has the given name was found, 
-     * the method will return an object of type 'CronJob' that represents 
+     * the method will return an object of type 'AbstractTask' that represents 
      * the task. Other than that, the method will return null.
      * 
      * @since 1.0.5
@@ -327,7 +327,7 @@ class TasksManager {
      * Returns the array that contains logged messages.
      * 
      * The array will contain the messages which where logged using the method 
-     * <code>Cron::log()</code>
+     * <code>TasksManager::log()</code>
      * 
      * @return array An array of strings.
      * 
@@ -339,7 +339,7 @@ class TasksManager {
     /**
      * Returns the number of current hour in the day as integer.
      * 
-     * This method is used by the class 'CronJob' to validate cron task 
+     * This method is used by the class 'AbstractTask' to validate task 
      * execution time. The method will always return a value between 0 and 23 
      * inclusive.
      * 
@@ -351,22 +351,22 @@ class TasksManager {
         return self::get()->timestamp['hour'];
     }
     /**
-     * Creates routes to cron web interface pages.
+     * Creates routes to tasks web interface pages.
      * 
      * This method is used to initialize the following routes:
      * <ul>
-     * <li>/cron</li>
-     * <li>/cron/login</li>
-     * <li>/cron/apis/{action}</li>
-     * <li>/cron/tasks</li>
-     * <li>/cron/tasks/{task-name}</li>
+     * <li>/scheduler</li>
+     * <li>/scheduler/login</li>
+     * <li>/scheduler/apis/{action}</li>
+     * <li>/scheduler/tasks</li>
+     * <li>/scheduler/tasks/{task-name}</li>
      * </ul>
      * 
      * @since 1.1.0
      */
     public static function initRoutes() {
         Router::addRoute([
-            'path' => '/cron',
+            'path' => '/scheduler',
             'route-to' => TasksLoginPage::class,
             'routes' => [
                 [
@@ -417,7 +417,7 @@ class TasksManager {
     /**
      * Returns the number of current minute in the current hour as integer.
      * 
-     * This method is used by the class 'CronJob' to validate cron task 
+     * This method is used by the class 'AbstractTask' to validate task 
      * execution time. The method will always return a value between 0 and 59 
      * inclusive.
      * 
@@ -432,7 +432,7 @@ class TasksManager {
     /**
      * Returns the number of current month as integer.
      * 
-     * This method is used by the class 'CronJob' to validate cron task 
+     * This method is used by the class 'AbstracTask' to validate task 
      * execution time. The method will always return a value between 1 and 12 
      * inclusive.
      * 
@@ -453,7 +453,7 @@ class TasksManager {
      * HH can have any value from '00' up to '23' and 'MM' can have any value 
      * from '00' up to '59'.
      * 
-     * @param string $name The name of cron task.
+     * @param string $name The name of the task.
      * 
      * @param callable $func A function that will be executed when it's time to
      * run the task.
@@ -485,7 +485,7 @@ class TasksManager {
         return false;
     }
     /**
-     * Sets or gets the password that is used to protect the cron instance.
+     * Sets or gets the password that is used to protect jobs execution.
      * 
      * The password is used to prevent unauthorized access to execute tasks. 
      * The provided password must be 'sha256' hashed string. It is recommended 
@@ -507,13 +507,13 @@ class TasksManager {
         return self::get()->getPasswordHelper();
     }
     /**
-     * Register any CRON task which exist in the folder 'tasks' of the application.
+     * Register any task which exist in the folder 'tasks' of the application.
      * 
      * Note that this method will register tasks only if the framework is running
-     * using CLI or the constant 'CRON_THROUGH_HTTP' is set to true.
+     * using CLI or the constant 'SCHEDULER_THROUGH_HTTP' is set to true.
      */
     public static function registerJobs() {
-        if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
+        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP === true)) {
             WebFioriApp::autoRegister('tasks', function (AbstractTask $task)
             {
                 TasksManager::scheduleJob($task);
@@ -531,13 +531,13 @@ class TasksManager {
         self::get()->tasksNamesArr = [];
         self::get()->logsArray = [];
         self::get()->isLogEnabled = false;
-        self::get()->cronJobsQueue = new Queue();
+        self::get()->tasksQueue = new Queue();
         self::get()->setPasswordHelper('');
     }
     /**
      * Check each scheduled task and run it if it's time to run it.
      * 
-     * @param string $pass If cron password is set, this value must be 
+     * @param string $pass If tasks scheduler password is set, this value must be 
      * provided. The given value will be hashed inside the body of the 
      * method and then compared with the password which was set. Default 
      * is empty string.
@@ -548,10 +548,10 @@ class TasksManager {
      * @param bool $force If this attribute is set to true and a task name 
      * was provided, the task will be forced to execute. Default is false.
      * 
-     * @param CronCommand|null $command If cron is run from CLI, this parameter is
+     * @param CronCommand|null $command If scheduler is executed from CLI, this parameter is
      * provided to set custom execution attributes of a task.
      * 
-     * @return string|array If cron password is set and the given one is 
+     * @return string|array If scheduler password is set and the given one is 
      * invalid, the method will return the string 'INV_PASS'. If 
      * a task name is specified and no task was found which has the given 
      * name, the method will return the string 'JOB_NOT_FOUND'. Other than that, 
@@ -572,10 +572,10 @@ class TasksManager {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
-        $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
-        $cronPass = TasksManager::password();
+        $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-login-status') : false;
+        $schedulerPass = TasksManager::password();
 
-        if ($cronPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $cronPass) {
+        if ($schedulerPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $schedulerPass) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
 
@@ -610,7 +610,7 @@ class TasksManager {
             }
 
             while ($task = $tempQ->dequeue()) {
-                self::get()->cronJobsQueue->enqueue($task);
+                self::get()->tasksQueue->enqueue($task);
             }
         }
         self::log('Check finished.');
@@ -801,10 +801,10 @@ class TasksManager {
         $retVal = false;
 
         if ($task instanceof AbstractTask) {
-            if ($task->getJobName() == 'CRON-JOB') {
+            if ($task->getJobName() == 'Background Task') {
                 $task->setJobName('task-'.$this->tasksQueue()->size());
             }
-            $retVal = $this->cronJobsQueue->enqueue($task);
+            $retVal = $this->tasksQueue->enqueue($task);
 
             if ($retVal === true && !in_array($task->getJobName(), $this->tasksNamesArr)) {
                 $this->tasksNamesArr[] = $task->getJobName();
@@ -831,7 +831,7 @@ class TasksManager {
      * @since 1.0
      */
     private function getQueueHelper(): Queue {
-        return $this->cronJobsQueue;
+        return $this->tasksQueue;
     }
     private function isLogEnabledHelper(): bool {
         return $this->isLogEnabled;
@@ -855,7 +855,7 @@ class TasksManager {
     private function logJobExecution($task,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
-            $logFile = $logsPath.DS.'cron.log';
+            $logFile = $logsPath.DS.'tasks.log';
             $file = new File($logFile);
             $file->create(true);
 

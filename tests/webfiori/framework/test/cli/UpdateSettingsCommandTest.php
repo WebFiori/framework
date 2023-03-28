@@ -201,7 +201,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
-        $this->assertEquals(hash('sha256', '123456'), ConfigController::get()->getCRONPassword());
+        $this->assertEquals(hash('sha256', '123456'), ConfigController::get()->getSchedulerPassword());
     }
     /**
      * @test
@@ -223,7 +223,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
-        $this->assertEquals('NO_PASSWORD', ConfigController::get()->getCRONPassword());
+        $this->assertEquals('NO_PASSWORD', ConfigController::get()->getSchedulerPassword());
     }
     /**
      * @test

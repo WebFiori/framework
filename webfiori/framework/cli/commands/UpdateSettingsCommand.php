@@ -122,7 +122,7 @@ class UpdateSettingsCommand extends CLICommand {
         } else {
             $newPass = hash('sha256', $newPass);
         }
-        ConfigController::get()->updateCronPassword($newPass);
+        ConfigController::get()->updateSchedulerPassword($newPass);
         $this->success('Password successfully updated.');
     }
     private function updateDescription() {

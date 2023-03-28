@@ -57,7 +57,7 @@ class TasksManager {
      * 
      * @since 1.0.4 
      */
-    private $activeJob;
+    private $activeTask;
     /**
      *
      * @var CLICommand 
@@ -136,8 +136,8 @@ class TasksManager {
      * 
      * @since 1.0.4
      */
-    public static function activeJob() {
-        return self::get()->activeJob;
+    public static function activeTask() {
+        return self::get()->activeTask;
     }
     /**
      * Creates new task using cron expression.
@@ -163,7 +163,7 @@ class TasksManager {
      * 
      * @since 1.0
      */
-    public static function createJob(string $when = '*/5 * * * *', string $taskName = '', callable $function = null, array $funcParams = []) : bool {
+    public static function createTask(string $when = '*/5 * * * *', string $taskName = '', callable $function = null, array $funcParams = []) : bool {
         try {
             $task = new BaseTask($when);
             
@@ -172,10 +172,10 @@ class TasksManager {
             }
 
             if (strlen($taskName) > 0) {
-                $task->setJobName($taskName);
+                $task->setTaskName($taskName);
             }
 
-            return self::scheduleJob($task);
+            return self::scheduleTask($task);
         } catch (Exception $ex) {
             return false;
         }
@@ -199,17 +199,17 @@ class TasksManager {
      * 
      * @since 1.0
      */
-    public static function dailyJob(string $time, string $name, callable $func, array $funcParams = []): bool {
+    public static function dailyTask(string $time, string $name, callable $func, array $funcParams = []): bool {
         $split = explode(':', $time);
 
         if (count($split) == 2 && is_callable($func)) {
             $task = new BaseTask();
-            $task->setJobName($name);
+            $task->setTaskName($name);
 
             if ($task->dailyAt($split[0], $split[1])) {
                 $task->setOnExecution($func, $funcParams);
 
-                return self::scheduleJob($task);
+                return self::scheduleTask($task);
             }
         }
 
@@ -291,7 +291,7 @@ class TasksManager {
      * 
      * @since 1.0.5
      */
-    public static function getJob(string $taskName) {
+    public static function getTask(string $taskName) {
         $trimmed = trim($taskName);
         $retVal = null;
 
@@ -301,13 +301,13 @@ class TasksManager {
             while ($task = &self::tasksQueue()->dequeue()) {
                 $tempQ->enqueue($task);
 
-                if ($task->getJobName() == $trimmed) {
+                if ($task->getTaskName() == $trimmed) {
                     $retVal = $task;
                 }
             }
 
             while ($task = &$tempQ->dequeue()) {
-                self::scheduleJob($task);
+                self::scheduleTask($task);
             }
         }
 
@@ -320,7 +320,7 @@ class TasksManager {
      * 
      * @since 1.0.9
      */
-    public static function getJobsNames() : array {
+    public static function getTasksNames() : array {
         return self::get()->tasksNamesArr;
     }
     /**
@@ -466,18 +466,18 @@ class TasksManager {
      * 
      * @since 1.0.3
      */
-    public static function monthlyJob(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool{
+    public static function monthlyTask(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool{
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
             if (count($split) == 2 && is_callable($func)) {
                 $task = new BaseTask();
-                $task->setJobName($name);
+                $task->setTaskName($name);
 
                 if ($task->everyMonthOn($dayNumber, $time)) {
                     $task->setOnExecution($func, $funcParams);
 
-                    return self::scheduleJob($task);
+                    return self::scheduleTask($task);
                 }
             }
         }
@@ -485,7 +485,7 @@ class TasksManager {
         return false;
     }
     /**
-     * Sets or gets the password that is used to protect jobs execution.
+     * Sets or gets the password that is used to protect tasks execution.
      * 
      * The password is used to prevent unauthorized access to execute tasks. 
      * The provided password must be 'sha256' hashed string. It is recommended 
@@ -512,11 +512,11 @@ class TasksManager {
      * Note that this method will register tasks only if the framework is running
      * using CLI or the constant 'SCHEDULER_THROUGH_HTTP' is set to true.
      */
-    public static function registerJobs() {
+    public static function registerTasks() {
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP === true)) {
             WebFioriApp::autoRegister('tasks', function (AbstractTask $task)
             {
-                TasksManager::scheduleJob($task);
+                TasksManager::scheduleTask($task);
             });
         }
     }
@@ -591,10 +591,10 @@ class TasksManager {
 
         if ($taskName !== null) {
             self::log("Forcing task '$taskName' to execute...");
-            $task = self::getJob(trim($taskName));
+            $task = self::getTask(trim($taskName));
 
             if ($task instanceof AbstractTask) {
-                self::runJobHelper($retVal, $task, $xForce, $command);
+                self::runTaskHelper($retVal, $task, $xForce, $command);
             } else {
                 self::log("Error: No task which has the name '$taskName' is found.");
                 self::log('Check finished.');
@@ -606,7 +606,7 @@ class TasksManager {
 
             while ($task = TasksManager::tasksQueue()->dequeue()) {
                 $tempQ->enqueue($task);
-                self::runJobHelper($retVal, $task, $xForce, $command);
+                self::runTaskHelper($retVal, $task, $xForce, $command);
             }
 
             while ($task = $tempQ->dequeue()) {
@@ -621,14 +621,14 @@ class TasksManager {
     /**
      * Adds new task to tasks queue.
      * 
-     * @param AbstractTask $task An instance of the class 'AbstractJob'.
+     * @param AbstractTask $task An instance of the class 'AbstractTask'.
      * 
      * @return bool If the task is added, the method will return true.
      * 
      * @since 1.0
      */
-    public static function scheduleJob(AbstractTask $task) : bool {
-        return self::get()->addJobHelper($task);
+    public static function scheduleTask(AbstractTask $task) : bool {
+        return self::get()->addTaskHelper($task);
     }
     /**
      * Sets the number of day in the month at which the scheduler started to 
@@ -775,17 +775,17 @@ class TasksManager {
      * 
      * @since 1.0
      */
-    public static function weeklyJob(string $time, string $name, callable $func, array $funcParams = []): bool {
+    public static function weeklyTask(string $time, string $name, callable $func, array $funcParams = []): bool {
         $split1 = explode('-', $time);
 
         if (count($split1) == 2) {
             $task = new BaseTask();
-            $task->setJobName($name);
+            $task->setTaskName($name);
 
             if ($task->weeklyOn($split1[0], $split1[1])) {
                 $task->setOnExecution($func, $funcParams);
 
-                return self::scheduleJob($task);
+                return self::scheduleTask($task);
             }
         }
 
@@ -797,17 +797,17 @@ class TasksManager {
      * @return bool
      * @since 1.0
      */
-    private function addJobHelper(AbstractTask $task): bool {
+    private function addTaskHelper(AbstractTask $task): bool {
         $retVal = false;
 
         if ($task instanceof AbstractTask) {
-            if ($task->getJobName() == 'Background Task') {
-                $task->setJobName('task-'.$this->tasksQueue()->size());
+            if ($task->getTaskName() == 'Background Task') {
+                $task->setTaskName('task-'.$this->tasksQueue()->size());
             }
             $retVal = $this->tasksQueue->enqueue($task);
 
-            if ($retVal === true && !in_array($task->getJobName(), $this->tasksNamesArr)) {
-                $this->tasksNamesArr[] = $task->getJobName();
+            if ($retVal === true && !in_array($task->getTaskName(), $this->tasksNamesArr)) {
+                $this->tasksNamesArr[] = $task->getTaskName();
             }
         }
 
@@ -838,10 +838,10 @@ class TasksManager {
     }
     private function logExecHelper($forced, $task, File $file) {
         if ($forced) {
-            $file->setRawData('Job \''.$task->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+            $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
 
         } else {
-            $file->setRawData('Job \''.$task->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+            $file->setRawData('Task \''.$task->getTaskName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
 
         }
         if ($task->isSuccess()) {
@@ -852,7 +852,7 @@ class TasksManager {
         $file->write();
     }
 
-    private function logJobExecution($task,$forced = false) {
+    private function logTaskExecution($task,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'tasks.log';
@@ -870,7 +870,7 @@ class TasksManager {
      * @param bool $xForce
      * @param CronCommand|null $command
      */
-    private static function runJobHelper(array &$retVal, AbstractTask $task, bool $xForce, CronCommand $command = null) {
+    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, CronCommand $command = null) {
         if ($task->isTime() || $xForce) {
             if ($command !== null) {
                 $task->setCommand($command);
@@ -886,31 +886,31 @@ class TasksManager {
                     }
                 }
             }
-            self::get()->setActiveJobHelper($task);
+            self::get()->setActiveTaskHelper($task);
         }
 
         if ($task->exec($xForce)) {
-            self::get()->logJobExecution($task,$xForce);
+            self::get()->logTaskExecution($task,$xForce);
             $retVal['executed-count']++;
 
             if ($task->isSuccess() === true) {
-                $retVal['successfully-completed'][] = $task->getJobName();
+                $retVal['successfully-completed'][] = $task->getTaskName();
             } else if ($task->isSuccess() === false) {
-                $retVal['failed'][] = $task->getJobName();
+                $retVal['failed'][] = $task->getTaskName();
             }
         }
-        self::get()->setActiveJobHelper();
+        self::get()->setActiveTaskHelper();
     }
     /**
      * 
      * @param AbstractTask|null $task
      * @since 1.0.4
      */
-    private function setActiveJobHelper(AbstractTask $task = null) {
-        $this->activeJob = $task;
+    private function setActiveTaskHelper(AbstractTask $task = null) {
+        $this->activeTask = $task;
 
         if ($task !== null) {
-            self::log('Active task: "'.$task->getJobName().'" ...');
+            self::log('Active task: "'.$task->getTaskName().'" ...');
         }
     }
     private function setLogEnabledHelper(bool $bool) {

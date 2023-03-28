@@ -48,9 +48,9 @@ class TaskStatusEmail extends EmailMessage {
      */
     public function __construct($sendAccName, array $receivers = []) {
         parent::__construct($sendAccName);
-        $activeJob = TasksManager::activeJob();
+        $activeTask = TasksManager::activeTask();
 
-        if ($activeJob !== null) {
+        if ($activeTask !== null) {
             if (gettype($receivers) == 'array' && count($receivers) != 0) {
                 foreach ($receivers as $addr => $name) {
                     $this->addReceiver($name, $addr);
@@ -70,16 +70,16 @@ class TaskStatusEmail extends EmailMessage {
                 'text-align' => 'justify'
             ]);
 
-            if ($activeJob->isSuccess()) {
-                $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😃');
+            if ($activeTask->isSuccess()) {
+                $this->setSubject('Background Task Status: Task \''.$activeTask->getTaskName().'\' 😃');
                 $text = 'This automatic system email is sent to notify you that the background task '
-                        .'\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
+                        .'\''.$activeTask->getTaskName().'\' was <b style="color:green">successfully completed '
                         .'without any issues</b>. For more details about execution process, '
                         .'please check the attached execution log file.</p>';
             } else {
-                $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😲');
+                $this->setSubject('Background Task Status: Task \''.$activeTask->getTaskName().'\' 😲');
                 $text = 'This automatic email is sent to notify you that the background task '
-                        .'\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
+                        .'\''.$activeTask->getTaskName().'\' <b style="color:red">did not successfully complet due some error(s)'
                         .'</b>. To investigate the cause of failure, '
                         .'please check the attached execution log file. It may lead you to '
                         .'the cause of the issue.';
@@ -87,13 +87,13 @@ class TaskStatusEmail extends EmailMessage {
             $paragraph->addTextNode($text, false);
             $this->insert($paragraph);
             $this->insert('p')->text('Technical Info:');
-            $this->insert($this->createJobInfoTable($activeJob));
+            $this->insert($this->createTaskInfoTable($activeTask));
             $logTxt = '';
 
             foreach (TasksManager::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
-            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
+            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
             $file->create(true);
             $file->write();
@@ -105,13 +105,13 @@ class TaskStatusEmail extends EmailMessage {
      * @param AbstractTask $task
      * @return HTMLNode
      */
-    private function createJobInfoTable(AbstractTask $task): HTMLNode {
+    private function createTaskInfoTable(AbstractTask $task): HTMLNode {
         $taskTable = new HTMLNode('table');
         $taskTable->setStyle([
             'border-collapse' => 'collapse'
         ]);
         $taskTable->setAttribute('border', 1);
-        $taskTable->addChild($this->createTableRow('Job Name:', $task->getJobName()));
+        $taskTable->addChild($this->createTableRow('Task Name:', $task->getTaskName()));
         $taskTable->addChild($this->createTableRow('Expression:', $task->getExpression()));
         $taskTable->addChild($this->createTableRow('Check Started:', TasksManager::timestamp()));
         $taskTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));

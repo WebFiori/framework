@@ -12,27 +12,28 @@ namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\file\File;
 /**
- * A view to display information about CRON Jobs.
- * The view will show a table of all scheduled cron jobs. The table will include 
- * the following information about each job:
+ * A view to display information about scheduled tasks.
+ * 
+ * The view will show a table of all scheduled tasks. The table will include 
+ * the following information about each task:
  * <ul>
- * <li>The name of the job.</li>
+ * <li>The name of the task.</li>
  * <li>Its cron expression.</li>
  * <li>
- * 5 columns that shows if it is time to execute the job or not 
+ * 5 columns that shows if it is time to execute the task or not 
  * (Yes, No). The columns are:
  * <ul>
- * <li>Is Minute: Is it current minute in the hour to run the job.</li>
- * <li>Is Hour: Is it current hour in the day to run the job.</li>
- * <li>Is Day of Month: Is it the date in month to run the job.</li>
- * <li>Is month: Is it current month in year to run the job.</li>
- * <li>Is day of week: Is it current day of week to run the job.</li>
+ * <li>Is Minute: Is it current minute in the hour to run the task.</li>
+ * <li>Is Hour: Is it current hour in the day to run the task.</li>
+ * <li>Is Day of Month: Is it the date in month to run the task.</li>
+ * <li>Is month: Is it current month in year to run the task.</li>
+ * <li>Is day of week: Is it current day of week to run the task.</li>
  * </ul>
  * </li>
  * </ul>
- * In addition to that, the view contains controls to make the page refresh 
- * every one minute. Also, there is a section that shows execution logs 
- * of cron jobs.
+ * Also, there is a section that shows execution logs 
+ * of tasks.
+ * 
  * @version 1.0
  */
 class ListTasksPage extends BaseTasksPage {
@@ -40,14 +41,14 @@ class ListTasksPage extends BaseTasksPage {
      * Creates new instance of the view.
      */
     public function __construct() {
-        parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
+        parent::__construct('Scheduled Tasks', 'A list of scheduled tasks.');
 
         $searchRow = $this->insert('v-row');
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
                 ])
                 ->addChild('v-text-field', [
-                    'label' => 'Search for a specific job...',
+                    'label' => 'Search for a specific task...',
                     'v-model' => 'search',
                     'dense', 'outlined'
                 ]);
@@ -62,8 +63,8 @@ class ListTasksPage extends BaseTasksPage {
         $card = $logRow->addChild('v-col', [
             'cols' => 12
         ])->addChild('v-card');
-        $card->addChild('v-card-title')->text('Jobs Execution Log');
-        $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron.log');
+        $card->addChild('v-card-title')->text('tasks Execution Log');
+        $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'tasks.log');
 
         if ($file->isExist()) {
             $file->read();

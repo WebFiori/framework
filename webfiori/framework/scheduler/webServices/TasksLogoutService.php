@@ -13,7 +13,7 @@ namespace webfiori\framework\scheduler\webServices;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 /**
- * A service which is used to log out user in CRON web interface.
+ * A service which is used to log out user in scheduler web interface.
  *
  * @author Ibrahim
  */
@@ -27,7 +27,7 @@ class TasksLogoutService extends AbstractWebService {
     }
 
     public function processRequest() {
-        SessionsManager::start('cron-session');
+        SessionsManager::start('scheduler-session');
         SessionsManager::destroy();
         $this->sendResponse('Logged out.', 'info');
     }

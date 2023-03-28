@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\scheduler\webServices;
 
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
 /**
- * An API which is used to authenticate users to access CRON web interface.
+ * An API which is used to authenticate users to access scheduler web interface.
  *
  * @author Ibrahim
  * 
@@ -32,14 +32,14 @@ class TasksLoginService extends AbstractWebService {
     }
 
     public function processRequest() {
-        $cronPass = TasksManager::password();
+        $schedulerPass = TasksManager::password();
 
-        if ($cronPass != 'NO_PASSWORD') {
+        if ($schedulerPass != 'NO_PASSWORD') {
             $inputHash = hash('sha256', $this->getInputs()['password']);
 
-            if ($inputHash == $cronPass) {
-                SessionsManager::start('cron-session');
-                SessionsManager::set('cron-login-status', true);
+            if ($inputHash == $schedulerPass) {
+                SessionsManager::start('scheduler-session');
+                SessionsManager::set('scheduler-login-status', true);
                 $this->sendResponse('Success', 'info');
             } else {
                 $this->sendResponse('Incorrect password', 'error', 404);

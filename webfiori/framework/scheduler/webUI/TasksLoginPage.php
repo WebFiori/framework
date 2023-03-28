@@ -21,10 +21,10 @@ use webfiori\http\Response;
  */
 class TasksLoginPage extends BaseTasksPage {
     public function __construct() {
-        parent::__construct('CRON Web Interface Login', 'Login to CRON Control panel.');
+        parent::__construct('Tasks Scheduler Web Interface Login', 'Login to Scheduler Control panel.');
 
-        if (SessionsManager::get('cron-login-status')) {
-            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
+        if (SessionsManager::get('scheduler-login-status')) {
+            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/tasks');
             Response::send();
         }
         $row = $this->insert('v-row');
@@ -42,7 +42,7 @@ class TasksLoginPage extends BaseTasksPage {
             ->addChild('v-text-field', [
                 'type' => 'password',
                 'v-model' => 'password',
-                'label' => 'Enter CRON password here.',
+                'label' => 'Enter scheduler password here.',
                 ':loading' => 'loading',
                 '@keydown' => 'checkIfEnterHit'
             ]);

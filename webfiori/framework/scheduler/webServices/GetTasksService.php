@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\scheduler\webServices;
 
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 use webfiori\json\Json;
 /**
- * A web service which is used to fetch a list of all scheduled jobs.
+ * A web service which is used to fetch a list of all scheduled tasks.
  *
  * @author Ibrahim
  * 
@@ -23,19 +23,19 @@ use webfiori\json\Json;
  */
 class GetTasksService extends AbstractWebService {
     public function __construct() {
-        parent::__construct('get-jobs');
+        parent::__construct('get-tasks');
         $this->addRequestMethod('get');
     }
     public function isAuthorized() {
-        SessionsManager::start('cron-session');
+        SessionsManager::start('scheduler-session');
 
-        return SessionsManager::get('cron-login-status') === true
+        return SessionsManager::get('scheduler-login-status') === true
                 || TasksManager::password() == 'NO_PASSWORD';
     }
 
     public function processRequest() {
         $json = new Json([
-            'jobs' => TasksManager::jobsQueue()->toArray()
+            'tasks' => TasksManager::tasksQueue()->toArray()
         ]);
         $this->send('application/json', $json);
     }

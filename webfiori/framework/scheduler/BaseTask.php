@@ -15,9 +15,9 @@ use Exception;
 /**
  * A class which provide basic implementation for scheduling tasks.
  * 
- * This class used to provide basic implementation for the class 'AbstractJob'. 
+ * This class used to provide basic implementation for the class 'AbstractTask'. 
  * It is recommended to not use this class in creating custom tasks. The recommended 
- * option is to extend the class 'AbstractJob'. 
+ * option is to extend the class 'AbstractTask'. 
  * @author Ibrahim
  * @version 1.0.9
  */

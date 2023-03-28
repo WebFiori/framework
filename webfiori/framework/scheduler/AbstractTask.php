@@ -170,7 +170,7 @@ abstract class AbstractTask implements JsonI {
     public function __construct(string $taskName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
         $this->taskDesc = '';
         $this->taskName = ''; 
-        $this->setJobName($taskName);
+        $this->setTaskName($taskName);
         $this->setDescription($description);
         $this->customAttrs = [];
         $this->isSuccess = false;
@@ -202,7 +202,7 @@ abstract class AbstractTask implements JsonI {
      * </ul>
      * 
      * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an 
-     * object of type JobArgument.
+     * object of type TaskArgument.
      * 
      * @since 1.0
      */
@@ -473,7 +473,7 @@ abstract class AbstractTask implements JsonI {
     /**
      * Returns an array that holds execution arguments of the task.
      * 
-     * @return array An array that holds objects of type 'JobArgument'.
+     * @return array An array that holds objects of type 'TaskArgument'.
      * 
      * @since 1.0.2
      */
@@ -540,10 +540,10 @@ abstract class AbstractTask implements JsonI {
     /**
      * Returns task description.
      * 
-     * Job description is a string which is used to describe what does the task 
+     * Task description is a string which is used to describe what does the task 
      * do.
      * 
-     * @return string Job description. Default return value is 'NO DESCRIPTION'.
+     * @return string Task description. Default return value is 'NO DESCRIPTION'.
      * 
      * @since 1.0.2
      */
@@ -595,7 +595,7 @@ abstract class AbstractTask implements JsonI {
      * 
      * @since 1.0
      */
-    public function getJobDetails() : array {
+    public function getTaskDetails() : array {
         return $this->taskDetails;
     }
     /**
@@ -610,7 +610,7 @@ abstract class AbstractTask implements JsonI {
      * 
      * @since 1.0
      */
-    public function getJobName() : string {
+    public function getTaskName() : string {
         return $this->taskName;
     }
     /**
@@ -836,7 +836,7 @@ abstract class AbstractTask implements JsonI {
      * Returns true if the task was executed successfully.
      * 
      * The value returned by this method will depend on the return value
-     * of the value which is returned by the method AbstractJob::execute(). 
+     * of the value which is returned by the method AbstractTask::execute(). 
      * If the method returned null or true, then it means the task 
      * was successfully executed. If it returns false, this means the task did 
      * not execute successfully. If it throws an exception, then the task is 
@@ -865,7 +865,7 @@ abstract class AbstractTask implements JsonI {
      * Run some routines if the task is executed and failed to completed successfully.
      * 
      * The status of failure or success depends on the implementation of the method 
-     * AbstractJob::execute().
+     * AbstractTask::execute().
      * The developer can implement this method to take actions after the 
      * task is executed and failed to complete.
      * It is optional to implement that method. The developer can 
@@ -919,7 +919,7 @@ abstract class AbstractTask implements JsonI {
      * Run some routines if the task is executed and completed successfully.
      * 
      * The status of failure or success depends on the implementation of the method 
-     * AbstractJob::execute().
+     * AbstractTask::execute().
      * The developer can implement this method to perform actions after the 
      * task is executed and failed to complete.
      * It is optional to implement that method. The developer can 
@@ -941,9 +941,9 @@ abstract class AbstractTask implements JsonI {
     /**
      * Sets task description.
      * 
-     * Job description is a string which is used to describe what does the task do.
+     * Task description is a string which is used to describe what does the task do.
      * 
-     * @param string $desc Job description.
+     * @param string $desc Task description.
      * 
      * @return bool If the description is set, the method will return true. Other than
      * that, the method will return false.
@@ -980,7 +980,7 @@ abstract class AbstractTask implements JsonI {
      * 
      * @since 1.0
      */
-    public function setJobName(string $name) : bool {
+    public function setTaskName(string $name) : bool {
         if (!self::isNameValid($name)) {
             return false;
         }
@@ -988,18 +988,18 @@ abstract class AbstractTask implements JsonI {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
-            $tempJobsQueue = new Queue();
+            $tempTasksQueue = new Queue();
             $nameTaken = false;
 
             while ($task = Cron::tasksQueue()->dequeue()) {
-                if ($task->getJobName() == $trimmed) {
+                if ($task->getTaskName() == $trimmed) {
                     $nameTaken = true;
                 }
-                $tempJobsQueue->enqueue($task);
+                $tempTasksQueue->enqueue($task);
             }
 
-            while ($task = $tempJobsQueue->dequeue()) {
-                Cron::scheduleJob($task);
+            while ($task = $tempTasksQueue->dequeue()) {
+                Cron::scheduleTask($task);
             }
 
             if (!$nameTaken) {
@@ -1013,7 +1013,7 @@ abstract class AbstractTask implements JsonI {
     }
     public function toJSON() : Json {
         $json = new Json([
-            'name' => $this->getJobName(),
+            'name' => $this->getTaskName(),
             'expression' => $this->getExpression(),
             'args' => $this->getArguments(),
             'description' => $this->getDescription(),
@@ -1071,7 +1071,7 @@ abstract class AbstractTask implements JsonI {
     /**
      * Calls one of the abstract methods of the class.
      * 
-     * This method is only used by the method AbstractJob::exec().
+     * This method is only used by the method AbstractTask::exec().
      * 
      * @param string $fName The name of the method.
      * 

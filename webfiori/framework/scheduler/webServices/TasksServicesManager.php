@@ -12,7 +12,7 @@ namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\http\WebServicesManager;
 /**
- * A class which is used to manage CRON jobs related services.
+ * A class which is used to manage scheduled tasks related services.
  *
  * @author Ibrahim
  */

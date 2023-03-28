@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\scheduler\webUI;
 
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
@@ -20,10 +20,10 @@ use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 /**
- * A generic view for cron related operations. 
+ * A generic view for scheduler related operations. 
  * 
- * It can be extended to create a view which is used to 
- * perform some operations on cron jobs.
+ * It can be extended to create a page which is used to 
+ * perform some operations on scheduled tasks.
  *
  * @author Ibrahim
  */
@@ -35,17 +35,17 @@ class BaseTasksPage extends WebPage {
             'title' => $title,
             'base' => $this->getBase()
         ]);
-        $loginPageTitle = 'CRON Web Interface Login';
-        SessionsManager::start('cron-session');
+        $loginPageTitle = 'Tasks Scheduler Login';
+        SessionsManager::start('scheduler-session');
 
         if (TasksManager::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
-                && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {
-            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/login');
+                && SessionsManager::getActiveSession()->get('scheduler-login-status') !== true) {
+            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/login');
             Response::send();
         } else {
             if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
-                Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
+                Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/tasks');
                 Response::send();
             }
         }
@@ -145,7 +145,7 @@ class BaseTasksPage extends WebPage {
             'color' => "primary",
             'text',
             '@click' => "output_dialog.show = true"
-        ])->text('View Job Output');
+        ])->text('View Output');
         $this->insert($dialog);
     }
     /**
@@ -185,7 +185,7 @@ class BaseTasksPage extends WebPage {
         {
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/cron.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/scheduler.js',
             ]);
         });
     }
@@ -197,7 +197,7 @@ class BaseTasksPage extends WebPage {
             'scrollable'
         ]);
         $card = $dialog->addChild('v-card');
-        $card->addChild('v-card-title')->text('Job Execution Output');
+        $card->addChild('v-card-title')->text('task Execution Output');
         $card->addChild('v-divider');
         $card->addChild('v-card-text', [
             'style' => [

@@ -14,11 +14,11 @@ use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 
 /**
- * A table which is used to list all scheduled background job.
+ * A table which is used to list all scheduled background tasks.
  * 
  * This UI component is used by the page which is used to list all
- * cron jobs. The table has job information including arguments,
- * description and the ability to force execute a job.
+ * scheduled tasks. The table has task information including arguments,
+ * description and the ability to force execute it.
  *
  * @author Ibrahim
  */
@@ -28,9 +28,9 @@ class TasksTable extends HTMLNode {
      */
     public function __construct() {
         parent::__construct('v-data-table', [
-            ':items' => 'jobs',
+            ':items' => 'tasks',
             ':loading' => 'loading',
-            ':headers' => 'jobs_table_headers',
+            ':headers' => 'tasks_table_headers',
             'show-expand', 'single-expand',
             ':expanded.sync' => "expanded",
             'item-key' => "name",
@@ -94,7 +94,7 @@ class TasksTable extends HTMLNode {
         $card = $tableRow->addChild('v-col', [
             'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('div');
-        $card->addChild('h3')->text('Job Arguments');
+        $card->addChild('h3')->text('task Arguments');
 
         $textField = $card->addChild('div', [
             'v-if' => 'item.args.length !== 0'

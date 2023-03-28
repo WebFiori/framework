@@ -8,13 +8,13 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\scheduler;
 
 use InvalidArgumentException;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**
- * A class that represents execution argument of a job.
+ * A class that represents execution argument of a task.
  *
  * @author Ibrahim
  * 
@@ -22,7 +22,7 @@ use webfiori\json\JsonI;
  * 
  * @since 2.3.1
  */
-class JobArgument implements JsonI {
+class TaskArgument implements JsonI {
     /**
      * 
      * @var string
@@ -46,7 +46,7 @@ class JobArgument implements JsonI {
      * if it contains one of the following characters: '=', '&', '#' and '?'.
      * 
      * @param string $desc A string that describes how the argument will affect 
-     * job execution. It must be non-empty string in order to be set.
+     * task execution. It must be non-empty string in order to be set.
      * 
      * @since 1.0
      */
@@ -72,7 +72,7 @@ class JobArgument implements JsonI {
     /**
      * Returns argument description.
      * 
-     * @return string A string that describes how the argument will affect job 
+     * @return string A string that describes how the argument will affect task 
      * execution. Default return value is 'NO DESCRIPTION'.
      *  
      * @since 1.0
@@ -91,7 +91,7 @@ class JobArgument implements JsonI {
         return $this->argName;
     }
     /**
-     * Returns the value of job argument.
+     * Returns the value of task argument.
      * 
      * 
      * @return string|null If the value of the argument is set, it will be returned 
@@ -119,7 +119,7 @@ class JobArgument implements JsonI {
      * Sets a description for the argument.
      * 
      * @param string $desc A string that describes how the argument will affect 
-     * job execution. It must be non-empty string in order to be set.
+     * task execution. It must be non-empty string in order to be set.
      * 
      * @return boolean If the description is set, the method will return true. 
      * false if not set.
@@ -148,7 +148,7 @@ class JobArgument implements JsonI {
     public function setName(string $name) {
         $nTrim = trim($name);
 
-        if (!AbstractJob::isNameValid($nTrim)) {
+        if (!AbstractTask::isNameValid($nTrim)) {
             if (strlen($nTrim) == 0) {
                 throw new InvalidArgumentException('Invalid argument name: <empty string>');
             } else {

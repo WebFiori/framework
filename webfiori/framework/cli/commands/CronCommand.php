@@ -12,8 +12,8 @@ namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
 use webfiori\cli\CommandArgument;
-use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\AbstractTask;
+use webfiori\framework\cron\TasksManager;
 /**
  * A CLI command which is related to executing 
  * background jobs or performing operations on them.
@@ -48,7 +48,7 @@ class CronCommand extends CLICommand {
             new CommandArgument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
         ], 'Run CRON Scheduler.');
 
-        if (Cron::password() != 'NO_PASSWORD') {
+        if (TasksManager::password() != 'NO_PASSWORD') {
             $this->addArg('p', [
                 'optional' => false,
                 'description' => 'CRON password.'
@@ -71,7 +71,7 @@ class CronCommand extends CLICommand {
             $pass = $this->getArgValue('p');
 
             if ($pass !== null) {
-                $result = Cron::run($pass, null, false, $this);
+                $result = TasksManager::run($pass, null, false, $this);
 
                 if ($result == 'INV_PASS') {
                     $this->error("Provided password is incorrect");
@@ -94,7 +94,7 @@ class CronCommand extends CLICommand {
         return $retVal;
     }
     public function listJobs() {
-        $jobs = Cron::jobsQueue();
+        $jobs = TasksManager::jobsQueue();
         $i = 1;
         $this->println("Number Of Jobs: ".$jobs->size());
 
@@ -110,7 +110,7 @@ class CronCommand extends CLICommand {
         }
     }
     private function checkJobArgs($jobName) {
-        $job = Cron::getJob($jobName);
+        $job = TasksManager::getJob($jobName);
         $args = $job->getExecArgsNames();
 
         if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {
@@ -121,7 +121,7 @@ class CronCommand extends CLICommand {
         $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p').'';
         $retVal = -1;
-        $jobsNamesArr = Cron::getJobsNames();
+        $jobsNamesArr = TasksManager::getJobsNames();
         $jobsNamesArr[] = 'Cancel';
 
         if ($jobName === null) {
@@ -132,7 +132,7 @@ class CronCommand extends CLICommand {
             $retVal = 0;
         } else {
             $this->checkJobArgs($jobName);
-            $result = Cron::run($cPass,$jobName.'',true, $this);
+            $result = TasksManager::run($cPass,$jobName.'',true, $this);
 
             if ($result == 'INV_PASS') {
                 $this->error("Provided password is incorrect.");
@@ -170,7 +170,7 @@ class CronCommand extends CLICommand {
             }
         }
     }
-    private function setArgs($argsArr, AbstractJob $job) {
+    private function setArgs($argsArr, AbstractTask $job) {
         $setArg = true;
         $index = 0;
         $count = count($argsArr);
@@ -192,9 +192,9 @@ class CronCommand extends CLICommand {
         $jobName = $this->getArgValue('--job-name');
 
         if ($jobName === null) {
-            $jobName = $this->select('Select one of the scheduled jobs to show supported args:', Cron::getJobsNames());
+            $jobName = $this->select('Select one of the scheduled jobs to show supported args:', TasksManager::getJobsNames());
         } 
-        $job = Cron::getJob($jobName);
+        $job = TasksManager::getJob($jobName);
 
         $this->println("Job Args:");
         $customArgs = $job->getArguments();

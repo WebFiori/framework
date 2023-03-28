@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webUI;
+namespace webfiori\framework\scheduler\webUI;
 
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
@@ -27,7 +27,7 @@ use webfiori\ui\JsCode;
  *
  * @author Ibrahim
  */
-class CronView extends WebPage {
+class BaseTasksPage extends WebPage {
     private $jsonData;
     public function __construct($title, $description = '') {
         parent::__construct();
@@ -38,13 +38,13 @@ class CronView extends WebPage {
         $loginPageTitle = 'CRON Web Interface Login';
         SessionsManager::start('cron-session');
 
-        if (Cron::password() != 'NO_PASSWORD' 
+        if (TasksManager::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
                 && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {
             Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/login');
             Response::send();
         } else {
-            if ($title == $loginPageTitle && Cron::password() == 'NO_PASSWORD') {
+            if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
                 Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
                 Response::send();
             }
@@ -66,7 +66,7 @@ class CronView extends WebPage {
             'cols' => 12
         ])->addChild('h1')->text($title);
 
-        if (Cron::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
+        if (TasksManager::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
             $row = $this->insert('v-row');
             $row->addChild('v-col', [
                 'cols' => 12
@@ -78,7 +78,7 @@ class CronView extends WebPage {
         }
         $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
         $this->createOutputDialog();
-        $this->addBeforeRender(function (CronView $view)
+        $this->addBeforeRender(function (BaseTasksPage $view)
         {
             $code = new JsCode();
             $code->addCode('window.data = '.$view->getJson().';');

@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\Cron;
-use webfiori\framework\cron\CronEmail;
-use webfiori\framework\cron\CronJob;
-use webfiori\framework\cron\JobArgument;
+use webfiori\framework\cron\AbstractTask;
+use webfiori\framework\cron\TasksManager;
+use webfiori\framework\cron\TaskStatusEmail;
+use webfiori\framework\cron\BaseTask;
+use webfiori\framework\cron\TaskArgument;
 /**
  * A class which is used to write cron jobs classes.
  *
@@ -35,7 +35,7 @@ class CronJobClassWriter extends ClassWriter {
      */
     public function __construct($jobName = '', $jobDesc = '', array $argsArr = []) {
         parent::__construct('NewJob', ROOT_PATH.DS.APP_DIR.DS.'jobs', APP_DIR.'\\jobs');
-        $this->job = new CronJob();
+        $this->job = new BaseTask();
 
         if (!$this->setJobName($jobName)) {
             $this->setJobName('New Job');
@@ -50,26 +50,26 @@ class CronJobClassWriter extends ClassWriter {
         }
         $this->setSuffix('Job');
         $this->addUseStatement([
-            AbstractJob::class,
-            CronEmail::class,
-            Cron::class,
+            AbstractTask::class,
+            TaskStatusEmail::class,
+            TasksManager::class,
         ]);
     }
     /**
      * Adds new execution argument to the job.
      * 
-     * @param JobArgument $arg An object which holds argument information.
+     * @param TaskArgument $arg An object which holds argument information.
      */
-    public function addArgument(JobArgument $arg) {
+    public function addArgument(TaskArgument $arg) {
         $this->getJob()->addExecutionArg($arg);
     }
     /**
      * Returns the object which holds the basic information of the job that will
      * be created.
      * 
-     * @return CronJob
+     * @return BaseTask
      */
-    public function getJob() : CronJob {
+    public function getJob() : BaseTask {
         return $this->job;
     }
     /**

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\scheduler;
 
 use Exception;
 use Throwable;
@@ -20,14 +20,16 @@ use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**
- * An abstract class that contains basic functionality for implementing cron 
- * jobs.
+ * An abstract class that contains basic functionality for implementing background 
+ * tasks.
+ * 
+ * This class uses an implementation which is similar to cron for scheduling tasks.
  *
  * @author Ibrahim
  * 
  * @version 1.0.3
  */
-abstract class AbstractJob implements JsonI {
+abstract class AbstractTask implements JsonI {
     /**
      * A constant that indicates a sub cron expression is of type 'multi-value'.
      * 
@@ -78,7 +80,7 @@ abstract class AbstractJob implements JsonI {
         'SAT' => 6,'SUN' => 0,'MON' => 1,'TUE' => 2,'WED' => 3,'THU' => 4,'FRI' => 5
     ];
     /**
-     * The command which is used to execute the job.
+     * The command which is used to execute the task.
      * 
      * @var CronCommand
      * 
@@ -95,7 +97,7 @@ abstract class AbstractJob implements JsonI {
     private $cronExpr;
     /**
      * An array that contains custom attributes which can be provided on 
-     * job execution.
+     * task execution.
      * 
      * @var array 
      * 
@@ -103,48 +105,48 @@ abstract class AbstractJob implements JsonI {
      */
     private $customAttrs;
     /**
-     * A boolean which is set to true if the job is forced to execute.
+     * A boolean which is set to true if the task is forced to execute.
      * 
-     * @var boolean 
+     * @var bool
      * 
      * @since 1.0
      */
     private $isForced;
     /**
-     * A boolean which is set to true if the job was 
+     * A boolean which is set to true if the task was 
      * successfully executed.
      * 
-     * @var boolean 
+     * @var bool
      * 
      * @since 1.0
      */
     private $isSuccess;
     /**
-     * A string that describes what does the job do.
+     * A string that describes what does the task do.
      * 
      * @var string
      */
-    private $jobDesc;
+    private $taskDesc;
     /**
-     * An array which contains all job details after parsing cron expression.
+     * An array which contains all task details after parsing cron expression.
      * 
      * @var array 
      * 
      * @since 1.0
      */
-    private $jobDetails;
+    private $taskDetails;
     /**
-     * A name for the cron job.
+     * A name for the task.
      * 
      * @var string
      * 
      * @since 1.0 
      */
-    private $jobName;
+    private $taskName;
     /**
      * Creates new instance of the class.
      * 
-     * @param string $jobName The name of the job.
+     * @param string $taskName The name of the task.
      * 
      * @param string $when A cron expression. An exception will be thrown if 
      * the given expression is invalid. 
@@ -156,29 +158,29 @@ abstract class AbstractJob implements JsonI {
      * <li>Fourth part is month (1-12)</li>
      * <li>Last part is day of the week (0-6)</li>
      * </ul>
-     * Default is '* * * * *' which means run the job every minute.
+     * Default is '* * * * *' which means run the task every minute.
      * 
-     * @param string $description A description for the job. Shown in CRON
+     * @param string $description A description for the task. Shown in CRON
      * web interface or CLI.
      * 
      * @throws Exception
      * 
      * @since 1.0
      */
-    public function __construct(string $jobName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
-        $this->jobDesc = '';
-        $this->jobName = ''; 
-        $this->setJobName($jobName);
+    public function __construct(string $taskName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
+        $this->taskDesc = '';
+        $this->taskName = ''; 
+        $this->setJobName($taskName);
         $this->setDescription($description);
         $this->customAttrs = [];
         $this->isSuccess = false;
 
-        $this->jobDetails = [];
-        $this->jobDetails['minutes'] = [];
-        $this->jobDetails['hours'] = [];
-        $this->jobDetails['days-of-month'] = [];
-        $this->jobDetails['months'] = [];
-        $this->jobDetails['days-of-week'] = [];
+        $this->taskDetails = [];
+        $this->taskDetails['minutes'] = [];
+        $this->taskDetails['hours'] = [];
+        $this->taskDetails['days-of-month'] = [];
+        $this->taskDetails['months'] = [];
+        $this->taskDetails['days-of-week'] = [];
 
 
         if (!$this->cron($when)) {
@@ -190,8 +192,8 @@ abstract class AbstractJob implements JsonI {
      * Adds new execution argument.
      * 
      * An execution argument is an argument that can be supplied to the 
-     * job in case of force execute. They will appear in cron control panel.
-     * They also can be provided to the job when executing it 
+     * task in case of force execute. They will appear in tasks management control panel.
+     * They also can be provided to the task when executing it 
      * throw CLI as 'arg-name="argVal".
      * The argument name must follow the following rules:
      * <ul>
@@ -199,15 +201,15 @@ abstract class AbstractJob implements JsonI {
      * <li>Must not contain '#', '?', '&', '=' or space.</li>
      * </ul>
      * 
-     * @param string|JobArgument $nameOrObj The name of the argument. This also can be an 
+     * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an 
      * object of type JobArgument.
      * 
      * @since 1.0
      */
     public function addExecutionArg($nameOrObj) {
         if (gettype($nameOrObj) == 'string') {
-            $arg = new JobArgument($nameOrObj);
-        } else if ($nameOrObj instanceof JobArgument) {
+            $arg = new TaskArgument($nameOrObj);
+        } else if ($nameOrObj instanceof TaskArgument) {
             $arg = $nameOrObj;
         } else {
             return;
@@ -229,7 +231,7 @@ abstract class AbstractJob implements JsonI {
     public function addExecutionArgs(array $argsArr) {
         foreach ($argsArr as $argName => $argParamsOrName) {
             if (gettype($argName) != 'integer') {
-                $argObj = new JobArgument($argName);
+                $argObj = new TaskArgument($argName);
 
                 if (isset($argParamsOrName['description'])) {
                     $argObj->setDescription($argParamsOrName['description']);
@@ -245,10 +247,10 @@ abstract class AbstractJob implements JsonI {
         }
     }
     /**
-     * Run some routines after the job is executed.
+     * Run some routines after the task is executed.
      * 
      * The developer can implement this method to perform some actions after the 
-     * job is executed. Note that the method will get executed if the job is failed 
+     * task is executed. Note that the method will get executed if the task is failed 
      * or successfully completed. It is optional to implement that method. The developer can 
      * leave the body of the method empty.
      * 
@@ -256,7 +258,7 @@ abstract class AbstractJob implements JsonI {
      */
     public abstract function afterExec();
     /**
-     * Schedules a job using specific cron expression.
+     * Schedules a task using specific cron expression.
      * 
      * For more information on cron expressions, go to 
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
@@ -269,10 +271,10 @@ abstract class AbstractJob implements JsonI {
      * </ul>
      * 
      * @param string $when A cron expression (such as '8 15 * * 1'). Default 
-     * is '* * * * *' which means run the job every minute.
+     * is '* * * * *' which means run the task every minute.
      * 
      * @return bool If the given cron expression is valid, the method will 
-     * set the time of cron job as specified by the expression and return 
+     * set the time of task as specified by the expression and return 
      * true. If the expression is invalid, the method will return false.
      * 
      * @since 1.0
@@ -295,7 +297,7 @@ abstract class AbstractJob implements JsonI {
                $daysOfMonthValidity === false ||
                $monthValidity === false || 
                $daysOfWeekValidity === false)) {
-                $this->jobDetails = [
+                $this->taskDetails = [
                     'minutes' => $minutesValidity,
                     'hours' => $hoursValidity,
                     'days-of-month' => $daysOfMonthValidity,
@@ -310,11 +312,11 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Schedules a cron job to run daily at specific hour and minute.
+     * Schedules a task to run daily at specific hour and minute.
      * 
-     * The job will be executed every day at the given hour and minute. The 
+     * The task will be executed every day at the given hour and minute. The 
      * function uses 24 hours mode. If no parameters are given, 
-     * The default time is 00:00 which means that the job will be executed 
+     * The default time is 00:00 which means that the task will be executed 
      * daily at midnight.
      * 
      * @param int $hour A number between 0 and 23 inclusive. 0 Means daily at 
@@ -322,7 +324,7 @@ abstract class AbstractJob implements JsonI {
      * @param int $minute A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
      * 
-     * @return bool If job time is set, the method will return true. If 
+     * @return bool If task time is set, the method will return true. If 
      * not set, the method will return false. It will not set only if the 
      * given time is not correct.
      * 
@@ -336,9 +338,9 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Schedules a cron job to run every hour.
+     * Schedules a task to run every hour.
      * 
-     * The job will run at the start of the hour.
+     * The task will run at the start of the hour.
      * 
      * @since 1.0.2
      */
@@ -346,14 +348,14 @@ abstract class AbstractJob implements JsonI {
         $this->cron('0 * * * *');
     }
     /**
-     * Schedules a cron job to run every month on specific day and time.
+     * Schedules a task to run every month on specific day and time.
      * 
      * @param int $dayNum The number of the day. It can be any value between 
      * 1 and 31 inclusive.
      * 
      * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
      * 
-     * @return bool If the time for the cron job is set, the method will 
+     * @return bool If the time for the task is set, the method will 
      * return true. If not, it will return false.
      * 
      * @since 1.0.1
@@ -375,19 +377,19 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Execute the event which should run when it is time to execute the job. 
+     * Execute the event which should run when it is time to execute the task. 
      * 
-     * This method will be called automatically when cron URL is accessed. The 
+     * This method will be called automatically when task URL is accessed. The 
      * method will check if it is time to execute the associated event or 
      * not. If it is the time, The event will be executed. If 
-     * the job is forced to execute, the event that is associated with the 
-     * job will be executed even if it is not the time to execute the job.
+     * the task is forced to execute, the event that is associated with the 
+     * task will be executed even if it is not the time to execute the task.
      * 
-     * @param bool $force If set to true, the job will be forced to execute 
-     * even if it is not job time. Default is false.
+     * @param bool $force If set to true, the task will be forced to execute 
+     * even if it is not task time. Default is false.
      * 
-     * @return bool If the event that is associated with the job is executed, 
-     * the method will return true (Even if the job did not finish successfully).
+     * @return bool If the event that is associated with the task is executed, 
+     * the method will return true (Even if the task did not finish successfully).
      * If it is not executed, the method will return false. 
      * 
      * @since 1.0
@@ -398,7 +400,7 @@ abstract class AbstractJob implements JsonI {
         $this->setIsForced($xForce);
 
         if ($xForce || $this->isTime()) {
-            //Called to set the values of job args
+            //Called to set the values of task args
             $this->getArgsValues();
             $isSuccessRun = $this->callMethod('execute');
             $retVal = true;
@@ -417,16 +419,16 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Execute the job.
+     * Execute the task.
      * 
      * The code that will be in the body of that method is the code that will be
-     * executed if it is time to run the job or the job is forced to
+     * executed if it is time to run the task or the task is forced to
      * execute. The developer must implement this method in a way it returns null or true
-     * if the job is executed successfully. If the implementation of the method 
-     * throws an exception, the job will be considered as failed.
+     * if the task is executed successfully. If the implementation of the method 
+     * throws an exception, the task will be considered as failed.
      * 
-     * @return bool|null If the job successfully completed, the method should 
-     * return null or true. If the job failed, the method should return false.
+     * @return bool|null If the task successfully completed, the method should 
+     * return null or true. If the task failed, the method should return false.
      * 
      * @since 1.0
      */
@@ -451,25 +453,25 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Returns job argument as an object given its name.
+     * Returns task argument as an object given its name.
      * 
      * @param string $argName The name of the argument.
      * 
-     * @return JobArgument|null If an argument which has the given name was added
-     * to the job, the method will return it as an object. Other than that, the
+     * @return TaskArgument|null If an argument which has the given name was added
+     * to the task, the method will return it as an object. Other than that, the
      * method will return null.
      * 
      * @since 1.0.3
      */
     public function getArgument(string $argName) {
-        foreach ($this->getArguments() as $jobArgObj) {
-            if ($jobArgObj->getName() == $argName) {
-                return $jobArgObj;
+        foreach ($this->getArguments() as $taskArgObj) {
+            if ($taskArgObj->getName() == $argName) {
+                return $taskArgObj;
             }
         }
     }
     /**
-     * Returns an array that holds execution arguments of the job.
+     * Returns an array that holds execution arguments of the task.
      * 
      * @return array An array that holds objects of type 'JobArgument'.
      * 
@@ -482,14 +484,14 @@ abstract class AbstractJob implements JsonI {
      * Returns the value of a custom execution argument.
      * 
      * The value of the argument can be supplied through the table that will 
-     * appear in cron control panel. If the execution is performed through 
-     * CLI, the value of the argument can be supplied to the job as arg-name="Arg Val".
+     * appear in tasks management control panel. If the execution is performed through 
+     * CLI, the value of the argument can be supplied to the task as arg-name="Arg Val".
      * 
      * @param string $name the name of execution argument.
      * 
-     * @return string|null If the argument does exist on the job and its value 
+     * @return string|null If the argument does exist on the task and its value 
      * is provided, the method will return its value. If it is not provided, or
-     * it does not exist on the job, the method will return null.
+     * it does not exist on the task, the method will return null.
      * 
      * @since 1.0
      */
@@ -524,7 +526,7 @@ abstract class AbstractJob implements JsonI {
     }
 
     /**
-     * Returns the command that was used to execute the job.
+     * Returns the command that was used to execute the task.
      * 
      * Note that the command will be null if not executed from CLI environment.
      * 
@@ -536,9 +538,9 @@ abstract class AbstractJob implements JsonI {
         return $this->command;
     }
     /**
-     * Returns job description.
+     * Returns task description.
      * 
-     * Job description is a string which is used to describe what does the job 
+     * Job description is a string which is used to describe what does the task 
      * do.
      * 
      * @return string Job description. Default return value is 'NO DESCRIPTION'.
@@ -546,7 +548,7 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0.2
      */
     public function getDescription() : string {
-        return $this->jobDesc;
+        return $this->taskDesc;
     }
     /**
      * Returns an array that contains the names of added custom 
@@ -558,15 +560,15 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getExecArgsNames() : array {
-        return array_map(function(JobArgument $obj)
+        return array_map(function(TaskArgument $obj)
         {
             return $obj->getName();
         }, $this->getArguments());
     }
     /**
-     * Returns the cron expression which is associated with the job.
+     * Returns the cron expression which is associated with the task.
      * 
-     * @return string The cron expression which is associated with the job.
+     * @return string The cron expression which is associated with the task.
      * 
      * @since 1.0
      */
@@ -575,44 +577,44 @@ abstract class AbstractJob implements JsonI {
     }
     /**
      * Returns an associative array which contains details about the timings 
-     * at which the job will be executed.
+     * at which the task will be executed.
      * 
      * @return array The array will have the following indices: 
      * <ul>
      * <li><b>minutes</b>: Contains sub arrays which has info about the minutes 
-     * at which the job will be executed.</li>
+     * at which the task will be executed.</li>
      * <li><b>hours</b>: Contains sub arrays which has info about the hours 
-     * at which the job will be executed.</li>
+     * at which the task will be executed.</li>
      * <li><b>days-of-month</b>: Contains sub arrays which has info about the days of month 
-     * at which the job will be executed.</li>
+     * at which the task will be executed.</li>
      * <li><b>months</b>: Contains sub arrays which has info about the months 
-     * at which the job will be executed.</li>
+     * at which the task will be executed.</li>
      * <li><b>days-of-week</b>: Contains sub arrays which has info about the days of week 
-     * at which the job will be executed.</li>
+     * at which the task will be executed.</li>
      * </ul>
      * 
      * @since 1.0
      */
     public function getJobDetails() : array {
-        return $this->jobDetails;
+        return $this->taskDetails;
     }
     /**
-     * Returns the name of the job.
+     * Returns the name of the task.
      * 
-     * The name is used to make different jobs unique. Each job must 
-     * have its own name. Also, the name of the job is used to force job 
-     * execution. It can be supplied as a part of cron URL. 
+     * The name is used to make different tasks unique. Each task must 
+     * have its own name. Also, the name of the task is used to force task 
+     * execution. It can be supplied as a part of task URL. 
      * 
-     * @return string The name of the job. If no name is set, the function will return 
+     * @return string The name of the task. If no name is set, the function will return 
      * 'CRON-JOB'.
      * 
      * @since 1.0
      */
     public function getJobName() : string {
-        return $this->jobName;
+        return $this->taskName;
     }
     /**
-     * Checks if an argument with specific name belongs to the job or not.
+     * Checks if an argument with specific name belongs to the task or not.
      * 
      * @param string $name The name of the argument that will be checked.
      * 
@@ -631,16 +633,16 @@ abstract class AbstractJob implements JsonI {
         return $added;
     }
     /**
-     * Checks if current day of month in time is a day at which the job must be 
+     * Checks if current day of month in time is a day at which the task must be 
      * executed.
      * 
      * @return bool The method will return true if the current day of month in 
-     * time is a day at which the job must be executed.
+     * time is a day at which the task must be executed.
      * 
      * @since 1.0
      */
     public function isDayOfMonth() : bool {
-        $monthDaysArr = $this->jobDetails['days-of-month'];
+        $monthDaysArr = $this->taskDetails['days-of-month'];
         $retVal = true;
 
         if ($monthDaysArr['every-day'] !== true) {
@@ -664,16 +666,16 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current day of week in time is a day at which the job must be 
+     * Checks if current day of week in time is a day at which the task must be 
      * executed.
      * 
      * @return bool The method will return true if the current day of week in 
-     * time is a day at which the job must be executed.
+     * time is a day at which the task must be executed.
      * 
      * @since 1.0
      */
     public function isDayOfWeek() : bool {
-        $daysArr = $this->jobDetails['days-of-week'];
+        $daysArr = $this->taskDetails['days-of-week'];
         $retVal = true;
 
         if ($daysArr['every-day'] !== true) {
@@ -697,9 +699,9 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if the job is forced to execute or not.
+     * Checks if the task is forced to execute or not.
      * 
-     * @return bool If the job was forced to execute, the method will return 
+     * @return bool If the task was forced to execute, the method will return 
      * true. Other than that, it will return false.
      * 
      * @since 1.0
@@ -708,16 +710,16 @@ abstract class AbstractJob implements JsonI {
         return $this->isForced;
     }
     /**
-     * Checks if current hour in time is an hour at which the job must be 
+     * Checks if current hour in time is an hour at which the task must be 
      * executed.
      * 
      * @return bool The method will return true if the current hour in 
-     * time is an hour at which the job must be executed.
+     * time is an hour at which the task must be executed.
      * 
      * @since 1.0
      */
     public function isHour() : bool {
-        $hoursArr = $this->jobDetails['hours'];
+        $hoursArr = $this->taskDetails['hours'];
         $retVal = true;
 
         if ($hoursArr['every-hour'] !== true) {
@@ -740,16 +742,16 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current minute in time is a minute at which the job must be 
+     * Checks if current minute in time is a minute at which the task must be 
      * executed.
      * 
      * @return bool The method will return true if the current minute in 
-     * time is a minute at which the job must be executed.
+     * time is a minute at which the task must be executed.
      * 
      * @since 1.0
      */
     public function isMinute() : bool {
-        $minuteArr = $this->jobDetails['minutes'];
+        $minuteArr = $this->taskDetails['minutes'];
         $retVal = true;
 
         if ($minuteArr['every-minute'] !== true) {
@@ -772,16 +774,16 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current month in time is a month at which the job must be 
+     * Checks if current month in time is a month at which the task must be 
      * executed.
      * 
      * @return bool The method will return true if the current month in 
-     * time is a month at which the job must be executed.
+     * time is a month at which the task must be executed.
      * 
      * @since 1.0
      */
     public function isMonth() : bool {
-        $monthsArr = $this->jobDetails['months'];
+        $monthsArr = $this->taskDetails['months'];
         $retVal = true;
 
         if ($monthsArr['every-month'] !== true) {
@@ -805,11 +807,11 @@ abstract class AbstractJob implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if job name is valid or not.
+     * Checks if task name is valid or not.
      * 
-     * This method is also used to validate names of job arguments.
+     * This method is also used to validate names of task arguments.
      * 
-     * @param string $val The name of the job.
+     * @param string $val The name of the task.
      * 
      * @return bool If valid, the method will return true. False otherwise.
      */
@@ -831,16 +833,16 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Returns true if the job was executed successfully.
+     * Returns true if the task was executed successfully.
      * 
      * The value returned by this method will depend on the return value
      * of the value which is returned by the method AbstractJob::execute(). 
-     * If the method returned null or true, then it means the job 
-     * was successfully executed. If it returns false, this means the job did 
-     * not execute successfully. If it throws an exception, then the job is 
+     * If the method returned null or true, then it means the task 
+     * was successfully executed. If it returns false, this means the task did 
+     * not execute successfully. If it throws an exception, then the task is 
      * not successfully completed.
      * 
-     * @return bool True if the job was executed successfully. False 
+     * @return bool True if the task was executed successfully. False 
      * if not.
      * 
      * @since 1.0
@@ -849,9 +851,9 @@ abstract class AbstractJob implements JsonI {
         return $this->isSuccess;
     }
     /**
-     * Checks if it's time to execute the job or not.
+     * Checks if it's time to execute the task or not.
      * 
-     * @return bool If it's time to execute the job, the method will return true.
+     * @return bool If it's time to execute the task, the method will return true.
      * If not, it will return false.
      * 
      * @since 1.0
@@ -860,12 +862,12 @@ abstract class AbstractJob implements JsonI {
         return $this->isMinute() && $this->isHour() && $this->isDayOfMonth() && $this->isMonth() && $this->isDayOfWeek();
     }
     /**
-     * Run some routines if the job is executed and failed to completed successfully.
+     * Run some routines if the task is executed and failed to completed successfully.
      * 
      * The status of failure or success depends on the implementation of the method 
      * AbstractJob::execute().
      * The developer can implement this method to take actions after the 
-     * job is executed and failed to complete.
+     * task is executed and failed to complete.
      * It is optional to implement that method. The developer can 
      * leave the body of the method empty.
      * 
@@ -873,7 +875,7 @@ abstract class AbstractJob implements JsonI {
      */
     public abstract function onFail();
     /**
-     * Schedules a job to run at specific day and time in a specific month.
+     * Schedules a task to run at specific day and time in a specific month.
      * 
      * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive 
      * or 3 letters month name. Default is 'jan'.
@@ -885,7 +887,7 @@ abstract class AbstractJob implements JsonI {
      * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
      * default is '00:00'.
      * 
-     * @return bool If the time for the cron job is set, the method will 
+     * @return bool If the time for the task is set, the method will 
      * return true. If not, it will return false.
      * 
      * @since 1.0
@@ -914,12 +916,12 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Run some routines if the job is executed and completed successfully.
+     * Run some routines if the task is executed and completed successfully.
      * 
      * The status of failure or success depends on the implementation of the method 
      * AbstractJob::execute().
      * The developer can implement this method to perform actions after the 
-     * job is executed and failed to complete.
+     * task is executed and failed to complete.
      * It is optional to implement that method. The developer can 
      * leave the body of the method empty.
      * 
@@ -927,7 +929,7 @@ abstract class AbstractJob implements JsonI {
      */
     public abstract function onSuccess();
     /**
-     * Associate the job with the command that was used to execute the job.
+     * Associate the task with the command that was used to execute the task.
      * 
      * @param CronCommand $command
      * 
@@ -937,9 +939,9 @@ abstract class AbstractJob implements JsonI {
         $this->command = $command;
     }
     /**
-     * Sets job description.
+     * Sets task description.
      * 
-     * Job description is a string which is used to describe what does the job do.
+     * Job description is a string which is used to describe what does the task do.
      * 
      * @param string $desc Job description.
      * 
@@ -952,7 +954,7 @@ abstract class AbstractJob implements JsonI {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {
-            $this->jobDesc = $trimmed;
+            $this->taskDesc = $trimmed;
 
             return true;
         }
@@ -960,20 +962,20 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Sets an optional name for the job.
+     * Sets an optional name for the task.
      * 
-     * The name is used to make different jobs unique. Each job must 
-     * have its own name. Also, the name of the job is used to force job 
-     * execution. It can be supplied as a part of cron URL. 
+     * The name is used to make different tasks unique. Each task must 
+     * have its own name. Also, the name of the task is used to force task 
+     * execution. It can be supplied as a part of task URL. 
      * 
-     * Note that job name will be considered invalid 
+     * Note that task name will be considered invalid 
      * if it contains one of the following characters: '=', '&', '#' and '?'.
      * 
-     * @param string $name The name of the job.
+     * @param string $name The name of the task.
      * 
-     * @return bool If job name is set, the method will return true. If not,
+     * @return bool If task name is set, the method will return true. If not,
      * the method will return false. The method will not set the name only if
-     * given value is empty string or the given name was used by a job which
+     * given value is empty string or the given name was used by a task which
      * was already scheduled.
      * 
      * @since 1.0
@@ -989,19 +991,19 @@ abstract class AbstractJob implements JsonI {
             $tempJobsQueue = new Queue();
             $nameTaken = false;
 
-            while ($job = Cron::jobsQueue()->dequeue()) {
-                if ($job->getJobName() == $trimmed) {
+            while ($task = Cron::tasksQueue()->dequeue()) {
+                if ($task->getJobName() == $trimmed) {
                     $nameTaken = true;
                 }
-                $tempJobsQueue->enqueue($job);
+                $tempJobsQueue->enqueue($task);
             }
 
-            while ($job = $tempJobsQueue->dequeue()) {
-                Cron::scheduleJob($job);
+            while ($task = $tempJobsQueue->dequeue()) {
+                Cron::scheduleJob($task);
             }
 
             if (!$nameTaken) {
-                $this->jobName = $trimmed;
+                $this->taskName = $trimmed;
 
                 return true;
             }
@@ -1029,7 +1031,7 @@ abstract class AbstractJob implements JsonI {
         return $json;
     }
     /**
-     * Schedules a job to run weekly at specific week day and time.
+     * Schedules a task to run weekly at specific week day and time.
      * 
      * @param int $dayNameOrNum A 3 letter day name (such as 'sun' or 'tue') or a day number from 0 to 6.
      * 0 for sunday. Default is 0.
@@ -1038,7 +1040,7 @@ abstract class AbstractJob implements JsonI {
      * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
      * default is '00:00'.
      * 
-     * @return bool If the time for the cron job is set, the method will 
+     * @return bool If the time for the task is set, the method will 
      * return true. If not, it will return false.
      * 
      * @since 1.0
@@ -1416,7 +1418,7 @@ abstract class AbstractJob implements JsonI {
      */
     private function logExeException(Throwable $ex, string $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
-                .'The output of the job might be not as expected.');
+                .'The output of the task might be not as expected.');
         Cron::log('Exception class: '.get_class($ex));
         Cron::log('Exception message: '.$ex->getMessage());
         Cron::log('Thrown in: '.Util::extractClassName($ex->getFile()));
@@ -1540,7 +1542,7 @@ abstract class AbstractJob implements JsonI {
         return false;
     }
     /**
-     * Sets the value of the property which is used to check if the job is 
+     * Sets the value of the property which is used to check if the task is 
      * forced to execute or not.
      * 
      * @param bool $bool True or false.

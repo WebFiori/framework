@@ -8,18 +8,18 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webUI;
+namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 /**
  * A page which is used to show login form to enter login information to 
- * access cron web interface.
+ * access tasks management web interface.
  *
  * @author Ibrahim
  */
-class CronLoginView extends CronView {
+class TasksLoginPage extends BaseTasksPage {
     public function __construct() {
         parent::__construct('CRON Web Interface Login', 'Login to CRON Control panel.');
 

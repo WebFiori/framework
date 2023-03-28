@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webServices;
+namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
@@ -17,7 +17,7 @@ use webfiori\http\AbstractWebService;
  *
  * @author Ibrahim
  */
-class CronLogoutService extends AbstractWebService {
+class TasksLogoutService extends AbstractWebService {
     public function __construct() {
         parent::__construct('logout');
         $this->addRequestMethod('post');

@@ -17,14 +17,14 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 /**
  * A class which can be used to send an email regarding the status of 
- * background job execution.
+ * background task execution.
  * 
  * This class must be only used in one of the abstract methods of a 
- * background job since using it while no job is active will have no 
+ * background task since using it while no task is active will have no 
  * effect.
  * 
  * The email that will be sent will contain technical information about 
- * the job in addition to a basic log file that shows execution steps. Also, 
+ * the task in addition to a basic log file that shows execution steps. Also, 
  * it will contain any log messages which was added by using the method 
  * 'Cron::log()'.
  * 
@@ -32,7 +32,7 @@ use webfiori\ui\TableRow;
  * 
  * @version 1.0.2
  */
-class CronEmail extends EmailMessage {
+class TaskStatusEmail extends EmailMessage {
     /**
      * Creates new instance of the class.
      * 
@@ -48,7 +48,7 @@ class CronEmail extends EmailMessage {
      */
     public function __construct($sendAccName, array $receivers = []) {
         parent::__construct($sendAccName);
-        $activeJob = Cron::activeJob();
+        $activeJob = TasksManager::activeJob();
 
         if ($activeJob !== null) {
             if (gettype($receivers) == 'array' && count($receivers) != 0) {
@@ -72,13 +72,13 @@ class CronEmail extends EmailMessage {
 
             if ($activeJob->isSuccess()) {
                 $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😃');
-                $text = 'This automatic system email is sent to notify you that the background job '
+                $text = 'This automatic system email is sent to notify you that the background task '
                         .'\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
                         .'without any issues</b>. For more details about execution process, '
                         .'please check the attached execution log file.</p>';
             } else {
                 $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😲');
-                $text = 'This automatic email is sent to notify you that the background job '
+                $text = 'This automatic email is sent to notify you that the background task '
                         .'\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
                         .'</b>. To investigate the cause of failure, '
                         .'please check the attached execution log file. It may lead you to '
@@ -90,7 +90,7 @@ class CronEmail extends EmailMessage {
             $this->insert($this->createJobInfoTable($activeJob));
             $logTxt = '';
 
-            foreach (Cron::getLogArray() as $logEntry) {
+            foreach (TasksManager::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
             $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
@@ -102,35 +102,35 @@ class CronEmail extends EmailMessage {
     }
     /**
      * 
-     * @param AbstractJob $job
+     * @param AbstractTask $task
      * @return HTMLNode
      */
-    private function createJobInfoTable(AbstractJob $job): HTMLNode {
-        $jobTable = new HTMLNode('table');
-        $jobTable->setStyle([
+    private function createJobInfoTable(AbstractTask $task): HTMLNode {
+        $taskTable = new HTMLNode('table');
+        $taskTable->setStyle([
             'border-collapse' => 'collapse'
         ]);
-        $jobTable->setAttribute('border', 1);
-        $jobTable->addChild($this->createTableRow('Job Name:', $job->getJobName()));
-        $jobTable->addChild($this->createTableRow('Expression:', $job->getExpression()));
-        $jobTable->addChild($this->createTableRow('Check Started:', Cron::timestamp()));
-        $jobTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));
-        $jobTable->addChild($this->createTableRow('PHP Version:', PHP_VERSION));
-        $jobTable->addChild($this->createTableRow('Framework Version:', WF_VERSION));
-        $jobTable->addChild($this->createTableRow('Framework Release Date:', WF_RELEASE_DATE));
-        $jobTable->addChild($this->createTableRow('Root Directory:', ROOT_PATH));
-        $jobTable->addChild($this->createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
-        $jobTable->addChild($this->createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
-        $jobTable->addChild($this->createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
-        $jobTable->addChild($this->createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
+        $taskTable->setAttribute('border', 1);
+        $taskTable->addChild($this->createTableRow('Job Name:', $task->getJobName()));
+        $taskTable->addChild($this->createTableRow('Expression:', $task->getExpression()));
+        $taskTable->addChild($this->createTableRow('Check Started:', TasksManager::timestamp()));
+        $taskTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));
+        $taskTable->addChild($this->createTableRow('PHP Version:', PHP_VERSION));
+        $taskTable->addChild($this->createTableRow('Framework Version:', WF_VERSION));
+        $taskTable->addChild($this->createTableRow('Framework Release Date:', WF_RELEASE_DATE));
+        $taskTable->addChild($this->createTableRow('Root Directory:', ROOT_PATH));
+        $taskTable->addChild($this->createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
+        $taskTable->addChild($this->createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
+        $taskTable->addChild($this->createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
+        $taskTable->addChild($this->createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
 
-        if ($job->isSuccess()) {
-            $jobTable->addChild($this->createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
+        if ($task->isSuccess()) {
+            $taskTable->addChild($this->createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
         } else {
-            $jobTable->addChild($this->createTableRow('Exit Status:', '<b style="color:red">Failed</b>'));
+            $taskTable->addChild($this->createTableRow('Exit Status:', '<b style="color:red">Failed</b>'));
         }
 
-        return $jobTable;
+        return $taskTable;
     }
     private function createTableRow($label, $info) {
         $row = new TableRow();

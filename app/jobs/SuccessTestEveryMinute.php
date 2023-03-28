@@ -1,9 +1,9 @@
 <?php
 namespace app\jobs;
 
-use webfiori\framework\cron\AbstractJob;
-use webfiori\framework\cron\Cron;
-use webfiori\framework\cron\CronEmail;
+use webfiori\framework\cron\AbstractTask;
+use webfiori\framework\cron\TasksManager;
+use webfiori\framework\cron\TaskStatusEmail;
 /**
  * A background process which was created using the command "create".
  *
@@ -14,7 +14,7 @@ use webfiori\framework\cron\CronEmail;
  * <li>end: End date of the report.</li>
  * </ul>
  */
-class SuccessTestEveryMinute extends AbstractJob {
+class SuccessTestEveryMinute extends AbstractTask {
     /**
      * Creates new instance of the class.
      */

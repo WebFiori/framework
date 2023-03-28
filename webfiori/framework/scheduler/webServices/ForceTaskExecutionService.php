@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webServices;
+namespace webfiori\framework\scheduler\webServices;
 
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
@@ -21,7 +21,7 @@ use webfiori\json\Json;
  *
  * @author Ibrahim
  */
-class ForceCronExecutionService extends AbstractWebService {
+class ForceTaskExecutionService extends AbstractWebService {
     public function __construct() {
         parent::__construct('force-execution');
         $this->addRequestMethod('post');
@@ -31,12 +31,12 @@ class ForceCronExecutionService extends AbstractWebService {
         SessionsManager::start('cron-session');
 
         return SessionsManager::get('cron-login-status') === true
-                || Cron::password() == 'NO_PASSWORD';
+                || TasksManager::password() == 'NO_PASSWORD';
     }
 
     public function processRequest() {
         $jobName = urldecode($this->getParamVal('job-name'));
-        $result = Cron::run('', $jobName, true);
+        $result = TasksManager::run('', $jobName, true);
 
         if (gettype($result) == 'array') {
             $infoJ = new Json([],true);
@@ -44,7 +44,7 @@ class ForceCronExecutionService extends AbstractWebService {
             $infoJ->add('executed-count', $result['executed-count']);
             $infoJ->add('successfully-completed', $result['successfully-completed']);
             $infoJ->add('failed', $result['failed']);
-            $infoJ->addArray('log', Cron::getLogArray());
+            $infoJ->addArray('log', TasksManager::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);
         } else if ($result == 'JOB_NOT_FOUND') {
             $infoJ = new Json([

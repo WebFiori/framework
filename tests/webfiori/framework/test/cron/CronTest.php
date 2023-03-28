@@ -2,10 +2,10 @@
 namespace webfiori\framework\test\cron;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\Cron;
-use webfiori\framework\cron\webServices\CronServicesManager;
-use webfiori\framework\cron\webUI\CronLoginView;
-use webfiori\framework\cron\webUI\CronTasksView;
+use webfiori\framework\cron\TasksManager;
+use webfiori\framework\cron\webServices\TasksServicesManager;
+use webfiori\framework\cron\webUI\TasksLoginPage;
+use webfiori\framework\cron\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
 /**
  * Description of CronTest
@@ -17,55 +17,55 @@ class CronTest extends TestCase {
      * @test
      */
     public function testCreateJob00() {
-        $this->assertFalse(Cron::createJob('7-1 * * * *'));
+        $this->assertFalse(TasksManager::createJob('7-1 * * * *'));
     }
     /**
      * @test
      */
     public function testGetJob00() {
-        $this->assertNull(Cron::getJob('Not Exist'));
+        $this->assertNull(TasksManager::getJob('Not Exist'));
     }
     /**
      * @test
      */
     public function testGetJob01() {
-        Cron::createJob('* * * * *', 'Job 1');
-        Cron::createJob('15 * * * *', 'Job 2');
-        Cron::createJob('16 * * * *', 'Job 3');
-        Cron::createJob('17 * * * *', 'Job 4');
-        $job = Cron::getJob('Job 3');
+        TasksManager::createJob('* * * * *', 'Job 1');
+        TasksManager::createJob('15 * * * *', 'Job 2');
+        TasksManager::createJob('16 * * * *', 'Job 3');
+        TasksManager::createJob('17 * * * *', 'Job 4');
+        $job = TasksManager::getJob('Job 3');
         $this->assertEquals('16 * * * *',$job->getExpression());
     }
     /**
      * @test
      */
     public function testTimestamp00() {
-        Cron::setDayOfMonth(15);
-        Cron::setHour(23);
-        Cron::setMonth(5);
-        Cron::setMinute(33);
-        $this->assertEquals('05-15 23:33', Cron::timestamp());
-        Cron::setDayOfMonth(1);
-        Cron::setHour(0);
-        Cron::setMonth(11);
-        Cron::setMinute(9);
-        $this->assertEquals('11-01 00:09', Cron::timestamp());
+        TasksManager::setDayOfMonth(15);
+        TasksManager::setHour(23);
+        TasksManager::setMonth(5);
+        TasksManager::setMinute(33);
+        $this->assertEquals('05-15 23:33', TasksManager::timestamp());
+        TasksManager::setDayOfMonth(1);
+        TasksManager::setHour(0);
+        TasksManager::setMonth(11);
+        TasksManager::setMinute(9);
+        $this->assertEquals('11-01 00:09', TasksManager::timestamp());
     }
     /**
      * @test
      */
     public function testWeeklyJob00() {
-        $this->assertTrue(Cron::weeklyJob('6-23:00', 'Job X', function()
+        $this->assertTrue(TasksManager::weeklyJob('6-23:00', 'Job X', function()
         {
         }));
-        $job = Cron::getJob('Job X');
+        $job = TasksManager::getJob('Job X');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
     public function testWeeklyJob01() {
-        $this->assertFalse(Cron::weeklyJob('7-23:00', 'Job X', function()
+        $this->assertFalse(TasksManager::weeklyJob('7-23:00', 'Job X', function()
         {
         }));
     }
@@ -73,7 +73,7 @@ class CronTest extends TestCase {
      * @test
      */
     public function testWeeklyJob02() {
-        $this->assertFalse(Cron::weeklyJob('6--23:00', 'Job X', function()
+        $this->assertFalse(TasksManager::weeklyJob('6--23:00', 'Job X', function()
         {
         }));
     }
@@ -81,13 +81,13 @@ class CronTest extends TestCase {
      * @test
      */
     public function testWeeklyJob03() {
-        Cron::password('');
-        $this->assertTrue(Cron::weeklyJob('sun-23:00', 'Job Ok', function(Cron $cron, TestCase $c)
+        TasksManager::password('');
+        $this->assertTrue(TasksManager::weeklyJob('sun-23:00', 'Job Ok', function(TasksManager $cron, TestCase $c)
         {
             $c->assertEquals('Job Ok', $cron->activeJob()->getJobName());
-        }, [Cron::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', Cron::password());
-        Cron::run('', 'Job Ok', true);
+        }, [TasksManager::get(), $this]));
+        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        TasksManager::run('', 'Job Ok', true);
     }
     
     
@@ -95,17 +95,17 @@ class CronTest extends TestCase {
      * @test
      */
     public function testDailyJob00() {
-        $this->assertTrue(Cron::dailyJob('00:00', 'Job Xy', function()
+        $this->assertTrue(TasksManager::dailyJob('00:00', 'Job Xy', function()
         {
         }));
-        $job = Cron::getJob('Job Xy');
+        $job = TasksManager::getJob('Job Xy');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
     public function testDailyJob01() {
-        $this->assertFalse(Cron::dailyJob('23:65:6', 'Job X', function()
+        $this->assertFalse(TasksManager::dailyJob('23:65:6', 'Job X', function()
         {
         }));
     }
@@ -113,7 +113,7 @@ class CronTest extends TestCase {
      * @test
      */
     public function testDailyJob02() {
-        $this->assertFalse(Cron::dailyJob('24:00', 'Job X', function()
+        $this->assertFalse(TasksManager::dailyJob('24:00', 'Job X', function()
         {
         }));
     }
@@ -121,29 +121,29 @@ class CronTest extends TestCase {
      * @test
      */
     public function testDailyJob03() {
-        $this->assertTrue(Cron::dailyJob('23:00', 'Job Ok2', function(Cron $cron, TestCase $c)
+        $this->assertTrue(TasksManager::dailyJob('23:00', 'Job Ok2', function(TasksManager $cron, TestCase $c)
         {
             $c->assertEquals('Job Ok2', $cron->activeJob()->getJobName());
-        }, [Cron::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', Cron::password());
-        Cron::run('', 'Job Ok2', true);
+        }, [TasksManager::get(), $this]));
+        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        TasksManager::run('', 'Job Ok2', true);
     }
     
     /**
      * @test
      */
     public function testMonthlyJob00() {
-        $this->assertTrue(Cron::monthlyJob(1, '00:00', 'Job Xyz', function()
+        $this->assertTrue(TasksManager::monthlyJob(1, '00:00', 'Job Xyz', function()
         {
         }));
-        $job = Cron::getJob('Job Xyz');
+        $job = TasksManager::getJob('Job Xyz');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
     public function testMonthlyJob01() {
-        $this->assertFalse(Cron::monthlyJob(44, '23:65:6', 'Job X', function()
+        $this->assertFalse(TasksManager::monthlyJob(44, '23:65:6', 'Job X', function()
         {
         }));
     }
@@ -151,7 +151,7 @@ class CronTest extends TestCase {
      * @test
      */
     public function testMonthlyJob02() {
-        $this->assertFalse(Cron::monthlyJob(2, '24:00', 'Job X', function()
+        $this->assertFalse(TasksManager::monthlyJob(2, '24:00', 'Job X', function()
         {
         }));
     }
@@ -159,36 +159,36 @@ class CronTest extends TestCase {
      * @test
      */
     public function testMonthlyJob03() {
-        $this->assertTrue(Cron::monthlyJob(15, '23:00', 'Job Ok3', function(Cron $cron, TestCase $c)
+        $this->assertTrue(TasksManager::monthlyJob(15, '23:00', 'Job Ok3', function(TasksManager $cron, TestCase $c)
         {
             $c->assertEquals('Job Ok3', $cron->activeJob()->getJobName());
-        }, [Cron::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', Cron::password());
-        Cron::run('', 'Job Ok3', true);
-        $this->assertEquals('JOB_NOT_FOUND', Cron::run('', 'Not Exist Super'));
+        }, [TasksManager::get(), $this]));
+        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        TasksManager::run('', 'Job Ok3', true);
+        $this->assertEquals('JOB_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
     }
     /**
      * @test
      */
     public function testRoutes() {
         Router::removeAll();
-        Cron::initRoutes();
+        TasksManager::initRoutes();
         $this->assertEquals(4, Router::routesCount());
         
         $route1 = Router::getUriObj('/cron');
         $this->assertNotNull($route1);
-        $this->assertEquals(CronLoginView::class, $route1->getRouteTo());
+        $this->assertEquals(TasksLoginPage::class, $route1->getRouteTo());
         
         $route2 = Router::getUriObj('/cron/login');
         $this->assertNotNull($route2);
-        $this->assertEquals(CronLoginView::class, $route2->getRouteTo());
+        $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
         
         $route3 = Router::getUriObj('/cron/jobs');
         $this->assertNotNull($route3);
-        $this->assertEquals(CronTasksView::class, $route3->getRouteTo());
+        $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
         
         $route4 = Router::getUriObj('/cron/apis/{action}');
         $this->assertNotNull($route4);
-        $this->assertEquals(CronServicesManager::class, $route4->getRouteTo());
+        $this->assertEquals(TasksServicesManager::class, $route4->getRouteTo());
     }
 }

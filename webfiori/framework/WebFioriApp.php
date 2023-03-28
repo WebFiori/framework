@@ -17,7 +17,7 @@ use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
@@ -548,12 +548,12 @@ class WebFioriApp {
 
         if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && in_array('cron', $pathArr))) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
-                Cron::initRoutes();
+                TasksManager::initRoutes();
             }
-            Cron::password($this->appConfig->getCRONPassword());
+            TasksManager::password($this->appConfig->getCRONPassword());
             //initialize cron jobs only if in CLI or cron is enabled through HTTP.
             call_user_func(APP_DIR.'\ini\InitCron::init');
-            Cron::registerJobs();
+            TasksManager::registerJobs();
         }
     }
     private function initFrameworkVersionInfo() {

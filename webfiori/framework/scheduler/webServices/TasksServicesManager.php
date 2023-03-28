@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webServices;
+namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\http\WebServicesManager;
 /**
@@ -16,15 +16,15 @@ use webfiori\http\WebServicesManager;
  *
  * @author Ibrahim
  */
-class CronServicesManager extends WebServicesManager {
+class TasksServicesManager extends WebServicesManager {
     /**
      * Creates new instance of the class.
      */
     public function __construct() {
         parent::__construct();
-        $this->addService(new CronLoginService());
-        $this->addService(new ForceCronExecutionService());
-        $this->addService(new CronLogoutService());
-        $this->addService(new GetJobsService());
+        $this->addService(new TasksLoginService());
+        $this->addService(new ForceTaskExecutionService());
+        $this->addService(new TasksLogoutService());
+        $this->addService(new GetTasksService());
     }
 }

@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
  * Description of CronCommandTest

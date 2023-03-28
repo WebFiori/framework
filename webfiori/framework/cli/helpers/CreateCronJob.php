@@ -13,8 +13,8 @@ namespace webfiori\framework\cli\helpers;
 use InvalidArgumentException;
 use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cron\CronJob;
-use webfiori\framework\cron\JobArgument;
+use webfiori\framework\cron\BaseTask;
+use webfiori\framework\cron\TaskArgument;
 use webfiori\framework\writers\CronJobClassWriter;
 /**
  * A helper class which is used to help in creating cron jobs classes using CLI.
@@ -57,7 +57,7 @@ class CreateCronJob extends CreateClassHelper {
 
         while ($addToMore) {
             try {
-                $argObj = new JobArgument($this->getInput('Enter argument name:'));
+                $argObj = new TaskArgument($this->getInput('Enter argument name:'));
                 $argObj->setDescription($this->getInput('Describe the use of the argument:', ''));
                 $argObj->setDefault($this->getInput('Default value:', ''));
 
@@ -81,7 +81,7 @@ class CreateCronJob extends CreateClassHelper {
     private function getJobName() : string {
         return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
         {
-            $temp = new CronJob();
+            $temp = new BaseTask();
 
             if ($temp->setJobName($val)) {
                 return true;

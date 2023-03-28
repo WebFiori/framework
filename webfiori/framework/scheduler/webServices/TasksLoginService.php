@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webServices;
+namespace webfiori\framework\scheduler\webServices;
 
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
@@ -21,7 +21,7 @@ use webfiori\http\RequestParameter;
  * 
  * @version 1.0
  */
-class CronLoginService extends AbstractWebService {
+class TasksLoginService extends AbstractWebService {
     public function __construct() {
         parent::__construct('login');
         $this->addRequestMethod('post');
@@ -32,7 +32,7 @@ class CronLoginService extends AbstractWebService {
     }
 
     public function processRequest() {
-        $cronPass = Cron::password();
+        $cronPass = TasksManager::password();
 
         if ($cronPass != 'NO_PASSWORD') {
             $inputHash = hash('sha256', $this->getInputs()['password']);

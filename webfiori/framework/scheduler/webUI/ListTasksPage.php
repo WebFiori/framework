@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron\webUI;
+namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\file\File;
 /**
@@ -35,7 +35,7 @@ use webfiori\file\File;
  * of cron jobs.
  * @version 1.0
  */
-class CronTasksView extends CronView {
+class ListTasksPage extends BaseTasksPage {
     /**
      * Creates new instance of the view.
      */

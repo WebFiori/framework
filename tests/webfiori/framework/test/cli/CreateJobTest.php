@@ -2,7 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\cron\AbstractJob;
+use webfiori\framework\cron\AbstractTask;
 use webfiori\framework\WebFioriApp;
 
 /**
@@ -206,7 +206,7 @@ class CreateJobTest extends CreateTestCase {
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $job = new $clazz();
-        $this->assertTrue($job instanceof AbstractJob);
+        $this->assertTrue($job instanceof AbstractTask);
         $this->assertEquals('Send Sales Report', $job->getJobName());
         $this->assertEquals('The job will execute every day to send sales report to management.', $job->getDescription());
         $this->assertEquals(2, count($job->getArguments()));

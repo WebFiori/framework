@@ -7,7 +7,7 @@ use webfiori\framework\router\RouterUri;
 /**
  * Description of TestRouterUri
  *
- * @author Eng.Ibrahim
+ * @author Ibrahim
  */
 class RouterUriTest extends TestCase {
     /**

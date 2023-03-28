@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\Cron;
+use webfiori\framework\cron\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
  * Description of CronCommandTest
@@ -30,7 +30,7 @@ class CronCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        Cron::password(hash('sha256', '123456'));
+        TasksManager::password(hash('sha256', '123456'));
         $runner = WebFioriApp::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -223,7 +223,7 @@ class CronCommandTest extends TestCase {
      */
     public function test07() {
         $runner = WebFioriApp::getRunner();
-        Cron::execLog(true);
+        TasksManager::execLog(true);
         $runner->setInputs([
             'N'
         ]);
@@ -263,10 +263,10 @@ class CronCommandTest extends TestCase {
      */
     public function test08() {
         $runner = WebFioriApp::getRunner();
-        Cron::reset();
-        Cron::execLog(true);
-        Cron::password('123456');
-        Cron::registerJobs();
+        TasksManager::reset();
+        TasksManager::execLog(true);
+        TasksManager::password('123456');
+        TasksManager::registerJobs();
         
         $runner->setInputs([
             'N'
@@ -287,7 +287,7 @@ class CronCommandTest extends TestCase {
             "Running job(s) check...",
             "Error: Given password is incorrect.",
             "Check finished.",
-        ], Cron::getLogArray());
+        ], TasksManager::getLogArray());
     }
     /**
      * @test
@@ -390,10 +390,10 @@ class CronCommandTest extends TestCase {
      */
     public function test13() {
         $runner = WebFioriApp::getRunner();
-        Cron::reset();
-        Cron::execLog(true);
-        Cron::password(hash('sha256', '123456'));
-        Cron::registerJobs();
+        TasksManager::reset();
+        TasksManager::execLog(true);
+        TasksManager::password(hash('sha256', '123456'));
+        TasksManager::registerJobs();
         
         $runner->setInputs([
             'Y',
@@ -430,6 +430,6 @@ class CronCommandTest extends TestCase {
             "Calling the method app\jobs\SuccessTestJob::onSuccess()",
             "Calling the method app\jobs\SuccessTestJob::afterExec()",
             "Check finished.",
-        ], Cron::getLogArray());
+        ], TasksManager::getLogArray());
     }
 }

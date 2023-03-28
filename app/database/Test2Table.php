@@ -5,7 +5,7 @@ use webfiori\database\mysql\MySQLTable;
 /**
  * Description of TestTable
  *
- * @author Ibrah
+ * @author Ibrahim
  */
 class Test2Table extends MySQLTable {
     public function __construct() {

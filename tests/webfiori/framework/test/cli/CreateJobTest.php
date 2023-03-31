@@ -6,11 +6,11 @@ use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\WebFioriApp;
 
 /**
- * Description of CreateJobTest
+ * Description of CreatetaskTest
  *
  * @author Ibrahim
  */
-class CreateJobTest extends CreateTestCase {
+class CreatetaskTest extends CreateTestCase {
     /**
      * @test
      */
@@ -22,10 +22,10 @@ class CreateJobTest extends CreateTestCase {
         ]);
         $runner->setInputs([
             '3',
-            'SuperCoolJob',
-            'app\jobs',
-            'The Greatest Job',
-            'The job will do nothing.',
+            'SuperCoolTask',
+            'app\tasks',
+            'The Greatest task',
+            'The task will do nothing.',
             'N',
             '',
         ]);
@@ -44,14 +44,14 @@ class CreateJobTest extends CreateTestCase {
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
-            "Enter a name for the job:\n",
-            "Provide short description of what does the job will do:\n",
-            "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter a name for the task:\n",
+            "Provide short description of what does the task will do:\n",
+            "Would you like to add arguments to the task?(y/N)\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
-        $this->removeClass('\\app\\jobs\\SuperCoolJob');
+        $this->assertTrue(class_exists('\\app\\tasks\\SuperCoolTask'));
+        $this->removeClass('\\app\\tasks\\SuperCooltask');
     }
     
     /**
@@ -67,12 +67,12 @@ class CreateJobTest extends CreateTestCase {
         ]);
         $runner->setInputs([
             '3',
-            'SuperCoolJob',
-            'app\jobs',
+            'SuperCoolTask',
+            'app\tasks',
             'SuperCool2',
-            'app\jobs',
-            'The Greatest Job',
-            'The job will do nothing.',
+            'app\tasks',
+            'The Greatest task',
+            'The task will do nothing.',
             'N',
             '',
         ]);
@@ -91,17 +91,17 @@ class CreateJobTest extends CreateTestCase {
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
             "Error: A class in the given namespace which has the given name was found.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n","Enter a name for the job:\n",
-            "Provide short description of what does the job will do:\n",
-            "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n","Enter a name for the task:\n",
+            "Provide short description of what does the task will do:\n",
+            "Would you like to add arguments to the task?(y/N)\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\jobs\\SuperCool2Job'));
-        $this->removeClass('\\app\\jobs\\SuperCoolJob');
-        $this->removeClass('\\app\\jobs\\SuperCool2Job');
+        $this->assertTrue(class_exists('\\app\\tasks\\SuperCool2Task'));
+        $this->removeClass('\\app\\tasks\\SuperCooltask');
+        $this->removeClass('\\app\\tasks\\SuperCool2task');
     }
     
     /**
@@ -117,11 +117,11 @@ class CreateJobTest extends CreateTestCase {
         $runner->setInputs([
             '3',
             'NewRound',
-            'app\jobs',
+            'app\tasks',
             '',
             'Invalid#',
-            'Create Round Job',
-            'The job will do nothing.',
+            'Create Round task',
+            'The task will do nothing.',
             'N',
             '',
         ]);
@@ -140,18 +140,18 @@ class CreateJobTest extends CreateTestCase {
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
-            "Enter a name for the job:\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter a name for the task:\n",
             "Error: Provided name is invalid!\n",
-            "Enter a name for the job:\n",
+            "Enter a name for the task:\n",
             "Error: Provided name is invalid!\n",
-            "Enter a name for the job:\n",
-            "Provide short description of what does the job will do:\n",
-            "Would you like to add arguments to the job?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
+            "Enter a name for the task:\n",
+            "Provide short description of what does the task will do:\n",
+            "Would you like to add arguments to the task?(y/N)\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\jobs\\NewRoundJob'));
-        $this->removeClass('\\app\\jobs\\NewRoundJob');
+        $this->assertTrue(class_exists('\\app\\tasks\\NewRoundtask'));
+        $this->removeClass('\\app\\tasks\\NewRoundtask');
     }
     /**
      * @test
@@ -162,13 +162,13 @@ class CreateJobTest extends CreateTestCase {
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'job'
+            '--c' => 'task'
         ]);
         $runner->setInputs([
             'SendDailyReport',
-            'app\jobs',
+            'app\tasks',
             'Send Sales Report',
-            'The job will execute every day to send sales report to management.',
+            'The task will execute every day to send sales report to management.',
             'y',
             'start',
             'Start date of the report.',
@@ -185,10 +185,10 @@ class CreateJobTest extends CreateTestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\jobs'\n",
-            "Enter a name for the job:\n",
-            "Provide short description of what does the job will do:\n",
-            "Would you like to add arguments to the job?(y/N)\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter a name for the task:\n",
+            "Provide short description of what does the task will do:\n",
+            "Would you like to add arguments to the task?(y/N)\n",
             "Enter argument name:\n",
             "Describe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
@@ -200,21 +200,21 @@ class CreateJobTest extends CreateTestCase {
             "Describe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
             "Would you like to add more arguments?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."jobs\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $clazz = '\\app\\jobs\\SendDailyReportJob';
+        $clazz = '\\app\\tasks\\SendDailyReporttask';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
-        $job = new $clazz();
-        $this->assertTrue($job instanceof AbstractTask);
-        $this->assertEquals('Send Sales Report', $job->getJobName());
-        $this->assertEquals('The job will execute every day to send sales report to management.', $job->getDescription());
-        $this->assertEquals(2, count($job->getArguments()));
-        $arg1 = $job->getArgument('start');
+        $task = new $clazz();
+        $this->assertTrue($task instanceof AbstractTask);
+        $this->assertEquals('Send Sales Report', $task->gettaskName());
+        $this->assertEquals('The task will execute every day to send sales report to management.', $task->getDescription());
+        $this->assertEquals(2, count($task->getArguments()));
+        $arg1 = $task->getArgument('start');
         $this->assertEquals('Start date of the report.', $arg1->getDescription());
         $this->assertNull($arg1->getDefault());
         
-        $arg2 = $job->getArgument('end');
+        $arg2 = $task->getArgument('end');
         $this->assertEquals('End date of the report.', $arg2->getDescription());
         $this->assertEquals('2021-07-07', $arg2->getDefault());
     }

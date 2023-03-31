@@ -115,7 +115,7 @@ class CreateCommand extends CLICommand {
         $options['table'] = 'Database table class.';
         $options['entity'] = 'Entity class from table.';
         $options['web-service'] = 'Web service.';
-        $options['job'] = 'Background Task.';
+        $options['task'] = 'Background Task.';
         $options['middleware'] = 'Middleware.';
         $options['command'] = 'CLI Command.';
         $options['theme'] = 'Theme.';

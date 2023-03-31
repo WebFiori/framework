@@ -15,16 +15,16 @@ class CronWritterTest extends TestCase {
      */
     public function test00() {
         $writter = new SchedulerTaskClassWriter();
-        $this->assertEquals('NewJob', $writter->getName());
-        $this->assertEquals('app\\jobs', $writter->getNamespace());
-        $this->assertEquals('Job', $writter->getSuffix());
+        $this->assertEquals('NewTask', $writter->getName());
+        $this->assertEquals('app\\tasks', $writter->getNamespace());
+        $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\scheduler\\AbstractTask",
             "webfiori\\framework\\scheduler\\TaskStatusEmail",
             "webfiori\\framework\\scheduler\\TasksManager",
         ], $writter->getUseStatements());
-        $this->assertEquals('No Description', $writter->getJobDescription());
-        $this->assertEquals(0, count($writter->getJob()->getArguments()));
+        $this->assertEquals('No Description', $writter->getTaskDescription());
+        $this->assertEquals(0, count($writter->getTask()->getArguments()));
     }
     /**
      * @test
@@ -32,18 +32,18 @@ class CronWritterTest extends TestCase {
     public function test01() {
         $writter = new SchedulerTaskClassWriter();
         $writter->setClassName('NewOk');
-        $this->assertEquals('NewOkJob', $writter->getName());
-        $this->assertEquals('app\\jobs', $writter->getNamespace());
-        $this->assertEquals('Job', $writter->getSuffix());
+        $this->assertEquals('NewOkTask', $writter->getName());
+        $this->assertEquals('app\\tasks', $writter->getNamespace());
+        $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\scheduler\\AbstractTask",
             "webfiori\\framework\\scheduler\\TaskStatusEmail",
             "webfiori\\framework\\scheduler\\TasksManager",
         ], $writter->getUseStatements());
-        $this->assertEquals('No Description', $writter->getJobDescription());
-        $this->assertEquals(0, count($writter->getJob()->getArguments()));
+        $this->assertEquals('No Description', $writter->getTaskDescription());
+        $this->assertEquals(0, count($writter->getTask()->getArguments()));
         $writter->addArgument(new TaskArgument('test', 'A test Arg.'));
-        $this->assertEquals(1, count($writter->getJob()->getArguments()));
+        $this->assertEquals(1, count($writter->getTask()->getArguments()));
         $writter->addArgument(new TaskArgument('test-2', 'Second test arg'));
         $writter->writeClass();
         $clazz = '\\'.$writter->getNamespace().'\\'.$writter->getName();

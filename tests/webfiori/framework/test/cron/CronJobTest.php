@@ -10,7 +10,7 @@ use webfiori\framework\scheduler\TaskArgument;
  *
  * @author Ibrahim
  */
-class CronJobTest extends TestCase {
+class CronTaskTest extends TestCase {
     /**
      * @test
      */
@@ -106,14 +106,14 @@ class CronJobTest extends TestCase {
     public function testConstructor00() {
         $job = new BaseTask();
         $this->assertEquals('* * * * *',$job->getExpression());
-        $this->assertEquals('SCHEDULER-TASK',$job->getJobName());
+        $this->assertEquals('SCHEDULER-TASK',$job->getTaskName());
         $this->assertTrue(!is_callable($job->getOnExecution()));
         $this->assertTrue($job->isMinute());
         $this->assertTrue($job->isHour());
         $this->assertTrue($job->isDayOfWeek());
         $this->assertTrue($job->isDayOfMonth());
         $this->assertTrue($job->isMonth());
-        $arr = $job->getJobDetails();
+        $arr = $job->getTaskDetails();
     }
     /**
      * @test
@@ -121,7 +121,7 @@ class CronJobTest extends TestCase {
     public function testConstructor01() {
         $job = new BaseTask();
         $this->assertEquals('* * * * *',$job->getExpression());
-        $this->assertEquals('SCHEDULER-TASK',$job->getJobName());
+        $this->assertEquals('SCHEDULER-TASK',$job->getTaskName());
         $this->assertTrue(!is_callable($job->getOnExecution()));
         $this->assertTrue($job->isMinute());
         $this->assertTrue($job->isHour());
@@ -704,8 +704,8 @@ class CronJobTest extends TestCase {
      */
     public function testSetName00() {
         $job = new BaseTask();
-        TasksManager::registerJobs();
-        $this->assertFalse($job->setJobName('Fail 1 '));
+        TasksManager::registerTasks();
+        $this->assertFalse($job->setTaskName('Fail 1 '));
     }
     /**
      * @test
@@ -808,14 +808,14 @@ class CronJobTest extends TestCase {
         $this->assertTrue($job->onMonth(2, '20', '10:00'));
         $this->assertEquals('0 10 20 2 *',$job->getExpression());
     }
-    public function testSetJobName00() {
+    public function testSetTaskName00() {
         $job = new BaseTask();
-        $job->setJobName('Hello Job');
-        $this->assertEquals('Hello Job',$job->getJobName());
-        $job->setJobName('  Hello Job  ');
-        $this->assertEquals('Hello Job',$job->getJobName());
-        $job->setJobName('   ');
-        $this->assertEquals('Hello Job',$job->getJobName());
+        $job->setTaskName('Hello Task');
+        $this->assertEquals('Hello Task',$job->getTaskName());
+        $job->setTaskName('  Hello Task  ');
+        $this->assertEquals('Hello Task',$job->getTaskName());
+        $job->setTaskName('   ');
+        $this->assertEquals('Hello Task',$job->getTaskName());
     }
     /**
      * @test

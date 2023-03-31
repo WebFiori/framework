@@ -94,7 +94,7 @@ class SchedulerCommand extends CLICommand {
         return $retVal;
     }
     public function listTasks() {
-        $tasksQueue = TasksManager::tQueue();
+        $tasksQueue = TasksManager::tasksQueue();
         $i = 1;
         $this->println("Number Of Scheduled Tasks: ".$tasksQueue->size());
 
@@ -136,7 +136,7 @@ class SchedulerCommand extends CLICommand {
 
             if ($result == 'INV_PASS') {
                 $this->error("Provided password is incorrect.");
-            } else if ($result == 'JOB_NOT_FOUND') {
+            } else if ($result == 'TASK_NOT_FOUND') {
                 $this->error("No task was found which has the name '".$taskName."'");
             } else {
                 $this->printExcResult($result);

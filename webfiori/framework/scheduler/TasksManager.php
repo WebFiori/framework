@@ -554,7 +554,7 @@ class TasksManager {
      * @return string|array If scheduler password is set and the given one is 
      * invalid, the method will return the string 'INV_PASS'. If 
      * a task name is specified and no task was found which has the given 
-     * name, the method will return the string 'JOB_NOT_FOUND'. Other than that, 
+     * name, the method will return the string 'TASK_NOT_FOUND'. Other than that, 
      * the method will return an associative array which has the 
      * following indices:
      * <ul>
@@ -591,7 +591,7 @@ class TasksManager {
 
         if ($taskName !== null) {
             self::log("Forcing task '$taskName' to execute...");
-            $task = self::getTask(trim($taskName));
+            $task = self::getTask($taskName);
 
             if ($task instanceof AbstractTask) {
                 self::runTaskHelper($retVal, $task, $xForce, $command);
@@ -599,7 +599,7 @@ class TasksManager {
                 self::log("Error: No task which has the name '$taskName' is found.");
                 self::log('Check finished.');
 
-                return 'JOB_NOT_FOUND';
+                return 'TASK_NOT_FOUND';
             }
         } else {
             $tempQ = new Queue();

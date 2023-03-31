@@ -1,5 +1,5 @@
 <?php
-namespace app\jobs;
+namespace app\tasks;
 
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
@@ -14,7 +14,7 @@ use webfiori\framework\scheduler\TaskStatusEmail;
  * <li>end: End date of the report.</li>
  * </ul>
  */
-class Fail2TestJob extends AbstractTask {
+class Fail2TestTask extends AbstractTask {
     /**
      * Creates new instance of the class.
      */

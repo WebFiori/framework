@@ -1,5 +1,5 @@
 <?php
-namespace app\jobs;
+namespace app\tasks;
 
 use webfiori\framework\scheduler\AbstractTask;
 /**
@@ -12,12 +12,21 @@ use webfiori\framework\scheduler\AbstractTask;
  * <li>end: End date of the report.</li>
  * </ul>
  */
-class Fail3TestJob extends AbstractTask {
+class SuccessTestEveryMinute extends AbstractTask {
     /**
      * Creates new instance of the class.
      */
     public function __construct() {
-        parent::__construct('Fail 3');
+        parent::__construct('Success Every Minute');
+        $this->setDescription('The job will execute every day to send sales report to management.');
+        $this->addExecutionArgs([
+            'start' => [
+                'description' => 'Start date of the report.'
+            ],
+            'end' => [
+                'description' => 'End date of the report.'
+            ],
+        ]);
         // TODO: Specify the time at which the process will run at.
         // You can use one of the following methods to specifiy the time:
         //$this->dailyAt(4, 30)
@@ -40,12 +49,13 @@ class Fail3TestJob extends AbstractTask {
      * Execute the process.
      */
     public function execute() {
-        $x = $argv[88];
+        //TODO: Write the code that represents the process.
     }
     /**
      * Execute a set of instructions when the job failed to complete without errors.
      */
     public function onFail() {
+        //TODO: Implement the action to perform when the job fails to complete without errors.
     }
     /**
      * Execute a set of instructions when the job completed without errors.

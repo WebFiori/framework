@@ -23,7 +23,7 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(-1, $runner->start());
         $this->assertEquals([
-            "Info: At least one of the options '--check', '--force' or '--show-job-args' must be provided.\n"
+            "Info: At least one of the options '--check', '--force' or '--show-task-args' must be provided.\n"
         ], $runner->getOutput());
     }
     /**
@@ -41,11 +41,11 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 4\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 4\n",
+            "Successfully finished tasks:\n",
             "    Success Every Minute\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    Fail 1\n",
             "    Fail 2\n",
             "    Fail 3\n",
@@ -83,18 +83,18 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Select one of the scheduled jobs to force:\n",
+            "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
             "1: Fail 2\n",
             "2: Fail 3\n",
             "3: Success Every Minute\n",
             "4: Success 1\n",
             "5: Cancel <--\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    <NONE>\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    Fail 1\n"
         ], $runner->getOutput());
     }
@@ -115,25 +115,25 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Select one of the scheduled jobs to force:\n",
+            "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
             "1: Fail 2\n",
             "2: Fail 3\n",
             "3: Success Every Minute\n",
             "4: Success 1\n",
             "5: Cancel <--\n",
-            "Running job(s) check...\n",
-            "Forcing job 'Fail 1' to execute...\n",
-            "Active job: \"Fail 1\" ...\n",
-            "Calling the method app\jobs\Fail1TestJob::execute()\n",
-            "Calling the method app\jobs\Fail1TestJob::onFail()\n",
-            "Calling the method app\jobs\Fail1TestJob::afterExec()\n",
+            "Running task(s) check...\n",
+            "Forcing task 'Fail 1' to execute...\n",
+            "Active task: \"Fail 1\" ...\n",
+            "Calling the method app\\tasks\Fail1TestTask::execute()\n",
+            "Calling the method app\\tasks\Fail1TestTask::onFail()\n",
+            "Calling the method app\\tasks\Fail1TestTask::afterExec()\n",
             "Check finished.\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    <NONE>\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    Fail 1\n"
         ], $runner->getOutput());
     }
@@ -154,30 +154,30 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Select one of the scheduled jobs to force:\n",
+            "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
             "1: Fail 2\n",
             "2: Fail 3\n",
             "3: Success Every Minute\n",
             "4: Success 1\n",
             "5: Cancel <--\n",
-            "Running job(s) check...\n",
-            "Forcing job 'Fail 2' to execute...\n",
-            "Active job: \"Fail 2\" ...\n",
-            "Calling the method app\jobs\Fail2TestJob::execute()\n",
-            "WARNING: An exception was thrown while performing the operation app\jobs\Fail2TestJob::execute. The output of the job might be not as expected.\n",
+            "Running task(s) check...\n",
+            "Forcing task 'Fail 2' to execute...\n",
+            "Active task: \"Fail 2\" ...\n",
+            "Calling the method app\\tasks\Fail2TestTask::execute()\n",
+            "WARNING: An exception was thrown while performing the operation app\\tasks\Fail2TestTask::execute. The output of the task might be not as expected.\n",
             "Exception class: Error\n",
-            "Exception message: Call to undefined method app\jobs\Fail2TestJob::undefined()\n",
-            "Thrown in: Fail2TestJob\n",
+            "Exception message: Call to undefined method app\\tasks\Fail2TestTask::undefined()\n",
+            "Thrown in: Fail2TestTask\n",
             "Line: 45\n",
-            "Calling the method app\jobs\Fail2TestJob::onFail()\n",
-            "Calling the method app\jobs\Fail2TestJob::afterExec()\n",
+            "Calling the method app\\tasks\Fail2TestTask::onFail()\n",
+            "Calling the method app\\tasks\Fail2TestTask::afterExec()\n",
             "Check finished.\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    <NONE>\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    Fail 2\n"
         ], $runner->getOutput());
     }
@@ -194,27 +194,27 @@ class CronCommandTest extends TestCase {
             'scheduler',
             '--force',
             '--show-log',
-            '--job-name' => 'Success 1',
+            '--task-name' => 'Success 1',
             'p' => '123456'
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
-            "Running job(s) check...\n",
-            "Forcing job 'Success 1' to execute...\n",
-            "Active job: \"Success 1\" ...\n",
-            "Calling the method app\jobs\SuccessTestJob::execute()\n",
+            "Running task(s) check...\n",
+            "Forcing task 'Success 1' to execute...\n",
+            "Active task: \"Success 1\" ...\n",
+            "Calling the method app\\tasks\SuccessTestTask::execute()\n",
             "Start: 2021-07-08\n",
             "End: \n",
-            "The job was forced.\n",
-            "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
-            "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
+            "The task was forced.\n",
+            "Calling the method app\\tasks\SuccessTestTask::onSuccess()\n",
+            "Calling the method app\\tasks\SuccessTestTask::afterExec()\n",
             "Check finished.\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    Success 1\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    <NONE>\n"
         ], $runner->getOutput());
     }
@@ -232,7 +232,7 @@ class CronCommandTest extends TestCase {
             'scheduler',
             '--force',
             '--show-log',
-            '--job-name' => 'Success 1',
+            '--task-name' => 'Success 1',
             'start' => '2021',
             'end' => '2022',
             'p' => '123456'
@@ -240,21 +240,21 @@ class CronCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
-            "Running job(s) check...\n",
-            "Forcing job 'Success 1' to execute...\n",
-            "Active job: \"Success 1\" ...\n",
-            "Calling the method app\jobs\SuccessTestJob::execute()\n",
+            "Running task(s) check...\n",
+            "Forcing task 'Success 1' to execute...\n",
+            "Active task: \"Success 1\" ...\n",
+            "Calling the method app\\tasks\SuccessTestTask::execute()\n",
             "Start: 2021\n",
             "End: 2022\n",
-            "The job was forced.\n",
-            "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
-            "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
+            "The task was forced.\n",
+            "Calling the method app\\tasks\SuccessTestTask::onSuccess()\n",
+            "Calling the method app\\tasks\SuccessTestTask::afterExec()\n",
             "Check finished.\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    Success 1\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    <NONE>\n"
         ], $runner->getOutput());
     }
@@ -266,7 +266,7 @@ class CronCommandTest extends TestCase {
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::password('123456');
-        TasksManager::registerJobs();
+        TasksManager::registerTasks();
         
         $runner->setInputs([
             'N'
@@ -275,7 +275,7 @@ class CronCommandTest extends TestCase {
             'webfiori',
             'scheduler',
             '--force',
-            '--job-name' => 'Success 1',
+            '--task-name' => 'Success 1',
             //'p' => '1234'
         ]);
         $this->assertEquals(-1, $runner->start());
@@ -284,7 +284,7 @@ class CronCommandTest extends TestCase {
             "Error: Provided password is incorrect.\n",
         ], $runner->getOutput());
         $this->assertEquals([
-            "Running job(s) check...",
+            "Running task(s) check...",
             "Error: Given password is incorrect.",
             "Check finished.",
         ], TasksManager::getLogArray());
@@ -300,13 +300,13 @@ class CronCommandTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'scheduler',
-            '--job-name' => 'Success 1',
-            '--show-job-args',
+            '--task-name' => 'Success 1',
+            '--show-task-args',
             'p' => '123456'
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Job Args:\n",
+            "Task Args:\n",
             "    start: Start date of the report.\n",
             "    end: End date of the report.\n",
         ], $runner->getOutput());
@@ -322,18 +322,18 @@ class CronCommandTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'scheduler',
-            '--show-job-args',
+            '--show-task-args',
             'p' => '123456'
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Select one of the scheduled jobs to show supported args:\n",
+            "Select one of the scheduled tasks to show supported args:\n",
             "0: Fail 1\n",
             "1: Fail 2\n",
             "2: Fail 3\n",
             "3: Success Every Minute\n",
             "4: Success 1\n",
-            "Job Args:\n",
+            "Task Args:\n",
             "    <NO ARGS>\n",
         ], $runner->getOutput());
     }
@@ -350,21 +350,21 @@ class CronCommandTest extends TestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Number Of Jobs: 5\n",
-            "--------- Job #01 ---------\n",
-            "Job Name          : Fail 1\n",
+            "Number Of Scheduled Tasks: 5\n",
+            "--------- Task #01 ---------\n",
+            "Task Name         : Fail 1\n",
             "Cron Expression   : * * * * *\n",
-            "--------- Job #02 ---------\n",
-            "Job Name          : Fail 2\n",
+            "--------- Task #02 ---------\n",
+            "Task Name         : Fail 2\n",
             "Cron Expression   : * * * * *\n",
-            "--------- Job #03 ---------\n",
-            "Job Name          : Fail 3\n",
+            "--------- Task #03 ---------\n",
+            "Task Name         : Fail 3\n",
             "Cron Expression   : * * * * *\n",
-            "--------- Job #04 ---------\n",
-            "Job Name          : Success Every Minute\n",
+            "--------- Task #04 ---------\n",
+            "Task Name         : Success Every Minute\n",
             "Cron Expression   : * * * * *\n",
-            "--------- Job #05 ---------\n",
-            "Job Name          : Success 1\n",
+            "--------- Task #05 ---------\n",
+            "Task Name         : Success 1\n",
             "Cron Expression   : 30 4 * * *\n",
         ], $runner->getOutput());
     }
@@ -393,7 +393,7 @@ class CronCommandTest extends TestCase {
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::password(hash('sha256', '123456'));
-        TasksManager::registerJobs();
+        TasksManager::registerTasks();
         
         $runner->setInputs([
             'Y',
@@ -404,7 +404,7 @@ class CronCommandTest extends TestCase {
             'webfiori',
             'scheduler',
             '--force',
-            '--job-name' => 'Success 1',
+            '--task-name' => 'Success 1',
             'p' => '123456'
         ]);
         $this->assertEquals(0, $runner->start());
@@ -414,21 +414,21 @@ class CronCommandTest extends TestCase {
             "Enter a value for the argument \"end\": Enter = ''\n",
             "Start: 2021-01-01\n",
             "End: 2020-01-01\n",
-            "The job was forced.\n",
-            "Total number of jobs: 5\n",
-            "Executed Jobs: 1\n",
-            "Successfully finished jobs:\n",
+            "The task was forced.\n",
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 1\n",
+            "Successfully finished tasks:\n",
             "    Success 1\n",
-            "Failed jobs:\n",
+            "Failed tasks:\n",
             "    <NONE>\n",
         ], $runner->getOutput());
         $this->assertEquals([
-            'Running job(s) check...',
-            "Forcing job 'Success 1' to execute...",
-            "Active job: \"Success 1\" ...",
-            "Calling the method app\jobs\SuccessTestJob::execute()",
-            "Calling the method app\jobs\SuccessTestJob::onSuccess()",
-            "Calling the method app\jobs\SuccessTestJob::afterExec()",
+            'Running task(s) check...',
+            "Forcing task 'Success 1' to execute...",
+            "Active task: \"Success 1\" ...",
+            "Calling the method app\\tasks\SuccessTestTask::execute()",
+            "Calling the method app\\tasks\SuccessTestTask::onSuccess()",
+            "Calling the method app\\tasks\SuccessTestTask::afterExec()",
             "Check finished.",
         ], TasksManager::getLogArray());
     }

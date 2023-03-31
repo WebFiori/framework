@@ -21,11 +21,6 @@ class TestTable extends MySQLTable {
                 'type' => 'int',
                 'size' => '11',
             ],
-            'new-col' => [
-                'type' => 'int',
-                'size' => '9',
-                'comment' => 'Cool new column.',
-            ],
         ]);
     }
 }

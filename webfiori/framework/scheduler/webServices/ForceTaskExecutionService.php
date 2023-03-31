@@ -28,9 +28,9 @@ class ForceTaskExecutionService extends AbstractWebService {
         $this->addParameter(new RequestParameter('task-name'));
     }
     public function isAuthorized() {
-        SessionsManager::start('cron-session');
+        SessionsManager::start('scheduler-session');
 
-        return SessionsManager::get('cron-login-status') === true
+        return SessionsManager::get('scheduler-login-status') === true
                 || TasksManager::password() == 'NO_PASSWORD';
     }
 

@@ -5,7 +5,6 @@ use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\test\cli\CreateTestCase;
 use webfiori\framework\writers\MiddlewareClassWriter;
 /**
- * Description of CronWritterTest
  *
  * @author Ibrahim
  */

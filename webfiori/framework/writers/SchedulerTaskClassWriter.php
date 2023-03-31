@@ -10,45 +10,45 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\cron\AbstractTask;
-use webfiori\framework\cron\TasksManager;
-use webfiori\framework\cron\TaskStatusEmail;
-use webfiori\framework\cron\BaseTask;
-use webfiori\framework\cron\TaskArgument;
+use webfiori\framework\scheduler\AbstractTask;
+use webfiori\framework\scheduler\TasksManager;
+use webfiori\framework\scheduler\TaskStatusEmail;
+use webfiori\framework\scheduler\BaseTask;
+use webfiori\framework\scheduler\TaskArgument;
 /**
- * A class which is used to write cron jobs classes.
+ * A class which is used to write scheduler tasks classes.
  *
  * @author Ibrahim
  */
-class CronJobClassWriter extends ClassWriter {
-    private $job;
+class SchedulerTaskClassWriter extends ClassWriter {
+    private $task;
     /**
      * Creates new instance of the class.
      * 
-     * @param string $jobName The name of the job.
+     * @param string $taskName The name of the task.
      * 
-     * @param string $jobDesc A short description that description what does the
-     * job do.
+     * @param string $taskDesc A short description that description what does the
+     * task do.
      * 
      * @param array $argsArr An associative array that holds any arguments that
-     * the job needs.
+     * the task needs.
      */
-    public function __construct($jobName = '', $jobDesc = '', array $argsArr = []) {
-        parent::__construct('NewJob', ROOT_PATH.DS.APP_DIR.DS.'jobs', APP_DIR.'\\jobs');
-        $this->job = new BaseTask();
+    public function __construct($taskName = '', $taskDesc = '', array $argsArr = []) {
+        parent::__construct('NewTask', ROOT_PATH.DS.APP_DIR.DS.'tasks', APP_DIR.'\\tasks');
+        $this->task = new BaseTask();
 
-        if (!$this->setJobName($jobName)) {
-            $this->setJobName('New Job');
+        if (!$this->setTaskName($taskName)) {
+            $this->setTaskName('New Task');
         }
 
-        if (!$this->setJobDescription($jobDesc)) {
-            $this->setJobDescription('No Description');
+        if (!$this->setTaskDescription($taskDesc)) {
+            $this->setTaskDescription('No Description');
         }
 
-        foreach ($argsArr as $jobArg) {
-            $this->addArgument($jobArg);
+        foreach ($argsArr as $taskArg) {
+            $this->addArgument($taskArg);
         }
-        $this->setSuffix('Job');
+        $this->setSuffix('Task');
         $this->addUseStatement([
             AbstractTask::class,
             TaskStatusEmail::class,
@@ -56,65 +56,65 @@ class CronJobClassWriter extends ClassWriter {
         ]);
     }
     /**
-     * Adds new execution argument to the job.
+     * Adds new execution argument to the task.
      * 
      * @param TaskArgument $arg An object which holds argument information.
      */
     public function addArgument(TaskArgument $arg) {
-        $this->getJob()->addExecutionArg($arg);
+        $this->getTask()->addExecutionArg($arg);
     }
     /**
-     * Returns the object which holds the basic information of the job that will
+     * Returns the object which holds the basic information of the task that will
      * be created.
      * 
      * @return BaseTask
      */
-    public function getJob() : BaseTask {
-        return $this->job;
+    public function getTask() : BaseTask {
+        return $this->task;
     }
     /**
-     * Returns the description of the job.
+     * Returns the description of the task.
      * 
-     * @return string The description of the job. Default return value is 'No Description'.
+     * @return string The description of the task. Default return value is 'No Description'.
      */
-    public function getJobDescription() : string {
-        return $this->getJob()->getDescription();
+    public function getTaskDescription() : string {
+        return $this->getTask()->getDescription();
     }
     /**
-     * Returns the name of the job.
+     * Returns the name of the task.
      * 
-     * @return string The name of the job. Default return value is 'New Job'.
+     * @return string The name of the task. Default return value is 'New Task'.
      */
-    public function getJobName() : string {
-        return $this->getJob()->getJobName();
+    public function getTaskName() : string {
+        return $this->getTask()->getTaskName();
     }
     /**
-     * Sets the description of the job.
+     * Sets the description of the task.
      * 
-     * The description is usually used to describe what does the job will do
+     * The description is usually used to describe what does the task will do
      * when it gets executed.
      * 
-     * @param string $jobDesc The description of the job. Must be non-empty string.
+     * @param string $taskDesc The description of the task. Must be non-empty string.
      * 
      * @return bool If the description is set, the method will return true. Other then
      * that, the method will return false.
      */
-    public function setJobDescription(string $jobDesc) : bool {
-        return $this->getJob()->setDescription($jobDesc);
+    public function setTaskDescription(string $taskDesc) : bool {
+        return $this->getTask()->setDescription($taskDesc);
     }
     /**
-     * Sets the name of the job.
+     * Sets the name of the task.
      * 
-     * The name is a unique string which is used by each created job. It acts as
-     * an identifier for the job.
+     * The name is a unique string which is used by each created task. It acts as
+     * an identifier for the task.
      * 
-     * @param string $jobName The name of the job. Must be non-empty string.
+     * @param string $taskName The name of the task. Must be non-empty string.
      * 
      * @return bool If the name is set, the method will return true. Other then
      * that, the method will return false.
      */
-    public function setJobName(string $jobName) : bool {
-        return $this->getJob()->setJobName($jobName);
+    public function setTaskName(string $taskName) : bool {
+        return $this->getTask()->setTaskName($taskName);
     }
 
     public function writeClassBody() {
@@ -130,29 +130,29 @@ class CronJobClassWriter extends ClassWriter {
         $this->append([
             '}',
             '/**',
-            ' * Execute a set of instructions when the job failed to complete without errors.',
+            ' * Execute a set of instructions when the task failed to complete without errors.',
             ' */',
             $this->f('onFail')
         ], 1);
-        $this->append('//TODO: Implement the action to perform when the job fails to complete without errors.', 2);
+        $this->append('//TODO: Implement the action to perform when the task fails to complete without errors.', 2);
         $this->append([
             '}',
             '/**',
-            ' * Execute a set of instructions when the job completed without errors.',
+            ' * Execute a set of instructions when the task completed without errors.',
             ' */',
             $this->f('onSuccess'),
         ], 1);
 
-        $this->append('//TODO: Implement the action to perform when the job executes without errors.', 2);
+        $this->append('//TODO: Implement the action to perform when the task executes without errors.', 2);
         $this->append([
             '}',
             '/**',
-            ' * Execute a set of instructions after the job has finished to execute.',
+            ' * Execute a set of instructions after the task has finished to execute.',
             ' */',
             $this->f('afterExec'),
         ], 1);
 
-        $this->append('//TODO: Implement the action to perform when the job finishes to execute.', 2);
+        $this->append('//TODO: Implement the action to perform when the task finishes to execute.', 2);
         $this->append("//\$email = new CronEmail('no-reply', [", 2);
         $this->append("//    'webfiori@example.com' => 'Ibrahim Ali'", 2);
         $this->append('//]);', 2);
@@ -166,11 +166,11 @@ class CronJobClassWriter extends ClassWriter {
             '/**',
             ' * A background process which was created using the command "create".',
             ' *',
-            " * The process will have the name '".$this->getJobName()."'."
+            " * The process will have the name '".$this->getTaskName()."'."
         ]);
 
         $argsPartArr = [];
-        $args = $this->getJob()->getArguments();
+        $args = $this->getTask()->getArguments();
 
         if (count($args) != 0) {
             $argsPartArr = [
@@ -189,7 +189,7 @@ class CronJobClassWriter extends ClassWriter {
     }
 
     public function writeClassDeclaration() {
-        $this->append('class '.$this->getName().' extends AbstractJob {');
+        $this->append('class '.$this->getName().' extends AbstractTask {');
     }
     private function writeConstructor() {
         $this->append([
@@ -199,16 +199,16 @@ class CronJobClassWriter extends ClassWriter {
             $this->f('__construct')
         ], 1);
         $this->append([
-            "parent::__construct('".$this->getJobName()."');",
-            "\$this->setDescription('".str_replace('\'', '\\\'', $this->getJobDescription())."');"
+            "parent::__construct('".$this->getTaskName()."');",
+            "\$this->setDescription('".str_replace('\'', '\\\'', $this->getTaskDescription())."');"
         ], 2);
 
-        $jobArgs = $this->getJob()->getArguments();
+        $taskArgs = $this->getTask()->getArguments();
 
-        if (count($jobArgs) > 0) {
+        if (count($taskArgs) > 0) {
             $this->append('$this->addExecutionArgs([', 2);
 
-            foreach ($jobArgs as $argObj) {
+            foreach ($taskArgs as $argObj) {
                 $this->append("'".$argObj->getName()."' => [", 3);
                 $this->append("'description' => '".str_replace('\'', '\\\'', $argObj->getDescription())."',", 4);
 

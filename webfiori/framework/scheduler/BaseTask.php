@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\scheduler;
 
 use Exception;
 
@@ -50,7 +50,7 @@ class BaseTask extends AbstractTask {
      * @since 1.0
      */
     public function __construct(string $when = '* * * * *') {
-        parent::__construct('CRON-JOB', $when);
+        parent::__construct('SCHEDULER-TASK', $when);
         $this->events = [];
         $this->events['on'] = [];
         $this->events['on']['func'] = null;

@@ -184,7 +184,7 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testUpdateCronPass00() {
+    public function testUpdateSchedulerPass00() {
         $runner = WebFioriApp::getRunner();
         $runner->setInputs([
             '123456'
@@ -193,7 +193,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
-            '--w' => 'cron-pass'
+            '--w' => 'scheduler-pass',
         ]);
         
         $this->assertEquals(0, $runner->start());
@@ -206,7 +206,7 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testUpdateCronPass01() {
+    public function testUpdateSchedulerPass01() {
         $runner = WebFioriApp::getRunner();
         $runner->setInputs([
             ''
@@ -215,7 +215,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
-            '--w' => 'cron-pass'
+            '--w' => 'scheduler-pass',
         ]);
         
         $this->assertEquals(0, $runner->start());
@@ -326,7 +326,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "What would you like to update?\n",
             "0: Update application version info.\n",
             "1: Update application name.\n",
-            "2: Update CRON password.\n",
+            "2: Update scheduler password.\n",
             "3: Update default page title.\n",
             "4: Update default page description.\n",
             "5: Change primary language.\n",

@@ -13,42 +13,42 @@ namespace webfiori\framework\cli\helpers;
 use InvalidArgumentException;
 use webfiori\cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cron\BaseTask;
-use webfiori\framework\cron\TaskArgument;
-use webfiori\framework\writers\CronJobClassWriter;
+use webfiori\framework\scheduler\BaseTask;
+use webfiori\framework\scheduler\TaskArgument;
+use webfiori\framework\writers\SchedulerTaskClassWriter;
 /**
- * A helper class which is used to help in creating cron jobs classes using CLI.
+ * A helper class which is used to help in creating scheduler tasks classes using CLI.
  *
  * @author Ibrahim
  * 
  * @version 1.0
  */
-class CreateCronJob extends CreateClassHelper {
+class CreateBackgroundTask extends CreateClassHelper {
     /**
-     * @var CronJobClassWriter
+     * @var SchedulerTaskClassWriter
      */
-    private $jobWriter;
+    private $taskWriter;
     /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command, new CronJobClassWriter());
-        $this->jobWriter = $this->getWriter();
+        parent::__construct($command, new SchedulerTaskClassWriter());
+        $this->taskWriter = $this->getWriter();
 
     }
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR.'\\jobs', 'Job');
-        $jobName = $this->getJobName();
-        $jobDesc = $this->getJobDesc();
+        $this->setClassInfo(APP_DIR.'\\tasks', 'Task');
+        $taskName = $this->getTaskName();
+        $taskDesc = $this->getTaskDesc();
 
-        if ($this->confirm('Would you like to add arguments to the job?', false)) {
+        if ($this->confirm('Would you like to add arguments to the task?', false)) {
             $this->getArgsHelper();
         }
 
-        $this->jobWriter->setJobName($jobName);
-        $this->jobWriter->setJobDescription($jobDesc);
+        $this->taskWriter->setTaskName($taskName);
+        $this->taskWriter->setTaskDescription($taskDesc);
 
         $this->writeClass();
     }
@@ -61,15 +61,15 @@ class CreateCronJob extends CreateClassHelper {
                 $argObj->setDescription($this->getInput('Describe the use of the argument:', ''));
                 $argObj->setDefault($this->getInput('Default value:', ''));
 
-                $this->jobWriter->addArgument($argObj);
+                $this->taskWriter->addArgument($argObj);
             } catch (InvalidArgumentException $ex) {
                 $this->error($ex->getMessage());
             }
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
     }
-    private function getJobDesc(): string {
-        return $this->getInput('Provide short description of what does the job will do:', null, new InputValidator(function ($val)
+    private function getTaskDesc(): string {
+        return $this->getInput('Provide short description of what does the task will do:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
                 return true;
@@ -78,12 +78,12 @@ class CreateCronJob extends CreateClassHelper {
             return false;
         }));
     }
-    private function getJobName() : string {
-        return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
+    private function getTaskName() : string {
+        return $this->getInput('Enter a name for the task:', null, new InputValidator(function ($val)
         {
             $temp = new BaseTask();
 
-            if ($temp->setJobName($val)) {
+            if ($temp->setTaskName($val)) {
                 return true;
             }
 

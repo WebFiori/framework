@@ -16,7 +16,7 @@ use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
 use webfiori\collections\Queue;
 use webfiori\file\File;
-use webfiori\framework\cli\commands\CronCommand;
+use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\scheduler\webServices\TasksServicesManager;
 use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\scheduler\webUI\ListTasksPage;
@@ -548,7 +548,7 @@ class TasksManager {
      * @param bool $force If this attribute is set to true and a task name 
      * was provided, the task will be forced to execute. Default is false.
      * 
-     * @param CronCommand|null $command If scheduler is executed from CLI, this parameter is
+     * @param SchedulerCommand|null $command If scheduler is executed from CLI, this parameter is
      * provided to set custom execution attributes of a task.
      * 
      * @return string|array If scheduler password is set and the given one is 
@@ -568,7 +568,7 @@ class TasksManager {
      * 
      * @since 1.0.6
      */
-    public static function run(string $pass = '', string $taskName = null, bool $force = false, CronCommand $command = null) {
+    public static function run(string $pass = '', string $taskName = null, bool $force = false, SchedulerCommand $command = null) {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
@@ -868,9 +868,9 @@ class TasksManager {
      * @param array $retVal
      * @param AbstractTask $task
      * @param bool $xForce
-     * @param CronCommand|null $command
+     * @param SchedulerCommand|null $command
      */
-    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, CronCommand $command = null) {
+    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, SchedulerCommand $command = null) {
         if ($task->isTime() || $xForce) {
             if ($command !== null) {
                 $task->setCommand($command);

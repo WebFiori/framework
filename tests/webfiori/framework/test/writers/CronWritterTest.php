@@ -1,12 +1,11 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\CronJobClassWriter;
+use webfiori\framework\writers\SchedulerTaskClassWriter;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\TaskArgument;
-use webfiori\framework\cron\AbstractTask;
+use webfiori\framework\scheduler\TaskArgument;
+use webfiori\framework\scheduler\AbstractTask;
 /**
- * Description of CronWritterTest
  *
  * @author Ibrahim
  */
@@ -15,14 +14,14 @@ class CronWritterTest extends TestCase {
      * @test
      */
     public function test00() {
-        $writter = new CronJobClassWriter();
+        $writter = new SchedulerTaskClassWriter();
         $this->assertEquals('NewJob', $writter->getName());
         $this->assertEquals('app\\jobs', $writter->getNamespace());
         $this->assertEquals('Job', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\cron\\AbstractJob",
-            "webfiori\\framework\\cron\\CronEmail",
-            "webfiori\\framework\\cron\\Cron",
+            "webfiori\\framework\\scheduler\\AbstractTask",
+            "webfiori\\framework\\scheduler\\TaskStatusEmail",
+            "webfiori\\framework\\scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getJobDescription());
         $this->assertEquals(0, count($writter->getJob()->getArguments()));
@@ -31,15 +30,15 @@ class CronWritterTest extends TestCase {
      * @test
      */
     public function test01() {
-        $writter = new CronJobClassWriter();
+        $writter = new SchedulerTaskClassWriter();
         $writter->setClassName('NewOk');
         $this->assertEquals('NewOkJob', $writter->getName());
         $this->assertEquals('app\\jobs', $writter->getNamespace());
         $this->assertEquals('Job', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\cron\\AbstractJob",
-            "webfiori\\framework\\cron\\CronEmail",
-            "webfiori\\framework\\cron\\Cron",
+            "webfiori\\framework\\scheduler\\AbstractTask",
+            "webfiori\\framework\\scheduler\\TaskStatusEmail",
+            "webfiori\\framework\\scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getJobDescription());
         $this->assertEquals(0, count($writter->getJob()->getArguments()));

@@ -30,7 +30,7 @@ class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-settings', [
             new CommandArgument('--w', 'An argument which is used to indicate what will be updated. '
-                .'Possible values are: version, app-name, cron-pass, page-title, '
+                .'Possible values are: version, app-name, scheduler-pass, page-title, '
                 .'page-description, primary-lang, title-sep, home-page, primary-theme,'
                 .'admin-theme.', true),
         ], 'Update application settings which are stored in the class "AppConfig".');
@@ -39,7 +39,7 @@ class UpdateSettingsCommand extends CLICommand {
         $options = [];
         $this->addOption($options,'version', 'Update application version info.');
         $this->addOption($options,'app-name', 'Update application name.');
-        $this->addOption($options,'cron-pass', 'Update CRON password.');
+        $this->addOption($options,'scheduler-pass', 'Update scheduler password.');
         $this->addOption($options,'page-title', 'Update default page title.');
         $this->addOption($options,'page-description', 'Update default page description.');
         $this->addOption($options,'primary-lang', 'Change primary language.');
@@ -72,8 +72,8 @@ class UpdateSettingsCommand extends CLICommand {
             $this->updateName();
         } else if ($answer == 'Update default page title.') {
             $this->updateTitle();
-        } else if ($answer == 'Update CRON password.') {
-            $this->updateCronPass();
+        } else if ($answer == 'Update scheduler password.') {
+            $this->updateSchedulerPass();
         } else if ($answer == 'Change title separator.') {
             $this->updateTitleSep();
         } else if ($answer == 'Update default page description.') {
@@ -114,7 +114,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo(['base-theme' => $classNs]);
         $this->success('Primary theme successfully updated.');
     }
-    private function updateCronPass() {
+    private function updateSchedulerPass() {
         $newPass = $this->getInput('Enter new password:', '');
 
         if (strlen($newPass) == 0) {

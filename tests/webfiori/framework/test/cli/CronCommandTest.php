@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
  * Description of CronCommandTest
@@ -19,7 +19,7 @@ class CronCommandTest extends TestCase {
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
-            'cron'
+            'scheduler',
         ]);
         $this->assertEquals(-1, $runner->start());
         $this->assertEquals([
@@ -35,7 +35,7 @@ class CronCommandTest extends TestCase {
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--check',
             'p' => '123456'
         ]);
@@ -59,12 +59,12 @@ class CronCommandTest extends TestCase {
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--check',
         ]);
         $this->assertEquals(-1, $runner->start());
         $this->assertEquals([
-            "Error: The argument 'p' is missing. It must be provided if cron password is set.\n",
+            "Error: The argument 'p' is missing. It must be provided if scheduler password is set.\n",
         ], $runner->getOutput());
     }
     /**
@@ -77,7 +77,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             'p' => '123456'
         ]);
@@ -108,7 +108,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--show-log',
             'p' => '123456'
@@ -147,7 +147,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--show-log',
             'p' => '123456'
@@ -191,7 +191,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--show-log',
             '--job-name' => 'Success 1',
@@ -229,7 +229,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--show-log',
             '--job-name' => 'Success 1',
@@ -273,7 +273,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--job-name' => 'Success 1',
             //'p' => '1234'
@@ -299,7 +299,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--job-name' => 'Success 1',
             '--show-job-args',
             'p' => '123456'
@@ -321,7 +321,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--show-job-args',
             'p' => '123456'
         ]);
@@ -345,7 +345,7 @@ class CronCommandTest extends TestCase {
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--list'
         ]);
         $this->assertEquals(0, $runner->start());
@@ -376,7 +376,7 @@ class CronCommandTest extends TestCase {
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--check',
             'p' => '4'
         ]);
@@ -402,7 +402,7 @@ class CronCommandTest extends TestCase {
         ]);
         $runner->setArgsVector([
             'webfiori',
-            'cron',
+            'scheduler',
             '--force',
             '--job-name' => 'Success 1',
             'p' => '123456'

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  * 
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\scheduler;
 
 use webfiori\file\File;
 use webfiori\framework\EmailMessage;
@@ -26,7 +26,7 @@ use webfiori\ui\TableRow;
  * The email that will be sent will contain technical information about 
  * the task in addition to a basic log file that shows execution steps. Also, 
  * it will contain any log messages which was added by using the method 
- * 'Cron::log()'.
+ * 'TasksManager::log()'.
  * 
  * @author Ibrahim
  * 
@@ -93,7 +93,7 @@ class TaskStatusEmail extends EmailMessage {
             foreach (TasksManager::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
-            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'cron'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
+            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'scheduler'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
             $file->create(true);
             $file->write();

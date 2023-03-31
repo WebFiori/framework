@@ -1,9 +1,7 @@
 <?php
 namespace app\jobs;
 
-use webfiori\framework\cron\AbstractTask;
-use webfiori\framework\cron\TasksManager;
-use webfiori\framework\cron\TaskStatusEmail;
+use webfiori\framework\scheduler\AbstractTask;
 /**
  * A background process which was created using the command "create".
  *
@@ -34,7 +32,7 @@ class Fail1TestJob extends AbstractTask {
      */
     public function afterExec() {
         //TODO: Implement the action to perform when the job finishes to execute.
-        //$email = new CronEmail('no-reply', [
+        //$email = new TasStatusEmail('no-reply', [
         //    'webfiori@example.com' => 'Ibrahim Ali'
         //]);
     }

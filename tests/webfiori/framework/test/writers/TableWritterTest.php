@@ -7,7 +7,6 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\framework\test\cli\CreateTestCase;
 use webfiori\framework\writers\TableClassWriter;
 /**
- * Description of CronWritterTest
  *
  * @author Ibrahim
  */

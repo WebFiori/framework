@@ -13,7 +13,7 @@ namespace webfiori\framework\scheduler;
 use Exception;
 use Throwable;
 use webfiori\collections\Queue;
-use webfiori\framework\cli\commands\CronCommand;
+use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
 use webfiori\framework\Util;
 use webfiori\http\Request;
@@ -82,7 +82,7 @@ abstract class AbstractTask implements JsonI {
     /**
      * The command which is used to execute the task.
      * 
-     * @var CronCommand
+     * @var SchedulerCommand
      * 
      * @since 1.0.1 
      */
@@ -160,7 +160,7 @@ abstract class AbstractTask implements JsonI {
      * </ul>
      * Default is '* * * * *' which means run the task every minute.
      * 
-     * @param string $description A description for the task. Shown in CRON
+     * @param string $description A description for the task. Shown in scheduler
      * web interface or CLI.
      * 
      * @throws Exception
@@ -530,7 +530,7 @@ abstract class AbstractTask implements JsonI {
      * 
      * Note that the command will be null if not executed from CLI environment.
      * 
-     * @return CronCommand|null 
+     * @return SchedulerCommand|null 
      * 
      * @since 1.0.1
      */
@@ -606,7 +606,7 @@ abstract class AbstractTask implements JsonI {
      * execution. It can be supplied as a part of task URL. 
      * 
      * @return string The name of the task. If no name is set, the function will return 
-     * 'CRON-JOB'.
+     * 'SCHEDULER-TASK'.
      * 
      * @since 1.0
      */
@@ -647,7 +647,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($monthDaysArr['every-day'] !== true) {
             $retVal = false;
-            $current = Cron::dayOfMonth();
+            $current = TasksManager::dayOfMonth();
             $ranges = $monthDaysArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -680,7 +680,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($daysArr['every-day'] !== true) {
             $retVal = false;
-            $current = Cron::dayOfWeek();
+            $current = TasksManager::dayOfWeek();
             $ranges = $daysArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -724,7 +724,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($hoursArr['every-hour'] !== true) {
             $retVal = false;
-            $current = Cron::hour();
+            $current = TasksManager::hour();
             $ranges = $hoursArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -756,7 +756,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($minuteArr['every-minute'] !== true) {
             $retVal = false;
-            $current = Cron::minute();
+            $current = TasksManager::minute();
             $ranges = $minuteArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -788,7 +788,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($monthsArr['every-month'] !== true) {
             $retVal = false;
-            $current = Cron::month();
+            $current = TasksManager::month();
             $ranges = $monthsArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -931,11 +931,11 @@ abstract class AbstractTask implements JsonI {
     /**
      * Associate the task with the command that was used to execute the task.
      * 
-     * @param CronCommand $command
+     * @param SchedulerCommand $command
      * 
      * @since 1.0.1
      */
-    public function setCommand(CronCommand $command) {
+    public function setCommand(SchedulerCommand $command) {
         $this->command = $command;
     }
     /**
@@ -991,7 +991,7 @@ abstract class AbstractTask implements JsonI {
             $tempTasksQueue = new Queue();
             $nameTaken = false;
 
-            while ($task = Cron::tasksQueue()->dequeue()) {
+            while ($task = TasksManager::tasksQueue()->dequeue()) {
                 if ($task->getTaskName() == $trimmed) {
                     $nameTaken = true;
                 }
@@ -999,7 +999,7 @@ abstract class AbstractTask implements JsonI {
             }
 
             while ($task = $tempTasksQueue->dequeue()) {
-                Cron::scheduleTask($task);
+                TasksManager::scheduleTask($task);
             }
 
             if (!$nameTaken) {
@@ -1078,7 +1078,7 @@ abstract class AbstractTask implements JsonI {
      * @return null|boolean
      */
     private function callMethod(string $fName) {
-        Cron::log('Calling the method '.get_class($this)."::$fName()");
+        TasksManager::log('Calling the method '.get_class($this)."::$fName()");
         try {
             return $this->$fName();
         } catch (Throwable $ex) {
@@ -1417,12 +1417,12 @@ abstract class AbstractTask implements JsonI {
      * @param string $meth
      */
     private function logExeException(Throwable $ex, string $meth = '') {
-        Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
+        TasksManager::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
                 .'The output of the task might be not as expected.');
-        Cron::log('Exception class: '.get_class($ex));
-        Cron::log('Exception message: '.$ex->getMessage());
-        Cron::log('Thrown in: '.Util::extractClassName($ex->getFile()));
-        Cron::log('Line: '.$ex->getLine());
+        TasksManager::log('Exception class: '.get_class($ex));
+        TasksManager::log('Exception message: '.$ex->getMessage());
+        TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
+        TasksManager::log('Line: '.$ex->getLine());
 
 
         if ($meth == 'execute') {

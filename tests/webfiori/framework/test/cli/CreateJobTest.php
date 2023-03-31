@@ -2,7 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\cron\AbstractTask;
+use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\WebFioriApp;
 
 /**

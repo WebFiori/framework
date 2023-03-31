@@ -4,7 +4,7 @@ namespace webfiori\framework\test\cron;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\TaskArgument;
+use webfiori\framework\scheduler\TaskArgument;
 /**
  * Description of JobArgumentTest
  *

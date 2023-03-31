@@ -17,7 +17,7 @@ use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
@@ -331,7 +331,7 @@ class WebFioriApp {
                     '\\webfiori\\framework\\cli\commands\\WHelpCommand',
                     '\\webfiori\\framework\\cli\\commands\\VersionCommand',
                     '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
-                    '\\webfiori\\framework\\cli\\commands\\CronCommand',
+                    '\\webfiori\\framework\\cli\\commands\\SchedulerCommand',
                     '\\webfiori\\framework\\cli\\commands\\CreateCommand',
                     '\\webfiori\\framework\\cli\\commands\\AddCommand',
                     '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
@@ -547,14 +547,14 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
         }
 
-        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('cron', $pathArr))) {
+        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
             if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
                 TasksManager::initRoutes();
             }
             TasksManager::password($this->appConfig->getSchedulerPassword());
-            //initialize cron jobs only if in CLI or cron is enabled through HTTP.
-            call_user_func(APP_DIR.'\ini\InitCron::init');
-            TasksManager::registerJobs();
+            //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
+            call_user_func(APP_DIR.'\ini\InitTasks::init');
+            TasksManager::registerTasks();
         }
     }
     private function initFrameworkVersionInfo() {

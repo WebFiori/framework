@@ -5,7 +5,6 @@ use webfiori\framework\writers\ThemeClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Theme;
 /**
- * Description of CronWritterTest
  *
  * @author Ibrahim
  */

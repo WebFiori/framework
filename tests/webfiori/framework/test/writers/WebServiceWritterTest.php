@@ -5,8 +5,6 @@ use webfiori\framework\writers\WebServiceWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\http\AbstractWebService;
 /**
- * Description of CronWritterTest
- *
  * @author Ibrahim
  */
 class WebServiceWritterTest extends TestCase {

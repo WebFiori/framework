@@ -3,11 +3,9 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
- * Description of CronCommandTest
- *
  * @author Ibrahim
  */
 class CreateCLICommandTest extends CreateTestCase {

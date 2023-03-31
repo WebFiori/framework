@@ -13,7 +13,7 @@ namespace webfiori\framework\handlers;
 use webfiori\cli\Formatter;
 use webfiori\cli\Runner;
 use webfiori\error\AbstractHandler;
-use webfiori\framework\cron\TasksManager;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
  * Exceptions handler which is used to handle exceptions in case of running

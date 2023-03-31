@@ -2,10 +2,10 @@
 namespace webfiori\framework\test\cron;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cron\TasksManager;
-use webfiori\framework\cron\webServices\TasksServicesManager;
-use webfiori\framework\cron\webUI\TasksLoginPage;
-use webfiori\framework\cron\webUI\ListTasksPage;
+use webfiori\framework\scheduler\TasksManager;
+use webfiori\framework\scheduler\webServices\TasksServicesManager;
+use webfiori\framework\scheduler\webUI\TasksLoginPage;
+use webfiori\framework\scheduler\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
 /**
  * Description of CronTest
@@ -82,9 +82,9 @@ class CronTest extends TestCase {
      */
     public function testWeeklyJob03() {
         TasksManager::password('');
-        $this->assertTrue(TasksManager::weeklyJob('sun-23:00', 'Job Ok', function(TasksManager $cron, TestCase $c)
+        $this->assertTrue(TasksManager::weeklyJob('sun-23:00', 'Job Ok', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok', $cron->activeJob()->getJobName());
+            $c->assertEquals('Job Ok', $task->activeJob()->getJobName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
         TasksManager::run('', 'Job Ok', true);
@@ -121,9 +121,9 @@ class CronTest extends TestCase {
      * @test
      */
     public function testDailyJob03() {
-        $this->assertTrue(TasksManager::dailyJob('23:00', 'Job Ok2', function(TasksManager $cron, TestCase $c)
+        $this->assertTrue(TasksManager::dailyJob('23:00', 'Job Ok2', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok2', $cron->activeJob()->getJobName());
+            $c->assertEquals('Job Ok2', $task->activeJob()->getJobName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
         TasksManager::run('', 'Job Ok2', true);
@@ -159,9 +159,9 @@ class CronTest extends TestCase {
      * @test
      */
     public function testMonthlyJob03() {
-        $this->assertTrue(TasksManager::monthlyJob(15, '23:00', 'Job Ok3', function(TasksManager $cron, TestCase $c)
+        $this->assertTrue(TasksManager::monthlyJob(15, '23:00', 'Job Ok3', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok3', $cron->activeJob()->getJobName());
+            $c->assertEquals('Job Ok3', $task->activeJob()->getJobName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
         TasksManager::run('', 'Job Ok3', true);
@@ -175,19 +175,19 @@ class CronTest extends TestCase {
         TasksManager::initRoutes();
         $this->assertEquals(4, Router::routesCount());
         
-        $route1 = Router::getUriObj('/cron');
+        $route1 = Router::getUriObj('/scheduler');
         $this->assertNotNull($route1);
         $this->assertEquals(TasksLoginPage::class, $route1->getRouteTo());
         
-        $route2 = Router::getUriObj('/cron/login');
+        $route2 = Router::getUriObj('/scheduler/login');
         $this->assertNotNull($route2);
         $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
         
-        $route3 = Router::getUriObj('/cron/jobs');
+        $route3 = Router::getUriObj('/scheduler/jobs');
         $this->assertNotNull($route3);
         $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
         
-        $route4 = Router::getUriObj('/cron/apis/{action}');
+        $route4 = Router::getUriObj('/scheduler/apis/{action}');
         $this->assertNotNull($route4);
         $this->assertEquals(TasksServicesManager::class, $route4->getRouteTo());
     }

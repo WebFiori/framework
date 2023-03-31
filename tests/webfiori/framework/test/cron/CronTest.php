@@ -165,7 +165,7 @@ class CronTest extends TestCase {
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
         TasksManager::run('', 'Task Ok3', true);
-        $this->assertEquals('JOB_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
+        $this->assertEquals('TASK_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
     }
     /**
      * @test

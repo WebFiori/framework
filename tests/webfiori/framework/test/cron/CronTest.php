@@ -16,24 +16,24 @@ class CronTest extends TestCase {
     /**
      * @test
      */
-    public function testCreateJob00() {
-        $this->assertFalse(TasksManager::createJob('7-1 * * * *'));
+    public function testCreateTask00() {
+        $this->assertFalse(TasksManager::createTask('7-1 * * * *'));
     }
     /**
      * @test
      */
-    public function testGetJob00() {
-        $this->assertNull(TasksManager::getJob('Not Exist'));
+    public function testGetTask00() {
+        $this->assertNull(TasksManager::getTask('Not Exist'));
     }
     /**
      * @test
      */
-    public function testGetJob01() {
-        TasksManager::createJob('* * * * *', 'Job 1');
-        TasksManager::createJob('15 * * * *', 'Job 2');
-        TasksManager::createJob('16 * * * *', 'Job 3');
-        TasksManager::createJob('17 * * * *', 'Job 4');
-        $job = TasksManager::getJob('Job 3');
+    public function testGetTask01() {
+        TasksManager::createTask('* * * * *', 'Task 1');
+        TasksManager::createTask('15 * * * *', 'Task 2');
+        TasksManager::createTask('16 * * * *', 'Task 3');
+        TasksManager::createTask('17 * * * *', 'Task 4');
+        $job = TasksManager::getTask('Task 3');
         $this->assertEquals('16 * * * *',$job->getExpression());
     }
     /**
@@ -54,117 +54,117 @@ class CronTest extends TestCase {
     /**
      * @test
      */
-    public function testWeeklyJob00() {
-        $this->assertTrue(TasksManager::weeklyJob('6-23:00', 'Job X', function()
+    public function testWeeklyTask00() {
+        $this->assertTrue(TasksManager::weeklyTask('6-23:00', 'Task X', function()
         {
         }));
-        $job = TasksManager::getJob('Job X');
+        $job = TasksManager::getTask('Task X');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
-    public function testWeeklyJob01() {
-        $this->assertFalse(TasksManager::weeklyJob('7-23:00', 'Job X', function()
+    public function testWeeklyTask01() {
+        $this->assertFalse(TasksManager::weeklyTask('7-23:00', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testWeeklyJob02() {
-        $this->assertFalse(TasksManager::weeklyJob('6--23:00', 'Job X', function()
+    public function testWeeklyTask02() {
+        $this->assertFalse(TasksManager::weeklyTask('6--23:00', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testWeeklyJob03() {
+    public function testWeeklyTask03() {
         TasksManager::password('');
-        $this->assertTrue(TasksManager::weeklyJob('sun-23:00', 'Job Ok', function(TasksManager $task, TestCase $c)
+        $this->assertTrue(TasksManager::weeklyTask('sun-23:00', 'Task Ok', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok', $task->activeJob()->getJobName());
+            $c->assertEquals('Task Ok', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
-        TasksManager::run('', 'Job Ok', true);
+        TasksManager::run('', 'Task Ok', true);
     }
     
     
     /**
      * @test
      */
-    public function testDailyJob00() {
-        $this->assertTrue(TasksManager::dailyJob('00:00', 'Job Xy', function()
+    public function testDailyTask00() {
+        $this->assertTrue(TasksManager::dailyTask('00:00', 'Task Xy', function()
         {
         }));
-        $job = TasksManager::getJob('Job Xy');
+        $job = TasksManager::getTask('Task Xy');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
-    public function testDailyJob01() {
-        $this->assertFalse(TasksManager::dailyJob('23:65:6', 'Job X', function()
+    public function testDailyTask01() {
+        $this->assertFalse(TasksManager::dailyTask('23:65:6', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testDailyJob02() {
-        $this->assertFalse(TasksManager::dailyJob('24:00', 'Job X', function()
+    public function testDailyTask02() {
+        $this->assertFalse(TasksManager::dailyTask('24:00', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testDailyJob03() {
-        $this->assertTrue(TasksManager::dailyJob('23:00', 'Job Ok2', function(TasksManager $task, TestCase $c)
+    public function testDailyTask03() {
+        $this->assertTrue(TasksManager::dailyTask('23:00', 'Task Ok2', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok2', $task->activeJob()->getJobName());
+            $c->assertEquals('Task Ok2', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
-        TasksManager::run('', 'Job Ok2', true);
+        TasksManager::run('', 'Task Ok2', true);
     }
     
     /**
      * @test
      */
-    public function testMonthlyJob00() {
-        $this->assertTrue(TasksManager::monthlyJob(1, '00:00', 'Job Xyz', function()
+    public function testMonthlyTask00() {
+        $this->assertTrue(TasksManager::monthlyTask(1, '00:00', 'Task Xyz', function()
         {
         }));
-        $job = TasksManager::getJob('Job Xyz');
+        $job = TasksManager::getTask('Task Xyz');
         $this->assertNotNull($job);
     }
     /**
      * @test
      */
-    public function testMonthlyJob01() {
-        $this->assertFalse(TasksManager::monthlyJob(44, '23:65:6', 'Job X', function()
+    public function testMonthlyTask01() {
+        $this->assertFalse(TasksManager::monthlyTask(44, '23:65:6', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testMonthlyJob02() {
-        $this->assertFalse(TasksManager::monthlyJob(2, '24:00', 'Job X', function()
+    public function testMonthlyTask02() {
+        $this->assertFalse(TasksManager::monthlyTask(2, '24:00', 'Task X', function()
         {
         }));
     }
     /**
      * @test
      */
-    public function testMonthlyJob03() {
-        $this->assertTrue(TasksManager::monthlyJob(15, '23:00', 'Job Ok3', function(TasksManager $task, TestCase $c)
+    public function testMonthlyTask03() {
+        $this->assertTrue(TasksManager::monthlyTask(15, '23:00', 'Task Ok3', function(TasksManager $task, TestCase $c)
         {
-            $c->assertEquals('Job Ok3', $task->activeJob()->getJobName());
+            $c->assertEquals('Task Ok3', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
-        TasksManager::run('', 'Job Ok3', true);
+        TasksManager::run('', 'Task Ok3', true);
         $this->assertEquals('JOB_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
     }
     /**
@@ -183,7 +183,7 @@ class CronTest extends TestCase {
         $this->assertNotNull($route2);
         $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
         
-        $route3 = Router::getUriObj('/scheduler/jobs');
+        $route3 = Router::getUriObj('/scheduler/tasks');
         $this->assertNotNull($route3);
         $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
         

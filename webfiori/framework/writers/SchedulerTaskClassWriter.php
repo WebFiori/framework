@@ -153,7 +153,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
         ], 1);
 
         $this->append('//TODO: Implement the action to perform when the task finishes to execute.', 2);
-        $this->append("//\$email = new CronEmail('no-reply', [", 2);
+        $this->append("//\$email = new TaskStatusEmail('no-reply', [", 2);
         $this->append("//    'webfiori@example.com' => 'Ibrahim Ali'", 2);
         $this->append('//]);', 2);
         $this->append('}', 1);

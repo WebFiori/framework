@@ -13,7 +13,7 @@ namespace webfiori\framework\exceptions;
 use Exception;
 /**
  * An exception which is thrown in case of invalid CRON expression was provided 
- * when initializing CRON job.
+ * when initializing tasks.
  *
  * @author Ibrahim
  */

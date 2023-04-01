@@ -19,7 +19,7 @@ use webfiori\framework\WebFioriApp;
 /**
  * Description of DBTest
  *
- * @author Ibrah
+ * @author Ibrahim
  */
 class DBTest extends TestCase {
     /**

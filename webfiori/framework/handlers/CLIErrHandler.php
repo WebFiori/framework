@@ -13,7 +13,7 @@ namespace webfiori\framework\handlers;
 use webfiori\cli\Formatter;
 use webfiori\cli\Runner;
 use webfiori\error\AbstractHandler;
-use webfiori\framework\cron\Cron;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\WebFioriApp;
 /**
  * Exceptions handler which is used to handle exceptions in case of running
@@ -53,16 +53,16 @@ class CLIErrHandler extends AbstractHandler {
         $stream->prints("Line: %s\n", $this->getLine());
         $stream->prints("Stack Trace:\n");
         $stream->prints($this->getException()->getTraceAsString());
-        Cron::log("<Uncaught Exception>\n");
-        Cron::log("Exception Message    : ".$this->getMessage()."\n");
-        Cron::log("Exception Class      : ".get_class($this->getException())."\n");
-        Cron::log("Class                 : ".$this->getClass()."\n");
-        Cron::log("Line                 : ".$this->getLine()."\n");
-        Cron::log("Stack Trace          : \n");
+        TasksManager::log("<Uncaught Exception>\n");
+        TasksManager::log("Exception Message    : ".$this->getMessage()."\n");
+        TasksManager::log("Exception Class      : ".get_class($this->getException())."\n");
+        TasksManager::log("Class                 : ".$this->getClass()."\n");
+        TasksManager::log("Line                 : ".$this->getLine()."\n");
+        TasksManager::log("Stack Trace          : \n");
         $num = 0;
 
         foreach ($this->getTrace() as $arrEntry) {
-            Cron::log($num.' Class '.$arrEntry->getClass().' line '.$arrEntry->getLine());
+            TasksManager::log($num.' Class '.$arrEntry->getClass().' line '.$arrEntry->getLine());
             $num++;
         }
     }

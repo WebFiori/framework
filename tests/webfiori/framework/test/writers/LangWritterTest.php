@@ -5,7 +5,6 @@ use webfiori\framework\writers\LangClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Language;
 /**
- * Description of CronWritterTest
  *
  * @author Ibrahim
  */

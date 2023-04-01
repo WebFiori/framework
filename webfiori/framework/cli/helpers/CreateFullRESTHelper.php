@@ -39,16 +39,6 @@ class CreateFullRESTHelper extends CreateClassHelper {
      * @var TableClassWriter
      */
     private $tableObjWriter;
-    /**
-     * Creates new instance of the class.
-     * 
-     * @param CreateCommand $command A command that is used to call the class.
-     */
-    public function __construct(CreateCommand $command) {
-        parent::__construct($command);
-
-
-    }
     public function readInfo() {
         $connection = CLIUtils::getConnectionName($this->getCommand());
 

@@ -15,7 +15,7 @@ use webfiori\cli\CommandArgument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
-use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateBackgroundTask;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
@@ -89,7 +89,7 @@ class CreateCommand extends CLICommand {
             $create = new CreateCLIClassHelper($this);
             $create->readClassInfo();
         } else if ($answer == 'Background Task.') {
-            $create = new CreateCronJob($this);
+            $create = new CreateBackgroundTask($this);
             $create->readClassInfo();
         } else if ($answer == 'Theme.') {
             $create = new CreateThemeHelper($this);
@@ -115,7 +115,7 @@ class CreateCommand extends CLICommand {
         $options['table'] = 'Database table class.';
         $options['entity'] = 'Entity class from table.';
         $options['web-service'] = 'Web service.';
-        $options['job'] = 'Background Task.';
+        $options['task'] = 'Background Task.';
         $options['middleware'] = 'Middleware.';
         $options['command'] = 'CLI Command.';
         $options['theme'] = 'Theme.';

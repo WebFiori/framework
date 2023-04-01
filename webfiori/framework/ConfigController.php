@@ -53,7 +53,7 @@ class ConfigController {
             'config-file-version' => '1.0',
             'smtp-connections' => [],
             'database-connections' => [],
-            'cron-password' => 'NO_PASSWORD',
+            'scheduler-password' => 'NO_PASSWORD',
             'version-info' => [
                 'version' => '1.0',
                 'version-type' => 'Stable',
@@ -209,11 +209,11 @@ class ConfigController {
                'type' => 'boolean',
                'value' => "true"
             ],
-            'CRON_THROUGH_HTTP' => [
-                'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
+            'SCHEDULER_THROUGH_HTTP' => [
+                'summary' => 'A constant which is used to enable or disable HTTP access to background tasks control panel.',
                 'description' => "If the constant value is set to true, the framework will add routes to the 
-             * components which is used to allow access to cron control panel. The control 
-             * panel is used to execute jobs and check execution status. Default value is false.",
+             * components which is used to allow access to tasks control panel. The control 
+             * panel is used to execute tasks and check execution status. Default value is false.",
                 'since' => '1.0',
                 'type' => 'boolean',
                 'value' => "false"
@@ -437,15 +437,15 @@ class ConfigController {
     }
     /**
      * Returns password hash of the password which is used to protect background 
-     * jobs from unauthorized execution.
+     * tasks from unauthorized execution.
      * 
      * @return string Password hash or the string 'NO_PASSWORD' if there is no 
      * password.
      * 
      * @since 1.5.2
      */
-    public function getCRONPassword(): string {
-        return $this->configVars['cron-password'];
+    public function getSchedulerPassword(): string {
+        return $this->configVars['scheduler-password'];
     }
     /**
      * Returns an array that holds database connections.
@@ -683,7 +683,7 @@ class ConfigController {
     }
 
     /**
-     * Updates the password which is used to protect cron jobs from unauthorized
+     * Updates the password which is used to protect tasks from unauthorized
      * execution.
      *
      * @param string $newPass The new password. If empty string is given, the password
@@ -692,8 +692,8 @@ class ConfigController {
      * @throws FileException
      * @since 1.5.2
      */
-    public function updateCronPassword(string $newPass) {
-        $this->configVars['cron-password'] = $newPass;
+    public function updateSchedulerPassword(string $newPass) {
+        $this->configVars['scheduler-password'] = $newPass;
         $this->writeAppConfig();
     }
 
@@ -867,15 +867,15 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-            'public function getCRONPassword() : string', 
-            'Returns sha256 hash of the password which is used to prevent unauthorized access to run the jobs or access CRON web interface.', 
+            'public function getSchedulerPassword() : string', 
+            'Returns sha256 hash of the password which is used to prevent unauthorized access to run the tasks or access scheduler web interface.', 
             '', 
             [], 
             [
                 'type' => 'string',
                 'description' => "Password hash or the string 'NO_PASSWORD' if there is no password."
             ]);
-        $this->a($cFile, "        return \$this->cronPass;");
+        $this->a($cFile, "        return \$this->schedulerPass;");
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
@@ -1231,13 +1231,13 @@ class ConfigController {
         $this->a($cFile, "    private \$configVision;");
 
         $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Password hash of CRON sub-system.");
+        $this->a($cFile, "     * Password hash of scheduler sub-system.");
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$cronPass;");
+        $this->a($cFile, "    private \$schedulerPass;");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * An associative array that will contain database connections.");
@@ -1330,9 +1330,9 @@ class ConfigController {
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function writeCronPass($cFile) {
-        $password = $this->getCRONPassword();
-        $this->a($cFile, "        \$this->cronPass = '".$password."';");
+    private function writeSchedulerPass($cFile) {
+        $password = $this->getSchedulerPassword();
+        $this->a($cFile, "        \$this->schedulerPass = '".$password."';");
     }
     private function writeDbCon($cFile) {
         $this->a($cFile, $this->docStart, 1);
@@ -1442,7 +1442,7 @@ class ConfigController {
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'jobs');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
@@ -1511,7 +1511,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
 
-        $this->writeCronPass($cFile);
+        $this->writeSchedulerPass($cFile);
 
         $this->a($cFile, $this->blockEnd, 1);
     }

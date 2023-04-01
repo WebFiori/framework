@@ -10,7 +10,7 @@ use webfiori\framework\WebFioriApp;
  *
  * @author Ibrahim
  */
-class CronCommandTest extends TestCase {
+class SchedulerCommandTest extends TestCase {
     /**
      * @test
      */

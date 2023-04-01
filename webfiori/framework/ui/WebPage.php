@@ -205,6 +205,11 @@ class WebPage {
         $this->titleSep = '|';
         $this->reset();
     }
+    public function include(string $path, array $args = []) : HTMLNode {
+        return HTMLNode::fromFile($path, array_merge([
+            'page' => $this
+        ], $args));
+    }
     /**
      * Adds a function which will be executed before the page is fully rendered.
      * 

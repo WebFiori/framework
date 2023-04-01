@@ -11,9 +11,9 @@
 namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
-use webfiori\framework\router\Router;
-use webfiori\framework\ui\ServerErrView;
 use webfiori\framework\App;
+use webfiori\framework\router\Router;
+use webfiori\framework\ui\serverErrPage\ServerErrPage;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
@@ -40,7 +40,7 @@ class HTTPErrHandler extends AbstractHandler {
      * general server error message.
      */
     public function handle() {
-        $exceptionView = new ServerErrView($this);
+        $exceptionView = new ServerErrPage($this);
         Response::clear();
         $exceptionView->render();
 

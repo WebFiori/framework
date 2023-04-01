@@ -203,7 +203,7 @@ class CreateTaskTest extends CreateTestCase {
             "Would you like to add more arguments?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $clazz = '\\app\\tasks\\SendDailyReporttask';
+        $clazz = '\\app\\tasks\\SendDailyReportTask';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $task = new $clazz();

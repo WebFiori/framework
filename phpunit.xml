@@ -99,7 +99,7 @@
             <directory>./tests/webfiori/framework/test/theme</directory>
         </testsuite>
         <testsuite name="Scheduler Tests">
-            <directory>./tests/webfiori/framework/test/cron</directory>
+            <directory>./tests/webfiori/framework/test/scheduler</directory>
         </testsuite>
         <testsuite name="Session Tests">
             <directory>./tests/webfiori/framework/test/session</directory>

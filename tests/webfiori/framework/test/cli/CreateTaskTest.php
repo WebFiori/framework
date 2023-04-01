@@ -10,7 +10,7 @@ use webfiori\framework\WebFioriApp;
  *
  * @author Ibrahim
  */
-class CreatetaskTest extends CreateTestCase {
+class CreateTaskTest extends CreateTestCase {
     /**
      * @test
      */

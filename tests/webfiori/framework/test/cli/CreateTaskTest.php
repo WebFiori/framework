@@ -50,8 +50,9 @@ class CreateTaskTest extends CreateTestCase {
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\tasks\\SuperCoolTask'));
-        $this->removeClass('\\app\\tasks\\SuperCooltask');
+        $clazz = '\\app\\tasks\\SuperCoolTask';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
     }
     
     /**
@@ -100,9 +101,10 @@ class CreateTaskTest extends CreateTestCase {
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\tasks\\SuperCool2Task'));
+        $clazz = '\\app\\tasks\\SuperCool2Task';
+        $this->assertTrue(class_exists($clazz));
         $this->removeClass('\\app\\tasks\\SuperCoolTask');
-        $this->removeClass('\\app\\tasks\\SuperCool2task');
+        $this->removeClass($clazz);
     }
     
     /**
@@ -151,8 +153,9 @@ class CreateTaskTest extends CreateTestCase {
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\tasks\\NewRoundTask'));
-        $this->removeClass('\\app\\tasks\\NewRoundTask');
+        $clazz = '\\app\\tasks\\NewRoundTask';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
     }
     /**
      * @test

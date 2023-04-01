@@ -94,13 +94,14 @@ class CreateTaskTest extends CreateTestCase {
             "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
             "Error: A class in the given namespace which has the given name was found.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n","Enter a name for the task:\n",
+            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\tasks\\SuperCool2Task'));
-        $this->removeClass('\\app\\tasks\\SuperCooltask');
+        $this->removeClass('\\app\\tasks\\SuperCoolTask');
         $this->removeClass('\\app\\tasks\\SuperCool2task');
     }
     
@@ -150,8 +151,8 @@ class CreateTaskTest extends CreateTestCase {
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\tasks\\NewRoundtask'));
-        $this->removeClass('\\app\\tasks\\NewRoundtask');
+        $this->assertTrue(class_exists('\\app\\tasks\\NewRoundTask'));
+        $this->removeClass('\\app\\tasks\\NewRoundTask');
     }
     /**
      * @test

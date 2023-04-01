@@ -13,7 +13,7 @@ namespace webfiori\framework\scheduler\webUI;
 use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\ui\exceptions\InvalidNodeNameException;
@@ -41,18 +41,18 @@ class BaseTasksPage extends WebPage {
         if (TasksManager::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
                 && SessionsManager::getActiveSession()->get('scheduler-login-status') !== true) {
-            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/login');
+            Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/login');
             Response::send();
         } else {
             if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
-                Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/tasks');
+                Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/tasks');
                 Response::send();
             }
         }
         $this->setTitle($title);
         $this->setDescription($description);
-        $defaultSiteLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
-        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
+        $defaultSiteLang = App::getAppConfig()->getPrimaryLanguage();
+        $siteNames = App::getAppConfig()->getWebsiteNames();
         $siteName = $siteNames[$defaultSiteLang] ?? null;
 
         if ($siteName !== null) {

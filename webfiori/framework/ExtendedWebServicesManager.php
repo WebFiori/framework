@@ -371,7 +371,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * @since 1.0.1
      */
     public function registerServices($pathToScan) {
-        WebFioriApp::autoRegister($pathToScan, function (AbstractWebService $ws, ExtendedWebServicesManager $m)
+        App::autoRegister($pathToScan, function (AbstractWebService $ws, ExtendedWebServicesManager $m)
         {
             $m->addService($ws);
         }, 'Service', [$this], [$this]);
@@ -422,7 +422,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         if ($activeSession !== null) {
             $tempCode = $activeSession->getLangCode(true);
         } else {
-            $tempCode = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+            $tempCode = App::getAppConfig()->getPrimaryLanguage();
         }
 
         if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {

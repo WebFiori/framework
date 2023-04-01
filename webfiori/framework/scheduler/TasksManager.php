@@ -23,7 +23,7 @@ use webfiori\framework\scheduler\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * A class that is used to manage scheduled background tasks.
  * 
@@ -514,7 +514,7 @@ class TasksManager {
      */
     public static function registerTasks() {
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP === true)) {
-            WebFioriApp::autoRegister('tasks', function (AbstractTask $task)
+            App::autoRegister('tasks', function (AbstractTask $task)
             {
                 TasksManager::scheduleTask($task);
             });

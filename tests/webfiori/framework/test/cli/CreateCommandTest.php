@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * Description of TestCreateCommand
  *
@@ -12,7 +12,7 @@ class CreateCommandTest extends CreateTestCase {
      * @test
      */
     public function testCreate00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '9',
         ]);
@@ -39,7 +39,7 @@ class CreateCommandTest extends CreateTestCase {
      * @test
      */
     public function testCreate01() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setInputs([
             '',
         ]);
@@ -70,7 +70,7 @@ class CreateCommandTest extends CreateTestCase {
      * @test
      */
     public function testCreateWebService00() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setInputs([
             '2',
             'NewWeb',

@@ -13,7 +13,7 @@ namespace webfiori\framework\handlers;
 use webfiori\error\AbstractHandler;
 use webfiori\framework\router\Router;
 use webfiori\framework\ui\ServerErrView;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
@@ -56,7 +56,7 @@ class HTTPErrHandler extends AbstractHandler {
      * @return bool True if active. false otherwise.
      */
     public function isActive(): bool {
-        if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
+        if (App::getClassStatus() == App::STATUS_INITIALIZING) {
             //We already have the API error handler active. So, disable it.
             return false;
         }

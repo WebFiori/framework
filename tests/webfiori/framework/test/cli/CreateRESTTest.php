@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of CreateRESTTest
@@ -15,8 +15,8 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        WebFioriApp::getAppConfig()->removeDBConnections();
-        $runner = WebFioriApp::getRunner();
+        App::getAppConfig()->removeDBConnections();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -143,8 +143,8 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test01() {
-        WebFioriApp::getAppConfig()->removeDBConnections();
-        $runner = WebFioriApp::getRunner();
+        App::getAppConfig()->removeDBConnections();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -275,12 +275,12 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test02() {
-        WebFioriApp::getAppConfig()->removeDBConnections();
+        App::getAppConfig()->removeDBConnections();
         $conn = new ConnectionInfo('mysql','root', '123456', 'testing_db', '127.0.0.1', 3306, [
             'connection-name' => 'Super Connection'
         ]);
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
-        $runner = WebFioriApp::getRunner();
+        App::getAppConfig()->addDbConnection($conn);
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',

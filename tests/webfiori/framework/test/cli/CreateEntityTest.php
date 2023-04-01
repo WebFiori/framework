@@ -2,14 +2,14 @@
 namespace webfiori\framework\test\cli;
 
 use app\database\TestTable;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 class CreateEntityTest extends CreateTestCase {
     /**
      * @test
      */
     public function testCreateEntity00() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setInputs([
             'NeEntity',
             '',
@@ -55,7 +55,7 @@ class CreateEntityTest extends CreateTestCase {
      * @test
      */
     public function testCreateEntity01() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setInputs([
             '1',
             'NewEntity',

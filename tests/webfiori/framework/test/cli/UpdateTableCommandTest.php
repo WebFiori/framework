@@ -5,14 +5,14 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\Table;
 use webfiori\file\File;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 class UpdateTableCommandTest extends TestCase {
     /**
      * 
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',
@@ -81,7 +81,7 @@ class UpdateTableCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',
@@ -161,7 +161,7 @@ class UpdateTableCommandTest extends TestCase {
      * 
      */
     public function test02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',
@@ -203,7 +203,7 @@ class UpdateTableCommandTest extends TestCase {
      * 
      */
     public function test03() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',
@@ -229,7 +229,7 @@ class UpdateTableCommandTest extends TestCase {
      * 
      */
     public function test04() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',
@@ -300,7 +300,7 @@ class UpdateTableCommandTest extends TestCase {
      * @depends test01
      */
     public function test05() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-table',

@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\cli\Runner;
 use webfiori\framework\cli\commands\UpdateSettingsCommand;
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of TestUpdateSettingsCommand
@@ -17,7 +17,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
@@ -32,7 +32,7 @@ class UpdateSettingsCommandTest extends TestCase {
 
     }
     public function testUpdatePrimaryLang() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
@@ -52,7 +52,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateVersion00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
@@ -70,8 +70,8 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             
-            "Application version: Enter = '".WebFioriApp::getAppConfig()->getVersion()."'\n",
-            "Application version type: Enter = '".WebFioriApp::getAppConfig()->getVersionType()."'\n",
+            "Application version: Enter = '".App::getAppConfig()->getVersion()."'\n",
+            "Application version type: Enter = '".App::getAppConfig()->getVersionType()."'\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Error: Invalid input is given. Try again.\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
@@ -90,7 +90,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'EN',
             'Super App',
@@ -116,7 +116,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '',
             'XC',
@@ -151,7 +151,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0',
             '',
@@ -185,7 +185,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateSchedulerPass00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '123456'
         ]);
@@ -207,7 +207,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateSchedulerPass01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             ''
         ]);
@@ -229,7 +229,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePageTitle00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'EN',
             'NEW PAGE'
@@ -256,7 +256,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePageDescription00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'EN',
             'NEW PAGE DESCRIPTION'
@@ -283,7 +283,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryLang00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'EN',
             'NEW PAGE DESCRIPTION'
@@ -308,7 +308,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateTitleSep00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '6',
             '+-+'
@@ -344,7 +344,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateHomePage00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         
         $runner->setArgsVector([
@@ -366,7 +366,7 @@ class UpdateSettingsCommandTest extends TestCase {
             'path' => 'x/y/z',
             'route-to' => 'test.txt'
         ]);
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0'
         ]);
@@ -389,7 +389,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryTheme00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'themes\\fioriTheme2\\NewTestTheme2'
         ]);
@@ -412,7 +412,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryTheme01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'themes\\greeny\\NotATheme',
             '',
@@ -440,7 +440,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'themes\\fioriTheme\\NewFTestTheme'
         ]);
@@ -461,7 +461,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'themes\\greeny\\NotATheme',
             '',
@@ -489,7 +489,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'app\\entity\\WithException',
             '',

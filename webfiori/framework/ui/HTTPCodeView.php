@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\ui\HTMLNode;
 /**
  * A basic view which is used to display HTTP error codes taken from 
@@ -24,7 +24,7 @@ class HTTPCodeView extends WebPage {
      */
     public function __construct($errCode) {
         parent::__construct();
-        $this->setTheme(WebFioriApp::getAppConfig()->getBaseThemeName());
+        $this->setTheme(App::getAppConfig()->getBaseThemeName());
 
         $this->setTitle($this->get("general/http-codes/$errCode/code").' - '.$this->get("general/http-codes/$errCode/type"));
         http_response_code(intval($this->get("general/http-codes/$errCode/code")));

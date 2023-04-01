@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of CreateDBAccessTest
@@ -15,7 +15,7 @@ class CreateDBAccessTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -50,7 +50,7 @@ class CreateDBAccessTest extends CreateTestCase {
      * @test
      */
     public function test01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -87,9 +87,9 @@ class CreateDBAccessTest extends CreateTestCase {
     public function test02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1', 3306);
         $conn->setName('Test Connection');
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        App::getAppConfig()->addDbConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',

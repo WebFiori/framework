@@ -17,7 +17,7 @@ use webfiori\cli\InputValidator;
 use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * This class implements a CLI command which is used to update the settings which are 
  * stored in the class 'AppConfing' of the application.
@@ -131,7 +131,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $descriptions = WebFioriApp::getAppConfig()->getDescriptions();
+        $descriptions = App::getAppConfig()->getDescriptions();
         $descriptions[$lang] = $newName;
         ConfigController::get()->updateSiteInfo(['descriptions' => $descriptions]);
         $this->success('Description successfully updated.');
@@ -142,13 +142,13 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $names = WebFioriApp::getAppConfig()->getWebsiteNames();
+        $names = App::getAppConfig()->getWebsiteNames();
         $names[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo(['website-names' => $names]);
         $this->println('Name successfully updated.');
     }
     private function updatePrimaryLang() {
-        $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
+        $langs = array_keys(App::getAppConfig()->getWebsiteNames());
         $newPrimary = $this->select('Select new primary language:', $langs);
         ConfigController::get()->updateSiteInfo(['primary-lang' => $newPrimary]);
         $this->success('Primary language successfully updated.');
@@ -159,7 +159,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $titles = WebFioriApp::getAppConfig()->getTitles();
+        $titles = App::getAppConfig()->getTitles();
         $titles[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo(['titles' => $titles]);
         $this->success('Title successfully updated.');
@@ -173,11 +173,11 @@ class UpdateSettingsCommand extends CLICommand {
         $this->success('Title separator successfully updated.');
     }
     private function updateVersionInfo() {
-        $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), new InputValidator(function ($val)
+        $versionNum = $this->getInput('Application version:', App::getAppConfig()->getVersion(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
         }));
-        $versionType = $this->getInput('Application version type:', WebFioriApp::getAppConfig()->getVersionType(), new InputValidator(function ($val)
+        $versionType = $this->getInput('Application version type:', App::getAppConfig()->getVersionType(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
         }));
@@ -220,7 +220,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
     }
     private function whichLang() {
-        $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
+        $langs = array_keys(App::getAppConfig()->getWebsiteNames());
 
         return $this->select('In which language you would like to update?', $langs);
     }

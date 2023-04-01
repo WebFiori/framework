@@ -11,7 +11,7 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\http\Response;
 /**
  * A page which is used to show login form to enter login information to 
@@ -24,7 +24,7 @@ class TasksLoginPage extends BaseTasksPage {
         parent::__construct('Tasks Scheduler Web Interface Login', 'Login to Scheduler Control panel.');
 
         if (SessionsManager::get('scheduler-login-status')) {
-            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/scheduler/tasks');
+            Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/tasks');
             Response::send();
         }
         $row = $this->insert('v-row');

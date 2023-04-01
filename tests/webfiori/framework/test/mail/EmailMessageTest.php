@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\email\SMTPAccount;
 use webfiori\framework\EmailMessage;
 use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *
@@ -26,7 +26,7 @@ class EmailMessageTest extends TestCase {
             'sender-address' => 'randomxyz@hotmail.com',
             'account-name' => 'no-reply'
         ]);
-        WebFioriApp::getAppConfig()->addAccount($acc);
+        App::getAppConfig()->addAccount($acc);
         $message = new EmailMessage();
         $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
         $this->assertNull($message->getTranslation());

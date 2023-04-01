@@ -24,7 +24,7 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
 use webfiori\framework\Util;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
@@ -255,7 +255,7 @@ class WebPage {
      */
     public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getAppConfig()->getVersion();
         }
         $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
     }
@@ -275,7 +275,7 @@ class WebPage {
      */
     public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getAppConfig()->getVersion();
         }
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }
@@ -766,17 +766,17 @@ class WebPage {
         $this->_checkLang();
         $this->usingLanguage();
 
-        $appName = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
+        $appName = App::getAppConfig()->getWebsiteName($this->getLangCode());
         $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
 
-        $websiteDesc = WebFioriApp::getAppConfig()->getDescription($this->getLangCode());
+        $websiteDesc = App::getAppConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
 
-        $pageTitle = WebFioriApp::getAppConfig()->getDefaultTitle($this->getLangCode());
+        $pageTitle = App::getAppConfig()->getDefaultTitle($this->getLangCode());
         $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
 
 
-        $this->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
+        $this->setTitleSep(App::getAppConfig()->getTitleSep());
 
         $langObj = $this->getTranslation();
 
@@ -1140,7 +1140,7 @@ class WebPage {
             $langCodeFromRequest = Request::getParam('lang');
 
             if ($langCodeFromRequest === null) {
-                $this->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
+                $this->setLang(App::getAppConfig()->getPrimaryLanguage());
 
                 return;
             }
@@ -1174,7 +1174,7 @@ class WebPage {
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
-            WebFioriApp::getAppConfig()->getBaseURL()
+            App::getAppConfig()->getBaseURL()
         );
 
         if ($loadedTheme !== null) {
@@ -1187,7 +1187,7 @@ class WebPage {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(WebFioriApp::getAppConfig()->getBaseURL());
+        $headNode->setBase(App::getAppConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {

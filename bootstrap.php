@@ -5,7 +5,7 @@
 
 use webfiori\framework\AutoLoader;
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 $DS = DIRECTORY_SEPARATOR;
 
@@ -84,7 +84,7 @@ foreach ($dirs as $dir) {
 }
 
 fprintf(STDOUT,"Initializing application...\n");
-WebFioriApp::start();
+App::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 define('TESTS_PATH', AutoLoader::get()->root().$DS.TESTS_DIRECTORY);

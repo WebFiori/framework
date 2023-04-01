@@ -287,7 +287,7 @@ abstract class Theme implements JsonI {
      */
     public function getBaseURL() : string {
         if ($this->baseUrl === null) {
-            return WebFioriApp::getAppConfig()->getBaseURL();
+            return App::getAppConfig()->getBaseURL();
         }
 
         return $this->baseUrl;

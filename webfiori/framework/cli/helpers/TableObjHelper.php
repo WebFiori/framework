@@ -20,7 +20,7 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * A CLI class helper which has methods to help in creating and 
@@ -173,7 +173,7 @@ class TableObjHelper {
         $runQuery = $this->confirm('Would you like to update the database?', false);
 
         if ($runQuery) {
-            $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+            $dbConnections = array_keys(App::getAppConfig()->getDBConnections());
 
             if (count($dbConnections) == 0) {
                 $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');

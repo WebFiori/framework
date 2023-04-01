@@ -8,7 +8,7 @@ use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\DatabaseSessionStorage;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of SessionsManagerTest
@@ -175,7 +175,7 @@ class SessionsManagerTest extends TestCase {
         $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        App::getAppConfig()->addDbConnection($conn);
         SessionsManager::reset();
         SessionsManager::setStorage(new DatabaseSessionStorage());
         SessionsManager::start('hello');
@@ -187,7 +187,7 @@ class SessionsManagerTest extends TestCase {
     public function testInitSessionsDb() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        App::getAppConfig()->addDbConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->getController()->createTables()->execute();
@@ -200,7 +200,7 @@ class SessionsManagerTest extends TestCase {
     public function testDatabaseSession02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        App::getAppConfig()->addDbConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         SessionsManager::setStorage($sto);
@@ -307,7 +307,7 @@ class SessionsManagerTest extends TestCase {
         $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        WebFioriApp::getAppConfig()->addDbConnection($conn);
+        App::getAppConfig()->addDbConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->dropTables();

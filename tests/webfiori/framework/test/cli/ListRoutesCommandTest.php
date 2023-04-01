@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\framework\router\Router;
 use webfiori\framework\ui\WebPage;
 /**
@@ -16,7 +16,7 @@ class ListRoutesCommandTest extends TestCase {
      */
     public function test00() {
         Router::removeAll();
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -31,7 +31,7 @@ class ListRoutesCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',

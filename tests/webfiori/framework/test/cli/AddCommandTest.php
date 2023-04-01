@@ -7,7 +7,7 @@ use webfiori\cli\Runner;
 use webfiori\file\File;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of TestAddCommand
@@ -36,7 +36,7 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddDBConnection00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0',
             '0',
@@ -52,7 +52,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -77,7 +77,7 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddDBConnection01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0',
             '0',
@@ -94,7 +94,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -121,7 +121,7 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddDBConnection02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0',
             '0',
@@ -138,7 +138,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -242,7 +242,7 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddSMTPConnection00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '1',
             '127.0.0.1',
@@ -259,7 +259,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts());
+        $connName = 'smtp-connection-'.count(App::getAppConfig()->getAccounts());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

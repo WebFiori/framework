@@ -4,7 +4,7 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * @author Ibrahim
  */
@@ -13,7 +13,7 @@ class CreateCLICommandTest extends CreateTestCase {
      * @test
      */
     public function testCreateCommand00() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'
@@ -55,7 +55,7 @@ class CreateCLICommandTest extends CreateTestCase {
      * @test
      */
     public function testCreateCommand01() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',

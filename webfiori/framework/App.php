@@ -43,7 +43,7 @@ define('MICRO_START', microtime(true));
  * 
  * @version 1.3.7
  */
-class WebFioriApp {
+class App {
     /**
      * A constant that indicates that the status of the class is 'initialized'.
      * 
@@ -91,7 +91,7 @@ class WebFioriApp {
     /**
      * A single instance of the class.
      * 
-     * @var WebFioriApp
+     * @var App
      * 
      * @since 1.0 
      */
@@ -368,16 +368,16 @@ class WebFioriApp {
     /**
      * Start your WebFiori application.
      *
-     * @return WebFioriApp An instance of the class.
+     * @return App An instance of the class.
      *
      * @throws InitializationException
      * @since 1.0
      */
-    public static function start(): WebFioriApp {
+    public static function start(): App {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
-                self::$LC = new WebFioriApp();
+                self::$LC = new App();
             }
         } else if (self::$classStatus == 'INITIALIZING') {
             throw new InitializationException('Using the core class while it is not fully initialized.');
@@ -586,7 +586,7 @@ class WebFioriApp {
      * @throws FileException
      */
     private function initMiddleware() {
-        WebFioriApp::autoRegister('middleware', function(AbstractMiddleware $inst)
+        App::autoRegister('middleware', function(AbstractMiddleware $inst)
         {
             MiddlewareManager::register($inst);
         });
@@ -614,7 +614,7 @@ class WebFioriApp {
             $home = trim(self::getAppConfig()->getHomePage());
 
             if (strlen($home) != 0) {
-                Router::redirect('/', WebFioriApp::getAppConfig()->getHomePage());
+                Router::redirect('/', App::getAppConfig()->getHomePage());
             }
         }
     }

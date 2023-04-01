@@ -6,7 +6,7 @@ use themes\fioriTheme\NewFTestTheme;
 use webfiori\framework\ConfigController;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use const DS;
 /**
  * Description of ThemeTest
@@ -69,7 +69,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
-        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
+        $this->assertEquals(App::getAppConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
     }

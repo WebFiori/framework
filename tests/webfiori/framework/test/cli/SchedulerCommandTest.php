@@ -4,7 +4,7 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * Description of CronCommandTest
  *
@@ -15,7 +15,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -31,7 +31,7 @@ class SchedulerCommandTest extends TestCase {
      */
     public function test01() {
         TasksManager::password(hash('sha256', '123456'));
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -55,7 +55,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -71,7 +71,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test03() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0'
         ]);
@@ -102,7 +102,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test04() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0'
         ]);
@@ -141,7 +141,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test05() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '1'
         ]);
@@ -185,7 +185,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test06() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             'N'
         ]);
@@ -222,7 +222,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test07() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         TasksManager::execLog(true);
         $runner->setInputs([
             'N'
@@ -262,7 +262,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test08() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::password('123456');
@@ -293,7 +293,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test09() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             
         ]);
@@ -315,7 +315,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test10() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs([
             '0'
         ]);
@@ -341,7 +341,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test11() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -372,7 +372,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test12() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -389,7 +389,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test13() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::password(hash('sha256', '123456'));

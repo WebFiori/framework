@@ -12,7 +12,7 @@ use webfiori\framework\router\Router;
  *
  * @author Ibrahim
  */
-class CronTest extends TestCase {
+class SchedulerTest extends TestCase {
     /**
      * @test
      */

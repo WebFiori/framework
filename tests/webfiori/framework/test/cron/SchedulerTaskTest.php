@@ -10,7 +10,7 @@ use webfiori\framework\scheduler\TaskArgument;
  *
  * @author Ibrahim
  */
-class CronTaskTest extends TestCase {
+class SchedulerTaskTest extends TestCase {
     /**
      * @test
      */
@@ -174,9 +174,15 @@ class CronTaskTest extends TestCase {
         TasksManager::setMinute(33);
         TasksManager::setDayOfWeek(4);
         TasksManager::setMonth(5);
+        TasksManager::setHour(6);
         $task = new BaseTask('15 8 * jan-mar 0,mon,3-5');
         $this->assertEquals('15 8 * jan-mar 0,mon,3-5',$task->getExpression());
-            $this->assertTrue($task->isDayOfWeek());
+        $this->assertTrue($task->isDayOfWeek());
+        $this->assertFalse($task->isMinute());
+        $this->assertFalse($task->isHour());
+        $this->assertFalse($task->isMonth());
+        $this->assertTrue($task->isDayOfMonth());
+        
             $this->assertequals('{'
             . '"name":"SCHEDULER-TASK",'
             . '"expression":"15 8 * jan-mar 0,mon,3-5",'

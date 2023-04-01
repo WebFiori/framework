@@ -1,12 +1,11 @@
 <?php
 
-namespace webfiori\framework\test\cron;
+namespace webfiori\framework\test\scheduler;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\scheduler\TaskArgument;
 /**
- * Description of JobArgumentTest
  *
  * @author Ibrahim
  */

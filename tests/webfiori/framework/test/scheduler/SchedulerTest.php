@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\test\cron;
+namespace webfiori\framework\test\scheduler;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\scheduler\TasksManager;
@@ -8,7 +8,6 @@ use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\scheduler\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
 /**
- * Description of CronTest
  *
  * @author Ibrahim
  */

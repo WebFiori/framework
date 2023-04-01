@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\test\cron;
+namespace webfiori\framework\test\scheduler;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

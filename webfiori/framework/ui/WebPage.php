@@ -31,6 +31,7 @@ use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
+require_once 'ui-functions.php';
 /**
  * A base class that can be used to implement web pages.
  *

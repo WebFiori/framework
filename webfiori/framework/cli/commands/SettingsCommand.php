@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * A CLI command which is used to show framework configuration.
  *
@@ -34,7 +34,7 @@ class SettingsCommand extends CLICommand {
      */
     public function exec() : int {
         $spaces = 25;
-        $C = WebFioriApp::getAppConfig();
+        $C = App::getAppConfig();
         $format = [];
         $format['color'] = 'yellow';
         $format['bold'] = true;

@@ -4,7 +4,7 @@ namespace webfiori\framework\cli;
 use webfiori\cli\CLICommand;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\Table;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to hold common CLI methods for reading inputs.
@@ -29,7 +29,7 @@ class CLIUtils {
      */
     public static function getConnectionName(CLICommand $c) {
         $connName = $c->getArgValue('--connection');
-        $dbConnections = WebFioriApp::getAppConfig()->getDBConnections();
+        $dbConnections = App::getAppConfig()->getDBConnections();
         $dbConnectionsNames = array_keys($dbConnections);
 
         if (count($dbConnectionsNames) == 0) {
@@ -47,7 +47,7 @@ class CLIUtils {
 
         $name = $c->select('Select database connection:', $dbConnectionsNames, 0);
 
-        return WebFioriApp::getAppConfig()->getDBConnection($name);
+        return App::getAppConfig()->getDBConnection($name);
     }
     /**
      * Reads and validates class name.

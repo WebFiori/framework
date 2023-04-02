@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of CreatetaskTest
@@ -15,7 +15,7 @@ class CreateTaskTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'
@@ -61,7 +61,7 @@ class CreateTaskTest extends CreateTestCase {
      * @depends test00
      */
     public function test01() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'
@@ -112,7 +112,7 @@ class CreateTaskTest extends CreateTestCase {
      * 
      */
     public function test02() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'
@@ -162,7 +162,7 @@ class CreateTaskTest extends CreateTestCase {
      * 
      */
     public function test03() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',

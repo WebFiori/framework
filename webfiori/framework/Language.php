@@ -248,7 +248,7 @@ class Language {
                 $langCode = Request::getParam('lang');
 
                 if ($langCode === null || strlen($langCode) == 2) {
-                    $langCode = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+                    $langCode = App::getAppConfig()->getPrimaryLanguage();
                 }
             }
         }

@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of CreateThemeTest
@@ -15,7 +15,7 @@ class MiddlewareTest extends CreateTestCase {
      * @test
      */
     public function testCreateMiddleware00() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'
@@ -57,7 +57,7 @@ class MiddlewareTest extends CreateTestCase {
      * @test
      */
     public function testCreateMiddleware01() {
-        $runner = $runner = WebFioriApp::getRunner();
+        $runner = $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',

@@ -5,14 +5,14 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 class RunSQLCommandTest extends TestCase {
     /**
      * @test
      */
     public function testQueryFromFile00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -38,7 +38,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -64,7 +64,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -90,7 +90,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -117,7 +117,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -147,7 +147,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -176,7 +176,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -214,7 +214,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -240,7 +240,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -290,7 +290,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -333,7 +333,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -368,7 +368,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -412,7 +412,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
@@ -450,7 +450,7 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         ConfigController::get()->addOrUpdateDBConnection($conn);
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',

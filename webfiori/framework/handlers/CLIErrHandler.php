@@ -14,7 +14,7 @@ use webfiori\cli\Formatter;
 use webfiori\cli\Runner;
 use webfiori\error\AbstractHandler;
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 /**
  * Exceptions handler which is used to handle exceptions in case of running
  * CLI applications.
@@ -36,7 +36,7 @@ class CLIErrHandler extends AbstractHandler {
      * Handles the exception
      */
     public function handle() {
-        $stream = WebFioriApp::getRunner()->getOutputStream();
+        $stream = App::getRunner()->getOutputStream();
         $stream->prints(Formatter::format("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,
@@ -74,7 +74,7 @@ class CLIErrHandler extends AbstractHandler {
      * @return bool True if active. false otherwise.
      */
     public function isActive(): bool {
-        if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
+        if (App::getClassStatus() == App::STATUS_INITIALIZING) {
             return true;
         }
 

@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of CreateThemeTest
@@ -15,7 +15,7 @@ class CreateThemeTest extends CreateTestCase {
      * @test
      */
     public function testCreateTheme00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create'

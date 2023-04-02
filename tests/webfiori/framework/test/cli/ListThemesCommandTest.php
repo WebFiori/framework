@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 
 /**
  * Description of ListRoutesCommandTest
@@ -15,7 +15,7 @@ class ListThemesCommandTest extends TestCase {
      */
     public function test00() {
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -45,7 +45,7 @@ class ListThemesCommandTest extends TestCase {
      */
     public function test01() {
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
@@ -67,7 +67,7 @@ class ListThemesCommandTest extends TestCase {
      */
     public function test02() {
         
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',

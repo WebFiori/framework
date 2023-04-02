@@ -3,7 +3,7 @@ namespace webfiori\framework\test\cli;
 use webfiori\cli\Runner;
 use webfiori\framework\cli\commands\ListRoutesCommand;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\framework\router\Router;
 
 class SettingsCommandTest extends TestCase {
@@ -11,14 +11,14 @@ class SettingsCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        $runner = WebFioriApp::getRunner();
+        $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'show-settings'
         ]);
         $runner->start();
-        $config = WebFioriApp::getAppConfig();
+        $config = App::getAppConfig();
         $this->assertEquals([
             "Framework Version Settings:\n",
             "    Framework Version        : ".WF_VERSION."\n",

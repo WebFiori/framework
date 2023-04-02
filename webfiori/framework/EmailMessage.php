@@ -40,7 +40,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
      * @since 1.0
      */
     public function __construct(string $sendAccountName = 'no-reply') {
-        $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
+        $acc = App::getAppConfig()->getAccount($sendAccountName);
 
         if ($acc instanceof SMTPAccount) {
             parent::__construct($acc);

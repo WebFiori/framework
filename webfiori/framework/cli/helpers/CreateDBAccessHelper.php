@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\Table;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\framework\writers\DBClassWriter;
 
 /**
@@ -100,7 +100,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
         $this->getWriter()->setTable($t);
     }
     private function getConnection() {
-        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
+        $dbConnections = array_keys(App::getAppConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
             $dbConnections[] = 'None';

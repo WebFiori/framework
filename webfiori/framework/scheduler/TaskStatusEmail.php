@@ -12,7 +12,7 @@ namespace webfiori\framework\scheduler;
 
 use webfiori\file\File;
 use webfiori\framework\EmailMessage;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\App;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 /**
@@ -120,9 +120,9 @@ class TaskStatusEmail extends EmailMessage {
         $taskTable->addChild($this->createTableRow('Framework Release Date:', WF_RELEASE_DATE));
         $taskTable->addChild($this->createTableRow('Root Directory:', ROOT_PATH));
         $taskTable->addChild($this->createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
-        $taskTable->addChild($this->createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
-        $taskTable->addChild($this->createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
-        $taskTable->addChild($this->createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
+        $taskTable->addChild($this->createTableRow('Application Version:', App::getAppConfig()->getVersion()));
+        $taskTable->addChild($this->createTableRow('Version Type:', App::getAppConfig()->getVersionType()));
+        $taskTable->addChild($this->createTableRow('Application Release Date:', App::getAppConfig()->getReleaseDate()));
 
         if ($task->isSuccess()) {
             $taskTable->addChild($this->createTableRow('Exit Status:', '<b style="color:green">Success</b>'));

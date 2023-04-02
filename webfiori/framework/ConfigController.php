@@ -630,7 +630,7 @@ class ConfigController {
      * @throws FileException
      */
     public function resetConfig() {
-        self::get()->setConfig(WebFioriApp::getAppConfig());
+        self::get()->setConfig(App::getAppConfig());
         $this->writeAppConfig();
     }
     /**

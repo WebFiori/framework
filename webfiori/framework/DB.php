@@ -50,7 +50,7 @@ class DB extends Database {
 
             return;
         }
-        $conn = WebFioriApp::getAppConfig()->getDBConnection($connName);
+        $conn = App::getAppConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
             $connectionsArr = ConfigController::get()->getDatabaseConnections();
@@ -113,7 +113,7 @@ class DB extends Database {
      * @since 1.0.1
      */
     public function register(string $pathToScan) {
-        WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db)
+        App::autoRegister($pathToScan, function (Table $table, DB $db)
         {
             foreach ($table->getForeignKeys() as $fk) {
                 $db->addTable($fk->getSource(), false);

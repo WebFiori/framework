@@ -1,3 +1,6 @@
+<?php
+namespace webfiori\framework\ui\serverErrPage;
+?>
 <v-col cols=12>
     <v-alert prominent type=error>
         <v-row align=center>

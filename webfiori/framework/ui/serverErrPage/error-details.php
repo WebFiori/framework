@@ -1,3 +1,10 @@
+<?php
+namespace webfiori\framework\ui\serverErrPage;
+
+if (!defined('WF_VERBOSE') || WF_VERBOSE === false) {
+    return;
+}
+?>
 <v-col cols=12>
     <v-card>
         <v-card-title>

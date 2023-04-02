@@ -34,7 +34,9 @@ class ServerErrPage extends WebPage {
 
         $this->setTitle('Server Error');
         $this->changeDom();
-        $this->getDocument()->setHeadNode($this->include('head.php'));
+        $this->getDocument()->setHeadNode($this->include('head.php', [
+            'throwableOrErr' => $throwableOrErr
+        ]));
 
         $this->addBeforeRender(function (WebPage $p)
         {
@@ -45,9 +47,13 @@ class ServerErrPage extends WebPage {
         });
         $container = $this->insert('v-container');
         $row = $container->addChild('v-row');
-        $row->component('header.php', []);
-        $row->component('error-details.php', []);
-        $row->component('stack-trace.php', []);
+        
+        $templateVars = [
+            'throwableOrErr' => $throwableOrErr
+        ];
+        $row->include('header.php', $templateVars);
+        $row->include('error-details.php', $templateVars);
+        $row->include('stack-trace.php', $templateVars);
     }
     
     private function changeDom() {

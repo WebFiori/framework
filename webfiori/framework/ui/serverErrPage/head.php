@@ -1,3 +1,6 @@
+<?php
+namespace webfiori\framework\ui\serverErrPage;
+?>
 <head>
     <base href="<?= baseURL()?>">
     <title>

@@ -42,11 +42,16 @@ function label(string $path, string $langCode = null) {
 }
 
 function canonical() {
-    return $page->getCanonical();
+    return call('getCanonical');
 }
 function baseURL() {
-    return $page->getBase();
+    return call('getBase');
 }
 function title() {
-    return $page->getTitle();
+    return call('getTitle');
+}
+function call($methodName) {
+    if (isset($page)) {
+        return $page->$methodName();
+    }
 }

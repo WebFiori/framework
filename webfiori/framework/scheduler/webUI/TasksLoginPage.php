@@ -31,27 +31,10 @@ class TasksLoginPage extends BaseTasksPage {
         $row->setAttributes([
             'align' => 'center'
         ]);
-        $card = $row->addChild('v-col', [
+        $row->addChild('v-col', [
             'cols' => 12,
             'md' => 4, 'sm' => 12
-        ])->addChild('v-card', [
-            ':loading' => 'loading',
-            ':disabled' => 'loading'
-        ]);
-        $card->addChild('v-card-text')
-            ->addChild('v-text-field', [
-                'type' => 'password',
-                'v-model' => 'password',
-                'label' => 'Enter scheduler password here.',
-                ':loading' => 'loading',
-                '@keydown' => 'checkIfEnterHit'
-            ]);
-        $card->addChild('v-card-text')
-            ->addChild('v-btn', [
-                '@click' => 'login',
-                'color' => 'primary',
-                ':loading' => 'loading',
-                ':disabled' => 'login_btn_disabled'
-            ])->text('Login');
+        ])->addChild($this->include('login-form.html'));
+        
     }
 }

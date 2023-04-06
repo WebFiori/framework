@@ -1,0 +1,93 @@
+<v-data-table :items=tasks :loading=loading :headers=tasks_table_headers show-expand single-expand :expanded.sync=expanded item-key=name :search=search>
+    <template #item.info="{ item }">
+        <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+                <v-icon v-bind=attrs v-on=on small>
+                    mdi-information
+                </v-icon>
+            </template>
+            <span>
+                {{ item.description }}
+            </span>
+        </v-tooltip>
+    </template>
+    <template #item.time.is_minute="{ item }">
+        <v-chip v-if=item.time.is_minute color=green small>
+            Yes
+        </v-chip>
+        <v-chip v-else color=red small>
+            No
+        </v-chip>
+    </template>
+    <template #item.time.is_hour="{ item }">
+        <v-chip v-if=item.time.is_hour color=green small>
+            Yes
+        </v-chip>
+        <v-chip v-else color=red small>
+            No
+        </v-chip>
+    </template>
+    <template #item.time.is_day_of_week="{ item }">
+        <v-chip v-if=item.time.is_day_of_week color=green small>
+            Yes
+        </v-chip>
+        <v-chip v-else color=red small>
+            No
+        </v-chip>
+    </template>
+    <template #item.time.is_month="{ item }">
+        <v-chip v-if=item.time.is_month color=green small>
+            Yes
+        </v-chip>
+        <v-chip v-else color=red small>
+            No
+        </v-chip>
+    </template>
+    <template #item.time.is_day_of_month="{ item }">
+        <v-chip v-if=item.time.is_day_of_month color=green small>
+            Yes
+        </v-chip>
+        <v-chip v-else color=red small>
+            No
+        </v-chip>
+    </template>
+    <template #expanded-item="{ headers, item }">
+        <td :colspan=headers.length>
+            <div style=padding:20px;>
+                <v-row>
+                    <v-col cols=12 sm=12 md=6>
+                        <div>
+                            <h3>
+                                task Arguments
+                            </h3>
+                            <div v-if="item.args.length !== 0">
+                                <v-text-field v-for="arg in item.args" outlined dense v-model=arg.value :label=arg.name>
+                                    <template #prepend>
+                                        <v-tooltip bottom>
+                                            <template #activator="{ on, attrs }">
+                                                <v-icon v-bind=attrs v-on=on small>
+                                                    mdi-information
+                                                </v-icon>
+                                            </template>
+                                            <span>
+                                                {{ arg.description }}
+                                            </span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-text-field>
+                            </div>
+                            <p v-else>
+                                No Arguments.
+                            </p>
+                        </div>
+                    </v-col>
+                </v-row>
+            </div>
+        </td>
+    </template>
+    <template #item.actions="{ item }">
+        <v-btn @click=forceExec(item) :loading=item.executing :disabled=loading x-small color=primary>
+            Force Execution
+        </v-btn>
+    </template>
+</v-data-table>

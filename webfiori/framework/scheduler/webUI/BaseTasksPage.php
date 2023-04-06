@@ -36,18 +36,18 @@ class BaseTasksPage extends WebPage {
             'base' => $this->getBase()
         ]);
         $loginPageTitle = 'Tasks Scheduler Login';
+        
         SessionsManager::start('scheduler-session');
 
         if (TasksManager::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
                 && SessionsManager::getActiveSession()->get('scheduler-login-status') !== true) {
-            Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/login');
+            Response::addHeader('location', 'scheduler/login');
+            die('gg');
             Response::send();
-        } else {
-            if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
-                Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/tasks');
-                Response::send();
-            }
+        } else if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
+            Response::addHeader('location', 'scheduler/tasks');
+            Response::send();
         }
         $this->setTitle($title);
         $this->setDescription($description);
@@ -76,8 +76,8 @@ class BaseTasksPage extends WebPage {
                 ':loading' => 'loading'
             ])->text('Logout');
         }
-        $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
-        $this->createOutputDialog();
+        $this->insert($this->include('job-execution-status-dialog.html'));
+        $this->insert($this->include('job-output-dialog.html'));
         $this->addBeforeRender(function (BaseTasksPage $view)
         {
             $code = new JsCode();
@@ -86,68 +86,7 @@ class BaseTasksPage extends WebPage {
         }, 1000);
     }
 
-    /**
-     * Adds a very basic v-dialog that can be used to show status messages and so on.
-     *
-     * @param string $model The vue model which is used to make the dialig visible.
-     *
-     * @param string $titleModel A string that represents the model which is used
-     * to set the title.
-     *
-     * @param string $messageModel The name of the model that will hold dialog
-     * message.
-     *
-     * @param string $closeAction The name of the method which will be invoked
-     * when close button is clicked.
-     *
-     * @param array $iconProps An optional array that holds icon props. the
-     * array can have two indices: 'model' and 'color-model'.
-     * @throws InvalidNodeNameException
-     */
-    public function createVDialog($model, $titleModel, $messageModel, $closeAction, $iconProps = []) {
-        $dialog = new HTMLNode('v-dialog');
-        $dialog->setAttribute('v-model', $model);
-
-        $dialog->setAttributes([
-            'v-model' => $model,
-            'width' => '500'
-        ]);
-
-        $dialogCard = $dialog->addChild('v-card');
-
-        $iconModel = isset($iconProps['model']) ? '{{ '.$iconProps['model'].' }}' : 'mdi-information';
-        $propsArr = [
-            'style' => [
-                'margin' => '10px'
-            ],
-        ];
-        isset($iconProps['color-model']) ? $propsArr[':color'] = $iconProps['color-model'] : $propsArr['color'] = 'green';
-        $dialogCard->addChild('v-card-title', [
-            'class' => ""
-        ])->addChild('v-icon', $propsArr)->text($iconModel)
-        ->getParent()->addChild('div', [
-            'style' => [
-                'display' => 'inline'
-            ]
-        ])->text("{{ $titleModel }}");
-        $dialogCard->addChild('v-divider');
-        $dialogCard->addChild('v-card-text')->text("{{ $messageModel }}");
-        $dialogCard->addChild('v-divider');
-        $dialogActions = $dialogCard->addChild('v-card-actions');
-        $dialogActions->addChild('v-spacer');
-        $dialogActions->addChild('v-btn', [
-            'color' => "primary",
-            'text',
-            '@click' => "$closeAction"
-        ])->text('Close');
-        $dialogActions->addChild('v-btn', [
-            'v-if' => 'output_dialog.output.length !== 0',
-            'color' => "primary",
-            'text',
-            '@click' => "output_dialog.show = true"
-        ])->text('View Output');
-        $this->insert($dialog);
-    }
+   
     /**
      * 
      * @return Json
@@ -180,51 +119,18 @@ class BaseTasksPage extends WebPage {
             $page->getDocument()->removeChild($footer);
             $page->getDocument()->addChild($appDiv);
             $page->getDocument()->getChildByID('main-content-area')->setClassName('container');
-        });
+        }, 100);
         $this->addBeforeRender(function (WebPage $page)
         {
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/scheduler.js',
+                'src' => $page->getBase().'/assets/js/scheduler-logic.js',
             ]);
         });
     }
-    private function createOutputDialog() {
-        $dialog = $this->insert('v-dialog');
-        $dialog->setAttributes([
-            'v-model' => 'output_dialog.show',
-            'max-width' => '850px',
-            'scrollable'
-        ]);
-        $card = $dialog->addChild('v-card');
-        $card->addChild('v-card-title')->text('task Execution Output');
-        $card->addChild('v-divider');
-        $card->addChild('v-card-text', [
-            'style' => [
-                "height" => '400px;',
-                'color' => 'white',
-                'background-color' => 'black',
-                'text-align' => 'justify'
-            ],
-            'v-html' => 'output_dialog.output'
-        ]);
-        $card->addChild('v-divider');
-        $card->addChild('v-card-actions')
-            ->addChild('v-btn', [
-                'color' => "primary",
-                'text',
-                '@click' => "output_dialog.show = false",
-            ])->text('Close');
-    }
+    
 
     private function iniHead() {
-        $this->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
-        $this->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css');
-        $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css');
-        $this->addJS('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js');
-        $this->addJS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js');
-        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.x.x/AJAXRequest.js', [
-            'revision' => true
-        ]);
+        $this->getDocument()->setHeadNode($this->include('head.php'));
     }
 }

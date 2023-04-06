@@ -57,21 +57,26 @@ class ListTasksPage extends BaseTasksPage {
 
         $row->addChild('v-col', [
             'cols' => 12
-        ])->addChild(new TasksTable());
+        ])->addChild($this->include('tasks-table.html'));
 
         $logRow = $this->insert('v-row');
         $card = $logRow->addChild('v-col', [
             'cols' => 12
         ])->addChild('v-card');
-        $card->addChild('v-card-title')->text('tasks Execution Log');
-        $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'tasks.log');
+        $card->addChild('v-card-title')->text('Tasks Execution Log');
+        $file = new File(APP_PATH.'sto'.DS.'logs'.DS.'tasks-execution.log');
 
         if ($file->isExist()) {
             $file->read();
-            $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
+            $data = $file->getRawData();
+            if (strlen($data) == 0) {
+                $card->addChild('v-card-text')->addChild('pre')->text('Empty log file.');
+            } else {
+                $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
+            }
+            
         } else {
             $file->create();
-            $file->write();
             $card->addChild('v-card-text')->addChild('pre', [
                 'style' => 'color:red'
             ])->text('Log file not found!');

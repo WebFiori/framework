@@ -1,0 +1,28 @@
+ <v-dialog v-model=dialog.show width=500>
+    <v-card>
+        <v-card-title class="">
+            <v-icon style=margin:10px; color=green>
+                mdi-information
+            </v-icon>
+            <div style=display:inline;>
+                {{ dialog.title }}
+            </div>
+        </v-card-title>
+        <v-divider>
+        </v-divider>
+        <v-card-text>
+            {{ dialog.message }}
+        </v-card-text>
+        <v-divider>
+        </v-divider>
+        <v-card-actions>
+            <v-spacer>
+            </v-spacer>
+            <v-btn color=primary text @click=dialogClosed>
+                Close
+            </v-btn>
+            <v-btn v-if="output_dialog.output.length !== 0" color=primary text @click="output_dialog.show = true">
+                View Output
+            </v-btn>
+        </v-card-actions>
+    </v-card>

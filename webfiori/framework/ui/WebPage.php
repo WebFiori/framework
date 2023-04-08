@@ -205,6 +205,8 @@ class WebPage {
         $this->title = '';
         $this->titleSep = '|';
         $this->reset();
+        global $page;
+        $page = $this;
     }
     /**
      * Render HTML or PHP template file and return its content as an object.
@@ -558,8 +560,7 @@ class WebPage {
     /**
      * Returns the title of the page.
      * 
-     * @return string The title of the page. Default return value is 
-     * 'Default X'.
+     * @return string The title of the page.
      * 
      * @since 1.0
      */

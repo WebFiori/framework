@@ -1,7 +1,4 @@
 <?php
-
-use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\Language;
 /**
  * This file is licensed under MIT License.
  * 
@@ -12,6 +9,9 @@ use webfiori\framework\Language;
  * 
  */
 
+use webfiori\framework\exceptions\MissingLangException;
+use webfiori\framework\Language;
+use webfiori\framework\ui\WebPage;
 
 /**
  * This file contains functions that can be used inside PHP templates. The
@@ -40,18 +40,39 @@ use webfiori\framework\Language;
 function label(string $path, string $langCode = null) {
     return Language::getLabel($path, $langCode);
 }
-
+/**
+ * Returns the canonical URL of the page.
+ * 
+ * @return null|string The method will return the  canonical URL of the page 
+ * if set. If not, the method will return null.
+ * 
+ */
 function canonical() {
     return call('getCanonical');
 }
+/**
+ * Returns the value of the attribute 'href' of the node 'base' of page document.
+ * 
+ * @return string|null If the base URL is set, the method will return its value. 
+ * If the value of the base URL is not set, the method will return null.
+ * 
+ */
 function baseURL() {
     return call('getBase');
 }
-function title() {
+/**
+ * Returns the title of the page.
+ * 
+ * @return string The title of the page.
+ * 
+ */
+function title() : string {
     return call('getTitle');
 }
 function call($methodName) {
-    if (isset($page)) {
+    global $page;
+    
+    if (isset($page) && $page instanceof WebPage) {
         return $page->$methodName();
     }
 }

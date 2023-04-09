@@ -35,13 +35,13 @@ ajax.setOnSuccess({
     }
 });
 ajax.setOnSuccess({
-    id:'Get Jobs',
+    id:'Get Tasks',
     call:function() {
-        return this.url === 'scheduler/apis/get-jobs';
+        return this.url === 'scheduler/apis/get-tasks';
     },
     callback:function() {
         if (this.jsonResponse) {
-            this.props.vue.jobs = this.jsonResponse.jobs;
+            this.props.vue.tasks = this.jsonResponse.tasks;
         } else {
             this.props.vue.showDialog('Something went wrong. Try again.');
         }
@@ -55,7 +55,7 @@ ajax.setOnSuccess({
     callback:function() {
         var vue = this.props.vue;
         vue.loading = false;
-        vue.active_job.executing = false;
+        vue.active_task.executing = false;
 
         if (this.status === 200 && this.jsonResponse) {
             var output = '';
@@ -73,7 +73,7 @@ ajax.setOnSuccess({
             }
             vue.output_dialog.output = output;
 
-            if (info.failed.indexOf(vue.active_job.name) !== -1) {
+            if (info.failed.indexOf(vue.active_task.name) !== -1) {
                 vue.output_dialog.failed = true;
             } else {
                 vue.output_dialog.failed = false;
@@ -161,8 +161,9 @@ var app = new Vue({
     },
     methods:{
         forceExec:function (job) {
+            this.active_task = job;
             var params = {
-                'job-name':job.name
+                'task-name':job.name
             };
             for(var x = 0 ; x < job.args.length ; x++) {
                 var argVal = job.args[x].value;
@@ -181,7 +182,7 @@ var app = new Vue({
             }
         },
         loadTasks:function() {
-            ajax.setURL('scheduler/apis/get-jobs');
+            ajax.setURL('scheduler/apis/get-tasks');
             ajax.setMethod('get');
             ajax.send();
         },

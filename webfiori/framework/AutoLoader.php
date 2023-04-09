@@ -215,14 +215,14 @@ class AutoLoader {
     ]): AutoLoader {
         $DS = DIRECTORY_SEPARATOR;
 
-        if (!defined('APP_DIR')) {
-            define('APP_DIR', 'app');
-        }
-        $appFolder = APP_DIR;
-
         if (self::$loader === null) {
+            if (!defined('APP_DIR')) {
+                define('APP_DIR', 'app');
+            }
+            $appFolder = APP_DIR;
             $frameworkSearchFolders = [
                 '',
+                $DS.'webfiori'.$DS.'framework',
                 $DS.'framework'.$DS.'exceptions',
                 $DS.'framework'.$DS.'cli',
                 $DS.'framework'.$DS.'ui',
@@ -323,10 +323,8 @@ class AutoLoader {
                 if ($classArr[self::$CLASS_INDICES[1]] == $namespace && $classArr[self::$CLASS_INDICES[0]] == $className) {
                     $retVal[] = $classArr[self::$CLASS_INDICES[2]];
                 }
-            } else {
-                if ($classArr[self::$CLASS_INDICES[0]] == $className) {
-                    $retVal[] = $classArr[self::$CLASS_INDICES[2]];
-                }
+            } else if ($classArr[self::$CLASS_INDICES[0]] == $className) {
+                $retVal[] = $classArr[self::$CLASS_INDICES[2]];
             }
         }
 

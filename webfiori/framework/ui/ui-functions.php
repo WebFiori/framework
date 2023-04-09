@@ -12,6 +12,7 @@
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\Language;
 use webfiori\framework\ui\WebPage;
+use webfiori\ui\HTMLNode;
 
 /**
  * This file contains functions that can be used inside PHP templates. The
@@ -59,6 +60,16 @@ function canonical() {
  */
 function baseURL() {
     return call('getBase');
+}
+/**
+ * Returns the description of the page.
+ * 
+ * @return string|null The description of the page. If the description is not set, 
+ * the method will return null.
+ * 
+ */
+function description() {
+    return call('getDescription');
 }
 /**
  * Returns the title of the page.

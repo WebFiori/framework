@@ -26,5 +26,6 @@ class TasksServicesManager extends WebServicesManager {
         $this->addService(new ForceTaskExecutionService());
         $this->addService(new TasksLogoutService());
         $this->addService(new GetTasksService());
+        $this->addService(new SetupPasswordService());
     }
 }

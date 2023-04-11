@@ -31,24 +31,15 @@ class BaseTasksPage extends WebPage {
     private $jsonData;
     public function __construct($title, $description = '') {
         parent::__construct();
+        SessionsManager::start('scheduler-session');
+        
         $this->jsonData = new Json([
             'title' => $title,
             'base' => $this->getBase()
         ]);
-        $loginPageTitle = 'Tasks Scheduler Login';
         
-        SessionsManager::start('scheduler-session');
+        
 
-        if (TasksManager::password() != 'NO_PASSWORD' 
-                && $title != $loginPageTitle
-                && SessionsManager::getActiveSession()->get('scheduler-login-status') !== true) {
-            Response::addHeader('location', 'scheduler/login');
-            die('gg');
-            Response::send();
-        } else if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
-            Response::addHeader('location', 'scheduler/tasks');
-            Response::send();
-        }
         $this->setTitle($title);
         $this->setDescription($description);
         $defaultSiteLang = App::getAppConfig()->getPrimaryLanguage();
@@ -59,13 +50,30 @@ class BaseTasksPage extends WebPage {
             $this->setWebsiteName($siteName);
         }
         $this->changePageStructure();
-        $this->iniHead();
+        $this->getDocument()->setHeadNode($this->include('head.php'));
 
         $row = $this->insert('v-row');
         $row->addChild('v-col', [
             'cols' => 12
         ])->addChild('h1')->text($title);
 
+        
+        
+        $this->addBeforeRender(function (BaseTasksPage $view) {
+            $code = new JsCode();
+            $code->addCode('window.data = '.$view->getJson().';');
+            $view->getDocument()->getHeadNode()->addChild($code);
+        }, 1000);
+    }
+    public function includeExecutionStatusOutputs() {
+        $this->insert($this->include('job-execution-status-dialog.html'));
+        $this->insert($this->include('job-output-dialog.html'));
+    }
+    public function isLoggedIn() : bool {
+        return $this->getActiveSession()->get('scheduler-login-status') === true;
+    }
+
+    public function includeLogoutButton() {
         if (TasksManager::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
             $row = $this->insert('v-row');
             $row->addChild('v-col', [
@@ -76,17 +84,10 @@ class BaseTasksPage extends WebPage {
                 ':loading' => 'loading'
             ])->text('Logout');
         }
-        $this->insert($this->include('job-execution-status-dialog.html'));
-        $this->insert($this->include('job-output-dialog.html'));
-        $this->addBeforeRender(function (BaseTasksPage $view)
-        {
-            $code = new JsCode();
-            $code->addCode('window.data = '.$view->getJson().';');
-            $view->getDocument()->getHeadNode()->addChild($code);
-        }, 1000);
     }
 
-   
+
+
     /**
      * 
      * @return Json
@@ -129,8 +130,4 @@ class BaseTasksPage extends WebPage {
         });
     }
     
-
-    private function iniHead() {
-        $this->getDocument()->setHeadNode($this->include('head.php'));
-    }
 }

@@ -35,18 +35,15 @@ class BaseTasksPage extends WebPage {
             'title' => $title,
             'base' => $this->getBase()
         ]);
-        $loginPageTitle = 'Tasks Scheduler Login';
-        
+        $loginPageTitle = 'Tasks Scheduler Web Interface Login';
+        $setPassPageTitle = 'Set Scheduler Password';
         SessionsManager::start('scheduler-session');
-
-        if (TasksManager::password() != 'NO_PASSWORD' 
-                && $title != $loginPageTitle
-                && SessionsManager::getActiveSession()->get('scheduler-login-status') !== true) {
-            Response::addHeader('location', 'scheduler/login');
-            die('gg');
+        if (TasksManager::password() == 'NO_PASSWORD' && $title != $setPassPageTitle) {
+            Response::addHeader('location', 'scheduler/set-password');
             Response::send();
-        } else if ($title == $loginPageTitle && TasksManager::password() == 'NO_PASSWORD') {
-            Response::addHeader('location', 'scheduler/tasks');
+        } else if (TasksManager::password() == 'NO_PASSWORD' && $title == $setPassPageTitle) {
+        } else if ($title != $loginPageTitle && $this->getActiveSession()->get('scheduler-login-status') !== true) {
+            Response::addHeader('location', 'scheduler/login');
             Response::send();
         }
         $this->setTitle($title);

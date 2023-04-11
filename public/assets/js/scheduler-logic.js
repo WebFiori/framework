@@ -3,13 +3,26 @@ ajax.setOnDisconnected(function () {
     this.props.vue.showDialog('Check your internet connection and try again.');
 });
 ajax.setOnSuccess({
+    id:'Set Password',
+    call:function() {
+        return this.url === 'scheduler/apis/set-password';
+    },
+    callback:function() {
+        if (this.jsonResponse) {
+            window.location.href = 'scheduler/login';
+        } else {
+            this.props.vue.showDialog('Something went wrong. Try again.');
+        }
+    }
+});
+ajax.setOnSuccess({
     id:'Login',
     call:function() {
         return this.url === 'scheduler/apis/login';
     },
     callback:function() {
         if (this.jsonResponse) {
-            window.location.href = data.base+'/scheduler/tasks';
+            window.location.href = 'scheduler/tasks';
         } else {
             this.props.vue.showDialog('Something went wrong. Try again.');
         }
@@ -30,7 +43,7 @@ ajax.setOnSuccess({
         if (this.jsonResponse) {
             window.location.href = 'scheduler/login';
         } else {
-            vue.showDialog('Something went wrong. Try again.');
+            this.props.vue.showDialog('Something went wrong. Try again.');
         }
     }
 });
@@ -147,7 +160,11 @@ var app = new Vue({
     computed:{
         login_btn_disabled:function() {
             var pass = this.password+'';
-            return pass.trim().length === 0;
+            return pass.length < 6;
+        },
+        set_password_btn_disabled:function () {
+            var pass = this.password+'';
+            return pass.length < 6;
         }
     },
     mounted:function () {
@@ -174,6 +191,14 @@ var app = new Vue({
             ajax.setURL('scheduler/apis/force-execution');
             ajax.setMethod('post');
             ajax.setParams(params);
+            ajax.send();
+        },
+        setPassword:function() {
+            ajax.setURL('scheduler/apis/set-password');
+            ajax.setMethod('post');
+            ajax.setParams({
+                password:this.password
+            });
             ajax.send();
         },
         checkIfEnterHit:function(e) {

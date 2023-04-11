@@ -10,13 +10,10 @@
  */
 namespace webfiori\framework\scheduler\webUI;
 
-use webfiori\framework\scheduler\TasksManager;
+use webfiori\framework\App;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
-use webfiori\framework\App;
-use webfiori\http\Response;
 use webfiori\json\Json;
-use webfiori\ui\exceptions\InvalidNodeNameException;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 /**
@@ -31,7 +28,7 @@ class BaseTasksPage extends WebPage {
     private $jsonData;
     public function __construct($title, $description = '') {
         parent::__construct();
-        SessionsManager::start('scheduler-session');
+        
         
         $this->jsonData = new Json([
             'title' => $title,
@@ -50,7 +47,7 @@ class BaseTasksPage extends WebPage {
             $this->setWebsiteName($siteName);
         }
         $this->changePageStructure();
-        $this->getDocument()->setHeadNode($this->include('head.php'));
+        $this->getDocument()->setHeadNode($this->include('templates/head.php'));
 
         $row = $this->insert('v-row');
         $row->addChild('v-col', [
@@ -66,24 +63,23 @@ class BaseTasksPage extends WebPage {
         }, 1000);
     }
     public function includeExecutionStatusOutputs() {
-        $this->insert($this->include('job-execution-status-dialog.html'));
-        $this->insert($this->include('job-output-dialog.html'));
+        $this->insert($this->include('templates/job-execution-status-dialog.html'));
+        $this->insert($this->include('templates/job-output-dialog.html'));
     }
     public function isLoggedIn() : bool {
+        SessionsManager::start('scheduler-session');
         return $this->getActiveSession()->get('scheduler-login-status') === true;
     }
 
     public function includeLogoutButton() {
-        if (TasksManager::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
-            $row = $this->insert('v-row');
-            $row->addChild('v-col', [
-                'cols' => 12
-            ])->addChild('v-btn', [
-                '@click' => 'logout',
-                'color' => 'primary',
-                ':loading' => 'loading'
-            ])->text('Logout');
-        }
+        $row = $this->insert('v-row');
+        $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-btn', [
+            '@click' => 'logout',
+            'color' => 'primary',
+            ':loading' => 'loading'
+        ])->text('Logout');
     }
 
 
@@ -123,6 +119,7 @@ class BaseTasksPage extends WebPage {
         }, 100);
         $this->addBeforeRender(function (WebPage $page)
         {
+            $page->insert($page->include('templates/message-dialog.html'));
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
                 'src' => $page->getBase().'/assets/js/scheduler-logic.js',

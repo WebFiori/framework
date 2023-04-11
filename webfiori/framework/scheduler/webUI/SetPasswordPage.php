@@ -18,6 +18,6 @@ class SetPasswordPage extends BaseTasksPage {
             Response::addHeader('location', 'scheduler/login');
         }
         
-        $this->insert($this->include('set-password-form.html'));
+        $this->insert($this->include('templates/set-password-form.html'));
     }
 }

@@ -15,6 +15,6 @@ namespace webfiori\framework\scheduler\webUI;
     </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js">
     </script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.x.x/AJAXRequest.js">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.1.6/dist/AJAXRequest.js">
     </script>
 </head>

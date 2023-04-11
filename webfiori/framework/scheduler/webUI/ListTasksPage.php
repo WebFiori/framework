@@ -45,7 +45,7 @@ class ListTasksPage extends BaseTasksPage {
         parent::__construct('Scheduled Tasks', 'A list of scheduled tasks.');
         
         if (!$this->isLoggedIn()) {
-            Response::addHeader('location', 'scheduler/login');
+            Response::addHeader('location', $this->getBase().'/scheduler/login');
             Response::send();
         }
         
@@ -63,7 +63,7 @@ class ListTasksPage extends BaseTasksPage {
 
         $row->addChild('v-col', [
             'cols' => 12
-        ])->addChild($this->include('tasks-table.html'));
+        ])->addChild($this->include('templates/tasks-table.html'));
 
         $logRow = $this->insert('v-row');
         $card = $logRow->addChild('v-col', [

@@ -1,0 +1,15 @@
+<v-dialog v-model=dialog.visible max-width=500>
+    <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+            <v-icon style=margin:10px; :color=dialog.icon_color>
+                {{ dialog.icon }}
+            </v-icon>
+            <div style=display:inline;>
+                {{ dialog.title }}
+            </div>
+        </v-card-title>
+        <v-card-text>
+            {{ dialog.message }}
+        </v-card-text>
+    </v-card>
+</v-dialog>

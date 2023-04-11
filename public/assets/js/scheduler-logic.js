@@ -1,4 +1,4 @@
-/* global ajax */
+/* global ajax, data */
 ajax.setOnDisconnected(function () {
     this.props.vue.showDialog('Check your internet connection and try again.');
 });
@@ -9,7 +9,7 @@ ajax.setOnSuccess({
     },
     callback:function() {
         if (this.jsonResponse) {
-            window.location.href = 'scheduler/login';
+            window.location.href = data.base+'/scheduler/login';
         } else {
             this.props.vue.showDialog('Something went wrong. Try again.');
         }
@@ -22,7 +22,20 @@ ajax.setOnSuccess({
     },
     callback:function() {
         if (this.jsonResponse) {
-            window.location.href = 'scheduler/tasks';
+            window.location.href = data.base+'/scheduler/tasks';
+        } else {
+            this.props.vue.showDialog('Something went wrong. Try again.');
+        }
+    }
+});
+ajax.setOnClientError({
+    id:'Login Failed',
+    call:function() {
+        return this.url === 'scheduler/apis/login';
+    },
+    callback:function() {
+        if (this.jsonResponse) {
+            this.props.vue.showDialog(this.jsonResponse.message);
         } else {
             this.props.vue.showDialog('Something went wrong. Try again.');
         }
@@ -41,7 +54,7 @@ ajax.setOnSuccess({
     },
     callback:function() {
         if (this.jsonResponse) {
-            window.location.href = 'scheduler/login';
+            window.location.href = data.base+'/scheduler/login';
         } else {
             this.props.vue.showDialog('Something went wrong. Try again.');
         }
@@ -148,8 +161,11 @@ var app = new Vue({
             {value:'actions', text:'Actions'},
         ],
         dialog:{
-            show:false,
-            message:''
+            visible:false,
+            title:'Message',
+            message:'',
+            icon_color:'',
+            icon:''
         },
         output_dialog:{
             show:false,
@@ -212,11 +228,11 @@ var app = new Vue({
             ajax.send();
         },
         dialogClosed:function() {
-            this.dialog.show = false; 
+            this.dialog.visible = false; 
         },
         showDialog(message) {
             this.dialog.message = message;
-            this.dialog.show = true;
+            this.dialog.visible = true;
         },
         logout:function() {
             ajax.setURL('scheduler/apis/logout');

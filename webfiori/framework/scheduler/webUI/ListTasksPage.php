@@ -11,6 +11,7 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\file\File;
+use webfiori\http\Response;
 /**
  * A view to display information about scheduled tasks.
  * 
@@ -42,7 +43,12 @@ class ListTasksPage extends BaseTasksPage {
      */
     public function __construct() {
         parent::__construct('Scheduled Tasks', 'A list of scheduled tasks.');
-
+        
+        if (!$this->isLoggedIn()) {
+            Response::addHeader('location', 'scheduler/login');
+            Response::send();
+        }
+        
         $searchRow = $this->insert('v-row');
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
@@ -81,5 +87,7 @@ class ListTasksPage extends BaseTasksPage {
                 'style' => 'color:red'
             ])->text('Log file not found!');
         }
+        
+        $this->includeExecutionStatusOutputs();
     }
 }

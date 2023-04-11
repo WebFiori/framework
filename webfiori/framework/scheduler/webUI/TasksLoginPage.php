@@ -23,8 +23,8 @@ class TasksLoginPage extends BaseTasksPage {
     public function __construct() {
         parent::__construct('Tasks Scheduler Web Interface Login', 'Login to Scheduler Control panel.');
 
-        if (SessionsManager::get('scheduler-login-status')) {
-            Response::addHeader('location', App::getAppConfig()->getBaseURL().'/scheduler/tasks');
+        if ($this->isLoggedIn()) {
+            Response::addHeader('location', 'scheduler/tasks');
             Response::send();
         }
         $row = $this->insert('v-row');

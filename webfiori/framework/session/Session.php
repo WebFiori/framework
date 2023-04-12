@@ -722,7 +722,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function toJSON() : Json {
-        return new Json([
+        $json = new Json([
             'name' => $this->getName(),
             'startedAt' => $this->getStartedAt(),
             'duration' => $this->getDuration(),
@@ -735,8 +735,9 @@ class Session implements JsonI {
             'isPersistent' => $this->isPersistent(),
             'status' => $this->getStatus(),
             'user' => $this->getUser(),
-            'vars' => $this->getVars()
         ]);
+        $json->addArray('vars', $this->getVars(), true);
+        return $json;
     }
 
     /**

@@ -22,12 +22,7 @@ class TasksLogoutService extends AbstractWebService {
         parent::__construct('logout');
         $this->addRequestMethod('post');
     }
-    public function isAuthorized() {
-        return true;
-    }
-
     public function processRequest() {
-        SessionsManager::start('scheduler-session');
         SessionsManager::destroy();
         $this->sendResponse('Logged out.', 'info');
     }

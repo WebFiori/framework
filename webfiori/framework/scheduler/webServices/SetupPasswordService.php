@@ -22,15 +22,13 @@ use webfiori\http\RequestParameter;
  * @version 1.0
  */
 class SetupPasswordService extends AbstractWebService {
-    private $currentPassword;
     public function __construct() {
         parent::__construct('set-password');
         $this->addRequestMethod('post');
         $this->addParameter(new RequestParameter('password'));
     }
     public function isAuthorized() {
-        $this->currentPassword = TasksManager::password();
-        return $this->currentPassword == 'NO_PASSWORD';
+        return TasksManager::password() == 'NO_PASSWORD';
     }
 
     public function processRequest() {

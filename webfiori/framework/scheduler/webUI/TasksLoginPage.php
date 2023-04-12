@@ -22,11 +22,11 @@ class TasksLoginPage extends BaseTasksPage {
     public function __construct() {
         parent::__construct('Tasks Scheduler Web Interface Login', 'Login to Scheduler Control panel.');
         if (TasksManager::password() == 'NO_PASSWORD') {
-            Response::addHeader('location', 'scheduler/set-password');
+            Response::addHeader('location', $this->getBase().'/scheduler/set-password');
             Response::send();
         }
         if ($this->isLoggedIn()) {
-            Response::addHeader('location', 'scheduler/tasks');
+            Response::addHeader('location', $this->getBase().'/scheduler/tasks');
             Response::send();
         }
         

@@ -28,11 +28,11 @@ class BaseTasksPage extends WebPage {
     private $jsonData;
     public function __construct($title, $description = '') {
         parent::__construct();
-        
-        
+
         $this->jsonData = new Json([
             'title' => $title,
-            'base' => $this->getBase()
+            'base' => $this->getBase(),
+            'session' => $this->getActiveSession()
         ]);
         
         
@@ -62,33 +62,24 @@ class BaseTasksPage extends WebPage {
             $view->getDocument()->getHeadNode()->addChild($code);
         }, 1000);
     }
-    public function includeExecutionStatusOutputs() {
-        $this->insert($this->include('templates/job-execution-status-dialog.html'));
-        $this->insert($this->include('templates/job-output-dialog.html'));
-    }
+    /**
+     * Checks if the user is logged in or not.
+     * 
+     * The method will check if session variable 'scheduler-is-logged-in' is
+     * set to true or not. The variable is set when the user successfully
+     * logged in.
+     * 
+     * @return bool
+     */
     public function isLoggedIn() : bool {
-        SessionsManager::start('scheduler-session');
-        return $this->getActiveSession()->get('scheduler-login-status') === true;
+        return $this->getActiveSession()->get('scheduler-is-logged-in') === true;
     }
-
-    public function includeLogoutButton() {
-        $row = $this->insert('v-row');
-        $row->addChild('v-col', [
-            'cols' => 12
-        ])->addChild('v-btn', [
-            '@click' => 'logout',
-            'color' => 'primary',
-            ':loading' => 'loading'
-        ])->text('Logout');
-    }
-
-
 
     /**
      * 
      * @return Json
      */
-    public function getJson() {
+    public function getJson() : Json {
         return $this->jsonData;
     }
     private function changePageStructure() {

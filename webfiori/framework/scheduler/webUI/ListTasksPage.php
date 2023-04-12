@@ -48,7 +48,7 @@ class ListTasksPage extends BaseTasksPage {
             Response::addHeader('location', $this->getBase().'/scheduler/login');
             Response::send();
         }
-        
+        $this->includeLogoutButton();
         $searchRow = $this->insert('v-row');
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
@@ -88,6 +88,17 @@ class ListTasksPage extends BaseTasksPage {
             ])->text('Log file not found!');
         }
         
-        $this->includeExecutionStatusOutputs();
+        $this->insert($this->include('templates/job-execution-status-dialog.html'));
+        $this->insert($this->include('templates/job-output-dialog.html'));
+    }
+    private function includeLogoutButton() {
+        $row = $this->insert('v-row');
+        $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-btn', [
+            '@click' => 'logout',
+            'color' => 'primary',
+            ':loading' => 'loading'
+        ])->text('Logout');
     }
 }

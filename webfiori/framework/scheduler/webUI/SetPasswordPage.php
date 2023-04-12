@@ -15,7 +15,7 @@ class SetPasswordPage extends BaseTasksPage {
         parent::__construct('Set Scheduler Password');
         
         if (TasksManager::password() != 'NO_PASSWORD') {
-            Response::addHeader('location', 'scheduler/login');
+            Response::addHeader('location', $this->getBase().'/scheduler/login');
         }
         
         $this->insert($this->include('templates/set-password-form.html'));

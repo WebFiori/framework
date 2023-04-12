@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\scheduler\webServices;
 
+use webfiori\framework\session\SessionsManager;
 use webfiori\http\WebServicesManager;
 /**
  * A class which is used to manage scheduled tasks related services.

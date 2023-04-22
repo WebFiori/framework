@@ -505,25 +505,26 @@ class Session implements JsonI {
      * Serialize the session.
      * 
      * @return string The method will return a string that represents serialized 
-     * session data.
+     * session data. Note that if openssl is enabled and the cipher aes-256-ctr
+     * is supported, returned string will be encrypted.
      * 
      */
     public function serialize() : string {
-        $serializedSession = serialize($this);
+        // Serialize => Encode => [Encrypt]
+        $serializedSession = base64_encode(serialize($this));
         $cipherMeth = 'aes-256-ctr';
 
-        //Need to do more research about the security of this approach.
-
-        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
-        //Shall we use IP address in key or not?
-        //It would add more security.
-        $key = $this->getId().$userAgent;
-
-        $iv = substr(hash('sha256', $key), 0,16);
-
-
-
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
+            
+            //Need to do more research about the security of this approach.
+
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
+            //Shall we use IP address in key or not?
+            //It would add more security.
+            $key = $this->getId().$userAgent;
+
+            $iv = substr(hash('sha256', $key), 0,16);
+            
             return openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
         }
 
@@ -676,7 +677,8 @@ class Session implements JsonI {
      */
     public function deserialize(string $serialized): bool {
         $cipherMeth = 'aes-256-ctr';
-
+        // [Decrypt] => decode => deserialize
+        
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
 
@@ -686,14 +688,14 @@ class Session implements JsonI {
             $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
-            $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
+            $decrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
 
-            if (strlen($encrypted) > 0) {
+            if (strlen($decrypted) > 0) {
                 set_error_handler(function ($errNo, $errStr)
                 {
                     throw  new SessionException($errStr, $errNo);
                 });
-                $sessionObj = unserialize($encrypted);
+                $sessionObj = unserialize(base64_decode($decrypted));
                 restore_error_handler();
 
                 if ($sessionObj instanceof Session) {
@@ -708,7 +710,7 @@ class Session implements JsonI {
             {
                 throw  new SessionException($errStr, $errNo);
             });
-            $sessionObj = unserialize($serialized);
+            $sessionObj = unserialize(base64_decode($serialized));
             restore_error_handler();
 
             if ($sessionObj instanceof Session) {

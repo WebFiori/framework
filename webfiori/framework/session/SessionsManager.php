@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\session;
 
+use SessionStatus;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\http\Request;
 /**
@@ -141,7 +142,7 @@ class SessionsManager {
         foreach (self::getInstance()->sessionsArr as $session) {
             $status = $session->getStatus();
 
-            if ($status == Session::STATUS_NEW || $status == Session::STATUS_RESUMED) {
+            if ($status == SessionStatus::NEW || $status == SessionStatus::RESUMED) {
                 self::getInstance()->activeSession = $session;
 
                 return $session;
@@ -442,11 +443,11 @@ class SessionsManager {
         foreach (self::getInstance()->sessionsArr as $session) {
             $status = $session->getStatus();
 
-            if ($status == Session::STATUS_NEW ||
-                $status == Session::STATUS_PAUSED ||  
-                $status == Session::STATUS_RESUMED) {
+            if ($status == SessionStatus::NEW ||
+                $status == SessionStatus::PAUSED ||  
+                $status == SessionStatus::RESUMED) {
                 self::getStorage()->save($session->getId(), $session->serialize());
-            } else if ($status == Session::STATUS_KILLED) {
+            } else if ($status == SessionStatus::KILLED) {
                 self::getStorage()->remove($session->getId());
             }
         }
@@ -471,7 +472,7 @@ class SessionsManager {
             ]);
             $tempSession->start();
 
-            if ($tempSession->getStatus() == Session::STATUS_RESUMED) {
+            if ($tempSession->getStatus() == SessionStatus::RESUMED) {
                 self::getInstance()->sessionsArr[] = $tempSession;
 
                 return true;

@@ -8,7 +8,6 @@ use webfiori\database\DatabaseException;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\DatabaseSessionStorage;
-use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 
 /**

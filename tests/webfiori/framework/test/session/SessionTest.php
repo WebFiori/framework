@@ -235,9 +235,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_none",'
+                . '"status":"none",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $s->start();
        // $j = $s->toJSON();
        // $j->setPropsStyle('snake');
@@ -251,9 +251,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"isRefresh":false,'
                 . '"isPersistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$s.'');
+                . '"vars":{}}',$s.'');
     }
     /**
      * @test
@@ -273,9 +273,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_none",'
+                . '"status":"none",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $s->start();
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
@@ -289,9 +289,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $_POST['lang'] = 'enx';
         $this->assertEquals('FR', $s->getLangCode(true));
         $_POST['lang'] = 'En';
@@ -308,9 +308,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
     }
     /**
      * @test

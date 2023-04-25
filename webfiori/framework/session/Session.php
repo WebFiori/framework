@@ -739,6 +739,8 @@ class Session implements JsonI {
         $this->isRef = $session->isRef;
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
+        $this->sessionUser = $session->sessionUser;
+        
         $langCodeR = $this->getLangFromRequest();
 
         if ($langCodeR) {
@@ -747,7 +749,6 @@ class Session implements JsonI {
             $this->langCode = $session->langCode;
         }
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
-        $this->sessionUser = $session->sessionUser;
     }
     /**
      * Generate a random session ID.

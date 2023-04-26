@@ -577,7 +577,7 @@ class TasksManager {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
-        $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-login-status') : false;
+        $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-is-logged-in') : false;
         $schedulerPass = TasksManager::password();
 
         if ($schedulerPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $schedulerPass) {

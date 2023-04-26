@@ -156,8 +156,7 @@ class DefaultSessionStorage implements SessionStorage {
             //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
             $file->setRawData($serializedSession);
-            $file->create();
-            $file->write();
+            $file->write(false, true);
         }
     }
 }

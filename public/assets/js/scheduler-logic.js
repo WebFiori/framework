@@ -82,7 +82,9 @@ ajax.setOnSuccess({
         var vue = this.props.vue;
         vue.loading = false;
         vue.active_task.executing = false;
-
+        var icon = 'mdi-check-decagram';
+        var iconColor = 'green';
+        
         if (this.status === 200 && this.jsonResponse) {
             var output = '';
             var info = this.jsonResponse['more-info'];
@@ -101,13 +103,18 @@ ajax.setOnSuccess({
 
             if (info.failed.indexOf(vue.active_task.name) !== -1) {
                 vue.output_dialog.failed = true;
+                icon = 'mdi-alert-octagram';
+                iconColor = 'red';
             } else {
                 vue.output_dialog.failed = false;
             }
         } else {
             vue.output_dialog.output = this.response;
             vue.output_dialog.failed = true;
+            icon = 'mdi-alert-octagram';
+            iconColor = 'red';
         }
+        vue.showDialog(this.jsonResponse.message, icon, iconColor);
     }
 });
 ajax.setOnServerError({
@@ -160,7 +167,7 @@ var app = new Vue({
             {value:'time.is_month', text:'Is Month'},
             {value:'actions', text:'Actions'},
         ],
-        dialog:{
+        execution_dialog:{
             visible:false,
             title:'Message',
             message:'',
@@ -228,11 +235,13 @@ var app = new Vue({
             ajax.send();
         },
         dialogClosed:function() {
-            this.dialog.visible = false; 
+            this.execution_dialog.visible = false; 
         },
-        showDialog(message) {
-            this.dialog.message = message;
-            this.dialog.visible = true;
+        showDialog(message, icon = 'mdi-information', iconColor = 'gray') {
+            this.execution_dialog.message = message;
+            this.execution_dialog.icon = icon;
+            this.execution_dialog.icon_color = iconColor;
+            this.execution_dialog.visible = true;
         },
         logout:function() {
             ajax.setURL('scheduler/apis/logout');

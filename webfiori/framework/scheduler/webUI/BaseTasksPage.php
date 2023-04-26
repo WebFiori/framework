@@ -11,7 +11,6 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\App;
-use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
@@ -110,7 +109,6 @@ class BaseTasksPage extends WebPage {
         }, 100);
         $this->addBeforeRender(function (WebPage $page)
         {
-            $page->insert($page->include('templates/message-dialog.html'));
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
                 'src' => $page->getBase().'/assets/js/scheduler-logic.js',

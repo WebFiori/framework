@@ -172,7 +172,7 @@ class SchedulerTest extends TestCase {
     public function testRoutes() {
         Router::removeAll();
         TasksManager::initRoutes();
-        $this->assertEquals(4, Router::routesCount());
+        $this->assertEquals(5, Router::routesCount());
         
         $route1 = Router::getUriObj('/scheduler');
         $this->assertNotNull($route1);

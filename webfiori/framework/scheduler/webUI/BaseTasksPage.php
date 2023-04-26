@@ -111,7 +111,7 @@ class BaseTasksPage extends WebPage {
         {
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
-                'src' => $page->getBase().'/assets/js/scheduler-logic.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/framework@'.WF_VERSION.'/assets/js/scheduler-logic.js',
             ]);
         });
     }

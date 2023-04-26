@@ -12,7 +12,6 @@
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\Language;
 use webfiori\framework\ui\WebPage;
-use webfiori\ui\HTMLNode;
 
 /**
  * This file contains functions that can be used inside PHP templates. The

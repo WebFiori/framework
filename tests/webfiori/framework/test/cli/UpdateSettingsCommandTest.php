@@ -198,7 +198,7 @@ class UpdateSettingsCommandTest extends TestCase {
         
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Enter new password: Enter = ''\n",
+            "Enter new password:\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
         $this->assertEquals(hash('sha256', '123456'), ConfigController::get()->getSchedulerPassword());
@@ -209,7 +209,8 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdateSchedulerPass01() {
         $runner = App::getRunner();
         $runner->setInputs([
-            ''
+            '',
+            '123'
         ]);
         
         $runner->setArgsVector([
@@ -220,10 +221,12 @@ class UpdateSettingsCommandTest extends TestCase {
         
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Enter new password: Enter = ''\n",
+            "Enter new password:\n",
+            "Error: Empty string is not allowed.\n",
+            "Enter new password:\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
-        $this->assertEquals('NO_PASSWORD', ConfigController::get()->getSchedulerPassword());
+        $this->assertEquals(hash('sha256', '123'), ConfigController::get()->getSchedulerPassword());
     }
     /**
      * @test

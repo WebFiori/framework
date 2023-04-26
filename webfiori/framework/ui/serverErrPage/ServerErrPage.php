@@ -41,7 +41,7 @@ class ServerErrPage extends WebPage {
         $this->addBeforeRender(function (WebPage $p)
         {
             $p->getDocument()->getBody()->addChild('script', [
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/server-err.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/framework@'.WF_VERSION.'/assets/js/server-err.js',
                 'type' => 'text/javascript'
             ]);
         });

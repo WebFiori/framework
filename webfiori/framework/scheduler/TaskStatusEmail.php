@@ -37,8 +37,7 @@ class TaskStatusEmail extends EmailMessage {
      * Creates new instance of the class.
      * 
      * @param string $sendAccName The name of SMTP account that will be 
-     * used to send the message. Note that it must be existed in the class
-     * 'MailConfig'.
+     * used to send the message.
      * 
      * @param array $receivers An associative array of receivers. The 
      * indices are the addresses of the receivers and the values are the 
@@ -71,13 +70,13 @@ class TaskStatusEmail extends EmailMessage {
             ]);
 
             if ($activeTask->isSuccess()) {
-                $this->setSubject('Background Task Status: Task \''.$activeTask->getTaskName().'\' 😃');
+                $this->setSubject('Success: Task \''.$activeTask->getTaskName().'\'');
                 $text = 'This automatic system email is sent to notify you that the background task '
                         .'\''.$activeTask->getTaskName().'\' was <b style="color:green">successfully completed '
                         .'without any issues</b>. For more details about execution process, '
                         .'please check the attached execution log file.</p>';
             } else {
-                $this->setSubject('Background Task Status: Task \''.$activeTask->getTaskName().'\' 😲');
+                $this->setSubject('Failed: Task \''.$activeTask->getTaskName().'\' ');
                 $text = 'This automatic email is sent to notify you that the background task '
                         .'\''.$activeTask->getTaskName().'\' <b style="color:red">did not successfully complet due some error(s)'
                         .'</b>. To investigate the cause of failure, '
@@ -93,10 +92,9 @@ class TaskStatusEmail extends EmailMessage {
             foreach (TasksManager::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
-            $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'scheduler'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
+            $file = new File(APP_PATH.'sto'.DS.'logs'.DS.'scheduler'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
-            $file->create(true);
-            $file->write();
+            $file->write(false, true);
             $this->addAttachment($file);
         }
     }

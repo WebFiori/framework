@@ -23,20 +23,16 @@ use webfiori\framework\exceptions\SessionException;
  * 
  * @author Ibrahim
  * 
- * @since 1.1.0
- * 
- * @version 1.0.1
  */
 class DefaultSessionStorage implements SessionStorage {
     private $storeLoc;
     /**
      * Creates new instance of the class.
      * 
-     * @since 1.0
      */
     public function __construct() {
         $sessionsDirName = 'sessions';
-        $sessionsStoragePath = ROOT_PATH.DS.APP_DIR.DS.'sto';
+        $sessionsStoragePath = APP_PATH.'sto';
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
@@ -63,7 +59,6 @@ class DefaultSessionStorage implements SessionStorage {
      * old sessions. If it does not exist, the method will remove any inactive 
      * session which is older than 30 days.
      * 
-     * @since 1.0
      */
     public function gc() {
         if (!$this->isStorageDirExist()) {
@@ -92,12 +87,25 @@ class DefaultSessionStorage implements SessionStorage {
      * @return bool If sessions storage location exist and is writable,
      * the method will return true.
      * 
-     * @since 1.0.1
      */
     public function isStorageDirExist(): bool {
         return file_exists($this->storeLoc) && is_writable($this->storeLoc);
     }
-
+    /**
+     * Checks if session storage file exist or not.
+     * 
+     * Note that this method will first check for existence of storage
+     * directory by calling the method DefaultSessionStorage::isStorageDirExist().
+     * 
+     * @return bool If sessions storage file exist and is writable,
+     * the method will return true.
+     * 
+     */
+    public function isStorageFileExist(string $sId): bool {
+        if ($this->isStorageDirExist()) {
+            return file_exists($this->storeLoc.DS.$sId);
+        }
+    }
     /**
      * Reads a session from session file.
      *
@@ -108,7 +116,6 @@ class DefaultSessionStorage implements SessionStorage {
      * the method will return null.
      *
      * @throws FileException
-     * @since 1.0
      */
     public function read(string $sessionId) {
         if (!$this->isStorageDirExist()) {
@@ -127,10 +134,10 @@ class DefaultSessionStorage implements SessionStorage {
      * 
      * @param string $sessionId The ID of the session.
      * 
-     * @since 1.0
      */
     public function remove(string $sessionId) {
-        if ($this->isStorageDirExist()) {
+        if ($this->isStorageFileExist($sessionId)) {
+            
             unlink($this->storeLoc.DS.$sessionId);
         }
     }
@@ -143,15 +150,13 @@ class DefaultSessionStorage implements SessionStorage {
      * @param string $serializedSession The session that will be stored.
      *
      * @throws FileException
-     * @since 1.0
      */
     public function save(string $sessionId, string $serializedSession) {
         if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__')) && $this->isStorageDirExist()) {
             //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
             $file->setRawData($serializedSession);
-            $file->create();
-            $file->write();
+            $file->write(false, true);
         }
     }
 }

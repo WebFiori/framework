@@ -687,13 +687,14 @@ class ConfigController {
      * execution.
      *
      * @param string $newPass The new password. If empty string is given, the password
-     * will be set to the string 'NO_PASSWORD'.
+     * will be set to the string 'NO_PASSWORD'. Note that provided value will
+     * be hashed using SHA256 algorithm.
      *
      * @throws FileException
      * @since 1.5.2
      */
     public function updateSchedulerPassword(string $newPass) {
-        $this->configVars['scheduler-password'] = $newPass;
+        $this->configVars['scheduler-password'] = hash('sha256', $newPass);
         $this->writeAppConfig();
     }
 

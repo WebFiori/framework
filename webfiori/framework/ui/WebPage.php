@@ -205,7 +205,20 @@ class WebPage {
         $this->title = '';
         $this->titleSep = '|';
         $this->reset();
+        global $page;
+        $page = $this;
     }
+    /**
+     * Render HTML or PHP template file and return its content as an object.
+     * 
+     * @param string $path The path to the template file.
+     * 
+     * @param array $args An optional array that contain slots values or 
+     * PHP variables that will be passed to the template.
+     * 
+     * @return HTMLNode The method will return rendered HTML as an instance of the
+     * class HTMLNode.
+     */
     public function include(string $path, array $args = []) : HTMLNode {
         return HTMLNode::fromFile($path, array_merge([
             'page' => $this
@@ -547,8 +560,7 @@ class WebPage {
     /**
      * Returns the title of the page.
      * 
-     * @return string The title of the page. Default return value is 
-     * 'Default X'.
+     * @return string The title of the page.
      * 
      * @since 1.0
      */

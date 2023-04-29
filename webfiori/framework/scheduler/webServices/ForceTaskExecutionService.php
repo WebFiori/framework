@@ -21,17 +21,11 @@ use webfiori\json\Json;
  *
  * @author Ibrahim
  */
-class ForceTaskExecutionService extends AbstractWebService {
+class ForceTaskExecutionService extends PrivateSchedulerService {
     public function __construct() {
         parent::__construct('force-execution');
         $this->addRequestMethod('post');
         $this->addParameter(new RequestParameter('task-name'));
-    }
-    public function isAuthorized() {
-        SessionsManager::start('scheduler-session');
-
-        return SessionsManager::get('scheduler-login-status') === true
-                || TasksManager::password() == 'NO_PASSWORD';
     }
 
     public function processRequest() {

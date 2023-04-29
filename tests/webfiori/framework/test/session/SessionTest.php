@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
+use SessionStatus;
 use webfiori\file\File;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\Session;
@@ -26,7 +27,7 @@ class SessionTest extends TestCase {
         $this->assertEquals('', $sesston->getLangCode());
         //$this->assertNull($sesston->getUser());
         $this->assertNotNull($sesston->getId());
-        $this->assertEquals(Session::STATUS_INACTIVE,$sesston->getStatus());
+        $this->assertEquals(SessionStatus::INACTIVE,$sesston->getStatus());
     }
     /**
      * @test
@@ -46,7 +47,7 @@ class SessionTest extends TestCase {
         $this->assertEquals('', $sesston->getLangCode(true));
         $this->assertNull($sesston->getUser());
         $this->assertEquals('super',$sesston->getId());
-        $this->assertEquals(Session::STATUS_INACTIVE,$sesston->getStatus());
+        $this->assertEquals(SessionStatus::INACTIVE,$sesston->getStatus());
     }
     /**
      * @test
@@ -63,7 +64,7 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$session->getPassedTime());
         $this->assertEquals('', $session->getLangCode());
         //$this->assertNull($session->getUser());
-        $this->assertEquals(Session::STATUS_INACTIVE,$session->getStatus());
+        $this->assertEquals(SessionStatus::INACTIVE,$session->getStatus());
         $cookie = $session->getCookie();
         $this->assertEquals(time() + 7200, $cookie->getExpires());
         $this->assertEquals(date(DATE_COOKIE, Session::DEFAULT_SESSION_DURATION*60 + time()), $cookie->getLifetime());
@@ -120,7 +121,7 @@ class SessionTest extends TestCase {
      */
     public function testStart00() {
         $session = new Session(['name'=>'new']);
-        $this->assertEquals(Session::STATUS_INACTIVE,$session->getStatus());
+        $this->assertEquals(SessionStatus::INACTIVE,$session->getStatus());
         $this->assertEquals(0,$session->getStartedAt());
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0,$session->getResumedAt());
@@ -135,7 +136,7 @@ class SessionTest extends TestCase {
         $this->assertEquals('EN', $session->getLangCode());
         $this->assertEquals('AR', $session->getLangCode(true));
         $this->assertEquals(0,$session->getPassedTime());
-        $this->assertEquals(Session::STATUS_NEW,$session->getStatus());
+        $this->assertEquals(SessionStatus::NEW,$session->getStatus());
         $this->assertEquals(time(),$session->getStartedAt());
         $this->assertEquals(time(),$session->getResumedAt());
         $this->assertTrue($session->isRunning());
@@ -168,7 +169,7 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$session->getPassedTime());
         sleep(10);
         $session->start();
-        $this->assertEquals(Session::STATUS_RESUMED,$session->getStatus());
+        $this->assertEquals(SessionStatus::RESUMED,$session->getStatus());
         $this->assertTrue(in_array($session->getStartedAt(),[
             time() - 8,
             time() - 9,
@@ -234,9 +235,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_none",'
+                . '"status":"none",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $s->start();
        // $j = $s->toJSON();
        // $j->setPropsStyle('snake');
@@ -250,9 +251,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"isRefresh":false,'
                 . '"isPersistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$s.'');
+                . '"vars":{}}',$s.'');
     }
     /**
      * @test
@@ -272,9 +273,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_none",'
+                . '"status":"none",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $s->start();
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
@@ -288,9 +289,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
         $_POST['lang'] = 'enx';
         $this->assertEquals('FR', $s->getLangCode(true));
         $_POST['lang'] = 'En';
@@ -307,9 +308,9 @@ class SessionTest extends TestCase {
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
-                . '"status":"status_new",'
+                . '"status":"new",'
                 . '"user":null,'
-                . '"vars":[]}',$j.'');
+                . '"vars":{}}',$j.'');
     }
     /**
      * @test

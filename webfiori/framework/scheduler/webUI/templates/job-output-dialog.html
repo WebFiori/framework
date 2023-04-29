@@ -1,0 +1,18 @@
+<v-dialog v-model=output_dialog.show max-width=850px scrollable>
+    <v-card>
+        <v-card-title>
+            Task Execution Output
+        </v-card-title>
+        <v-divider>
+        </v-divider>
+        <v-card-text style="height:400px;;color:white;background-color:black;text-align:justify;" v-html=output_dialog.output>
+        </v-card-text>
+        <v-divider>
+        </v-divider>
+        <v-card-actions>
+            <v-btn color=primary text @click="output_dialog.show = false">
+                Close
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+</v-dialog>

@@ -80,7 +80,7 @@ class StarterPage extends WebPage {
     private function createCard($link, $icon, $cardTitle, $paragraph, \webfiori\ui\HTMLNode $el) {
         $card = $el->addChild('v-card', [
             'hover',
-
+            'height' => '220px'
         ]);
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'

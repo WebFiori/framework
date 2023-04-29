@@ -11,6 +11,7 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\file\File;
+use webfiori\http\Response;
 /**
  * A view to display information about scheduled tasks.
  * 
@@ -42,7 +43,12 @@ class ListTasksPage extends BaseTasksPage {
      */
     public function __construct() {
         parent::__construct('Scheduled Tasks', 'A list of scheduled tasks.');
-
+        
+        if (!$this->isLoggedIn()) {
+            Response::addHeader('location', $this->getBase().'/scheduler/login');
+            Response::send();
+        }
+        $this->includeLogoutButton();
         $searchRow = $this->insert('v-row');
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
@@ -57,24 +63,42 @@ class ListTasksPage extends BaseTasksPage {
 
         $row->addChild('v-col', [
             'cols' => 12
-        ])->addChild(new TasksTable());
+        ])->addChild($this->include('templates/tasks-table.html'));
 
         $logRow = $this->insert('v-row');
         $card = $logRow->addChild('v-col', [
             'cols' => 12
         ])->addChild('v-card');
-        $card->addChild('v-card-title')->text('tasks Execution Log');
-        $file = new File(ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs'.DS.'tasks.log');
+        $card->addChild('v-card-title')->text('Tasks Execution Log');
+        $file = new File(APP_PATH.'sto'.DS.'logs'.DS.'tasks-execution.log');
 
         if ($file->isExist()) {
             $file->read();
-            $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
+            $data = $file->getRawData();
+            if (strlen($data) == 0) {
+                $card->addChild('v-card-text')->addChild('pre')->text('Empty log file.');
+            } else {
+                $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
+            }
+            
         } else {
             $file->create();
-            $file->write();
             $card->addChild('v-card-text')->addChild('pre', [
                 'style' => 'color:red'
             ])->text('Log file not found!');
         }
+        
+        $this->insert($this->include('templates/job-execution-status-dialog.html'));
+        $this->insert($this->include('templates/job-output-dialog.html'));
+    }
+    private function includeLogoutButton() {
+        $row = $this->insert('v-row');
+        $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-btn', [
+            '@click' => 'logout',
+            'color' => 'primary',
+            ':loading' => 'loading'
+        ])->text('Logout');
     }
 }

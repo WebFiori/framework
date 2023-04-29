@@ -10,6 +10,7 @@
  */
 namespace webfiori\framework\scheduler\webServices;
 
+use webfiori\framework\session\SessionsManager;
 use webfiori\http\WebServicesManager;
 /**
  * A class which is used to manage scheduled tasks related services.
@@ -26,5 +27,6 @@ class TasksServicesManager extends WebServicesManager {
         $this->addService(new ForceTaskExecutionService());
         $this->addService(new TasksLogoutService());
         $this->addService(new GetTasksService());
+        $this->addService(new SetupPasswordService());
     }
 }

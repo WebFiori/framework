@@ -1,0 +1,11 @@
+<v-card :loading=loading :disabled=loading>
+    <v-card-text>
+        <v-text-field type=password v-model=password label="Enter scheduler password here." :loading=loading @keydown=checkIfEnterHit>
+        </v-text-field>
+    </v-card-text>
+    <v-card-text>
+        <v-btn @click=login color=primary :loading=loading :disabled=login_btn_disabled>
+            Login
+        </v-btn>
+    </v-card-text>
+</v-card>

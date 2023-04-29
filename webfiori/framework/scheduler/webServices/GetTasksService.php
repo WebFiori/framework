@@ -21,16 +21,10 @@ use webfiori\json\Json;
  * 
  * @version 1.0
  */
-class GetTasksService extends AbstractWebService {
+class GetTasksService extends PrivateSchedulerService {
     public function __construct() {
         parent::__construct('get-tasks');
         $this->addRequestMethod('get');
-    }
-    public function isAuthorized() {
-        SessionsManager::start('scheduler-session');
-
-        return SessionsManager::get('scheduler-login-status') === true
-                || TasksManager::password() == 'NO_PASSWORD';
     }
 
     public function processRequest() {

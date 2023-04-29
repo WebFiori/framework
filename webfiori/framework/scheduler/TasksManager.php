@@ -10,20 +10,21 @@
  */
 namespace webfiori\framework\scheduler;
 
-use const DS;
 use Exception;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
 use webfiori\collections\Queue;
 use webfiori\file\File;
+use webfiori\framework\App;
 use webfiori\framework\cli\commands\SchedulerCommand;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\scheduler\webUI\TasksLoginPage;
-use webfiori\framework\scheduler\webUI\ListTasksPage;
 use webfiori\framework\router\Router;
+use webfiori\framework\scheduler\webServices\TasksServicesManager;
+use webfiori\framework\scheduler\webUI\ListTasksPage;
+use webfiori\framework\scheduler\webUI\SetPasswordPage;
+use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
-use webfiori\framework\App;
+use const DS;
 /**
  * A class that is used to manage scheduled background tasks.
  * 
@@ -381,6 +382,10 @@ class TasksManager {
                 [
                     'path' => '/login',
                     'route-to' => TasksLoginPage::class
+                ],
+                [
+                    'path' => '/set-password',
+                    'route-to' => SetPasswordPage::class
                 ]
             ]
         ]);
@@ -572,7 +577,7 @@ class TasksManager {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
-        $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-login-status') : false;
+        $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-is-logged-in') : false;
         $schedulerPass = TasksManager::password();
 
         if ($schedulerPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $schedulerPass) {

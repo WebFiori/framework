@@ -18,6 +18,15 @@ class PageTest extends TestCase{
     /**
      * @test
      */
+    public function testUIFunctions00() {
+        $page = new WebPage();
+        $this->assertEquals($page->getTitle(), title());
+        $page->setTitle('New One');
+        $this->assertEquals($page->getTitle(), title());
+    }
+    /**
+     * @test
+     */
     public function testBeforeRender00() {
         $page = new WebPage();
         $c = $page->addBeforeRender(function (WebPage $p, TestCase $c) {

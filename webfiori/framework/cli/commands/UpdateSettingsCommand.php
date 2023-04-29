@@ -115,13 +115,10 @@ class UpdateSettingsCommand extends CLICommand {
         $this->success('Primary theme successfully updated.');
     }
     private function updateSchedulerPass() {
-        $newPass = $this->getInput('Enter new password:', '');
+        $newPass = $this->getInput('Enter new password:', null, new InputValidator(function (string $val) {
+            return strlen(trim($val)) != 0;
+        }, 'Empty string is not allowed.'));
 
-        if (strlen($newPass) == 0) {
-            $newPass = 'NO_PASSWORD';
-        } else {
-            $newPass = hash('sha256', $newPass);
-        }
         ConfigController::get()->updateSchedulerPassword($newPass);
         $this->success('Password successfully updated.');
     }

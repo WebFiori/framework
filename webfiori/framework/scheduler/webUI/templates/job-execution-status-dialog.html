@@ -1,0 +1,25 @@
+ <v-dialog v-model=execution_dialog.visible width=500>
+    <v-card>
+        <v-card-title class="">
+            <v-icon style=margin:10px; :color=execution_dialog.icon_color>
+                {{ execution_dialog.icon }}
+            </v-icon>
+            <div style=display:inline;>
+                {{ execution_dialog.title }}
+            </div>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+            {{ execution_dialog.message }}
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+            <v-btn color=primary text @click=dialogClosed>
+                Close
+            </v-btn>
+            <v-btn v-if="output_dialog.output.length !== 0" color=primary text @click="output_dialog.show = true">
+                View Output
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+ </v-dialog>

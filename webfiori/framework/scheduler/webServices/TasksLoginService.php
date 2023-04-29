@@ -27,25 +27,16 @@ class TasksLoginService extends AbstractWebService {
         $this->addRequestMethod('post');
         $this->addParameter(new RequestParameter('password'));
     }
-    public function isAuthorized() {
-        return true;
-    }
 
     public function processRequest() {
         $schedulerPass = TasksManager::password();
-
-        if ($schedulerPass != 'NO_PASSWORD') {
-            $inputHash = hash('sha256', $this->getInputs()['password']);
-
-            if ($inputHash == $schedulerPass) {
-                SessionsManager::start('scheduler-session');
-                SessionsManager::set('scheduler-login-status', true);
-                $this->sendResponse('Success', 'info');
-            } else {
-                $this->sendResponse('Incorrect password', 'error', 404);
-            }
+        $inputHash = hash('sha256', $this->getInputs()['password']);
+        
+        if ($inputHash == $schedulerPass) {
+            SessionsManager::set('scheduler-is-logged-in', true);
+            $this->sendResponse('Success', self::I, 200, SessionsManager::getActiveSession());
         } else {
-            $this->sendResponse('Success', 'info');
+            $this->sendResponse('Incorrect password', self::E, 404);
         }
     }
 }

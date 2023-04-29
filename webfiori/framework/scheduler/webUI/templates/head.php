@@ -13,6 +13,5 @@ namespace webfiori\framework\scheduler\webUI;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.6.15/dist/vuetify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js" integrity="sha256-1gHyKSR7Jh0YGBmI9zN7P2UhZRh/PCKhCYIaUOqWoPk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.15/dist/vuetify.min.js" integrity="sha256-Fetn6QcWnO5THt0I/81iDeUNWAIFQ+K3ZGmMCh270UU=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.1.6/dist/AJAXRequest.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@2.1.6/dist/AJAXRequest.js" integrity="sha256-xgtvhbUpeXbYZTG8q6WvNfoCQJjomizJ2+PK4BzV3E8=" crossorigin="anonymous"></script>
 </head>

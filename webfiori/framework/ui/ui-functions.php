@@ -12,6 +12,9 @@
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\Language;
 use webfiori\framework\ui\WebPage;
+use webfiori\http\Response;
+use webfiori\json\JsonI;
+use webfiori\ui\HTMLNode;
 
 /**
  * This file contains functions that can be used inside PHP templates. The
@@ -78,6 +81,29 @@ function description() {
  */
 function title() : string {
     return call('getTitle');
+}
+/**
+ * Display a message in web browser's console.
+ * 
+ * @param mixed $message Any variable.
+ */
+function logVar($message) {
+    $js = new HTMLNode('script');
+    $type = gettype($message);
+    if ($type == 'object' || $type == 'resource') {
+        if (is_subclass_of($message, JsonI::class)) {
+            $js->text("console.log(".$message->toJSON().")", false);
+        } else {
+            ob_start();
+            var_dump($message);
+            $js->text("console.log(`".trim(str_replace('\\', '\\\\', ob_get_clean()))."`)", false);
+        }
+    } else if ($type == 'string') {
+        $js->text("console.log(`".$message."`)", false);
+    } else {
+        $js->text("console.log(".$message.")", false);
+    }
+    Response::write($js);
 }
 function call($methodName) {
     global $page;

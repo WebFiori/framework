@@ -23,6 +23,7 @@ class JsonDriver implements ConfigurationDriver {
             'theme' => null,
             'home-page' => null,
             'primary-lang' => 'EN',
+            'title' => 'Hello World',
             'name-separator' => '|',
             'scheduler-password' => 'NO_PASSWORD',
             'app-names' => new Json([
@@ -42,6 +43,7 @@ class JsonDriver implements ConfigurationDriver {
             'smtp-connections' => new Json(),
             'database-connections' => new Json(),
         ]);
+        $this->json->setIsFormatted(true);
     }
     public function addEnvVar(string $name, $value, string $description = null) {
         $this->json->get('env-vars')->add($name, new Json([
@@ -107,7 +109,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getPrimaryLanguage(): string {
-        return $this->json->get('primary-language');
+        return $this->json->get('primary-lang');
     }
 
     public function getSMTPAccount(string $name) {
@@ -129,9 +131,12 @@ class JsonDriver implements ConfigurationDriver {
     public function getTitleSeparator(): string {
         return $this->json->get('name-separator');
     }
-
+    public function getTitle() : string {
+        return $this->json->get('title');
+    }
     public function initialize() {
-        if (file_exists(self::JSON_CONFIG_FILE_PATH)) {
+        $path = self::JSON_CONFIG_FILE_PATH;
+        if (!file_exists($path)) {
             $this->writeJson();
         }
         $this->json = Json::fromJsonFile(self::JSON_CONFIG_FILE_PATH);

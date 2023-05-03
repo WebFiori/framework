@@ -17,7 +17,8 @@ use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
-use webfiori\framework\scheduler\TasksManager;
+use webfiori\framework\config\ConfigurationDriver;
+use webfiori\framework\config\Controller;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
@@ -26,6 +27,7 @@ use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
+use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
 use webfiori\http\Response;
@@ -41,25 +43,21 @@ define('MICRO_START', microtime(true));
  * 
  * @author Ibrahim
  * 
- * @version 1.3.7
  */
 class App {
     /**
      * A constant that indicates that the status of the class is 'initialized'.
      * 
-     * @since 1.3.7
      */
     const STATUS_INITIALIZED = 'INITIALIZED';
     /**
      * A constant that indicates that the status of the class is 'initializing'.
      * 
-     * @since 1.3.7
      */
     const STATUS_INITIALIZING = 'INITIALIZING';
     /**
      * A constant that indicates that the status of the class is 'none'.
      * 
-     * @since 1.3.7
      */
     const STATUS_NONE = 'NONE';
     /**
@@ -117,6 +115,7 @@ class App {
             mb_http_output($encoding);
             mb_regex_encoding($encoding);
         }
+        $this->initAutoLoader();
         $this->loadEnvVars();
         /**
          * Set memory limit.
@@ -128,14 +127,10 @@ class App {
          */
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
-        $this->initAutoLoader();
+        
         $this->setHandlers();
         //Initialize CLI
         self::getRunner();
-
-        $this->initAppConfig();
-
-
 
         $this->initThemesPath();
         $this->checkStandardLibs();
@@ -253,15 +248,10 @@ class App {
     /**
      * Returns the instance which is used as main application configuration class.
      * 
-     * @return Config
+     * @return ConfigurationDriver
      */
-    public static function getAppConfig(): Config {
-        if (self::$LC !== null) {
-            return self::$LC->appConfig;
-        }
-        $constructor = '\\'.APP_DIR.'\\config\\AppConfig';
-
-        return new $constructor();
+    public static function getAppConfig(): ConfigurationDriver {
+        return Controller::getDriver();
     }
     /**
      * Returns a reference to an instance of 'AutoLoader'.
@@ -526,7 +516,7 @@ class App {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\framework\AutoLoader',false)) {
-            require_once WF_CORE_PATH.DS.'AutoLoader.php';
+            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
 
@@ -631,28 +621,12 @@ class App {
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR.'\config\Env')) {
-            $configPath = 'webfiori'.DIRECTORY_SEPARATOR.
-                    'framework'.DIRECTORY_SEPARATOR.
-                    'config'.DIRECTORY_SEPARATOR;
-            $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
-                    'vendor'.DIRECTORY_SEPARATOR.
-                    'webfiori'.DIRECTORY_SEPARATOR.
-                    'framework'.DIRECTORY_SEPARATOR.
-                    $configPath.
-                    'Controller.php';
 
-            if (!file_exists($confControllerPath)) {
-                $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
-                        $configPath.
-                        'Controller.php';
-            }
-            require_once $confControllerPath;
             $path = ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
 
             if (!file_exists($path)) {
                 Controller::get()->updateEnv();
             }
-            require_once ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
         }
         call_user_func(APP_DIR.'\config\\Env::defineEnvVars');
     }

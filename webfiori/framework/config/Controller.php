@@ -10,7 +10,23 @@ namespace webfiori\framework\config;
  */
 class Controller {
     private $driver;
+    private static $singleton;
+    /**
+     * Returns a single instance of the class.
+     * 
+     * @return Controller
+     * 
+     */
+    public static function get(): Controller {
+        if (self::$singleton === null) {
+            self::$singleton = new Controller();
+        }
+
+        return self::$singleton;
+    }
     public function __construct() {
+        require_once './ConfigurationDriver.php';
+        require_once './DefaultDriver.php';
         $this->setDriver(new DefaultDriver());
     }
     public function setDriver(ConfigurationDriver $driver) {

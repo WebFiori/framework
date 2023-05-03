@@ -1,0 +1,14 @@
+{
+    "names":{
+        "AR":""
+    },
+    "descriptions":{
+        "AR":""
+    },
+    "env":{
+        "SOMETHING":{
+            
+        },
+        "SOMETHING_ELSE":"test"
+    }
+}

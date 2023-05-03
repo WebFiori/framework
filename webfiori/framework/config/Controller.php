@@ -25,7 +25,8 @@ class Controller {
         return self::$singleton;
     }
     public function __construct() {
-        $this->setDriver(new JsonDriver());
+        $this->driver = new JsonDriver();
+        $this->driver->initialize();
     }
     public static function setDriver(ConfigurationDriver $driver) {
         self::get()->driver = $driver;

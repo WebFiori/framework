@@ -631,25 +631,26 @@ class App {
     }
     private function loadEnvVars() {
         if (!class_exists(APP_DIR.'\config\Env')) {
+            $configPath = 'webfiori'.DIRECTORY_SEPARATOR.
+                    'framework'.DIRECTORY_SEPARATOR.
+                    'config'.DIRECTORY_SEPARATOR;
             $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
-                    'webfiori'.DIRECTORY_SEPARATOR.
-                    'framework'.DIRECTORY_SEPARATOR.
-                    'ConfigController.php';
+                    $configPath.
+                    'Controller.php';
 
             if (!file_exists($confControllerPath)) {
                 $confControllerPath = ROOT_PATH.DIRECTORY_SEPARATOR.
-                        'webfiori'.DIRECTORY_SEPARATOR.
-                        'framework'.DIRECTORY_SEPARATOR.
-                        'ConfigController.php';
+                        $configPath.
+                        'Controller.php';
             }
             require_once $confControllerPath;
             $path = ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
 
             if (!file_exists($path)) {
-                ConfigController::get()->createConstClass();
+                Controller::get()->updateEnv();
             }
             require_once ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
         }

@@ -1,5 +1,8 @@
 <?php
 namespace webfiori\framework\config;
+
+use webfiori\database\ConnectionInfo;
+use webfiori\email\SMTPAccount;
 /**
  * An interface which holds base methods for implementing application configuration storage.
  * 

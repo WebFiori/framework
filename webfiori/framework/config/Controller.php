@@ -25,14 +25,13 @@ class Controller {
         return self::$singleton;
     }
     public function __construct() {
-        require_once './ConfigurationDriver.php';
-        require_once './DefaultDriver.php';
-        $this->setDriver(new DefaultDriver());
+        $this->setDriver(new JsonDriver());
     }
-    public function setDriver(ConfigurationDriver $driver) {
-        $this->driver = $driver;
+    public static function setDriver(ConfigurationDriver $driver) {
+        self::get()->driver = $driver;
+        $driver->initialize();
     }
-    public function updateEnv() {
+    public static function updateEnv() {
         $DS = DIRECTORY_SEPARATOR;
         //The class GlobalConstants must exist before autoloader.
         //For this reason, use the 'resource' instead of the class 'File'. 
@@ -74,14 +73,14 @@ class Controller {
             "public static function defineEnvVars() {"
         ], 1);
         
-        foreach ($this->getDriver()->getEnvVars() as $envVar) {
+        foreach (self::getDriver()->getEnvVars() as $envVar) {
             $this->a($resource, "define('".$envVar['name']."', ".$envVar['value'].");", 2);
         }
         $this->a($resource, '}', 1);
         $this->a($resource, '}');
     }
-    public function getDriver() : ConfigurationDriver {
-        return $this->driver;
+    public static function getDriver() : ConfigurationDriver {
+        return self::get()->driver;
     }
     private function a($file, $str, $tabSize = 0) {
         $isResource = is_resource($file);

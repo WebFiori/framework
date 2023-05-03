@@ -541,7 +541,7 @@ class App {
             if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
                 TasksManager::initRoutes();
             }
-            TasksManager::password($this->appConfig->getSchedulerPassword());
+            TasksManager::password(self::getAppConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
             call_user_func(APP_DIR.'\ini\InitTasks::init');
             TasksManager::registerTasks();

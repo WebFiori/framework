@@ -784,17 +784,17 @@ class WebPage {
         $this->_checkLang();
         $this->usingLanguage();
 
-        $appName = App::getAppConfig()->getWebsiteName($this->getLangCode());
+        $appName = App::getAppConfig()->getAppName($this->getLangCode());
         $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
 
         $websiteDesc = App::getAppConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
 
-        $pageTitle = App::getAppConfig()->getDefaultTitle($this->getLangCode());
+        $pageTitle = App::getAppConfig()->getTitle($this->getLangCode());
         $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
 
 
-        $this->setTitleSep(App::getAppConfig()->getTitleSep());
+        $this->setTitleSep(App::getAppConfig()->getTitleSeparator());
 
         $langObj = $this->getTranslation();
 

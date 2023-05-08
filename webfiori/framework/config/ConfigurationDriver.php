@@ -13,7 +13,7 @@ use webfiori\email\SMTPAccount;
  */
 interface ConfigurationDriver {
     /**
-     * Returns SMTP account given its name.
+     * Returns SMTP connection given its name.
      * 
      * The method should be implemented in a way that it searches
      * for an account with the given name in the set

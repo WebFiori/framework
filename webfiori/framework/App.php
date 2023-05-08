@@ -402,6 +402,10 @@ class App {
         }
     }
     private function checkAppDir() {
+        /**
+         * Directory separator.
+         */
+        define('DS', DIRECTORY_SEPARATOR);
         if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application 
@@ -620,15 +624,7 @@ class App {
         }
     }
     private function loadEnvVars() {
-        if (!class_exists(APP_DIR.'\config\Env')) {
-
-            $path = ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'Env.php';
-
-            if (!file_exists($path)) {
-                Controller::get()->updateEnv();
-            }
-        }
-        call_user_func(APP_DIR.'\config\\Env::defineEnvVars');
+        Controller::get()->updateEnv();
     }
     /**
      * Sets new error and exception handler.

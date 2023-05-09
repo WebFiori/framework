@@ -23,7 +23,10 @@ class JsonDriver implements ConfigurationDriver {
             'theme' => null,
             'home-page' => null,
             'primary-lang' => 'EN',
-            'title' => 'Hello World',
+            'titles' => new Json([
+                'AR' => 'افتراضي',
+                'EN' => 'Default'
+            ]),
             'name-separator' => '|',
             'scheduler-password' => 'NO_PASSWORD',
             'app-names' => new Json([
@@ -131,7 +134,7 @@ class JsonDriver implements ConfigurationDriver {
     public function getTitleSeparator(): string {
         return $this->json->get('name-separator');
     }
-    public function getTitle() : string {
+    public function getTitle(string $lang) : string {
         return $this->json->get('title');
     }
     public function initialize() {
@@ -169,6 +172,7 @@ class JsonDriver implements ConfigurationDriver {
         $appNamesJson->add($langCode, $name);
         $this->writeJson();
     }
+
 
     public function setAppVersion(string $vNum, string $vType, string $releaseDate) {
         $this->json->add('version-info', new Json([
@@ -211,6 +215,39 @@ class JsonDriver implements ConfigurationDriver {
 
     public function setTitleSeparator(string $separator) {
         $this->json->add('name-separator', $separator);
+        $this->writeJson();
+    }
+
+    public function getAppNames(): array {
+        $appNamesJson = $this->json->get('app-names');
+        $retVal = [];
+        foreach ($appNamesJson->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+        return $retVal;
+    }
+
+    public function getDescriptions(): array {
+        $descriptions = $this->json->get('app-descriptions');
+        $retVal = [];
+        foreach ($descriptions->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+        return $retVal;
+    }
+
+    public function getTitles(): array {
+        $titles = $this->json->get('titles');
+        $retVal = [];
+        foreach ($titles->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+        return $retVal;
+    }
+
+    public function setTitle(string $title, string $langCode): string {
+        $appNamesJson = $this->json->get('titles');
+        $appNamesJson->add($langCode, $title);
         $this->writeJson();
     }
 

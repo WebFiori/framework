@@ -14,10 +14,11 @@ use Throwable;
 use webfiori\cli\CLICommand;
 use webfiori\cli\CommandArgument;
 use webfiori\cli\InputValidator;
+use webfiori\framework\App;
+use webfiori\framework\config\Controller;
 use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
-use webfiori\framework\App;
 /**
  * This class implements a CLI command which is used to update the settings which are 
  * stored in the class 'AppConfing' of the application.
@@ -94,8 +95,8 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function setAdminTheme() {
         $classNs = $this->getThemeNs();
-        ConfigController::get()->updateSiteInfo(['admin-theme' => $classNs]);
-        $this->success('Admin theme successfully updated.');
+        Controller::getDriver()->setTheme($classNs);
+        $this->success('Theme successfully updated.');
     }
     private function setHome() {
         $routes = array_keys(Router::routes());
@@ -106,20 +107,15 @@ class UpdateSettingsCommand extends CLICommand {
             return;
         }
         $home = $this->select('Select home page route:', $routes);
-        ConfigController::get()->updateSiteInfo(['home-page' => substr($home, strlen(Router::base()) + 1)]);
+        Controller::getDriver()->setHomePage(substr($home, strlen(Router::base()) + 1));
         $this->success('Home page successfully updated.');
-    }
-    private function setPrimaryTheme() {
-        $classNs = $this->getThemeNs();
-        ConfigController::get()->updateSiteInfo(['base-theme' => $classNs]);
-        $this->success('Primary theme successfully updated.');
     }
     private function updateSchedulerPass() {
         $newPass = $this->getInput('Enter new password:', null, new InputValidator(function (string $val) {
             return strlen(trim($val)) != 0;
         }, 'Empty string is not allowed.'));
 
-        ConfigController::get()->updateSchedulerPassword($newPass);
+        Controller::getDriver()->setSchedulerPassword($newPass);
         $this->success('Password successfully updated.');
     }
     private function updateDescription() {
@@ -128,9 +124,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $descriptions = App::getAppConfig()->getDescriptions();
-        $descriptions[$lang] = $newName;
-        ConfigController::get()->updateSiteInfo(['descriptions' => $descriptions]);
+        Controller::getDriver()->setDescription($newName, $lang);
         $this->success('Description successfully updated.');
     }
     private function updateName() {
@@ -139,15 +133,13 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $names = App::getAppConfig()->getWebsiteNames();
-        $names[$lang] = trim($newName);
-        ConfigController::get()->updateSiteInfo(['website-names' => $names]);
+        Controller::getDriver()->setAppName($newName, $lang);
         $this->println('Name successfully updated.');
     }
     private function updatePrimaryLang() {
-        $langs = array_keys(App::getAppConfig()->getWebsiteNames());
+        $langs = array_keys(App::getAppConfig()->getAppNames());
         $newPrimary = $this->select('Select new primary language:', $langs);
-        ConfigController::get()->updateSiteInfo(['primary-lang' => $newPrimary]);
+        Controller::getDriver()->setPrimaryLanguage($newPrimary);
         $this->success('Primary language successfully updated.');
     }
     private function updateTitle() {
@@ -156,9 +148,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        $titles = App::getAppConfig()->getTitles();
-        $titles[$lang] = trim($newName);
-        ConfigController::get()->updateSiteInfo(['titles' => $titles]);
+        Controller::getDriver()->setTitle($newName, $lang);
         $this->success('Title successfully updated.');
     }
     private function updateTitleSep() {
@@ -166,7 +156,7 @@ class UpdateSettingsCommand extends CLICommand {
         {
             return strlen(trim($val)) != 0;
         }));
-        ConfigController::get()->updateSiteInfo(['title-sep' => $newSep]);
+        Controller::getDriver()->setTitleSeparator($newSep);
         $this->success('Title separator successfully updated.');
     }
     private function updateVersionInfo() {
@@ -193,7 +183,7 @@ class UpdateSettingsCommand extends CLICommand {
                 && intval($expl[2]) > 0
                 && intval($expl[2]) < 32;
         }));
-        ConfigController::get()->updateAppVersionInfo($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
+        Controller::getDriver()->setAppVersion($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
         $this->println('Version information successfully updated.');
     }
     private function addOption(&$optArr, $key, $txt) {
@@ -217,7 +207,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
     }
     private function whichLang() {
-        $langs = array_keys(App::getAppConfig()->getWebsiteNames());
+        $langs = array_keys(App::getAppConfig()->getAppNames());
 
         return $this->select('In which language you would like to update?', $langs);
     }

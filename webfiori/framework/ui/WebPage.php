@@ -274,7 +274,7 @@ class WebPage {
      */
     public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getAppConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
     }
@@ -294,7 +294,7 @@ class WebPage {
      */
     public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getAppConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }

@@ -31,7 +31,11 @@ interface ConfigurationDriver {
     public function getEnvVars() : array;
     public function getPrimaryLanguage() : string;
     public function getTitleSeparator() : string;
-    public function getTitle() : string;
+    public function getTitle(string $lang) : string;
+    public function getTitles() : array;
+    public function setTitle(string $title, string $langCode);
+    public function getAppNames() : array;
+    public function getDescriptions() : array;
     /**
      * Returns an associative array that contains all added SMTP accounts.
      * 

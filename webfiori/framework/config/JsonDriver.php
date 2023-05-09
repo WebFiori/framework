@@ -15,7 +15,7 @@ use const APP_PATH;
  * @author i.binalshikh
  */
 class JsonDriver implements ConfigurationDriver {
-    const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.js';
+    const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.json';
     private $json;
     public function __construct() {
         $this->json = new Json([
@@ -38,11 +38,16 @@ class JsonDriver implements ConfigurationDriver {
                 'EN' => ''
             ]),
             'version-info' => new Json([
-                'version' => '1.0.0',
+                'version' => '1.0',
                 'version-type' => 'Stable',
                 'release-date' => date('Y-m-d')
             ]),
-            'env-vars' => new Json(), 
+            'env-vars' => new Json([
+                "CLI_HTTP_HOST" => new Json([
+                    "value" => "example.com",
+                    "description" => ""
+                ])
+            ]), 
             'smtp-connections' => new Json(),
             'database-connections' => new Json(),
         ]);
@@ -135,7 +140,13 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('name-separator');
     }
     public function getTitle(string $lang) : string {
-        return $this->json->get('title');
+        $titles = $this->json->get('titles');
+        foreach ($titles->getProperties() as $prob) {
+            if ($prob->getName() == $lang) {
+                return $prob->getValue();
+            }
+        }
+        return '';
     }
     public function initialize() {
         $path = self::JSON_CONFIG_FILE_PATH;

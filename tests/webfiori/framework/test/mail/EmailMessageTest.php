@@ -26,7 +26,7 @@ class EmailMessageTest extends TestCase {
             'sender-address' => 'randomxyz@hotmail.com',
             'account-name' => 'no-reply'
         ]);
-        App::getAppConfig()->addAccount($acc);
+        App::getAppConfig()->addOrUpdateSMTPAccount($acc);
         $message = new EmailMessage();
         $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
         $this->assertNull($message->getTranslation());

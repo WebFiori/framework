@@ -50,8 +50,8 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $this->assertEquals('EN',$page->getLangCode());
         $this->assertNull($page->getDescription());
-        $this->assertEquals('Hello World',$page->getTitle());
-        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals('Default',$page->getTitle());
+        $this->assertEquals('Application',$page->getWebsiteName());
         $this->assertEquals(' | ',$page->getTitleSep());
         $this->assertTrue($page->hasHeader());
         $this->assertTrue($page->hasFooter());
@@ -71,7 +71,7 @@ class PageTest extends TestCase{
                 . '<html lang=EN>'
                 . '<head>'
                 . '<base href="https://example.com">'
-                . '<title>Hello World | WebFiori</title>'
+                . '<title>Default | Application</title>'
                 . '<link rel=canonical href="https://example.com/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
@@ -97,7 +97,7 @@ class PageTest extends TestCase{
                 . '<html lang=EN>'
                 . '<head>'
                 . '<base href="https://example.com">'
-                . '<title>Hello World | WebFiori</title>'
+                . '<title>Default | Application</title>'
                 . '<link rel=canonical href="https://example.com/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
@@ -163,8 +163,8 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $this->assertEquals('EN',$page->getLangCode());
         $this->assertNull($page->getDescription());
-        $this->assertEquals('Hello World',$page->getTitle());
-        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals('Default',$page->getTitle());
+        $this->assertEquals('Application',$page->getWebsiteName());
         $this->assertEquals(' | ',$page->getTitleSep());
         $this->assertTrue($page->hasAside());
         $this->assertTrue($page->hasFooter());

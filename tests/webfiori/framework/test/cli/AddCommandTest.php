@@ -53,7 +53,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -95,7 +95,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -139,7 +139,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(App::getAppConfig()->getDBConnections());
+        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -260,7 +260,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'smtp-connection-'.count(App::getAppConfig()->getSMTPAccounts());
+        $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPAccounts());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

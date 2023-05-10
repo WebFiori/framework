@@ -12,7 +12,7 @@ use const APP_PATH;
 /**
  * Description of JsonDriver
  *
- * @author i.binalshikh
+ * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
     const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.json';
@@ -71,6 +71,7 @@ class JsonDriver implements ConfigurationDriver {
             'username' => $dbConnectionsInfo->getUsername(),
         ]);
         $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $json);
+        $this->writeJson();
     }
 
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
@@ -82,6 +83,7 @@ class JsonDriver implements ConfigurationDriver {
             'username' => $emailAccount->getSenderName()
         ]);
         $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $json);
+        $this->writeJson();
     }
 
     public function getAppName(string $langCode) {
@@ -153,7 +155,18 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getSMTPAccount(string $name) {
-        return $this->json->get('smtp-connections')->get($name);
+        $jsonObj = $this->json->get('smtp-connections')->get($name);
+        
+        if ($jsonObj !== null) {
+            return new SMTPAccount([
+                'sender-address' => $jsonObj->get('address'),
+                'password' => $jsonObj->get('password'),
+                'port' => $jsonObj->get('port'),
+                'sender-name' => $jsonObj->get('sender-name'),
+                'server-address' => $jsonObj->get('server-address'),
+                'username' => $jsonObj->get('username'),
+            ]);
+        }
     }
 
     public function getSMTPAccounts(): array {
@@ -203,7 +216,10 @@ class JsonDriver implements ConfigurationDriver {
     }
     private function writeJson() {
         $file = new File(self::JSON_CONFIG_FILE_PATH);
-        $file->setRawData($this->toJSON().'');
+        $file->remove();
+        $json = $this->toJSON();
+        $json->setIsFormatted(true);
+        $file->setRawData($json.'');
         $file->write(false, true);
     }
     public function toJSON() : Json {

@@ -9,6 +9,8 @@
             <file>./webfiori/framework/DB.php</file>
             <file>./webfiori/framework/Language.php</file>
             
+            <file>./webfiori/framework//config/Controller.php</file>
+            <file>./webfiori/framework//config/JsonDriver.php</file>
             
             <file>./webfiori/framework/Privilege.php</file>
             <file>./webfiori/framework/PrivilegesGroup.php</file>

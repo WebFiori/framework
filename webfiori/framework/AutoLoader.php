@@ -173,7 +173,7 @@ class AutoLoader {
         }
         $this->loadedClasses[] = [
             self::$CLASS_INDICES[0] => 'AutoLoader',
-            self::$CLASS_INDICES[1] => 'webfiori\\entity',
+            self::$CLASS_INDICES[1] => 'webfiori\\framework',
             self::$CLASS_INDICES[2] => __DIR__,
             self::$CLASS_INDICES[3] => false
         ];
@@ -503,20 +503,22 @@ class AutoLoader {
     private static function getComposerVendorDirs(): array {
         $DS = DIRECTORY_SEPARATOR;
         $split = explode($DS, ROOT_PATH);
-        $vendorPath = '';
+        $vendorPath = $split[0].$DS;
         $pathsCount = count($split);
         $vendorFound = false;
         $vendorFolderName = 'vendor';
         $vendorDirs = [];
 
-        for ($x = 0 ; $x < $pathsCount; $x++) {
-            if (is_dir($vendorPath.$vendorFolderName)) {
+        for ($x = 1 ; $x < $pathsCount; $x++) {
+            $xDir = $vendorPath.$vendorFolderName;
+            if (is_dir($xDir)) {
                 $vendorFound = true;
-                $vendorDirs[] = $vendorPath.$vendorFolderName;
+                $vendorDirs[] = $xDir;
             }
 
             $vendorPath .= $split[$x].$DS;
         }
+        
 
         if (!$vendorFound && is_dir($vendorPath.$vendorFolderName)) {
             $vendorDirs[] = $vendorPath.$vendorFolderName;
@@ -733,14 +735,17 @@ class AutoLoader {
 
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');
+            $root = $this->getRoot();
 
             if (is_resource($h)) {
                 foreach ($this->loadedClasses as $classArr) {
+                    $path = substr($classArr[self::$CLASS_INDICES[2]], strlen($root)).'=>';
+                    
                     if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
                         //A class without a namespace
-                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[0]]."\n");
                     } else {
-                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
                     }
                 }
                 fclose($h);

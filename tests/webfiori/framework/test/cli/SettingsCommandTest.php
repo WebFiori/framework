@@ -18,7 +18,7 @@ class SettingsCommandTest extends TestCase {
             'show-settings'
         ]);
         $runner->start();
-        $config = App::getAppConfig();
+        $config = App::getConfig();
         $this->assertEquals([
             "Framework Version Settings:\n",
             "    Framework Version        : ".WF_VERSION."\n",

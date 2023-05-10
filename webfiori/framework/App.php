@@ -250,7 +250,7 @@ class App {
      * 
      * @return ConfigurationDriver
      */
-    public static function getAppConfig(): ConfigurationDriver {
+    public static function getConfig(): ConfigurationDriver {
         return Controller::getDriver();
     }
     /**
@@ -530,7 +530,7 @@ class App {
             if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
                 TasksManager::initRoutes();
             }
-            TasksManager::password(self::getAppConfig()->getSchedulerPassword());
+            TasksManager::password(self::getConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
             call_user_func(APP_DIR.'\ini\InitTasks::init');
             TasksManager::registerTasks();
@@ -590,10 +590,10 @@ class App {
         }
 
         if (Router::routesCount() != 0) {
-            $home = trim(self::getAppConfig()->getHomePage());
+            $home = trim(self::getConfig()->getHomePage());
 
             if (strlen($home) != 0) {
-                Router::redirect('/', App::getAppConfig()->getHomePage());
+                Router::redirect('/', App::getConfig()->getHomePage());
             }
         }
     }

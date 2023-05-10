@@ -32,7 +32,7 @@ class UpdateSettingsCommand extends CLICommand {
         parent::__construct('update-settings', [
             new CommandArgument('--w', 'An argument which is used to indicate what will be updated. '
                 .'Possible values are: version, app-name, scheduler-pass, page-title, '
-                .'page-description, primary-lang, title-sep, home-page, primary-theme,'
+                .'page-description, primary-lang, title-sep, home-page, theme,'
                 .'admin-theme.', true),
         ], 'Update application settings which are stored in the class "AppConfig".');
     }
@@ -46,8 +46,7 @@ class UpdateSettingsCommand extends CLICommand {
         $this->addOption($options,'primary-lang', 'Change primary language.');
         $this->addOption($options,'title-sep', 'Change title separator.');
         $this->addOption($options,'home-page', 'Set home page.');
-        $this->addOption($options,'primary-theme', 'Set primay theme.');
-        $this->addOption($options,'admin-theme', 'Set admin theme.');
+        $this->addOption($options,'theme', 'Set primay theme.');
         $this->addOption($options,'q', 'Quit.');
 
         $what = $this->getArgValue('--w');
@@ -82,8 +81,6 @@ class UpdateSettingsCommand extends CLICommand {
         } else if ($answer == 'Change primary language.') {
             $this->updatePrimaryLang();
         } else if ($answer == 'Set primay theme.') {
-            $this->setPrimaryTheme();
-        } else if ($answer == 'Set admin theme.') {
             $this->setAdminTheme();
         } else if ($answer == 'Set home page.') {
             $this->setHome();
@@ -115,7 +112,7 @@ class UpdateSettingsCommand extends CLICommand {
             return strlen(trim($val)) != 0;
         }, 'Empty string is not allowed.'));
 
-        Controller::getDriver()->setSchedulerPassword($newPass);
+        Controller::getDriver()->setSchedulerPassword(hash('sha256',$newPass));
         $this->success('Password successfully updated.');
     }
     private function updateDescription() {
@@ -137,7 +134,7 @@ class UpdateSettingsCommand extends CLICommand {
         $this->println('Name successfully updated.');
     }
     private function updatePrimaryLang() {
-        $langs = array_keys(App::getAppConfig()->getAppNames());
+        $langs = array_keys(App::getConfig()->getAppNames());
         $newPrimary = $this->select('Select new primary language:', $langs);
         Controller::getDriver()->setPrimaryLanguage($newPrimary);
         $this->success('Primary language successfully updated.');
@@ -160,11 +157,11 @@ class UpdateSettingsCommand extends CLICommand {
         $this->success('Title separator successfully updated.');
     }
     private function updateVersionInfo() {
-        $versionNum = $this->getInput('Application version:', App::getAppConfig()->getVersion(), new InputValidator(function ($val)
+        $versionNum = $this->getInput('Application version:', App::getConfig()->getAppVersion(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
         }));
-        $versionType = $this->getInput('Application version type:', App::getAppConfig()->getVersionType(), new InputValidator(function ($val)
+        $versionType = $this->getInput('Application version type:', App::getConfig()->getAppVersionType(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
         }));
@@ -207,7 +204,7 @@ class UpdateSettingsCommand extends CLICommand {
         }));
     }
     private function whichLang() {
-        $langs = array_keys(App::getAppConfig()->getAppNames());
+        $langs = array_keys(App::getConfig()->getAppNames());
 
         return $this->select('In which language you would like to update?', $langs);
     }

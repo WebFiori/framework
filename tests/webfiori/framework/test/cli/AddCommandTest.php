@@ -5,9 +5,10 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\cli\Runner;
 use webfiori\file\File;
-use webfiori\framework\cli\commands\AddCommand;
-use webfiori\framework\ConfigController;
 use webfiori\framework\App;
+use webfiori\framework\cli\commands\AddCommand;
+use webfiori\framework\config\Controller;
+use webfiori\framework\ConfigController;
 
 /**
  * Description of TestAddCommand
@@ -192,7 +193,7 @@ class AddCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
-        ConfigController::get()->resetConfig();
+        Controller::getDriver()->initialize();
     }
     /**
      * @test
@@ -213,7 +214,7 @@ class AddCommandTest extends TestCase {
             "Language code:\n",
             "Info: This language already added. Nothing changed.\n",
         ], $runner->getOutput());
-        ConfigController::get()->resetConfig();
+        Controller::getDriver()->initialize();
     }
     /**
      * @test
@@ -259,7 +260,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'smtp-connection-'.count(App::getAppConfig()->getAccounts());
+        $connName = 'smtp-connection-'.count(App::getAppConfig()->getSMTPAccounts());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

@@ -497,21 +497,6 @@ class App {
     }
 
     /**
-     * Initialize application configuration class.
-     *
-     * @throws FileException If the method was not able to Initialize configuration class.
-     */
-    private function initAppConfig() {
-        if (!class_exists(APP_DIR.'\\config\\AppConfig')) {
-            ConfigController::get()->createAppConfigFile();
-        }
-
-        $constructor = '\\'.APP_DIR.'\\'.'config\\AppConfig';
-        $this->appConfig = new $constructor();
-        ConfigController::get()->setConfig($this->appConfig);
-    }
-
-    /**
      * @throws FileException
      * @throws Exception
      */

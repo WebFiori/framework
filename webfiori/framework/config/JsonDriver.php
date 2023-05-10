@@ -61,11 +61,27 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
-        $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $dbConnectionsInfo);
+        $json = new Json([
+            'name' => $dbConnectionsInfo->getDBName(),
+            'type' => $dbConnectionsInfo->getDatabaseType(),
+            'extars' => $dbConnectionsInfo->getExtars(),
+            'host' => $dbConnectionsInfo->getHost(),
+            'password' => $dbConnectionsInfo->getPassword(),
+            'port' => $dbConnectionsInfo->getPort(),
+            'username' => $dbConnectionsInfo->getUsername(),
+        ]);
+        $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $json);
     }
 
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
-        $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $emailAccount);
+        $json = new Json([
+            'address' => $emailAccount->getAddress(),
+            'password' => $emailAccount->getPassword(),
+            'port' => $emailAccount->getPort(),
+            'sender-name' => $emailAccount->getSenderName(),
+            'username' => $emailAccount->getSenderName()
+        ]);
+        $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $json);
     }
 
     public function getAppName(string $langCode) {
@@ -93,7 +109,23 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getDBConnections(): array {
-        
+                
+        $accountsInfo = $this->json->get('database-connections');
+        $retVal = [];
+        foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
+            
+            $acc = new ConnectionInfo();
+            $acc->setDBName($jsonObj->get('name'));
+            $acc->setDatabaseType($jsonObj->get('type'));
+            $acc->setExtras($jsonObj->get('extras'));
+            $acc->setHost($jsonObj->get('port'));
+            $acc->setName($name);
+            $acc->setPassword($jsonObj->get('password'));
+            $acc->setPort($jsonObj->get('port'));
+            $acc->setUsername($jsonObj->get('username'));
+            $retVal[] = $acc;
+        }
+        return $retVal;
     }
 
     public function getDescription(string $langCode) {
@@ -125,7 +157,21 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getSMTPAccounts(): array {
-        
+        $accountsInfo = $this->json->get('smtp-connections');
+        $retVal = [];
+        foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
+            
+            $acc = new SMTPAccount();
+            $acc->setAccountName($name);
+            $acc->setAddress($jsonObj->get('address'));
+            $acc->setPassword($jsonObj->get('password'));
+            $acc->setPort($jsonObj->get('port'));
+            $acc->setSenderName($jsonObj->get('sender-name'));
+            $acc->setServerAddress($jsonObj->get('server-address'));
+            $acc->setUsername($jsonObj->get('username'));
+            $retVal[] = $acc;
+        }
+        return $retVal;
     }
 
     public function getSchedulerPassword(): string {

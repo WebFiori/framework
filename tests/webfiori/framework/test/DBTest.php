@@ -69,11 +69,11 @@ class DBTest extends TestCase {
     public function test04() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
         $conn->setName('default-conn');
-        App::getAppConfig()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         $db = new DB('default-conn');
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
         $this->assertEquals(2, count($db->getTables()));
-        App::getAppConfig()->removeAllDBConnections();
+        App::getConfig()->removeAllDBConnections();
     }
 }

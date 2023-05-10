@@ -261,8 +261,8 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setDescription(string $description, string $langCode) {
-        $appNamesJson = $this->json->get('app-names');
-        $appNamesJson->add($langCode, $name);
+        $appNamesJson = $this->json->get('app-descriptions');
+        $appNamesJson->add($langCode, $description);
         $this->writeJson();
     }
 
@@ -272,7 +272,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setPrimaryLanguage(string $langCode) {
-        $this->json->add('primary-language', $langCode);
+        $this->json->add('primary-lang', $langCode);
         $this->writeJson();
     }
 
@@ -318,7 +318,7 @@ class JsonDriver implements ConfigurationDriver {
         return $retVal;
     }
 
-    public function setTitle(string $title, string $langCode): string {
+    public function setTitle(string $title, string $langCode) {
         $appNamesJson = $this->json->get('titles');
         $appNamesJson->add($langCode, $title);
         $this->writeJson();

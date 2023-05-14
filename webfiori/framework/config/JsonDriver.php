@@ -70,13 +70,13 @@ class JsonDriver implements ConfigurationDriver {
 
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $json = new Json([
-            'name' => $dbConnectionsInfo->getDBName(),
             'type' => $dbConnectionsInfo->getDatabaseType(),
-            'extars' => $dbConnectionsInfo->getExtars(),
             'host' => $dbConnectionsInfo->getHost(),
-            'password' => $dbConnectionsInfo->getPassword(),
             'port' => $dbConnectionsInfo->getPort(),
             'username' => $dbConnectionsInfo->getUsername(),
+            'database' => $dbConnectionsInfo->getDBName(),
+            'password' => $dbConnectionsInfo->getPassword(),
+            'extars' => $dbConnectionsInfo->getExtars(),
         ]);
         $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $json);
         $this->writeJson();
@@ -84,11 +84,13 @@ class JsonDriver implements ConfigurationDriver {
 
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
         $json = new Json([
-            'address' => $emailAccount->getAddress(),
-            'password' => $emailAccount->getPassword(),
+            'host' => $emailAccount->getServerAddress(),
             'port' => $emailAccount->getPort(),
+            'username' => $emailAccount->getSenderName(),
+            'password' => $emailAccount->getPassword(),
+            'address' => $emailAccount->getAddress(),
             'sender-name' => $emailAccount->getSenderName(),
-            'username' => $emailAccount->getSenderName()
+            
         ]);
         $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $json);
         $this->writeJson();
@@ -115,7 +117,18 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getDBConnection(string $conName) {
-        return $this->json->get('database-connections')->get($conName);
+        $jsonObj = $this->json->get('database-connections')->get($conName);
+        
+        if ($jsonObj !== null) {
+            return new ConnectionInfo(
+                    $jsonObj->get('type'), 
+                    $jsonObj->get('username'), 
+                    $jsonObj->get('password'), 
+                    $jsonObj->get('database'), 
+                    $jsonObj->get('host'), 
+                    $jsonObj->get('port'), 
+                    $jsonObj->get('extras'));
+        }
     }
 
     public function getDBConnections(): array {
@@ -125,10 +138,10 @@ class JsonDriver implements ConfigurationDriver {
         foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
             
             $acc = new ConnectionInfo();
-            $acc->setDBName($jsonObj->get('name'));
+            $acc->setDBName($jsonObj->get('database'));
             $acc->setDatabaseType($jsonObj->get('type'));
             $acc->setExtras($jsonObj->get('extras'));
-            $acc->setHost($jsonObj->get('port'));
+            $acc->setHost($jsonObj->get('host'));
             $acc->setName($name);
             $acc->setPassword($jsonObj->get('password'));
             $acc->setPort($jsonObj->get('port'));
@@ -162,7 +175,7 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('primary-lang');
     }
 
-    public function getSMTPAccount(string $name) {
+    public function getSMTPConnection(string $name) {
         $jsonObj = $this->json->get('smtp-connections')->get($name);
         
         if ($jsonObj !== null) {
@@ -171,7 +184,7 @@ class JsonDriver implements ConfigurationDriver {
                 'password' => $jsonObj->get('password'),
                 'port' => $jsonObj->get('port'),
                 'sender-name' => $jsonObj->get('sender-name'),
-                'server-address' => $jsonObj->get('server-address'),
+                'server-address' => $jsonObj->get('host'),
                 'username' => $jsonObj->get('username'),
             ]);
         }
@@ -188,7 +201,7 @@ class JsonDriver implements ConfigurationDriver {
             $acc->setPassword($jsonObj->get('password'));
             $acc->setPort($jsonObj->get('port'));
             $acc->setSenderName($jsonObj->get('sender-name'));
-            $acc->setServerAddress($jsonObj->get('server-address'));
+            $acc->setServerAddress($jsonObj->get('host'));
             $acc->setUsername($jsonObj->get('username'));
             $retVal[] = $acc;
         }

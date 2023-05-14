@@ -63,7 +63,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -89,7 +89,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile03() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -116,7 +116,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile04() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -146,7 +146,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile05() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -175,7 +175,7 @@ class RunSQLCommandTest extends TestCase {
     public function testCLIQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -213,7 +213,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile06() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -239,7 +239,7 @@ class RunSQLCommandTest extends TestCase {
     public function testTableQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -289,7 +289,7 @@ class RunSQLCommandTest extends TestCase {
     public function testTableQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -332,7 +332,7 @@ class RunSQLCommandTest extends TestCase {
     public function testCLIQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -367,7 +367,7 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -411,7 +411,7 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -449,7 +449,7 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery03() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        App::getConfig()->addOrUpdateDBConnection
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([

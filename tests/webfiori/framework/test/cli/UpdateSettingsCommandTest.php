@@ -69,8 +69,8 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             
-            "Application version: Enter = '".App::getConfig()->getAppVersion()."'\n",
-            "Application version type: Enter = '".App::getConfig()->getAppVersionType()."'\n",
+            "Application version: Enter = '1.0'\n",
+            "Application version type: Enter = 'Stable'\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Error: Invalid input is given. Try again.\n",
             "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",

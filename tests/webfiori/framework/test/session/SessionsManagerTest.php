@@ -175,7 +175,7 @@ class SessionsManagerTest extends TestCase {
         $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        App::getConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         SessionsManager::setStorage(new DatabaseSessionStorage());
         SessionsManager::start('hello');
@@ -187,7 +187,7 @@ class SessionsManagerTest extends TestCase {
     public function testInitSessionsDb() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        App::getConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->getController()->createTables()->execute();
@@ -200,7 +200,7 @@ class SessionsManagerTest extends TestCase {
     public function testDatabaseSession02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        App::getConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         SessionsManager::setStorage($sto);
@@ -307,7 +307,7 @@ class SessionsManagerTest extends TestCase {
         $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
-        App::getConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->dropTables();

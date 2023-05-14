@@ -53,7 +53,7 @@ class DB extends Database {
         $conn = App::getConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
-            $connectionsArr = ConfigController::get()->getDatabaseConnections();
+            $connectionsArr = App::getConfig()->getDBConnections();
 
             foreach ($connectionsArr as $xCon) {
                 if ($xCon->getName() == $connName) {

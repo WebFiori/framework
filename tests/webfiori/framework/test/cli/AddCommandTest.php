@@ -52,7 +52,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
+        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) - 1);
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

@@ -87,7 +87,7 @@ class CreateDBAccessTest extends CreateTestCase {
     public function test02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1', 3306);
         $conn->setName('Test Connection');
-        App::getConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([

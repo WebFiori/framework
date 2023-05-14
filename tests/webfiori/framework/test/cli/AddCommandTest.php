@@ -8,7 +8,6 @@ use webfiori\file\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\config\Controller;
-use webfiori\framework\ConfigController;
 
 /**
  * Description of TestAddCommand

@@ -148,6 +148,10 @@ interface ConfigurationDriver {
      */
     public function initialize(bool $reCreate = false);
     /**
+     * Removes all configuration variables.
+     */
+    public function remove();
+    /**
      * Returns version number of the application.
      * 
      * @return string The method should return a string in the format 'x.x.x' if

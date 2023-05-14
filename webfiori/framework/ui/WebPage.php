@@ -274,7 +274,7 @@ class WebPage {
      */
     public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getAppVersion();
+            $attrs['revision'] = App::getConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
     }
@@ -294,7 +294,7 @@ class WebPage {
      */
     public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getAppVersion();
+            $attrs['revision'] = App::getConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }
@@ -784,17 +784,17 @@ class WebPage {
         $this->_checkLang();
         $this->usingLanguage();
 
-        $appName = App::getAppConfig()->getAppName($this->getLangCode());
+        $appName = App::getConfig()->getAppName($this->getLangCode());
         $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
 
-        $websiteDesc = App::getAppConfig()->getDescription($this->getLangCode());
+        $websiteDesc = App::getConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
 
-        $pageTitle = App::getAppConfig()->getTitle($this->getLangCode());
+        $pageTitle = App::getConfig()->getTitle($this->getLangCode());
         $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
 
 
-        $this->setTitleSep(App::getAppConfig()->getTitleSeparator());
+        $this->setTitleSep(App::getConfig()->getTitleSeparator());
 
         $langObj = $this->getTranslation();
 
@@ -1158,7 +1158,7 @@ class WebPage {
             $langCodeFromRequest = Request::getParam('lang');
 
             if ($langCodeFromRequest === null) {
-                $this->setLang(App::getAppConfig()->getPrimaryLanguage());
+                $this->setLang(App::getConfig()->getPrimaryLanguage());
 
                 return;
             }
@@ -1192,7 +1192,7 @@ class WebPage {
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
-            App::getAppConfig()->getBaseURL()
+            App::getConfig()->getBaseURL()
         );
 
         if ($loadedTheme !== null) {
@@ -1205,7 +1205,7 @@ class WebPage {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(App::getAppConfig()->getBaseURL());
+        $headNode->setBase(App::getConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {

@@ -121,7 +121,7 @@ interface ConfigurationDriver {
      * @return array An associative array that contains all added SMTP accounts.
      * 
      */
-    public function getSMTPAccounts() : array;
+    public function getSMTPConnections() : array;
     /**
      * Returns the name of the theme that will be used as default theme for
      * all web pages.

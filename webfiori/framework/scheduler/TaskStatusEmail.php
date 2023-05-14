@@ -118,9 +118,9 @@ class TaskStatusEmail extends EmailMessage {
         $taskTable->addChild($this->createTableRow('Framework Release Date:', WF_RELEASE_DATE));
         $taskTable->addChild($this->createTableRow('Root Directory:', ROOT_PATH));
         $taskTable->addChild($this->createTableRow('Application Directory:', ROOT_PATH.DS.APP_DIR));
-        $taskTable->addChild($this->createTableRow('Application Version:', App::getAppConfig()->getVersion()));
-        $taskTable->addChild($this->createTableRow('Version Type:', App::getAppConfig()->getVersionType()));
-        $taskTable->addChild($this->createTableRow('Application Release Date:', App::getAppConfig()->getReleaseDate()));
+        $taskTable->addChild($this->createTableRow('Application Version:', App::getConfig()->getVersion()));
+        $taskTable->addChild($this->createTableRow('Version Type:', App::getConfig()->getVersionType()));
+        $taskTable->addChild($this->createTableRow('Application Release Date:', App::getConfig()->getReleaseDate()));
 
         if ($task->isSuccess()) {
             $taskTable->addChild($this->createTableRow('Exit Status:', '<b style="color:green">Success</b>'));

@@ -260,7 +260,7 @@ class AddCommandTest extends TestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPAccounts());
+        $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

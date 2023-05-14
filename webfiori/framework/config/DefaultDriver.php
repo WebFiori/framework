@@ -116,7 +116,7 @@ class DefaultDriver implements ConfigurationDriver {
         
     }
 
-    public function getSMTPAccounts(): array {
+    public function getSMTPConnections(): array {
         
     }
 

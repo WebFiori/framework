@@ -10,13 +10,21 @@ use webfiori\json\Json;
 use const APP_PATH;
 
 /**
- * Description of JsonDriver
+ * Application configuration driver which is used to read and write application
+ * configuration from JSON file.
+ * 
+ * The driver will create a JSON file in the path 'APP_PATH/config' with
+ * the name 'app-config.json'. The developer can use the file to
+ * modify application configuration.
  *
  * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
     const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.json';
     private $json;
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         $this->json = new Json([
             'base-url' => Uri::getBaseURL(),
@@ -90,15 +98,15 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('app-names')->get($langCode);
     }
 
-    public function getAppReleaseDate() {
+    public function getAppReleaseDate() : string {
         return $this->json->get('version-info')->get('release-date');
     }
 
-    public function getAppVersion() {
+    public function getAppVersion() : string {
         return $this->json->get('version-info')->get('version');
     }
 
-    public function getAppVersionType() {
+    public function getAppVersionType() : string {
         return $this->json->get('version-info')->get('version-type');
     }
 
@@ -146,7 +154,7 @@ class JsonDriver implements ConfigurationDriver {
         return $retVal;
     }
 
-    public function getHomePage() {
+    public function getHomePage() : string {
         return $this->json->get('home-page');
     }
 
@@ -169,7 +177,7 @@ class JsonDriver implements ConfigurationDriver {
         }
     }
 
-    public function getSMTPAccounts(): array {
+    public function getSMTPConnections(): array {
         $accountsInfo = $this->json->get('smtp-connections');
         $retVal = [];
         foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
@@ -207,9 +215,9 @@ class JsonDriver implements ConfigurationDriver {
         }
         return '';
     }
-    public function initialize() {
+    public function initialize(bool $reCreate = false) {
         $path = self::JSON_CONFIG_FILE_PATH;
-        if (!file_exists($path)) {
+        if (!file_exists($path) || $reCreate) {
             $this->writeJson();
         }
         $this->json = Json::fromJsonFile(self::JSON_CONFIG_FILE_PATH);

@@ -1,20 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace webfiori\framework\test;
 
 use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
-use webfiori\framework\ConfigController;
-use webfiori\framework\DB;
 use webfiori\framework\App;
+use webfiori\framework\DB;
 
 /**
  * Description of DBTest

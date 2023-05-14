@@ -142,7 +142,7 @@ class JsonDriver implements ConfigurationDriver {
             $acc->setHost($jsonObj->get('host'));
             $acc->setName($name);
             $acc->setPort($jsonObj->get('port'));
-            $retVal[] = $acc;
+            $retVal[$name] = $acc;
         }
         return $retVal;
     }

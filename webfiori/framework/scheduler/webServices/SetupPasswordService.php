@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\scheduler\webServices;
 
-use webfiori\framework\ConfigController;
+use webfiori\framework\App;
 use webfiori\framework\scheduler\TasksManager;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
@@ -32,7 +32,7 @@ class SetupPasswordService extends AbstractWebService {
     }
 
     public function processRequest() {
-        ConfigController::get()->updateSchedulerPassword($this->getParamVal('password'));
+        App::getConfig()->setSchedulerPassword($this->getParamVal('password'));
         $this->sendResponse('Password updated.', self::I, 200);
     }
 }

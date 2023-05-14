@@ -235,6 +235,10 @@ class JsonDriver implements ConfigurationDriver {
         }
         $this->json = Json::fromJsonFile(self::JSON_CONFIG_FILE_PATH);
     }
+    public function remove() {
+        $f = new File(self::JSON_CONFIG_FILE_PATH);
+        $f->remove();
+    }
     private function writeJson() {
         $file = new File(self::JSON_CONFIG_FILE_PATH);
         $file->remove();

@@ -26,7 +26,7 @@ interface ConfigurationDriver {
      * method should return null.
      * 
      */
-    public function getSMTPAccount(string $name);
+    public function getSMTPConnection(string $name);
     /**
      * Adds application environment variable to the configuration.
      * 

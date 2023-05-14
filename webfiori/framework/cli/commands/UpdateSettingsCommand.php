@@ -16,7 +16,6 @@ use webfiori\cli\CommandArgument;
 use webfiori\cli\InputValidator;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
-use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
 /**

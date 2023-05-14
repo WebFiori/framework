@@ -93,7 +93,7 @@ fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.
 register_shutdown_function(function()
 {
-    ConfigController::get()->removeConfigFiles();
+    App::getConfig()->remove();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"Starting to run tests...\n");

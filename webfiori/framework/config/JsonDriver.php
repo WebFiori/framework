@@ -135,17 +135,13 @@ class JsonDriver implements ConfigurationDriver {
                 
         $accountsInfo = $this->json->get('database-connections');
         $retVal = [];
-        foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
-            
-            $acc = new ConnectionInfo();
-            $acc->setDBName($jsonObj->get('database'));
-            $acc->setDatabaseType($jsonObj->get('type'));
-            $acc->setExtras($jsonObj->get('extras'));
+        foreach ($accountsInfo->getProperties() as $name => $propObj) {
+            $jsonObj = $propObj->getValue();
+            $acc = new ConnectionInfo($jsonObj->get('type'), $jsonObj->get('username'), $jsonObj->get('password'), $jsonObj->get('database'));
+            $acc->setExtras($jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
             $acc->setHost($jsonObj->get('host'));
             $acc->setName($name);
-            $acc->setPassword($jsonObj->get('password'));
             $acc->setPort($jsonObj->get('port'));
-            $acc->setUsername($jsonObj->get('username'));
             $retVal[] = $acc;
         }
         return $retVal;

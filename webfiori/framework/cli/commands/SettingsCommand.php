@@ -34,7 +34,7 @@ class SettingsCommand extends CLICommand {
      */
     public function exec() : int {
         $spaces = 25;
-        $C = App::getAppConfig();
+        $C = App::getConfig();
         $format = [];
         $format['color'] = 'yellow';
         $format['bold'] = true;

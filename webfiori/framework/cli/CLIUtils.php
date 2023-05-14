@@ -29,7 +29,7 @@ class CLIUtils {
      */
     public static function getConnectionName(CLICommand $c) {
         $connName = $c->getArgValue('--connection');
-        $dbConnections = App::getAppConfig()->getDBConnections();
+        $dbConnections = App::getConfig()->getDBConnections();
         $dbConnectionsNames = array_keys($dbConnections);
 
         if (count($dbConnectionsNames) == 0) {
@@ -47,7 +47,7 @@ class CLIUtils {
 
         $name = $c->select('Select database connection:', $dbConnectionsNames, 0);
 
-        return App::getAppConfig()->getDBConnection($name);
+        return App::getConfig()->getDBConnection($name);
     }
     /**
      * Reads and validates class name.

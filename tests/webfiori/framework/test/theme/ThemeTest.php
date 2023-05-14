@@ -69,7 +69,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
-        $this->assertEquals(App::getAppConfig()->getBaseURL(),$theme->getBaseURL());
+        $this->assertEquals(App::getConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
     }

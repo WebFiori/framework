@@ -72,7 +72,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getAppConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);
@@ -148,7 +148,7 @@ class AddCommand extends CLICommand {
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', $smtpConn->getAddress()));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(App::getAppConfig()->getAccounts())));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(App::getConfig()->getSMTPConnections())));
         $this->println('Trying to connect. This can take up to 1 minute...');
         $server = new SMTPServer($smtpConn->getServerAddress(), $smtpConn->getPort());
 

@@ -148,7 +148,7 @@ class AutoLoader {
             throw new ClassLoaderException('Unable to set root search folder.');
         }
         //Read Cache after setting root dir as it depends on it.
-        $this->_readCache();
+        $this->readCache();
 
         if (gettype($searchFolders) == 'array') {
             foreach ($searchFolders as $folder) {
@@ -173,7 +173,7 @@ class AutoLoader {
         }
         $this->loadedClasses[] = [
             self::$CLASS_INDICES[0] => 'AutoLoader',
-            self::$CLASS_INDICES[1] => 'webfiori\\entity',
+            self::$CLASS_INDICES[1] => 'webfiori\\framework',
             self::$CLASS_INDICES[2] => __DIR__,
             self::$CLASS_INDICES[3] => false
         ];
@@ -233,7 +233,7 @@ class AutoLoader {
                 $DS.'pages',
                 $DS.'ini',
                 $DS.'libs',
-                $DS.'conf',
+                $DS.'config',
                 $DS.$appFolder
             ];
 
@@ -251,7 +251,7 @@ class AutoLoader {
             }
             $onFail = $options['on-load-failure'] ?? self::ON_FAIL_ACTIONS[0];
             self::$loader = new AutoLoader($root, $frameworkSearchFolders, $defineRoot,$onFail);
-            self::_checkComposer();
+            self::checkComposer();
         }
 
         return self::$loader;
@@ -456,7 +456,7 @@ class AutoLoader {
             }
         }
     }
-    private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
+    private function addSearchDirectoryHelper($cleanDir, $appendRoot) {
         $dirsStack = [$cleanDir];
         $root = $this->getRoot();
 
@@ -472,7 +472,7 @@ class AutoLoader {
             }
         }
     }
-    private function _attemptCreateCache($autoloadCachePath, $autoloadCache) {
+    private function attemptCreateCache($autoloadCachePath, $autoloadCache) {
         if (!file_exists($autoloadCachePath)) {
             mkdir($autoloadCachePath, 0777, true);
         }
@@ -485,13 +485,11 @@ class AutoLoader {
             }
         }
     }
-    private static function _checkComposer() {
-        if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
-            $composerVendors = self::_getComposerVendorDirs();
+    private static function checkComposer() {
+        $composerVendors = self::getComposerVendorDirs();
 
-            foreach ($composerVendors as $vendorFolder) {
-                self::$loader->addSearchDirectory($vendorFolder, true, false);
-            }
+        foreach ($composerVendors as $vendorFolder) {
+            self::$loader->addSearchDirectory($vendorFolder, true, false);
         }
     }
     /**
@@ -502,23 +500,25 @@ class AutoLoader {
      * 
      * @since 1.1.6
      */
-    private static function _getComposerVendorDirs(): array {
+    private static function getComposerVendorDirs(): array {
         $DS = DIRECTORY_SEPARATOR;
         $split = explode($DS, ROOT_PATH);
-        $vendorPath = '';
+        $vendorPath = $split[0].$DS;
         $pathsCount = count($split);
         $vendorFound = false;
         $vendorFolderName = 'vendor';
         $vendorDirs = [];
 
-        for ($x = 0 ; $x < $pathsCount; $x++) {
-            if (is_dir($vendorPath.$vendorFolderName)) {
+        for ($x = 1 ; $x < $pathsCount; $x++) {
+            $xDir = $vendorPath.$vendorFolderName;
+            if (is_dir($xDir)) {
                 $vendorFound = true;
-                $vendorDirs[] = $vendorPath.$vendorFolderName;
+                $vendorDirs[] = $xDir;
             }
 
             $vendorPath .= $split[$x].$DS;
         }
+        
 
         if (!$vendorFound && is_dir($vendorPath.$vendorFolderName)) {
             $vendorDirs[] = $vendorPath.$vendorFolderName;
@@ -526,7 +526,7 @@ class AutoLoader {
 
         return array_reverse($vendorDirs);
     }
-    private function _parseCacheString($str) {
+    private function parseCacheString($str) {
         $cacheArr = explode("\n", $str);
 
         foreach ($cacheArr as $ca) {
@@ -553,15 +553,15 @@ class AutoLoader {
      * 
      * @since 1.1.6
      */
-    private function _readCache() {
+    private function readCache() {
         $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto';
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {
             $cacheStr = file_get_contents($autoloadCache);
-            $this->_parseCacheString($cacheStr);
+            $this->parseCacheString($cacheStr);
         } else {
-            $this->_attemptCreateCache($autoloadCachePath, $autoloadCache);
+            $this->attemptCreateCache($autoloadCachePath, $autoloadCache);
         }
     }
     /**
@@ -591,7 +591,7 @@ class AutoLoader {
             }
 
             if ($incSubFolders) {
-                $this->_addSearchDirectoryHelper($cleanDir, $appendRoot);
+                $this->addSearchDirectoryHelper($cleanDir, $appendRoot);
             } else {
                 $this->searchFolders[$cleanDir] = $appendRoot;
             }
@@ -735,14 +735,17 @@ class AutoLoader {
 
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');
+            $root = $this->getRoot();
 
             if (is_resource($h)) {
                 foreach ($this->loadedClasses as $classArr) {
+                    $path = substr($classArr[self::$CLASS_INDICES[2]], strlen($root)).'=>';
+                    
                     if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
                         //A class without a namespace
-                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[0]]."\n");
                     } else {
-                        fwrite($h, substr($classArr[self::$CLASS_INDICES[2]], strlen($this->getRoot())).'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
                     }
                 }
                 fclose($h);

@@ -15,8 +15,8 @@ use webfiori\cli\CommandArgument;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
 use webfiori\file\File;
+use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 /**
  * A command which can be used to execute SQL queries on 
@@ -44,7 +44,7 @@ class RunSQLQueryCommand extends CLICommand {
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
-        $dbConnections = array_keys(ConfigController::get()->getDatabaseConnections());
+        $dbConnections = array_keys(App::getConfig()->getDBConnections());
         $schema = $this->getArgValue('--schema');
 
         if (count($dbConnections) != 0) {

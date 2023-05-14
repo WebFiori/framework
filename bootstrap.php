@@ -3,9 +3,8 @@
 //Bootstrap file which is used to boot testing process.
 
 
-use webfiori\framework\AutoLoader;
-use webfiori\framework\ConfigController;
 use webfiori\framework\App;
+use webfiori\framework\AutoLoader;
 
 $DS = DIRECTORY_SEPARATOR;
 

@@ -4,7 +4,7 @@ namespace webfiori\framework\test;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
-use webfiori\framework\ConfigController;
+use webfiori\framework\App;
 use webfiori\framework\Language;
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
@@ -198,9 +198,7 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         $page = new WebPage();
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]);
+        App::getConfig()->setTheme('');
         $page->setTheme();
         $this->assertEquals('',$page->getThemeCSSDir());
         $this->assertEquals('',$page->getThemeImagesDir());
@@ -210,16 +208,14 @@ class PageTest extends TestCase{
      * @test
      */
     public function testTheme00() {
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]);
+        App::getConfig()->setTheme('');
         $page = new WebPage();
         $page->setTheme();
         $theme = $page->getTheme();
         $this->assertNull($theme);
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => 'New Theme 2'
-        ]);
+        
+        App::getConfig()->setTheme('New Theme 2');
+
         $page->setTheme();
         $theme2 = $page->getTheme();
         $this->assertSame($theme2->getPage(), $page);

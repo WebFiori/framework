@@ -812,7 +812,7 @@ class Session implements JsonI {
             //the value of default language.
             //used in case no language found 
             //in $_GET['lang'], $_POST['lang'] or in cookie
-            $defaultLang = App::getAppConfig()->getPrimaryLanguage();
+            $defaultLang = App::getConfig()->getPrimaryLanguage();
             $langCodeFromReq = $this->getLangFromRequest();
             $isLangSet = false;
             $isNullCode = $langCodeFromReq === null;

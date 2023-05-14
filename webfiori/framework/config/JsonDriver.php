@@ -127,7 +127,7 @@ class JsonDriver implements ConfigurationDriver {
                     $jsonObj->get('database'), 
                     $jsonObj->get('host'), 
                     $jsonObj->get('port'), 
-                    $jsonObj->get('extras'));
+                    $jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
         }
     }
 
@@ -135,14 +135,14 @@ class JsonDriver implements ConfigurationDriver {
                 
         $accountsInfo = $this->json->get('database-connections');
         $retVal = [];
-        foreach ($accountsInfo->getProperties() as $name => $propObj) {
+        foreach ($accountsInfo->getProperties() as $propObj) {
             $jsonObj = $propObj->getValue();
             $acc = new ConnectionInfo($jsonObj->get('type'), $jsonObj->get('username'), $jsonObj->get('password'), $jsonObj->get('database'));
             $acc->setExtras($jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
             $acc->setHost($jsonObj->get('host'));
-            $acc->setName($name);
+            $acc->setName($propObj->getName());
             $acc->setPort($jsonObj->get('port'));
-            $retVal[$name] = $acc;
+            $retVal[$propObj->getName()] = $acc;
         }
         return $retVal;
     }
@@ -164,7 +164,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getHomePage() : string {
-        return $this->json->get('home-page');
+        return $this->json->get('home-page') ?? '';
     }
 
     public function getPrimaryLanguage(): string {
@@ -205,11 +205,11 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getSchedulerPassword(): string {
-        return $this->json->get('scheduler-password');
+        return $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
     }
 
     public function getTheme(): string {
-        return $this->json->get('theme');
+        return $this->json->get('theme') ?? '';
     }
 
     public function getTitleSeparator(): string {

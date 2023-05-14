@@ -4,7 +4,6 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
-use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 
 /**

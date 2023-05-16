@@ -4,16 +4,17 @@
 namespace webfiori\framework\config;
 
 /**
- * Default configuration driver.
+ * A configuration driver which is used to store configuration on PHP class.
  * 
- * The default configuration driver is class-based. This driver will
+ * This driver will
  * create a class called 'AppConfig' on the directory APP_DIR/config and
  * use it to read and write configurations.
  *
  * @author Ibrahim
  */
-class DefaultDriver implements ConfigurationDriver {
+class ClassDriver implements ConfigurationDriver {
     const NL = "\n";
+    const CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'AppConfig.php';
     private $blockEnd;
     private $configVars;
     private $docEmptyLine;
@@ -34,6 +35,9 @@ class DefaultDriver implements ConfigurationDriver {
                 'version-type' => 'Stable',
                 'release-date' => '2021-01-10'
             ],
+            'env-vars' => [
+                
+            ],
             'site' => [
                 'base-url' => '',
                 'primary-lang' => 'EN',
@@ -46,17 +50,87 @@ class DefaultDriver implements ConfigurationDriver {
                     'AR' => ''
                 ],
                 'website-names' => [
-                    'EN' => 'WebFiori',
-                    'AR' => 'ويب فيوري'
+                    'EN' => 'Application',
+                    'AR' => 'تطبيق'
                 ],
                 'titles' => [
-                    'EN' => 'Hello World',
-                    'AR' => 'اهلا و سهلا'
+                    'EN' => 'Default',
+                    'AR' => 'افتراضي'
                 ],
             ]
         ];
     }
+    private function writeFuncHeader($cFile, $methSig, $methodSummary = '', $description = [], $params = [], $returns = null) {
+        $phpDocArr = [
+            $this->docStart,
+            ' * '.$methodSummary,
+            $this->docEmptyLine,
+        ];
 
+        if (gettype($description) == 'array') {
+            foreach ($description as $line) {
+                $phpDocArr[] = ' * '.$line;
+            }
+            $phpDocArr[] = $this->docEmptyLine;
+        } else if (strlen($description) != 0) {
+            $phpDocArr[] = ' * '.$description;
+            $phpDocArr[] = $this->docEmptyLine;
+        }
+
+
+        foreach ($params as $paramName => $paramArr) {
+            $currentDescLine = ' * @param '.$paramArr['type'].' '.$paramName.' ';
+
+            if (gettype($paramArr['description']) == 'array') {
+                $currentDescLine .= $paramArr['description'][0];
+                $phpDocArr[] = $currentDescLine;
+
+                for ($x = 1 ; $x < count($paramArr['description']) ; $x++) {
+                    $phpDocArr[] = ' * '.$paramArr['description'][$x];
+                }
+            } else {
+                $phpDocArr[] = $currentDescLine.$paramArr['description'];
+            }
+            $phpDocArr[] = $this->docEmptyLine;
+        }
+
+        if ($returns !== null && gettype($returns) == 'array') {
+            $phpDocArr[] = ' * @return '.$returns['type'].' ';
+
+            if (gettype($returns['description']) == 'array') {
+                $phpDocArr[count($phpDocArr) - 1] .= $returns['description'][0];
+
+                for ($x = 1 ; $x < count($returns['description']) ; $x++) {
+                    $phpDocArr[] = ' * '.$returns['description'][$x];
+                }
+            } else {
+                $phpDocArr[count($phpDocArr) - 1] .= $returns['description'];
+            }
+        }
+        $phpDocArr[] = $this->docEnd;
+        $phpDocArr[] = $methSig.' {';
+        $this->a($cFile, $phpDocArr, 1);
+    }
+    private function a($file, $str, $tabSize = 0) {
+        $isResource = is_resource($file);
+        $tabStr = $tabSize > 0 ? '    ' : '';
+
+        if (gettype($str) == 'array') {
+            foreach ($str as $subStr) {
+                if ($isResource) {
+                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                } else {
+                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                }
+            }
+        } else {
+            if ($isResource) {
+                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
+            } else {
+                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
+            }
+        }
+    }
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $this->configVars['database-connections'][$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
         $this->writeAppConfig();
@@ -93,19 +167,26 @@ class DefaultDriver implements ConfigurationDriver {
     }
 
     public function getDBConnection(string $conName) {
-        
+        foreach ($this->getDBConnections() as $connNameStored => $connObj) {
+            
+            if ($connNameStored == $conName || $connObj->getName() == $conName) {
+                return $connObj;
+            }
+        }
     }
 
     public function getDBConnections(): array {
-        
+        return $this->configVars['database-connections'];
     }
 
     public function getDescription(string $langCode) {
-        
+        if (isset($this->getDescriptions()[$langCode])) {
+            return $this->getDescriptions()[$langCode];
+        }
     }
 
     public function getEnvVars(): array {
-        
+        return $this->configVars['env-vars'];
     }
 
     public function getHomePage() {
@@ -113,11 +194,16 @@ class DefaultDriver implements ConfigurationDriver {
     }
 
     public function getSMTPAccount(string $name) {
-        
+        foreach ($this->getSMTPConnections() as $connName => $connObj) {
+            
+            if ($connName == $name || $connObj->getAccountName() == $name) {
+                return $connObj;
+            }
+        }
     }
 
     public function getSMTPConnections(): array {
-        
+        return $this->configVars['smtp-connections'];
     }
 
     public function getSchedulerPassword(): string {
@@ -180,44 +266,52 @@ class DefaultDriver implements ConfigurationDriver {
     }
 
     public function setDescription(string $description, string $langCode) {
-        
+        $this->configVars['site']['descriptions'][$langCode] = $description;
+        $this->writeAppConfig();
     }
 
     public function setHomePage(string $url) {
-        
+        $this->configVars['site']['home-page'] = $url;
+        $this->writeAppConfig();
     }
 
     public function setPrimaryLanguage(string $langCode) {
-        
+        $this->configVars['site']['primary-lang'] = $langCode;
+        $this->writeAppConfig();
     }
 
     public function setSchedulerPassword(string $newPass) {
-        $this->configVars['scheduler-password'] = hash('sha256', $newPass);
+        $this->configVars['scheduler-password'] = $newPass;
         $this->writeAppConfig();
     }
 
     public function setTheme(string $theme) {
-        
+        $this->configVars['site']['base-theme'] = $theme;
+        $this->writeAppConfig();
     }
     
     public function getTitleSeparator() : string {
         return $this->configVars['site']['title-sep'];
     }
     public function setTitleSeparator(string $separator) {
-        
+        $this->configVars['site']['title-sep'] = $separator;
+        $this->writeAppConfig();
     }
 
     public function addEnvVar(string $name, $value, string $description = null) {
-        
+        $this->configVars['env-vars'][$name] = [
+            'value' => $value,
+            'description' => $description
+        ];
+        $this->writeAppConfig();
     }
     /**
      * Stores configuration variables into the application configuration class.
      *
      * @throws FileException
-     * @since 1.5
      */
     public function writeAppConfig() {
-        $cFile = new File('AppConfig.php', APP_PATH.'config');
+        $cFile = new File(self::CONFIG_FILE_PATH);
         $cFile->remove();
 
         $this->writeAppConfigAttrs($cFile);
@@ -595,9 +689,7 @@ class DefaultDriver implements ConfigurationDriver {
         $this->writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
-        $cFile->create(true);
-        $cFile->write();
-        require_once APP_PATH.'config'.DS.'AppConfig.php';
+        $cFile->write(false, true);
     }
     private function writeAppConfigAttrs($cFile) {
         $this->a($cFile, "<?php");
@@ -830,4 +922,38 @@ class DefaultDriver implements ConfigurationDriver {
         }
         $this->a($cFile, "        ];");
     }
+
+    public function getAppNames(): array {
+        return $this->configVars['site']['website-names'];
+    }
+
+    public function getDescriptions(): array {
+        return $this->configVars['site']['descriptions'];
+    }
+
+    public function getSMTPConnection(string $name) {
+        if (isset($this->getSMTPConnections()[$name])) {
+            return $this->getSMTPConnections()[$name];
+        }
+    }
+
+    public function getTitle(string $lang): string {
+        if (isset($this->getTitles()[$lang])) {
+            return $this->getTitles()[$lang];
+        }
+    }
+
+    public function getTitles(): array {
+        return $this->configVars['site']['titles'];
+    }
+
+    public function remove() {
+        $f = new \webfiori\file\File(self::CONFIG_FILE_PATH);
+        $f->remove();
+    }
+
+    public function setTitle(string $title, string $langCode) {
+        $this->configVars['site']['website-names'][$langCode] = $title;
+    }
+
 }

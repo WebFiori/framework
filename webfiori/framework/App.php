@@ -39,12 +39,34 @@ use webfiori\http\Response;
 define('MICRO_START', microtime(true));
 /**
  * The instance of this class is used to control basic settings of 
- * the framework. Also, it is the entry point of any request.
+ * the application. Also, it is the entry point of the application.
  * 
  * @author Ibrahim
  * 
  */
 class App {
+    /**
+     * Sets the class that will be used as configuration driver.
+     * 
+     * @param string $clazz The full name of the class including namespace.
+     */
+    public function setConfigDriver(string $clazz) {
+        self::$ConfigDriver = $clazz;
+    }
+    /**
+     * Returns the class that represents configuration driver.
+     * 
+     * @return string  The full name of the class including namespace.
+     */
+    public static function getConfigDriver() : string {
+        return self::$ConfigDriver;
+    }
+    /**
+     * A string which points to the class that represents configuration driver.
+     * 
+     * @var string
+     */
+    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
     /**
      * A constant that indicates that the status of the class is 'initialized'.
      * 
@@ -80,7 +102,7 @@ class App {
      * 
      * @since 1.0 
      */
-    private static $classStatus = self::STATUS_NONE;
+    private static $ClassStatus = self::STATUS_NONE;
     /**
      * 
      * @var Runner
@@ -180,7 +202,7 @@ class App {
             }
         });
         //class is now initialized
-        self::$classStatus = self::STATUS_INITIALIZED;
+        self::$ClassStatus = self::STATUS_INITIALIZED;
     }
     /**
      * Register CLI commands or background tasks.
@@ -274,7 +296,7 @@ class App {
      * @since 1.0
      */
     public static function getClassStatus() {
-        return self::$classStatus;
+        return self::$ClassStatus;
     }
 
     /**
@@ -364,12 +386,12 @@ class App {
      * @since 1.0
      */
     public static function start(): App {
-        if (self::$classStatus == 'NONE') {
+        if (self::$ClassStatus == 'NONE') {
             if (self::$LC === null) {
-                self::$classStatus = 'INITIALIZING';
+                self::$ClassStatus = 'INITIALIZING';
                 self::$LC = new App();
             }
-        } else if (self::$classStatus == 'INITIALIZING') {
+        } else if (self::$ClassStatus == 'INITIALIZING') {
             throw new InitializationException('Using the core class while it is not fully initialized.');
         }
 

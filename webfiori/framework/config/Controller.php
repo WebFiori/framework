@@ -2,6 +2,9 @@
 
 namespace webfiori\framework\config;
 
+use webfiori\framework\App;
+use webfiori\framework\exceptions\InitializationException;
+
 /**
  * A class which acts as an interface between the application and configuration
  * driver.
@@ -29,7 +32,8 @@ class Controller {
      * Creates new instance of the class.
      */
     public function __construct() {
-        $this->driver = new JsonDriver();
+        $driverClazz = App::getConfigDriver();
+        $this->driver = new $driverClazz();
         $this->driver->initialize();
     }
     /**

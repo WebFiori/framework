@@ -3,6 +3,12 @@
 
 namespace webfiori\framework\config;
 
+use webfiori\database\ConnectionInfo;
+use webfiori\email\SMTPAccount;
+use webfiori\file\exceptions\FileException;
+use webfiori\file\File;
+use webfiori\framework\writers\LangClassWriter;
+
 /**
  * A configuration driver which is used to store configuration on PHP class.
  * 
@@ -15,6 +21,7 @@ namespace webfiori\framework\config;
 class ClassDriver implements ConfigurationDriver {
     const NL = "\n";
     const CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'AppConfig.php';
+    const CONFIG_NS = APP_DIR.'\\config\\AppConfig';
     private $blockEnd;
     private $configVars;
     private $docEmptyLine;
@@ -25,8 +32,10 @@ class ClassDriver implements ConfigurationDriver {
         $this->blockEnd = "}";
         $this->docStart = "/**";
         $this->docEmptyLine = " * ";
+        $this->initDefaultConfig();
+    }
+    private function initDefaultConfig() {
         $this->configVars = [
-            'config-file-version' => '1.0',
             'smtp-connections' => [],
             'database-connections' => [],
             'scheduler-password' => 'NO_PASSWORD',
@@ -42,7 +51,7 @@ class ClassDriver implements ConfigurationDriver {
                 'base-url' => '',
                 'primary-lang' => 'EN',
                 'title-sep' => '|',
-                'home-page' => null,
+                'home-page' => '',
                 'admin-theme' => '',
                 'base-theme' => '',
                 'descriptions' => [
@@ -150,15 +159,15 @@ class ClassDriver implements ConfigurationDriver {
         }
     }
 
-    public function getAppReleaseDate() {
+    public function getAppReleaseDate() : string {
         return $this->configVars['version-info']['release-date'];
     }
 
-    public function getAppVersion() {
+    public function getAppVersion() : string {
         return $this->configVars['version-info']['version'];
     }
 
-    public function getAppVersionType() {
+    public function getAppVersionType() : string {
         return $this->configVars['version-info']['version-type'];
     }
 
@@ -189,7 +198,7 @@ class ClassDriver implements ConfigurationDriver {
         return $this->configVars['env-vars'];
     }
 
-    public function getHomePage() {
+    public function getHomePage() : string {
         return $this->configVars['site']['home-page'];
     }
 
@@ -214,11 +223,6 @@ class ClassDriver implements ConfigurationDriver {
         return $this->configVars['site']['base-theme'];
     }
 
-    public function initialize() {
-        if (!class_exists(APP_DIR.'\\config\\AppConfig')) {
-            $this->writeAppConfig();
-        }
-    }
 
     public function removeAllDBConnections() {
         $this->configVars['database-connections'] = [];
@@ -716,7 +720,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$adminThemeName;");
 
@@ -725,7 +729,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$appReleaseDate;");
 
@@ -734,7 +738,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$appVersionType;");
 
@@ -743,7 +747,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$appVersion;");
 
@@ -752,7 +756,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$baseThemeName;");
 
@@ -761,7 +765,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$baseUrl;");
 
@@ -770,7 +774,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$configVision;");
 
@@ -779,7 +783,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$schedulerPass;");
 
@@ -788,7 +792,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var array");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$dbConnections;");
 
@@ -797,7 +801,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var array");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$defaultPageTitles;");
 
@@ -806,7 +810,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var array");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$descriptions;");
 
@@ -815,7 +819,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$emailAccounts;");
 
@@ -824,7 +828,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$homePage;");
 
@@ -833,7 +837,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$primaryLang;");
 
@@ -842,7 +846,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$titleSep;");
 
@@ -851,25 +855,73 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, $this->docEmptyLine, 1);
         $this->a($cFile, "     * @var string");
         $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$webSiteNames;");
+    }
+    private function writeAppConfigConstructor(File $cFile) {
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * Creates new instance of the class.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    public function __construct() {");
+        $this->a($cFile, "        \$this->configVision = '1.0.1';");
+        $this->a($cFile, "        \$this->initVersionInfo();");
+        $this->a($cFile, "        \$this->initSiteInfo();");
+        $this->a($cFile, "        \$this->initDbConnections();");
+        $this->a($cFile, "        \$this->initSmtpConnections();");
+
+
+        $this->writeSchedulerPass($cFile);
+
+        $this->a($cFile, $this->blockEnd, 1);
+    }
+    private function writeAppConfigAddMethods(File $cFile) {
+        $this->writeFuncHeader($cFile, 
+            'public function addAccount(SMTPAccount $acc)', 
+            'Adds SMTP account.', 
+            [
+                'The developer can use this method to add new account during runtime.',
+                'The account will be removed once the program finishes.'
+            ], [
+                '$acc' => [
+                    'type' => 'SMTPAccount',
+                    'description' => [
+                        'An object of type SMTPAccount.'
+                    ]
+                ]
+            ]);
+        $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
+        $this->a($cFile, $this->blockEnd, 1);
+
+        $this->writeFuncHeader($cFile, 
+            'public function addDbConnection(ConnectionInfo $connectionInfo)', 
+            'Adds new database connection or updates an existing one.', 
+            '', 
+            [
+                '$connectionInfo' => [
+                    'type' => 'ConnectionInfo',
+                    'description' => [
+                        "An object of type 'ConnectionInfo' that will contain connection information."
+                    ]
+                ]
+            ]);
+        $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
+        $this->a($cFile, $this->blockEnd, 1);
     }
     private function writeAppVersionInfo($cFile) {
         $this->a($cFile, [
             $this->docStart,
-            $this->since10,
             $this->docEnd
         ], 1);
 
         $this->a($cFile, "private function initVersionInfo() {", 1);
 
-        $versionInfo = $this->getAppVersionInfo();
 
         $this->a($cFile, [
-            "\$this->appVersion = '".$versionInfo['version']."';",
-            "\$this->appVersionType = '".$versionInfo['version-type']."';",
-            "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
+            "\$this->appVersion = '".$this->getAppVersion()."';",
+            "\$this->appVersionType = '".$this->getAppVersionType()."';",
+            "\$this->appReleaseDate = '".$this->getAppReleaseDate()."';"
         ], 2);
 
         $this->a($cFile, $this->blockEnd, 1);
@@ -878,15 +930,100 @@ class ClassDriver implements ConfigurationDriver {
         $password = $this->getSchedulerPassword();
         $this->a($cFile, "        \$this->schedulerPass = '".$password."';");
     }
+    private function writeSiteDescriptions($cFile) {
+        $descArr = $this->getDescriptions();
+        $this->a($cFile, "        \$this->descriptions = [");
+
+        foreach ($descArr as $langCode => $desc) {
+            $desc = str_replace("'", "\'", $desc);
+            $this->a($cFile, "            '$langCode' => '$desc',");
+        }
+        $this->a($cFile, "        ];");
+    }
+    private function writeSiteNames($cFile) {
+        $wNamesArr = $this->getAppNames();
+        $this->a($cFile, "        \$this->webSiteNames = [");
+
+        foreach ($wNamesArr as $langCode => $name) {
+            $name = str_replace("'", "\'", $name);
+            $this->a($cFile, "            '$langCode' => '$name',");
+        }
+        $this->a($cFile, "        ];");
+        $this->a($cFile, "    ");
+    }
+    private function writeSmtpConn($cFile) {
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    private function initSmtpConnections() {");
+        $this->a($cFile, "        \$this->emailAccounts = [");
+
+        $smtpAccArr = $this->getSMTPConnections();
+
+        foreach ($smtpAccArr as $smtpAcc) {
+            if ($smtpAcc instanceof SMTPAccount) {
+                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
+                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
+                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
+                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
+                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
+                $this->a($cFile, "            ]),");
+            }
+        }
+        $this->a($cFile, "        ];");
+        $this->a($cFile, $this->blockEnd, 1);
+    }
+    private function writeSiteInfo($cFile) {
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    private function initSiteInfo() {");
+
+        $this->writeSiteNames($cFile);
+        $this->writeSiteTitles($cFile);
+        $this->writeSiteDescriptions($cFile);
+
+        $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
+
+        $sep = $this->getTitleSeparator();
+        $this->a($cFile, "        \$this->titleSep = '$sep';");
+
+        $lang = $this->getPrimaryLanguage();
+        $this->a($cFile, "        \$this->primaryLang = '$lang';");
+
+
+        $baseTheme = $this->getTheme();
+
+        if (class_exists($baseTheme)) {
+            $this->a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
+        } else {
+            $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
+        }
+
+        
+
+
+        $home = $this->getHomePage();
+
+        if ($home === null || strlen($home) == 0) {
+            $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
+        } else {
+            $this->a($cFile, "        \$this->homePage = '$home';");
+        }
+
+
+        $this->a($cFile, $this->blockEnd, 1);
+    }
     private function writeDbCon($cFile) {
         $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, $this->since10, 1);
+        
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initDbConnections() {");
         $this->a($cFile, "        \$this->dbConnections = [");
 
 
-        $dbCons = $this->getDatabaseConnections();
+        $dbCons = $this->getDBConnections();
 
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
@@ -948,12 +1085,59 @@ class ClassDriver implements ConfigurationDriver {
     }
 
     public function remove() {
-        $f = new \webfiori\file\File(self::CONFIG_FILE_PATH);
+        $f = new File(self::CONFIG_FILE_PATH);
         $f->remove();
     }
 
     public function setTitle(string $title, string $langCode) {
         $this->configVars['site']['website-names'][$langCode] = $title;
+    }
+
+    public function initialize(bool $reCreate = false) {
+        $cfgNs = self::CONFIG_NS;
+        if ($reCreate) {
+            $cFile = new File(self::CONFIG_FILE_PATH);
+            $cFile->remove();
+            $this->initDefaultConfig();
+        }
+        if (!class_exists($cfgNs)) {
+            $this->writeAppConfig();
+        } else {
+            $cfg = new $cfgNs();
+            $this->configVars = [
+                'smtp-connections' => [],
+                'database-connections' => [],
+                'scheduler-password' => 'NO_PASSWORD',
+                'version-info' => [
+                    'version' => '1.0',
+                    'version-type' => 'Stable',
+                    'release-date' => '2021-01-10'
+                ],
+                'env-vars' => [
+
+                ],
+                'site' => [
+                    'base-url' => '',
+                    'primary-lang' => 'EN',
+                    'title-sep' => '|',
+                    'home-page' => '',
+                    'admin-theme' => '',
+                    'base-theme' => '',
+                    'descriptions' => [
+                        'EN' => '',
+                        'AR' => ''
+                    ],
+                    'website-names' => [
+                        'EN' => 'Application',
+                        'AR' => 'تطبيق'
+                    ],
+                    'titles' => [
+                        'EN' => 'Default',
+                        'AR' => 'افتراضي'
+                    ],
+                ]
+            ];
+        }
     }
 
 }

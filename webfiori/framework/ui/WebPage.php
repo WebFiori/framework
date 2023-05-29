@@ -780,7 +780,7 @@ class WebPage {
     public function reset() {
         $this->skipLangCheck = true;
         $this->document = new HTMLDoc();
-        $this->_checkLang();
+        $this->checkLang();
         $this->usingLanguage();
 
         $appName = App::getConfig()->getAppName($this->getLangCode());
@@ -1137,7 +1137,7 @@ class WebPage {
      * Sets the language of the page based on session language or 
      * request.
      */
-    private function _checkLang() {
+    private function checkLang() {
         try {
             $session = SessionsManager::getActiveSession();
         } catch (Exception $ex) {

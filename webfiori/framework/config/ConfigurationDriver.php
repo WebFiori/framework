@@ -155,7 +155,7 @@ interface ConfigurationDriver {
      * Returns version number of the application.
      * 
      * @return string The method should return a string in the format 'x.x.x' if
-     * sematic versioning is used.
+     * semantic versioning is used.
      */
     public function getAppVersion() : string;
     /**

@@ -144,37 +144,84 @@ class ClassDriver implements ConfigurationDriver {
         $this->configVars['database-connections'][$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
         $this->writeAppConfig();
     }
-
+    /**
+     * Returns a two-letters string that represents primary language of the application.
+     * 
+     * @return string A two-letters string that represents primary language of the application.
+     */
     public function getPrimaryLanguage() : string {
         return $this->configVars['site']['primary-lang'];
     }
+    /**
+     * Adds new SMTP account or Updates an existing one.
+     * 
+     * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
+     */
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
         $this->configVars[$emailAccount->getAccountName()] = $emailAccount;
         $this->writeAppConfig();
     }
-
+    /**
+     * Returns application name.
+     * 
+     * @param string $langCode Language code such as 'AR' or 'EN'.
+     * 
+     * @return string|null If the name of the application
+     * does exist in the given language, the method should return it.
+     * If no such name, the method should return null.
+     */
     public function getAppName(string $langCode) {
         if (isset($this->configVars['site']['website-names'][$langCode])) {
             return $this->configVars['site']['website-names'][$langCode];
         }
     }
-
+    /**
+     * Returns a string that represents the date at which the version of
+     * the application was released at.
+     * 
+     * @return string A string in the format 'YYYY-MM-DD'.
+     */
     public function getAppReleaseDate() : string {
         return $this->configVars['version-info']['release-date'];
     }
-
+    /**
+     * Returns version number of the application.
+     * 
+     * @return string The method should return a string in the format 'x.x.x' if
+     * semantic versioning is used.
+     */
     public function getAppVersion() : string {
         return $this->configVars['version-info']['version'];
     }
-
+    /**
+     * Returns a string that represents the type of application version.
+     * 
+     * @return string A string such as 'alpha', 'beta' or 'rc'.
+     */
     public function getAppVersionType() : string {
         return $this->configVars['version-info']['version-type'];
     }
-
+    /**
+     * Returns the base URL that is used to fetch resources.
+     * 
+     * The return value of this method is usually used by the tag 'base'
+     * of website pages.
+     * 
+     * @return string the base URL.
+     */
     public function getBaseURL(): string {
         return $this->configVars['site']['base-url'];
     }
-
+    /**
+     * Returns database connection information given connection name.
+     * 
+     * @param string $conName The name of the connection.
+     * 
+     * @return ConnectionInfo|null The method will return an object of type
+     * ConnectionInfo if a connection info was found for the given connection name.
+     * Other than that, the method will return null.
+     * 
+     */
     public function getDBConnection(string $conName) {
         foreach ($this->getDBConnections() as $connNameStored => $connObj) {
             
@@ -183,7 +230,11 @@ class ClassDriver implements ConfigurationDriver {
             }
         }
     }
-
+    /**
+     * Returns an associative array that contain the information of database connections.
+     * 
+     * @return array An associative array of objects of type ConnectionInfo.
+     */
     public function getDBConnections(): array {
         return $this->configVars['database-connections'];
     }

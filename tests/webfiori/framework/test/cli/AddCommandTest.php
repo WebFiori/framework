@@ -93,8 +93,9 @@ class AddCommandTest extends TestCase {
             'webfiori',
             'add'
         ]);
-        $this->assertEquals(0, $runner->start());
         $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
+        $this->assertEquals(0, $runner->start());
+        
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

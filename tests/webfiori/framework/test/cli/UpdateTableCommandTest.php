@@ -30,7 +30,9 @@ class UpdateTableCommandTest extends TestCase {
             '',
             'n',
             'Cool new column.',
-            'n'
+            'y',
+            'ModifiedO',
+            ''
         ]);
         
         
@@ -74,8 +76,21 @@ class UpdateTableCommandTest extends TestCase {
             "Can this column have null values?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Column added.\n",
         ], $runner->getOutput());
+        
+        $clazz = '\\app\\database\\ModifiedOTable';
+        $this->assertTrue(class_exists($clazz));
+        $file = new File(ROOT_PATH.$clazz.'.php');
+        $file->remove();
+        $obj = new $clazz();
+        $this->assertTrue($obj instanceof Table);
+        $col = $obj->getColByKey('new-col');
+        $this->assertEquals('int', $col->getDatatype());
+        $this->assertEquals(9, $col->getSize());
+        $this->assertEquals('Cool new column.', $col->getComment());
     }
     /**
      * @test
@@ -339,38 +354,5 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertTrue($obj instanceof Table);
         $this->assertFalse($obj->hasColumn('user-id'));
     }
-    /**
-     * @depends test00
-     */
-    public function test06() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-table',
-        ]);
-        $runner->setInputs([
-            'app\\database\\TestTable',
-            '3',
-            '1',
-            'n',
-        ]);
-        
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter database table class name (include namespace):\n",
-            "What operation whould you like to do with the table?\n",
-            "0: Add new column.\n",
-            "1: Add foreign key.\n",
-            "2: Update existing column.\n",
-            "3: Drop column.\n",
-            "4: Drop foreign key.\n",
-            "Which column would you like to drop?\n",
-            "0: id\n",
-            "1: new-col\n",
-            "Would you like to update same class or create a copy with the update?(y/N)\n",
-            "Success: Column dropped.\n",
-            
-        ], $runner->getOutput());
-    }
+    
 }

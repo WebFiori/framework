@@ -339,4 +339,38 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertTrue($obj instanceof Table);
         $this->assertFalse($obj->hasColumn('user-id'));
     }
+    /**
+     * @depends test00
+     */
+    public function test06() {
+        $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-table',
+        ]);
+        $runner->setInputs([
+            'app\\database\\TestTable',
+            '3',
+            '1',
+            'n',
+        ]);
+        
+        
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter database table class name (include namespace):\n",
+            "What operation whould you like to do with the table?\n",
+            "0: Add new column.\n",
+            "1: Add foreign key.\n",
+            "2: Update existing column.\n",
+            "3: Drop column.\n",
+            "4: Drop foreign key.\n",
+            "Which column would you like to drop?\n",
+            "0: id\n",
+            "1: new-col\n",
+            "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Success: Column dropped.\n",
+            
+        ], $runner->getOutput());
+    }
 }

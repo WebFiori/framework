@@ -155,7 +155,7 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::start('hello');
         $sessions = SessionsManager::getSessions();
         $this->assertEquals([
-            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; domain=example.com; path=/; Secure; HttpOnly; SameSite=Lax' 
+            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; domain=127.0.0.1; path=/; Secure; HttpOnly; SameSite=Lax' 
             ], SessionsManager::getCookiesHeaders());
     }
     /**

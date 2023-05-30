@@ -47,8 +47,8 @@ class ListRoutesCommandTest extends TestCase {
         ]);
         $runner->start();
         $this->assertEquals([
-            "https://example.com/xyz   =>  ".Router::class."\n",
-            "https://example.com/xyzb  =>  ".WebPage::class."\n"
+            "https://127.0.0.1/xyz   =>  ".Router::class."\n",
+            "https://127.0.0.1/xyzb  =>  ".WebPage::class."\n"
         ], $runner->getOutput());
         Router::removeAll();
     }

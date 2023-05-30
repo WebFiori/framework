@@ -378,7 +378,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Select home page route:\n",
-            "0: https://example.com/x/y/z\n",
+            "0: https://127.0.0.1/x/y/z\n",
             "Success: Home page successfully updated.\n",
         ], $runner->getOutput());
         $this->assertEquals('x/y/z', Controller::getDriver()->getHomePage());

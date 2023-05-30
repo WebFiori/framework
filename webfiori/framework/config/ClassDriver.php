@@ -56,16 +56,16 @@ class ClassDriver implements ConfigurationDriver {
                 'admin-theme' => '',
                 'base-theme' => '',
                 'descriptions' => [
+                    'AR' => '',
                     'EN' => '',
-                    'AR' => ''
                 ],
                 'website-names' => [
+                    'AR' => 'تطبيق',
                     'EN' => 'Application',
-                    'AR' => 'تطبيق'
                 ],
                 'titles' => [
+                    'AR' => 'افتراضي',
                     'EN' => 'Default',
-                    'AR' => 'افتراضي'
                 ],
             ]
         ];

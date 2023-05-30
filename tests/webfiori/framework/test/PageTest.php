@@ -58,21 +58,22 @@ class PageTest extends TestCase{
         $this->assertTrue($page->hasAside());
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
-        $this->assertEquals('https://example.com/',$page->getCanonical());
+        $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testRender00() {
+        $_SERVER['HTTPS'] = null;
         $page = new WebPage();
         $doc = $page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href="http://127.0.0.1">'
                 . '<title>Default | Application</title>'
-                . '<link rel=canonical href="https://example.com/">'
+                . '<link rel=canonical href="http://127.0.0.1/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope itemtype="http://schema.org/WebPage">'
@@ -96,9 +97,9 @@ class PageTest extends TestCase{
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href="http://127.0.0.1">'
                 . '<title>Default | Application</title>'
-                . '<link rel=canonical href="https://example.com/">'
+                . '<link rel=canonical href="http://127.0.0.1/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope itemtype="http://schema.org/WebPage">'
@@ -137,6 +138,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testReset00() {
+        $_SERVER['HTTPS'] = 'yes';
         $page = new WebPage();
         $page->setTheme('New Super Theme');
         $page->setDescription('This is a test page.');
@@ -171,17 +173,17 @@ class PageTest extends TestCase{
         $this->assertTrue($page->hasHeader());
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
-        $this->assertEquals('https://example.com/',$page->getCanonical());
+        $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testCanonical() {
         $page = new WebPage();
-        $page->setCanonical('https://example.com/home');
+        $page->setCanonical('https://127.0.0.1/home');
         $c = $page->getCanonical();
-        $this->assertEquals('https://example.com/home',$c);
-        $this->assertEquals('https://example.com/home',$page->getDocument()->getHeadNode()->getCanonical());
+        $this->assertEquals('https://127.0.0.1/home',$c);
+        $this->assertEquals('https://127.0.0.1/home',$page->getDocument()->getHeadNode()->getCanonical());
     }
     /**
      * @test

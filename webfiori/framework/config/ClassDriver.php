@@ -8,6 +8,7 @@ use webfiori\email\SMTPAccount;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\writers\LangClassWriter;
+use webfiori\http\Uri;
 
 /**
  * A configuration driver which is used to store configuration on PHP class.
@@ -48,7 +49,7 @@ class ClassDriver implements ConfigurationDriver {
                 
             ],
             'site' => [
-                'base-url' => '',
+                'base-url' => Uri::getBaseURL(),
                 'primary-lang' => 'EN',
                 'title-sep' => '|',
                 'home-page' => '',

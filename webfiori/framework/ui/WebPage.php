@@ -806,7 +806,7 @@ class WebPage {
         $this->setWritingDir();
         $this->setCanonical(Request::getRequestedURI());
         $this->document->setLanguage($this->getLangCode());
-        $headNode = $this->_getHead();
+        $headNode = $this->getHead();
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
         $headerNode->setID(self::MAIN_ELEMENTS[1]);
@@ -825,7 +825,7 @@ class WebPage {
         $this->document->addChild($footerNode);
         $this->includeLables = false;
 
-        $this->_resetBeforeLoaded();
+        $this->resetBeforeLoaded();
         $this->skipLangCheck = false;
     }
     /**
@@ -1027,7 +1027,7 @@ class WebPage {
             }
 
             $this->document = new HTMLDoc();
-            $this->document->setHeadNode($this->_getHead());
+            $this->document->setHeadNode($this->getHead());
 
             $body = new HTMLNode();
             $body->setID(self::MAIN_ELEMENTS[0]);
@@ -1186,7 +1186,7 @@ class WebPage {
     }
 
 
-    private function _getHead() {
+    private function getHead() {
         $loadedTheme = $this->getTheme();
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
@@ -1213,7 +1213,7 @@ class WebPage {
 
         return $headNode;
     }
-    private function _resetBeforeLoaded() {
+    private function resetBeforeLoaded() {
         $this->beforeRenderCallbacks = new LinkedList();
         $this->addBeforeRender(function (WebPage $page)
         {

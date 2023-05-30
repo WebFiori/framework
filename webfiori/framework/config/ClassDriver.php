@@ -159,7 +159,7 @@ class ClassDriver implements ConfigurationDriver {
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      */
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
-        $this->configVars[$emailAccount->getAccountName()] = $emailAccount;
+        $this->configVars['smtp-connections'][$emailAccount->getAccountName()] = $emailAccount;
         $this->writeAppConfig();
     }
     /**

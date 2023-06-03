@@ -107,8 +107,6 @@ interface ConfigurationDriver {
      * 
      * @return array The indices of the array are language codes such as 'AR' and 
      * the value of the index is the description.
-     * 
-     * @since 1.0
      */
     public function getDescriptions() : array;
     /**

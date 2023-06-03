@@ -778,7 +778,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, " *");
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig implements Config {");
+        $this->a($cFile, "class AppConfig {");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * The name of admin control pages Theme.");

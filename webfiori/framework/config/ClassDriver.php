@@ -1133,7 +1133,7 @@ class ClassDriver implements ConfigurationDriver {
     }
 
     public function getTitles(): array {
-        return $this->configVars['site']['titles'];
+        return $this->configVars['site']['website-names'];
     }
 
     public function remove() {
@@ -1143,6 +1143,7 @@ class ClassDriver implements ConfigurationDriver {
 
     public function setTitle(string $title, string $langCode) {
         $this->configVars['site']['website-names'][$langCode] = $title;
+        $this->writeAppConfig();
     }
 
     public function initialize(bool $reCreate = false) {

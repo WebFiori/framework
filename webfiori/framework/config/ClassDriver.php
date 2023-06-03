@@ -53,7 +53,6 @@ class ClassDriver implements ConfigurationDriver {
                 'primary-lang' => 'EN',
                 'title-sep' => '|',
                 'home-page' => '',
-                'admin-theme' => '',
                 'base-theme' => '',
                 'descriptions' => [
                     'AR' => '',
@@ -417,17 +416,6 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "        return \$this->emailAccounts;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getAdminThemeName() : string', 
-            'Returns the name of the theme that is used in admin control pages.', 
-            '', 
-            [], 
-            [
-                'type' => 'string',
-                'description' => 'The name of the theme that is used in admin control pages.'
-            ]);
-        $this->a($cFile, "        return \$this->adminThemeName;");
-        $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
             'public function getBaseThemeName() : string', 
@@ -660,6 +648,31 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "        return \$this->titleSep;");
         $this->a($cFile, $this->blockEnd, 1);
 
+        $this->writeFuncHeader($cFile, 
+            'public function getTitle(string $langCode)', 
+            'Returns default title to use for specific display language.', 
+            [
+                
+            ], 
+            [
+                '$langCode' => [
+                    'type' => 'string',
+                    'description' => 'The code of display language.'
+                ]
+            ], 
+            [
+                'type' => 'string',
+                'description' => [
+                    'If the provided language is found, The method',
+                    'will return the title as string. Other than that,',
+                    'method will return empty string.'
+                ]
+            ]);
+        $this->a($cFile, "        if (isset(\$this->defaultPageTitles[\$langCode])) {");
+        $this->a($cFile, "            return \$this->defaultPageTitles[\$langCode];");
+        $this->a($cFile, "        }");
+        $this->a($cFile, $this->blockEnd, 1);
+        
         $this->writeFuncHeader($cFile, 
             'public function getVersion() : string', 
             'Returns version number of the application.', 
@@ -1197,36 +1210,36 @@ class ClassDriver implements ConfigurationDriver {
             $this->writeAppConfig();
         } else {
             $cfg = new $cfgNs();
+            $cfg instanceof \app\config\AppConfig;
             $this->configVars = [
-                'smtp-connections' => [],
-                'database-connections' => [],
-                'scheduler-password' => 'NO_PASSWORD',
+                'smtp-connections' => $cfg->getAccounts(),
+                'database-connections' => $cfg->getDBConnections(),
+                'scheduler-password' => $cfg->getSchedulerPassword(),
                 'version-info' => [
-                    'version' => '1.0',
-                    'version-type' => 'Stable',
-                    'release-date' => '2021-01-10'
+                    'version' => $cfg->getVersion(),
+                    'version-type' => $cfg->getVersionType(),
+                    'release-date' => $cfg->getReleaseDate()
                 ],
                 'env-vars' => [
 
                 ],
                 'site' => [
-                    'base-url' => '',
-                    'primary-lang' => 'EN',
-                    'title-sep' => '|',
-                    'home-page' => '',
-                    'admin-theme' => '',
-                    'base-theme' => '',
+                    'base-url' => $cfg->getBaseURL(),
+                    'primary-lang' => $cfg->getPrimaryLanguage(),
+                    'title-sep' => $cfg->getTitleSep(),
+                    'home-page' => $cfg->getHomePage(),
+                    'base-theme' => $cfg->getBaseThemeName(),
                     'descriptions' => [
-                        'EN' => '',
-                        'AR' => ''
+                        'AR' => $cfg->getDescription('AR'),
+                        'EN' => $cfg->getDescription('EN')
                     ],
                     'website-names' => [
-                        'EN' => 'Application',
-                        'AR' => 'تطبيق'
+                        'AR' => $cfg->getWebsiteName('AR'),
+                        'EN' => $cfg->getWebsiteName('EN')
                     ],
                     'titles' => [
-                        'EN' => 'Default',
-                        'AR' => 'افتراضي'
+                        'AR' => $cfg->getTitle('AR'),
+                        'EN' => $cfg->getTitle('EN')
                     ],
                 ]
             ];

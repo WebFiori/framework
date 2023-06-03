@@ -1111,15 +1111,37 @@ class ClassDriver implements ConfigurationDriver {
         }
         $this->a($cFile, "        ];");
     }
-
+    /**
+     * Returns an array that holds different names for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the name.
+     * 
+     */
     public function getAppNames(): array {
         return $this->configVars['site']['website-names'];
     }
-
+    /**
+     * Returns an array that holds different descriptions for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the description.
+     */
     public function getDescriptions(): array {
         return $this->configVars['site']['descriptions'];
     }
-
+    /**
+     * Returns SMTP connection given its name.
+     * 
+     * @param string $name The name of the account.
+     * 
+     * @return SMTPAccount|null If the account is found, The method
+     * will return an object of type SMTPAccount. Else, the
+     * method will return null.
+     * 
+     */
     public function getSMTPConnection(string $name) {
         if (isset($this->getSMTPConnections()[$name])) {
             return $this->getSMTPConnections()[$name];
@@ -1131,18 +1153,36 @@ class ClassDriver implements ConfigurationDriver {
             return $this->getTitles()[$lang];
         }
     }
-
+    /**
+     * Returns the default title at which a web page will use in case no title
+     * is specified.
+     * 
+     * @param string $lang A two-letter string that represents language code.
+     * The returned value will be specific to selected language.
+     * 
+     * @return string The default title at which a web page will use in case no title
+     * is specified.
+     */
     public function getTitles(): array {
-        return $this->configVars['site']['website-names'];
+        return $this->configVars['site']['titles'];
     }
-
+    /**
+     * Removes all configuration variables.
+     */
     public function remove() {
         $f = new File(self::CONFIG_FILE_PATH);
         $f->remove();
     }
-
+    /**
+     * Sets or updates default web page title for a specific display language.
+     * 
+     * @param string $title The title that will be set.
+     * 
+     * @param string $langCode The display language at which the title will be
+     * set or updated for.
+     */
     public function setTitle(string $title, string $langCode) {
-        $this->configVars['site']['website-names'][$langCode] = $title;
+        $this->configVars['site']['titles'][$langCode] = $title;
         $this->writeAppConfig();
     }
 

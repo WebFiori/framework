@@ -1,10 +1,8 @@
 <?php
 namespace webfiori\framework\test\cli;
-use webfiori\cli\Runner;
-use webfiori\framework\cli\commands\ListRoutesCommand;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\App;
-use webfiori\framework\router\Router;
 
 class SettingsCommandTest extends TestCase {
     /**

@@ -780,14 +780,6 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, " */");
         $this->a($cFile, "class AppConfig {");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The name of admin control pages Theme.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$adminThemeName;");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * The date at which the application was released.");

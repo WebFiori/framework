@@ -260,6 +260,7 @@ class SessionTest extends TestCase {
      */
     public function testToJsonTest01() {
         $_POST['lang'] = 'fr';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $s = new Session(['name'=>'session','duration'=>1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');

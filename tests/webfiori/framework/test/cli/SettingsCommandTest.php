@@ -9,6 +9,7 @@ class SettingsCommandTest extends TestCase {
      * @test
      */
     public function test00() {
+        App::getConfig()->initialize(true);
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([

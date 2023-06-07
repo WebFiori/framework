@@ -140,6 +140,11 @@ class ClassDriver implements ConfigurationDriver {
             }
         }
     }
+    /**
+     * Adds new database connections information or update existing connection.
+     *
+     * @param ConnectionInfo $dbConnectionsInfo An object which holds connection information.
+     */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $this->configVars['database-connections'][$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
         $this->writeAppConfig();
@@ -273,13 +278,22 @@ class ClassDriver implements ConfigurationDriver {
     public function getTheme(): string {
         return $this->configVars['site']['base-theme'];
     }
-
-
+    /**
+     * Removes all stored database connections.
+     */
     public function removeAllDBConnections() {
         $this->configVars['database-connections'] = [];
         $this->writeAppConfig();
     }
-
+    /**
+     * Removes database connection given its name.
+     *
+     * This method will search for a connection which has the given
+     * name. Once it found, it will remove the connection.
+     *
+     * @param string $connectionName The name of the connection.
+     *
+     */
     public function removeDBConnection(string $connectionName) {
         if (isset($this->configVars['database-connections'][$connectionName])) {
             unset($this->configVars['database-connections'][$connectionName]);

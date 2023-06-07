@@ -120,6 +120,8 @@ class SessionTest extends TestCase {
      * @test
      */
     public function testStart00() {
+        $_POST['lang'] = 'EN';
+        putenv('REQUEST_METHOD=POST');
         $session = new Session(['name'=>'new']);
         $this->assertEquals(SessionStatus::INACTIVE,$session->getStatus());
         $this->assertEquals(0,$session->getStartedAt());

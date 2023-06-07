@@ -13,6 +13,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function testQueryFromFile00() {
+        App::getConfig()->removeAllDBConnections();
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

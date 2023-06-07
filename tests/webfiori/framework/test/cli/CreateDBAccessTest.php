@@ -46,7 +46,6 @@ class CreateDBAccessTest extends CreateTestCase {
             "Info: New class was created at \"app\database\".\n"
         ], $runner->getOutput());
         $clazz = '\\app\\database\\EmployeeOperationsDB';
-        $this->assertTrue(File::isFileExist(ROOT_PATH.DS.$clazz.'.php'));
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

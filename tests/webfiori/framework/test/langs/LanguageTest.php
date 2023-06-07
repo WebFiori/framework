@@ -115,6 +115,7 @@ class LanguageTest extends TestCase{
      * @depends testGetLabel01
      */
     public function testGetLabel02() {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         SessionsManager::start('new-x-session');
         $_POST['lang'] = 'ar';
         $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));

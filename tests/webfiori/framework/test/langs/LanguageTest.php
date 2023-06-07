@@ -95,7 +95,9 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testGetLabel01() {
+        $this->assertNull(Language::getActive());
         $this->assertEquals('general/action/print', Language::getLabel('general/action/print','EN'));
+        $this->assertEquals('EN', Language::getActive()->getCode());
         Language::getActive()->set('general.action', 'print', 'Print Report');
         $_POST['lang'] = 'EN';
         $_SERVER['REQUEST_METHOD'] = 'POST';

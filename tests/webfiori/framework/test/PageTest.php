@@ -91,6 +91,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testRender01() {
+        $_SERVER['HTTPS'] = null;
         $page = new WebPage();
         $doc =$page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));

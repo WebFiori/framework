@@ -17,6 +17,7 @@ class CreateDBAccessTest extends CreateTestCase {
      */
     public function test00() {
         $runner = App::getRunner();
+        App::getConfig()->removeAllDBConnections();
         $runner->setArgsVector([
             'webfiori',
             'create',

@@ -99,6 +99,7 @@ class LanguageTest extends TestCase{
         Language::getActive()->set('general.action', 'print', 'Print Report');
         $_POST['lang'] = 'EN';
         $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->assertEquals('EN', Language::getActive()->getCode());
         $this->assertEquals('Print Report', Language::getLabel('general/action/print'));
         $this->assertEquals('general/action/print', Language::getLabel('general/action/print','AR'));
         $this->assertEquals('Print Report', Language::getLabel('general/action/print', 'EN'));

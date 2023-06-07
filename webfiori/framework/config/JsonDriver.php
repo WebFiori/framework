@@ -7,7 +7,6 @@ use webfiori\email\SMTPAccount;
 use webfiori\file\File;
 use webfiori\http\Uri;
 use webfiori\json\Json;
-use const APP_PATH;
 
 /**
  * Application configuration driver which is used to read and write application
@@ -69,7 +68,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
-        $json = new Json([
+        $connectionJAsJson = new Json([
             'type' => $dbConnectionsInfo->getDatabaseType(),
             'host' => $dbConnectionsInfo->getHost(),
             'port' => $dbConnectionsInfo->getPort(),
@@ -78,12 +77,12 @@ class JsonDriver implements ConfigurationDriver {
             'password' => $dbConnectionsInfo->getPassword(),
             'extars' => $dbConnectionsInfo->getExtars(),
         ]);
-        $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $json);
+        $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $connectionJAsJson);
         $this->writeJson();
     }
 
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
-        $json = new Json([
+        $connectionAsJson = new Json([
             'host' => $emailAccount->getServerAddress(),
             'port' => $emailAccount->getPort(),
             'username' => $emailAccount->getSenderName(),
@@ -92,7 +91,7 @@ class JsonDriver implements ConfigurationDriver {
             'sender-name' => $emailAccount->getSenderName(),
             
         ]);
-        $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $json);
+        $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $connectionAsJson);
         $this->writeJson();
     }
 

@@ -3,6 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
+use webfiori\file\File;
 use webfiori\framework\App;
 
 /**
@@ -43,6 +44,7 @@ class CreateDBAccessTest extends CreateTestCase {
             "Info: New class was created at \"app\database\".\n"
         ], $runner->getOutput());
         $clazz = '\\app\\database\\EmployeeOperationsDB';
+        $this->assertTrue(File::isFileExist(APP_PATH.$clazz));
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

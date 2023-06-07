@@ -247,7 +247,7 @@ class Language {
             } else {
                 $langCode = Request::getParam('lang');
 
-                if ($langCode === null || strlen($langCode) == 2) {
+                if ($langCode === null || strlen($langCode) != 2) {
                     $langCode = App::getConfig()->getPrimaryLanguage();
                 }
             }

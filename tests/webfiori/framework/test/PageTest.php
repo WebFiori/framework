@@ -4,7 +4,7 @@ namespace webfiori\framework\test;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
-use webfiori\framework\ConfigController;
+use webfiori\framework\App;
 use webfiori\framework\Language;
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
@@ -50,29 +50,30 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $this->assertEquals('EN',$page->getLangCode());
         $this->assertNull($page->getDescription());
-        $this->assertEquals('Hello World',$page->getTitle());
-        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals('Default',$page->getTitle());
+        $this->assertEquals('Application',$page->getWebsiteName());
         $this->assertEquals(' | ',$page->getTitleSep());
         $this->assertTrue($page->hasHeader());
         $this->assertTrue($page->hasFooter());
         $this->assertTrue($page->hasAside());
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
-        $this->assertEquals('https://example.com/',$page->getCanonical());
+        $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testRender00() {
+        $_SERVER['HTTPS'] = null;
         $page = new WebPage();
         $doc = $page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
-                . '<title>Hello World | WebFiori</title>'
-                . '<link rel=canonical href="https://example.com/">'
+                . '<base href="http://127.0.0.1">'
+                . '<title>Default | Application</title>'
+                . '<link rel=canonical href="http://127.0.0.1/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope itemtype="http://schema.org/WebPage">'
@@ -90,15 +91,16 @@ class PageTest extends TestCase{
      * @test
      */
     public function testRender01() {
+        $_SERVER['HTTPS'] = null;
         $page = new WebPage();
         $doc =$page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
-                . '<title>Hello World | WebFiori</title>'
-                . '<link rel=canonical href="https://example.com/">'
+                . '<base href="http://127.0.0.1">'
+                . '<title>Default | Application</title>'
+                . '<link rel=canonical href="http://127.0.0.1/">'
                 . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope itemtype="http://schema.org/WebPage">'
@@ -137,6 +139,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testReset00() {
+        $_SERVER['HTTPS'] = 'yes';
         $page = new WebPage();
         $page->setTheme('New Super Theme');
         $page->setDescription('This is a test page.');
@@ -163,25 +166,25 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $this->assertEquals('EN',$page->getLangCode());
         $this->assertNull($page->getDescription());
-        $this->assertEquals('Hello World',$page->getTitle());
-        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals('Default',$page->getTitle());
+        $this->assertEquals('Application',$page->getWebsiteName());
         $this->assertEquals(' | ',$page->getTitleSep());
         $this->assertTrue($page->hasAside());
         $this->assertTrue($page->hasFooter());
         $this->assertTrue($page->hasHeader());
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
-        $this->assertEquals('https://example.com/',$page->getCanonical());
+        $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testCanonical() {
         $page = new WebPage();
-        $page->setCanonical('https://example.com/home');
+        $page->setCanonical('https://127.0.0.1/home');
         $c = $page->getCanonical();
-        $this->assertEquals('https://example.com/home',$c);
-        $this->assertEquals('https://example.com/home',$page->getDocument()->getHeadNode()->getCanonical());
+        $this->assertEquals('https://127.0.0.1/home',$c);
+        $this->assertEquals('https://127.0.0.1/home',$page->getDocument()->getHeadNode()->getCanonical());
     }
     /**
      * @test
@@ -198,9 +201,7 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         $page = new WebPage();
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]);
+        App::getConfig()->setTheme('');
         $page->setTheme();
         $this->assertEquals('',$page->getThemeCSSDir());
         $this->assertEquals('',$page->getThemeImagesDir());
@@ -210,16 +211,14 @@ class PageTest extends TestCase{
      * @test
      */
     public function testTheme00() {
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]);
+        App::getConfig()->setTheme('');
         $page = new WebPage();
         $page->setTheme();
         $theme = $page->getTheme();
         $this->assertNull($theme);
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => 'New Theme 2'
-        ]);
+        
+        App::getConfig()->setTheme('New Theme 2');
+
         $page->setTheme();
         $theme2 = $page->getTheme();
         $this->assertSame($theme2->getPage(), $page);

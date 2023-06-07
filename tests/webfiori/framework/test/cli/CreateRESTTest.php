@@ -15,7 +15,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test00() {
-        App::getAppConfig()->removeDBConnections();
+        App::getConfig()->removeAllDBConnections();
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -143,7 +143,7 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test01() {
-        App::getAppConfig()->removeDBConnections();
+        App::getConfig()->removeAllDBConnections();
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -275,11 +275,11 @@ class CreateRESTTest extends CreateTestCase {
      * @test
      */
     public function test02() {
-        App::getAppConfig()->removeDBConnections();
+        App::getConfig()->removeAllDBConnections();
         $conn = new ConnectionInfo('mysql','root', '123456', 'testing_db', '127.0.0.1', 3306, [
             'connection-name' => 'Super Connection'
         ]);
-        App::getAppConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

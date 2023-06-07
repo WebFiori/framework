@@ -16,7 +16,6 @@ use webfiori\database\DatabaseException;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\email\SMTPServer;
-use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\App;
 use webfiori\framework\writers\LangClassWriter;
@@ -72,7 +71,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getAppConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);
@@ -90,7 +89,7 @@ class AddCommand extends CLICommand {
         if ($addConnection === true) {
             $this->success('Connected. Adding the connection...');
 
-            ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
+            App::getConfig()->addOrUpdateDBConnection($connInfoObj);
             $this->success('Connection information was stored in application configuration.');
         } else {
             $this->error('Unable to connect to the database.');
@@ -108,20 +107,19 @@ class AddCommand extends CLICommand {
 
             return -1;
         }
-        $siteInfo = ConfigController::get()->getSiteConfigVars();
 
-        if (isset($siteInfo['website-names'][$langCode])) {
+        if (App::getConfig()->getAppName($langCode) !== null) {
             $this->info('This language already added. Nothing changed.');
 
             return 0;
         }
-        $siteInfo['website-names'][$langCode] = $this->getInput('Name of the website in the new language:');
-        $siteInfo['descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
-        $siteInfo['titles'][$langCode] = $this->getInput('Default page title in the new language:');
+        App::getConfig()->setAppName($this->getInput('Name of the website in the new language:'), $langCode);
+        App::getConfig()->setDescription($this->getInput('Description of the website in the new language:'), $langCode);
+        App::getConfig()->setTitle($this->getInput('Default page title in the new language:'), $langCode);
         $writingDir = $this->select('Select writing direction:', [
             'ltr', 'rtl'
         ]);
-        ConfigController::get()->updateSiteInfo($siteInfo);
+        
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
@@ -148,14 +146,14 @@ class AddCommand extends CLICommand {
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', $smtpConn->getAddress()));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(App::getAppConfig()->getAccounts())));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(App::getConfig()->getSMTPConnections())));
         $this->println('Trying to connect. This can take up to 1 minute...');
         $server = new SMTPServer($smtpConn->getServerAddress(), $smtpConn->getPort());
 
         try {
             if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
                 $this->success('Connected. Adding connection information...');
-                ConfigController::get()->updateOrAddEmailAccount($smtpConn);
+                App::getConfig()->addOrUpdateSMTPAccount($smtpConn);
                 $this->success('Connection information was stored in application configuration.');
             } else {
                 $this->error('Unable to connect to SMTP server.');
@@ -173,9 +171,9 @@ class AddCommand extends CLICommand {
     private function confirmAdd($smtpOrDbConn) {
         if ($this->confirm('Would you like to store connection information anyway?', false)) {
             if ($smtpOrDbConn instanceof SMTPAccount) {
-                ConfigController::get()->updateOrAddEmailAccount($smtpOrDbConn);
+                App::getConfig()->addOrUpdateSMTPAccount($smtpOrDbConn);
             } else if ($smtpOrDbConn instanceof ConnectionInfo) {
-                ConfigController::get()->addOrUpdateDBConnection($smtpOrDbConn);
+                App::getConfig()->addOrUpdateDBConnection($smtpOrDbConn);
             }
             $this->success('Connection information was stored in application configuration.');
         }

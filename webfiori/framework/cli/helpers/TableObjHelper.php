@@ -173,7 +173,7 @@ class TableObjHelper {
         $runQuery = $this->confirm('Would you like to update the database?', false);
 
         if ($runQuery) {
-            $dbConnections = array_keys(App::getAppConfig()->getDBConnections());
+            $dbConnections = array_keys(App::getConfig()->getDBConnections());
 
             if (count($dbConnections) == 0) {
                 $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');

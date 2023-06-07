@@ -41,7 +41,7 @@ class CLICommandClassWriter extends ClassWriter {
      * the command will have.
      */
     public function __construct() {
-        parent::__construct('NewCommand', ROOT_PATH.DS.APP_DIR.DS.'commands', APP_DIR.'\\commands');
+        parent::__construct('NewCommand', APP_PATH.'commands', APP_DIR.'\\commands');
         $this->name = 'new-command';
         $this->args = [];
         $this->desc = '';

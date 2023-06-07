@@ -2,8 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TasksManager;
+use webfiori\cli\CLICommand;
 use webfiori\framework\App;
 /**
  * @author Ibrahim
@@ -106,7 +105,7 @@ class CreateCLICommandTest extends CreateTestCase {
         $clazz = '\\app\\commands\\DoItCommand';
         $this->assertTrue(class_exists($clazz));
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof \webfiori\cli\CLICommand);
+        $this->assertTrue($clazzObj instanceof CLICommand);
         $this->assertEquals('do-it', $clazzObj->getName());
         $arg = $clazzObj->getArg('--what-to-do');
         $this->assertNotNull($arg);

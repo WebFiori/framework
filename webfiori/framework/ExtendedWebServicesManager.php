@@ -422,7 +422,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         if ($activeSession !== null) {
             $tempCode = $activeSession->getLangCode(true);
         } else {
-            $tempCode = App::getAppConfig()->getPrimaryLanguage();
+            $tempCode = App::getConfig()->getPrimaryLanguage();
         }
 
         if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {

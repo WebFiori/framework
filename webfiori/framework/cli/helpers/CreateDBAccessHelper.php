@@ -100,7 +100,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
         $this->getWriter()->setTable($t);
     }
     private function getConnection() {
-        $dbConnections = array_keys(App::getAppConfig()->getDBConnections());
+        $dbConnections = array_keys(App::getConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
             $dbConnections[] = 'None';

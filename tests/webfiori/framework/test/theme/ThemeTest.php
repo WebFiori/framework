@@ -1,12 +1,12 @@
 <?php
 namespace webfiori\framework\test\theme;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
-use webfiori\framework\ConfigController;
+use webfiori\framework\App;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
-use webfiori\framework\App;
 use const DS;
 /**
  * Description of ThemeTest
@@ -23,9 +23,7 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testToJson00() {
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]); 
+        App::getConfig()->setTheme('');
         $theme = ThemeLoader::usingTheme();
         $this->assertNull($theme);
         $theme = ThemeLoader::usingTheme('New Super Theme');
@@ -61,15 +59,13 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testUseTheme01() {
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => ''
-        ]); 
+        App::getConfig()->setTheme(''); 
         $theme = ThemeLoader::usingTheme();
         $this->assertNull($theme);
         $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
-        $this->assertEquals(App::getAppConfig()->getBaseURL(),$theme->getBaseURL());
+        $this->assertEquals(App::getConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
     }
@@ -77,9 +73,7 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testCreateHTMLNode00() {
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => 'New Super Theme'
-        ]);   
+        App::getConfig()->setTheme('New Super Theme' ); 
                 
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
@@ -103,7 +97,7 @@ class ThemeTest extends TestCase {
      */
     public function testUseTheme02() {
         $themeName = 'Not Exist';
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('No such theme: \''.$themeName.'\'.');
         ThemeLoader::usingTheme('Not Exist');
     }

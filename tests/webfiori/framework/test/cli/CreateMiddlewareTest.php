@@ -10,7 +10,7 @@ use webfiori\framework\App;
  *
  * @author Ibrahim
  */
-class MiddlewareTest extends CreateTestCase {
+class CreateMiddlewareTest extends CreateTestCase {
     /**
      * @test
      */

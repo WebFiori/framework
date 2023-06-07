@@ -3,9 +3,8 @@
 //Bootstrap file which is used to boot testing process.
 
 
-use webfiori\framework\AutoLoader;
-use webfiori\framework\ConfigController;
 use webfiori\framework\App;
+use webfiori\framework\AutoLoader;
 
 $DS = DIRECTORY_SEPARATOR;
 
@@ -82,18 +81,22 @@ $dirs = AutoLoader::getFolders();
 foreach ($dirs as $dir) {
     fprintf(STDOUT, $dir."\n");
 }
-
+fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
 App::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 define('TESTS_PATH', AutoLoader::get()->root().$DS.TESTS_DIRECTORY);
+fprintf(STDOUT,'Tests Path: '.TESTS_PATH."\n");
+fprintf(STDOUT,'App Path: '.APP_PATH."\n");
+fprintf(STDOUT,"---------------------------------\n");
 
 fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.
 register_shutdown_function(function()
 {
-    ConfigController::get()->removeConfigFiles();
+    App::getConfig()->remove();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
+fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Starting to run tests...\n");

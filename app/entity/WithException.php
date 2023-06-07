@@ -4,7 +4,7 @@ namespace app\entity;
 /**
  * Description of WithException
  *
- * @author i.binalshikh
+ * @author Ibrahim
  */
 class WithException {
     public function __construct() {

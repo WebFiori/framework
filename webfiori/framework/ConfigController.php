@@ -630,7 +630,7 @@ class ConfigController {
      * @throws FileException
      */
     public function resetConfig() {
-        self::get()->setConfig(App::getAppConfig());
+        self::get()->setConfig(App::getConfig());
         $this->writeAppConfig();
     }
     /**

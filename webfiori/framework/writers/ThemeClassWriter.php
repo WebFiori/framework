@@ -32,7 +32,7 @@ class ThemeClassWriter extends ClassWriter {
      * </ul>
      */
     public function __construct(string $themeName = '') {
-        parent::__construct('NewTheme', ROOT_PATH.DS.APP_DIR.DS.'themes', APP_DIR.'\\themes\\new');
+        parent::__construct('NewTheme', APP_PATH.'themes', APP_DIR.'\\themes\\new');
 
         if (!$this->setThemeName($themeName)) {
             $this->setThemeName('New Theme');

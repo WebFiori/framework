@@ -173,7 +173,7 @@ class ThemeLoader {
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {
-            $themeName = ConfigController::get()->getBaseTheme();
+            $themeName = App::getConfig()->getTheme();
 
             if (strlen($themeName) == 0) {
                 return null;

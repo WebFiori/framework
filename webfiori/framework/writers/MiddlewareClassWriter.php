@@ -47,7 +47,7 @@ class MiddlewareClassWriter extends ClassWriter {
      * will be added to.
      */
     public function __construct($middlewareName = '', $priority = 0, array $groupsArr = []) {
-        parent::__construct('NewMiddleware', ROOT_PATH.DS.APP_DIR.DS.'middleware', APP_DIR.'\\middleware');
+        parent::__construct('NewMiddleware', APP_PATH.'middleware', APP_DIR.'\\middleware');
         $this->setSuffix('Middleware');
         $this->addUseStatement([
                 AbstractMiddleware::class,

@@ -1,20 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace webfiori\framework\test;
 
 use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
-use webfiori\framework\ConfigController;
-use webfiori\framework\DB;
 use webfiori\framework\App;
+use webfiori\framework\DB;
 
 /**
  * Description of DBTest
@@ -69,11 +62,11 @@ class DBTest extends TestCase {
     public function test04() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
         $conn->setName('default-conn');
-        App::getAppConfig()->addDbConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         $db = new DB('default-conn');
         $this->assertEquals(0, count($db->getTables()));
         $db->register('database');
         $this->assertEquals(2, count($db->getTables()));
-        App::getAppConfig()->removeDBConnections();
+        App::getConfig()->removeAllDBConnections();
     }
 }

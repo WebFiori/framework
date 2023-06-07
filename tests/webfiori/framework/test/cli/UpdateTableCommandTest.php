@@ -30,7 +30,9 @@ class UpdateTableCommandTest extends TestCase {
             '',
             'n',
             'Cool new column.',
-            'n'
+            'y',
+            'ModifiedO',
+            ''
         ]);
         
         
@@ -74,8 +76,21 @@ class UpdateTableCommandTest extends TestCase {
             "Can this column have null values?(y/N)\n",
             "Enter your optional comment about the column:\n",
             "Would you like to update same class or create a copy with the update?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Column added.\n",
         ], $runner->getOutput());
+        
+        $clazz = '\\app\\database\\ModifiedOTable';
+        $this->assertTrue(class_exists($clazz));
+        $file = new File(ROOT_PATH.$clazz.'.php');
+        $file->remove();
+        $obj = new $clazz();
+        $this->assertTrue($obj instanceof Table);
+        $col = $obj->getColByKey('new-col');
+        $this->assertEquals('int', $col->getDatatype());
+        $this->assertEquals(9, $col->getSize());
+        $this->assertEquals('Cool new column.', $col->getComment());
     }
     /**
      * @test
@@ -339,4 +354,5 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertTrue($obj instanceof Table);
         $this->assertFalse($obj->hasColumn('user-id'));
     }
+    
 }

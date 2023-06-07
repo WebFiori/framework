@@ -95,8 +95,13 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testGetLabel01() {
+        $this->assertNull(Language::getActive());
         $this->assertEquals('general/action/print', Language::getLabel('general/action/print','EN'));
+        $this->assertEquals('EN', Language::getActive()->getCode());
         Language::getActive()->set('general.action', 'print', 'Print Report');
+        $_POST['lang'] = 'EN';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $this->assertEquals('EN', Language::getActive()->getCode());
         $this->assertEquals('Print Report', Language::getLabel('general/action/print'));
         $this->assertEquals('general/action/print', Language::getLabel('general/action/print','AR'));
         $this->assertEquals('Print Report', Language::getLabel('general/action/print', 'EN'));
@@ -110,6 +115,7 @@ class LanguageTest extends TestCase{
      * @depends testGetLabel01
      */
     public function testGetLabel02() {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         SessionsManager::start('new-x-session');
         $_POST['lang'] = 'ar';
         $this->assertEquals('طباعة التقرير', Language::getLabel('general.action.print','AR'));
@@ -163,7 +169,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation04() {
-        
+        Language::reset();
         $lang = Language::loadTranslation('Ar');
         $this->assertTrue($lang instanceof Language);
         $this->assertEquals('AR',$lang->getCode());

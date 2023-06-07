@@ -34,7 +34,7 @@ class SettingsCommand extends CLICommand {
      */
     public function exec() : int {
         $spaces = 25;
-        $C = App::getAppConfig();
+        $C = App::getConfig();
         $format = [];
         $format['color'] = 'yellow';
         $format['bold'] = true;
@@ -44,18 +44,16 @@ class SettingsCommand extends CLICommand {
         $this->println("    Release Date %".($spaces - strlen('Release Date'))."s %s",':',WF_RELEASE_DATE);
 
         $this->println("AppConfig.php Settings:", $format);
-        $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',ROOT_PATH.DS.APP_DIR);
-        $this->println("    Application Version %".($spaces - strlen('Application Version'))."s %s",':',$C->getVersion());
-        $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
-        $this->println("    Application Release Date %".($spaces - strlen('Application Release Date'))."s %s",':',$C->getReleaseDate());
+        $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',APP_PATH);
+        $this->println("    Application Version %".($spaces - strlen('Application Version'))."s %s",':',$C->getAppVersion());
+        $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getAppVersionType());
+        $this->println("    Application Release Date %".($spaces - strlen('Application Release Date'))."s %s",':',$C->getAppReleaseDate());
         $this->println("    Base CLI URL %".($spaces - strlen('Base CLI URL'))."s %s",':',$C->getBaseURL());
-        $this->println("    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$C->getAdminThemeName());
-        $this->println("    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$C->getBaseThemeName());
-        $this->println("    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$C->getTitleSep());
+        $this->println("    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$C->getTheme());
+        $this->println("    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$C->getTitleSeparator());
         $this->println("    Home Page %".($spaces - strlen('Home Page'))."s %s",':',$C->getHomePage());
-        $this->println("    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$C->getConfigVersion());
         $this->println("    Website Names:",':');
-        $names = $C->getWebsiteNames();
+        $names = $C->getAppNames();
 
         foreach ($names as $langCode => $name) {
             $this->println("        $langCode => $name");

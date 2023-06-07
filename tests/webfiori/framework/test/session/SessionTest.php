@@ -120,6 +120,8 @@ class SessionTest extends TestCase {
      * @test
      */
     public function testStart00() {
+        $_POST['lang'] = 'EN';
+        putenv('REQUEST_METHOD=POST');
         $session = new Session(['name'=>'new']);
         $this->assertEquals(SessionStatus::INACTIVE,$session->getStatus());
         $this->assertEquals(0,$session->getStartedAt());
@@ -222,6 +224,7 @@ class SessionTest extends TestCase {
      */
     public function testToJsonTest00() {
         $_POST['lang'] = 'fr';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $s = new Session(['name'=>'session','duration'=>1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
@@ -260,6 +263,7 @@ class SessionTest extends TestCase {
      */
     public function testToJsonTest01() {
         $_POST['lang'] = 'fr';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $s = new Session(['name'=>'session','duration'=>1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');

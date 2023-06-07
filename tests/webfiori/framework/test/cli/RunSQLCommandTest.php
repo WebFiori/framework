@@ -3,8 +3,9 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
+use tables\Schema;
+use tables\Schema2;
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\ConfigController;
 use webfiori\framework\App;
 
 class RunSQLCommandTest extends TestCase {
@@ -12,6 +13,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function testQueryFromFile00() {
+        App::getConfig()->removeAllDBConnections();
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
@@ -36,7 +38,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -62,7 +64,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile02() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -88,7 +90,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile03() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -115,7 +117,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile04() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -145,7 +147,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile05() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -174,7 +176,7 @@ class RunSQLCommandTest extends TestCase {
     public function testCLIQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -212,7 +214,7 @@ class RunSQLCommandTest extends TestCase {
     public function testQueryFromFile06() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -238,7 +240,7 @@ class RunSQLCommandTest extends TestCase {
     public function testTableQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -288,7 +290,7 @@ class RunSQLCommandTest extends TestCase {
     public function testTableQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -331,7 +333,7 @@ class RunSQLCommandTest extends TestCase {
     public function testCLIQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
@@ -366,13 +368,13 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery00() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
-            '--schema' => \tables\Schema::class
+            '--schema' => Schema::class
         ]);
         $runner->setInputs([
             '0',
@@ -410,13 +412,13 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery01() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
-            '--schema' => \tables\Schema2::class,
+            '--schema' => Schema2::class,
             '--create'
         ]);
         $runner->setInputs([
@@ -448,13 +450,13 @@ class RunSQLCommandTest extends TestCase {
     public function testSchemaQuery03() {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
-        ConfigController::get()->addOrUpdateDBConnection($conn);
+        App::getConfig()->addOrUpdateDBConnection($conn);
         
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'run-query',
-            '--schema' => \tables\Schema2::class,
+            '--schema' => Schema2::class,
         ]);
         $runner->setInputs([
             '1',

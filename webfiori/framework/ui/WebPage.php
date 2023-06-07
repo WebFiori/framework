@@ -13,7 +13,6 @@ namespace webfiori\framework\ui;
 use Error;
 use Exception;
 use webfiori\collections\LinkedList;
-use webfiori\framework\ConfigController;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
@@ -274,7 +273,7 @@ class WebPage {
      */
     public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
     }
@@ -294,7 +293,7 @@ class WebPage {
      */
     public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getAppConfig()->getVersion();
+            $attrs['revision'] = App::getConfig()->getAppVersion();
         }
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }
@@ -781,20 +780,20 @@ class WebPage {
     public function reset() {
         $this->skipLangCheck = true;
         $this->document = new HTMLDoc();
-        $this->_checkLang();
+        $this->checkLang();
         $this->usingLanguage();
 
-        $appName = App::getAppConfig()->getWebsiteName($this->getLangCode());
+        $appName = App::getConfig()->getAppName($this->getLangCode());
         $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
 
-        $websiteDesc = App::getAppConfig()->getDescription($this->getLangCode());
+        $websiteDesc = App::getConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
 
-        $pageTitle = App::getAppConfig()->getDefaultTitle($this->getLangCode());
+        $pageTitle = App::getConfig()->getTitle($this->getLangCode());
         $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
 
 
-        $this->setTitleSep(App::getAppConfig()->getTitleSep());
+        $this->setTitleSep(App::getConfig()->getTitleSeparator());
 
         $langObj = $this->getTranslation();
 
@@ -807,7 +806,7 @@ class WebPage {
         $this->setWritingDir();
         $this->setCanonical(Request::getRequestedURI());
         $this->document->setLanguage($this->getLangCode());
-        $headNode = $this->_getHead();
+        $headNode = $this->getHead();
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
         $headerNode->setID(self::MAIN_ELEMENTS[1]);
@@ -826,7 +825,7 @@ class WebPage {
         $this->document->addChild($footerNode);
         $this->includeLables = false;
 
-        $this->_resetBeforeLoaded();
+        $this->resetBeforeLoaded();
         $this->skipLangCheck = false;
     }
     /**
@@ -1007,7 +1006,7 @@ class WebPage {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
             return;
         }
-        $xthemeName = $themeNameOrClass === null ? ConfigController::get()->getBaseTheme() : $themeNameOrClass;
+        $xthemeName = $themeNameOrClass === null ? App::getConfig()->getTheme() : $themeNameOrClass;
 
         if (strlen($xthemeName) === 0) {
             return;
@@ -1028,7 +1027,7 @@ class WebPage {
             }
 
             $this->document = new HTMLDoc();
-            $this->document->setHeadNode($this->_getHead());
+            $this->document->setHeadNode($this->getHead());
 
             $body = new HTMLNode();
             $body->setID(self::MAIN_ELEMENTS[0]);
@@ -1138,7 +1137,7 @@ class WebPage {
      * Sets the language of the page based on session language or 
      * request.
      */
-    private function _checkLang() {
+    private function checkLang() {
         try {
             $session = SessionsManager::getActiveSession();
         } catch (Exception $ex) {
@@ -1158,7 +1157,7 @@ class WebPage {
             $langCodeFromRequest = Request::getParam('lang');
 
             if ($langCodeFromRequest === null) {
-                $this->setLang(App::getAppConfig()->getPrimaryLanguage());
+                $this->setLang(App::getConfig()->getPrimaryLanguage());
 
                 return;
             }
@@ -1187,12 +1186,12 @@ class WebPage {
     }
 
 
-    private function _getHead() {
+    private function getHead() {
         $loadedTheme = $this->getTheme();
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
-            App::getAppConfig()->getBaseURL()
+            App::getConfig()->getBaseURL()
         );
 
         if ($loadedTheme !== null) {
@@ -1205,7 +1204,7 @@ class WebPage {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(App::getAppConfig()->getBaseURL());
+        $headNode->setBase(App::getConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {
@@ -1214,7 +1213,7 @@ class WebPage {
 
         return $headNode;
     }
-    private function _resetBeforeLoaded() {
+    private function resetBeforeLoaded() {
         $this->beforeRenderCallbacks = new LinkedList();
         $this->addBeforeRender(function (WebPage $page)
         {

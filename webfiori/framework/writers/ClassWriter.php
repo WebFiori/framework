@@ -403,7 +403,6 @@ abstract class ClassWriter {
         $this->writeClassDeclaration();
         $this->writeClassBody();
         $classFile->setRawData($this->classAsStr);
-        $classFile->create(true);
         $classFile->write(false, true);
     }
     public abstract function writeClassBody();

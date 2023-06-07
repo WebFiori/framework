@@ -165,7 +165,7 @@ class LanguageTest extends TestCase{
      * @test
      */
     public function testLoadTranslation04() {
-        
+        Language::reset();
         $lang = Language::loadTranslation('Ar');
         $this->assertTrue($lang instanceof Language);
         $this->assertEquals('AR',$lang->getCode());

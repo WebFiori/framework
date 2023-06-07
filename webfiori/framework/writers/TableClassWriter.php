@@ -70,7 +70,7 @@ class TableClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function __construct($tableObj = null) {
-        parent::__construct('NewTable', ROOT_PATH.DS.APP_DIR.DS.'database', APP_DIR.'\\database');
+        parent::__construct('NewTable', APP_PATH.'database', APP_DIR.'\\database');
         $this->setSuffix('Table');
 
         if ($tableObj === null) {

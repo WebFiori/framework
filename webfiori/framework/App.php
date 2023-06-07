@@ -444,7 +444,8 @@ class App {
         }
         /**
          * The absolute path to application directory.
-         *
+         * 
+         * @var string
          */
         define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
     }

@@ -389,6 +389,26 @@ class ClassDriver implements ConfigurationDriver {
 
         $this->writeAppConfigAddMethods($cFile);
 
+        
+        $this->writeFuncHeader($cFile, 
+            'public function initConstants()', 
+            'Initialize application environment constants.');
+        $this->a($cFile, "        \$this->globalConst = [");
+        foreach ($this->getEnvVars() as $varName => $varProbs) {
+            $this->a($cFile, "            '$varName' => [");
+            $this->a($cFile, "                'value' => ".$varProbs['value'].',');
+            $this->a($cFile, "                'description' => ".$varProbs['description'].',');
+            $this->a($cFile, "             ],");
+        }
+        $this->a($cFile, "        ];");
+        $this->a($cFile, $this->blockEnd, 1);
+        
+        $this->writeFuncHeader($cFile, 
+            'public function getConstants() : array ', 
+            'Returns an array that contains application environment constants.');
+        $this->a($cFile, "        return \$this->globalConst;");
+        $this->a($cFile, $this->blockEnd, 1);
+        
         $this->writeFuncHeader($cFile, 
             'public function getAccount(string $name)', 
             'Returns SMTP account given its name.', 
@@ -794,6 +814,14 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, " */");
         $this->a($cFile, "class AppConfig {");
 
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * An array that holds global constants of the application");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    private \$globalConst;");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * The date at which the application was released.");
@@ -941,6 +969,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "        \$this->initSiteInfo();");
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
+        $this->a($cFile, "        \$this->initConstants();");
 
 
         $this->writeSchedulerPass($cFile);
@@ -1226,9 +1255,7 @@ class ClassDriver implements ConfigurationDriver {
                     'version-type' => $cfg->getVersionType(),
                     'release-date' => $cfg->getReleaseDate()
                 ],
-                'env-vars' => [
-
-                ],
+                'env-vars' => $cfg->getConstants(),
                 'site' => [
                     'base-url' => $cfg->getBaseURL(),
                     'primary-lang' => $cfg->getPrimaryLanguage(),

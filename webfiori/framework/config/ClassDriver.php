@@ -422,7 +422,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "        \$this->globalConst = [");
         foreach ($this->getEnvVars() as $varName => $varProbs) {
             $valType = gettype($varProbs['value']);
-            if (!in_array($valType, ['string', 'integer', 'double'])) {
+            if (!in_array($valType, ['string', 'integer', 'double', 'boolean'])) {
                 continue;
             }
             $this->a($cFile, "            '$varName' => [");
@@ -838,7 +838,6 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
         $this->a($cFile, "use webfiori\\email\\SMTPAccount;");
-        $this->a($cFile, "use webfiori\\framework\\Config;");
         $this->a($cFile, "use webfiori\\http\\Uri;");
         $this->a($cFile, "/**");
         $this->a($cFile, " * Configuration class of the application");

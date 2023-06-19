@@ -47,7 +47,7 @@ class ClassDriver implements ConfigurationDriver {
             ],
             'env-vars' => [
                 'WF_VERBOSE' => [
-                    'value' => true,
+                    'value' => false,
                     'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
                 ]
             ],

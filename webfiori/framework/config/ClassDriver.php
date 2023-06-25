@@ -1280,8 +1280,8 @@ class ClassDriver implements ConfigurationDriver {
         if (!class_exists($cfgNs)) {
             $this->writeAppConfig();
         } else {
+            //$cfg is of type [APP_DIR]\config\AppConfig
             $cfg = new $cfgNs();
-            $cfg instanceof \app\config\AppConfig;
             $this->configVars = [
                 'smtp-connections' => $cfg->getAccounts(),
                 'database-connections' => $cfg->getDBConnections(),

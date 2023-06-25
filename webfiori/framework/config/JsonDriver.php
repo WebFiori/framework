@@ -19,6 +19,11 @@ use webfiori\json\Json;
  * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
+    /**
+     * The location at which the configuration file will be kept at.
+     * 
+     * @var string The file will be stored at [APP_PATH]/config/app-config.json';
+     */
     const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.json';
     private $json;
     /**
@@ -50,9 +55,13 @@ class JsonDriver implements ConfigurationDriver {
                 'release-date' => date('Y-m-d')
             ]),
             'env-vars' => new Json([
+                'WF_VERBOSE' => new Json([
+                    'value' => false,
+                    'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
+                ]),
                 "CLI_HTTP_HOST" => new Json([
                     "value" => "example.com",
-                    "description" => ""
+                    "description" => "Host name that will be used when runing the application as command line utility."
                 ])
             ]), 
             'smtp-connections' => new Json(),
@@ -60,6 +69,20 @@ class JsonDriver implements ConfigurationDriver {
         ]);
         $this->json->setIsFormatted(true);
     }
+    /**
+     * Adds application environment variable to the configuration.
+     * 
+     * The variables which are added using this method will be defined as
+     * a named constant at run time using the function 'define'. This means
+     * the constant will be accesaable anywhere within the appllication's environment.
+     * 
+     * @param string $name The name of the named constant such as 'MY_CONSTANT'.
+     * 
+     * @param mixed $value The value of the constant.
+     * 
+     * @param string $description An optional description to describe the porpuse
+     * of the constant.
+     */
     public function addEnvVar(string $name, $value, string $description = null) {
         $this->json->get('env-vars')->add($name, new Json([
             'value' => $value,
@@ -96,7 +119,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getAppName(string $langCode) {
-        return $this->json->get('app-names')->get($langCode);
+        return $this->json->get('app-names')->get(strtoupper(trim($langCode)));
     }
 
     public function getAppReleaseDate() : string {
@@ -147,7 +170,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getDescription(string $langCode) {
-        return $this->json->get('app-descriptions')->get($langCode);
+        return $this->json->get('app-descriptions')->get(strtoupper(trim($langCode)));
     }
 
     public function getEnvVars(): array {
@@ -156,7 +179,7 @@ class JsonDriver implements ConfigurationDriver {
         foreach ($vars->getPropsNames() as $name) {
             $retVal[$name] = [
                 'value' => $this->json->get('env-vars')->get($name)->get('value'),
-                'description' => $this->json->get('env-vars')->get($name)->get('value')
+                'description' => $this->json->get('env-vars')->get($name)->get('description')
             ];
         }
         return $retVal;
@@ -259,10 +282,21 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->add('smtp-connections', new Json());
         $this->writeJson();
     }
-
+    private function isValidLangCode($langCode) {
+        $code = strtoupper(trim($langCode));
+        if (strlen($code) != 2) {
+            return false;
+        }
+        return $code;
+    }
     public function setAppName(string $name, string $langCode) {
+        $code = $this->isValidLangCode($langCode);
+        
+        if ($code === false) {
+            return;
+        }
         $appNamesJson = $this->json->get('app-names');
-        $appNamesJson->add($langCode, $name);
+        $appNamesJson->add($code, $name);
         $this->writeJson();
     }
 
@@ -281,8 +315,13 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setDescription(string $description, string $langCode) {
+        $code = $this->isValidLangCode($langCode);
+        
+        if ($code === false) {
+            return;
+        }
         $appNamesJson = $this->json->get('app-descriptions');
-        $appNamesJson->add($langCode, $description);
+        $appNamesJson->add($code, $description);
         $this->writeJson();
     }
 
@@ -292,7 +331,12 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setPrimaryLanguage(string $langCode) {
-        $this->json->add('primary-lang', $langCode);
+        $code = $this->isValidLangCode($langCode);
+        
+        if ($code === false) {
+            return;
+        }
+        $this->json->add('primary-lang', $code);
         $this->writeJson();
     }
 
@@ -339,8 +383,13 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setTitle(string $title, string $langCode) {
+        $code = $this->isValidLangCode($langCode);
+        
+        if ($code === false) {
+            return;
+        }
         $appNamesJson = $this->json->get('titles');
-        $appNamesJson->add($langCode, $title);
+        $appNamesJson->add($code, $title);
         $this->writeJson();
     }
 

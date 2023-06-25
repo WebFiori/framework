@@ -46,7 +46,10 @@ class ClassDriver implements ConfigurationDriver {
                 'release-date' => '2021-01-10'
             ],
             'env-vars' => [
-                
+                'WF_VERBOSE' => [
+                    'value' => false,
+                    'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
+                ]
             ],
             'site' => [
                 'base-url' => Uri::getBaseURL(),
@@ -249,11 +252,21 @@ class ClassDriver implements ConfigurationDriver {
             return $this->getDescriptions()[$langCode];
         }
     }
-
+    /**
+     * Returns an associative array of application constants.
+     * 
+     * @return array The indices of the array are names of the constants and
+     * values are sub-associative arrays. Each sub-array will have two indices,
+     * 'value' and 'description'.
+     */
     public function getEnvVars(): array {
         return $this->configVars['env-vars'];
     }
-
+    /**
+     * Returns a string that represents the URL of home page of the application.
+     * 
+     * @return string
+     */
     public function getHomePage() : string {
         return $this->configVars['site']['home-page'];
     }
@@ -366,7 +379,20 @@ class ClassDriver implements ConfigurationDriver {
         $this->configVars['site']['title-sep'] = $separator;
         $this->writeAppConfig();
     }
-
+    /**
+     * Adds application environment variable to the configuration.
+     * 
+     * The variables which are added using this method will be defined as
+     * a named constant at run time using the function 'define'. This means
+     * the constant will be accesaable anywhere within the appllication's environment.
+     * 
+     * @param string $name The name of the named constant such as 'MY_CONSTANT'.
+     * 
+     * @param mixed $value The value of the constant.
+     * 
+     * @param string $description An optional description to describe the porpuse
+     * of the constant.
+     */
     public function addEnvVar(string $name, $value, string $description = null) {
         $this->configVars['env-vars'][$name] = [
             'value' => $value,
@@ -389,6 +415,37 @@ class ClassDriver implements ConfigurationDriver {
 
         $this->writeAppConfigAddMethods($cFile);
 
+        
+        $this->writeFuncHeader($cFile, 
+            'public function initConstants()', 
+            'Initialize application environment constants.');
+        $this->a($cFile, "        \$this->globalConst = [");
+        foreach ($this->getEnvVars() as $varName => $varProbs) {
+            $valType = gettype($varProbs['value']);
+            if (!in_array($valType, ['string', 'integer', 'double', 'boolean'])) {
+                continue;
+            }
+            $this->a($cFile, "            '$varName' => [");
+            $valType = gettype($varProbs['value']);
+            if ($valType == 'boolean') {
+                $this->a($cFile, "                'value' => ".($varProbs['value'] === true ? 'true' : 'false').',');
+            } else if ($valType == 'integer' || $valType == 'double') {
+                $this->a($cFile, "                'value' => ".$varProbs['value'].',');
+            } else if ($valType == 'string') {
+                $this->a($cFile, "                'value' => ".$varProbs['value'].',');
+            }
+            $this->a($cFile, "                'description' => '".$varProbs['description']."',");
+            $this->a($cFile, "             ],");
+        }
+        $this->a($cFile, "        ];");
+        $this->a($cFile, $this->blockEnd, 1);
+        
+        $this->writeFuncHeader($cFile, 
+            'public function getConstants() : array ', 
+            'Returns an array that contains application environment constants.');
+        $this->a($cFile, "        return \$this->globalConst;");
+        $this->a($cFile, $this->blockEnd, 1);
+        
         $this->writeFuncHeader($cFile, 
             'public function getAccount(string $name)', 
             'Returns SMTP account given its name.', 
@@ -781,7 +838,6 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
         $this->a($cFile, "use webfiori\\email\\SMTPAccount;");
-        $this->a($cFile, "use webfiori\\framework\\Config;");
         $this->a($cFile, "use webfiori\\http\\Uri;");
         $this->a($cFile, "/**");
         $this->a($cFile, " * Configuration class of the application");
@@ -794,6 +850,14 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, " */");
         $this->a($cFile, "class AppConfig {");
 
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * An array that holds global constants of the application");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    private \$globalConst;");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * The date at which the application was released.");
@@ -941,6 +1005,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->a($cFile, "        \$this->initSiteInfo();");
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
+        $this->a($cFile, "        \$this->initConstants();");
 
 
         $this->writeSchedulerPass($cFile);
@@ -1215,8 +1280,8 @@ class ClassDriver implements ConfigurationDriver {
         if (!class_exists($cfgNs)) {
             $this->writeAppConfig();
         } else {
+            //$cfg is of type [APP_DIR]\config\AppConfig
             $cfg = new $cfgNs();
-            $cfg instanceof \app\config\AppConfig;
             $this->configVars = [
                 'smtp-connections' => $cfg->getAccounts(),
                 'database-connections' => $cfg->getDBConnections(),
@@ -1226,9 +1291,7 @@ class ClassDriver implements ConfigurationDriver {
                     'version-type' => $cfg->getVersionType(),
                     'release-date' => $cfg->getReleaseDate()
                 ],
-                'env-vars' => [
-
-                ],
+                'env-vars' => $cfg->getConstants(),
                 'site' => [
                     'base-url' => $cfg->getBaseURL(),
                     'primary-lang' => $cfg->getPrimaryLanguage(),

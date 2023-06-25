@@ -46,6 +46,40 @@ class Controller {
         $driver->initialize();
     }
     /**
+     * Creates a copy of current configuration driver to another one.
+     * 
+     * @param ConfigurationDriver $new An instance of the driver at which the
+     * active configuration will be copied to. Note that if the driver is
+     * same as active one, nothing will be copied.
+     */
+    public function copy(ConfigurationDriver $new) {
+        $current = $this->getDriver();
+        if (get_class($current) == get_class($new)) {
+            return;
+        }
+        foreach ($current->getDBConnections() as $connObj) {
+            $new->addOrUpdateDBConnection($connObj);
+        }
+        foreach ($current->getSMTPConnections() as $connObj) {
+            $new->addOrUpdateSMTPAccount($connObj);
+        }
+        foreach ($current->getAppNames() as $langCode => $name) {
+            $new->setAppName($name, $langCode);
+        }
+        foreach ($current->getDescriptions() as $langCode => $desc) {
+            $new->setDescription($desc, $langCode);
+        }
+        foreach ($current->getEnvVars() as $name => $probs) {
+            $new->addEnvVar($name, $probs['value'], $probs['description']);
+        }
+        $new->setPrimaryLanguage($current->getPrimaryLanguage());
+        $new->setTheme($current->getTheme());
+        $new->setSchedulerPassword($current->getSchedulerPassword());
+        $new->setHomePage($current->getHomePage());
+        $new->setTitleSeparator($current->getTitleSeparator());
+        $new->initialize(true);
+    }
+    /**
      * Reads application environment variables and updates the class which holds
      * application environment variables.
      * 

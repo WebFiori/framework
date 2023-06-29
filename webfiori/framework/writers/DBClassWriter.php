@@ -290,8 +290,8 @@ class DBClassWriter extends ClassWriter {
         foreach ($cols as $key) {
             $colObj = $t->getColByKey($key);
             $this->paramsArr[$colObj->getNormalName()] = $colObj->getPHPType();
-            $this->whereArr[] = count($this->whereArr) == 0 ? "->where('$key', '=', $".$colObj->getNormalName().")"
-                    : "->andWhere('$key', '=', $".$colObj->getNormalName().")";
+            $this->whereArr[] = count($this->whereArr) == 0 ? "->where('$key', $".$colObj->getNormalName().")"
+                    : "->andWhere('$key', $".$colObj->getNormalName().")";
         }
     }
 
@@ -399,8 +399,8 @@ class DBClassWriter extends ClassWriter {
 
             foreach ($this->getUniqueColsKeys() as $key) {
                 $cols[] = count($cols) == 0 ? 
-                        "->where('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())' 
-                        : "->andWhere('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())';
+                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())' 
+                        : "->andWhere('$key', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
             $this->append($cols, 4);
             $this->append("->execute();", 4);
@@ -439,8 +439,8 @@ class DBClassWriter extends ClassWriter {
         $this->append("->map(function (array \$record) {", 4);
         $this->append("return ".$this->getEntityName().'::map($record);', 5);
         $this->append("});", 4);
-        $this->append('if (count($mappedRecords) == 1) {', 2);
-        $this->append('return $mappedRecords[0];', 3);
+        $this->append('if ($mappedRecords->getRowsCount() == 1) {', 2);
+        $this->append('return $mappedRecords->getRows()[0];', 3);
         $this->append('}', 2);
         $this->append('}', 1);
     }
@@ -523,8 +523,8 @@ class DBClassWriter extends ClassWriter {
 
             foreach ($uniqueCols as $key) {
                 $whereCols[] = count($whereCols) == 0 ? 
-                        "->where('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())' 
-                        : "->andWhere('$key', '=', \$entity->".EntityMapper::mapToMethodName($key).'())';
+                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())' 
+                        : "->andWhere('$key', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
 
             foreach ($keys as $key) {

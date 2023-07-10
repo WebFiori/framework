@@ -506,7 +506,7 @@ class RouterUri extends Uri {
     }
     private function buildSitemapNode($uri): HTMLNode {
         $node = new HTMLNode('url');
-        $node->addChild('loc')->text($uri);
+        $node->addChild('loc')->text($uri, false);
 
         foreach ($this->getLanguages() as $langCode) {
             $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$uri.'?lang='.$langCode.'"/>', false);

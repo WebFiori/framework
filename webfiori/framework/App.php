@@ -565,7 +565,7 @@ class App {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC8');
+        define('WF_VERSION', '3.0.0-RC9');
         /**
          * A constant that tells the type of framework version.
          * 

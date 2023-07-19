@@ -24,7 +24,7 @@ class HTTPCodeView extends WebPage {
      */
     public function __construct($errCode) {
         parent::__construct();
-        $this->setTheme(App::getConfig()->getBaseThemeName());
+        $this->setTheme(App::getConfig()->getTheme());
 
         $this->setTitle($this->get("general/http-codes/$errCode/code").' - '.$this->get("general/http-codes/$errCode/type"));
         http_response_code(intval($this->get("general/http-codes/$errCode/code")));

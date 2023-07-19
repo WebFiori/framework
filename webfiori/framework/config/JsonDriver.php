@@ -68,7 +68,7 @@ class JsonDriver implements ConfigurationDriver {
             'database-connections' => new Json(),
         ]);
         $this->json->setIsFormatted(true);
-        $this->json->setPropsStyle('snake');
+        $this->json->setPropsStyle('none');
     }
     /**
      * Adds application environment variable to the configuration.

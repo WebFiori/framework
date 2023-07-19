@@ -1269,7 +1269,16 @@ class ClassDriver implements ConfigurationDriver {
         $this->configVars['site']['titles'][$langCode] = $title;
         $this->writeAppConfig();
     }
-
+    /**
+     * Initialize configuration driver.
+     * 
+     * This method should be used to create application configuration and
+     * pubulate it with default values if needed.
+     * 
+     * @param bool $reCreate If the configuration is exist and this one is set
+     * to true, the method should remove existing configuration and re-create it
+     * using default values.
+     */
     public function initialize(bool $reCreate = false) {
         $cfgNs = self::CONFIG_NS;
         if ($reCreate) {

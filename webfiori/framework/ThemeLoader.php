@@ -152,7 +152,7 @@ class ThemeLoader {
      * Loads a theme given its name or class name.
      *
      * If the given name is null or empty string, the method will load the default theme as
-     * specified by the method AppConfig::getBaseThemeName().
+     * which is set by application configuration.
      *
      * @param string|null $themeName The name of the theme. This also can be the name of
      * theme class including its namespace (e.g. Theme::class).

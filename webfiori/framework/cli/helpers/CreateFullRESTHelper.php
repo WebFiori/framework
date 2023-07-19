@@ -192,11 +192,9 @@ class CreateFullRESTHelper extends CreateClassHelper {
     }
     private function IncludeAPISetProps(WebServiceWriter $w, $type) {
         $t = $this->getTable();
-        $w->addProcessCode('$entity = new '.$t->getEntityMapper()->getEntityName().'();');
+        $w->addProcessCode('$entity = $this->getObject('.$t->getEntityMapper()->getEntityName().'::class);');
 
-        foreach ($t->getColsKeys() as $paramName) {
-            $w->addProcessCode('$entity->'.EntityMapper::mapToMethodName($paramName, 's').'($this->getParamVal(\''.$paramName.'\'));');
-        }
+        
         $dbClassName = $this->dbObjWriter->getName();
         $entityName = $this->dbObjWriter->getEntityName();
         $w->addProcessCode("");

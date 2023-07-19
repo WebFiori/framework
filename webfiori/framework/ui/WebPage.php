@@ -988,8 +988,8 @@ class WebPage {
      * 
      * @param string $themeNameOrClass The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is 'null', the 
-     * method will load the default theme as specified by the method 
-     * 'AppConfig::getBaseThemeName()'. Note that once the theme is updated, 
+     * method will load the default theme as specified by application configuration. 
+     * Note that once the theme is updated, 
      * the document content of the page will reset if it was set before calling this 
      * method. This also can be the value which can be taken from 'ClassName::class'. 
      * 

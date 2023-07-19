@@ -68,6 +68,7 @@ class JsonDriver implements ConfigurationDriver {
             'database-connections' => new Json(),
         ]);
         $this->json->setIsFormatted(true);
+        $this->json->setPropsStyle('none');
     }
     /**
      * Adds application environment variable to the configuration.
@@ -313,7 +314,15 @@ class JsonDriver implements ConfigurationDriver {
     public function setBaseURL(string $url) {
         
     }
-
+    /**
+     * Sets or update default description of the application that will be used
+     * by web pages.
+     * 
+     * @param string $description The default description.
+     * 
+     * @param string $langCode The code of the language at which the description
+     * will be updated for.
+     */
     public function setDescription(string $description, string $langCode) {
         $code = $this->isValidLangCode($langCode);
         
@@ -324,12 +333,27 @@ class JsonDriver implements ConfigurationDriver {
         $appNamesJson->add($code, $description);
         $this->writeJson();
     }
-
+    /**
+     * Sets the home page of the application.
+     * 
+     * 
+     * @param string $url The URL of the home page of the website. For example,
+     * This page is served when the user visits the domain without specifying a path.
+     */
     public function setHomePage(string $url) {
         $this->json->add('home-page', $url);
         $this->writeJson();
     }
-
+    /**
+     * Update application version information.
+     *
+     * @param string $vNum Version number such as 1.0.0.
+     *
+     * @param string $vType Version type such as 'Beta', 'Alpha' or 'RC'.
+     *
+     * @param string $releaseDate The date at which the version was released on.
+     *
+     */
     public function setPrimaryLanguage(string $langCode) {
         $code = $this->isValidLangCode($langCode);
         
@@ -339,22 +363,47 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->add('primary-lang', $code);
         $this->writeJson();
     }
-
+    /**
+     * Updates the password which is used to protect tasks from unauthorized
+     * execution.
+     *
+     * @param string $newPass The new password. Note that provided value
+     * must be hashed using SHA256 algorithm.
+     *
+     */
     public function setSchedulerPassword(string $newPass) {
         $this->json->add('scheduler-password', $newPass);
         $this->writeJson();
     }
-
+    /**
+     * Sets the default theme which will be used to style web pages.
+     * 
+     * @param string $theme The name of the theme that will be used to style
+     * website UI. This can also be class name of the theme.
+     */
     public function setTheme(string $theme) {
         $this->json->add('theme', $theme);
         $this->writeJson();
     }
-
+    /**
+     * Sets the string which is used to separate application name from page name.
+     * 
+     * @param string $separator A character or a string that is used
+     * to separate application name from web page title. Two common
+     * values are '-' and '|'.
+     */
     public function setTitleSeparator(string $separator) {
         $this->json->add('name-separator', $separator);
         $this->writeJson();
     }
-
+    /**
+     * Returns an array that holds different names for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the name.
+     * 
+     */
     public function getAppNames(): array {
         $appNamesJson = $this->json->get('app-names');
         $retVal = [];
@@ -363,7 +412,13 @@ class JsonDriver implements ConfigurationDriver {
         }
         return $retVal;
     }
-
+    /**
+     * Returns an array that holds different descriptions for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the description.
+     */
     public function getDescriptions(): array {
         $descriptions = $this->json->get('app-descriptions');
         $retVal = [];
@@ -372,7 +427,14 @@ class JsonDriver implements ConfigurationDriver {
         }
         return $retVal;
     }
-
+    /**
+     * Returns an array that holds different page titles for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the title.
+     * 
+     */
     public function getTitles(): array {
         $titles = $this->json->get('titles');
         $retVal = [];
@@ -381,7 +443,14 @@ class JsonDriver implements ConfigurationDriver {
         }
         return $retVal;
     }
-
+    /**
+     * Sets or updates default web page title for a specific display language.
+     * 
+     * @param string $title The title that will be set.
+     * 
+     * @param string $langCode The display language at which the title will be
+     * set or updated for.
+     */
     public function setTitle(string $title, string $langCode) {
         $code = $this->isValidLangCode($langCode);
         

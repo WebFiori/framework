@@ -39,7 +39,7 @@ class BaseTasksPage extends WebPage {
         $this->setTitle($title);
         $this->setDescription($description);
         $defaultSiteLang = App::getConfig()->getPrimaryLanguage();
-        $siteNames = App::getConfig()->getWebsiteNames();
+        $siteNames = App::getConfig()->getAppNames();
         $siteName = $siteNames[$defaultSiteLang] ?? null;
 
         if ($siteName !== null) {

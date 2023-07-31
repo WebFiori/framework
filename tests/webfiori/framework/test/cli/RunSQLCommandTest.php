@@ -478,7 +478,7 @@ class RunSQLCommandTest extends TestCase {
             "3: Add Column.\n",
             "4: Modify Column.\n",
             "5: Drop Column.\n",
-            "The following query will be executed on the database 'testing_db'\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "drop table `users`;\n"
             . "create table if not exists `users` (\n"
             . "    `id` int not null unique,\n"

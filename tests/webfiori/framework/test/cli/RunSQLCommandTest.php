@@ -107,7 +107,7 @@ class RunSQLCommandTest extends TestCase {
         
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
     }
@@ -134,10 +134,10 @@ class RunSQLCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         
         $this->assertEquals([
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "use testing_db;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
     }
@@ -164,7 +164,7 @@ class RunSQLCommandTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         
         $this->assertEquals([
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "use testing_db;\n",
             "Continue?(Y/n)\n",
             "Info: Nothing to execute.\n",
@@ -201,10 +201,10 @@ class RunSQLCommandTest extends TestCase {
             "1: Run query on table instance.\n",
             "2: Run query from file.\n",
             "Please type in SQL query:\n",
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "select * from hello;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Error: 1146 - Table 'testing_db.hello' doesn't exist\n"
         ], $runner->getOutput());
     }
@@ -272,14 +272,14 @@ class RunSQLCommandTest extends TestCase {
             "3: Add Column.\n",
             "4: Modify Column.\n",
             "5: Drop Column.\n",
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "create table if not exists `test` (\n".
             "    `id` int not null\n".
             ")\n".
             "engine = InnoDB\n".
             "default charset = utf8mb4\n".
             "collate = utf8mb4_unicode_520_ci;\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
     }
@@ -321,7 +321,7 @@ class RunSQLCommandTest extends TestCase {
             "3: Add Column.\n",
             "4: Modify Column.\n",
             "5: Drop Column.\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
         
@@ -355,10 +355,10 @@ class RunSQLCommandTest extends TestCase {
             "1: Run query on table instance.\n",
             "2: Run query from file.\n",
             "Please type in SQL query:\n",
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "drop table test2_x;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
         ], $runner->getOutput());
     }
@@ -388,7 +388,7 @@ class RunSQLCommandTest extends TestCase {
             "Select an option:\n",
             "0: Create Database.\n",
             "1: Run Query on Specific Table.\n",
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "create table if not exists `users` (\n"
             . "    `id` int not null,\n"
             . "    `email` varchar(128) not null collate utf8mb4_unicode_520_ci,\n"
@@ -401,7 +401,7 @@ class RunSQLCommandTest extends TestCase {
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $code);
@@ -426,7 +426,7 @@ class RunSQLCommandTest extends TestCase {
         ]);
         $code = $runner->start();
         $this->assertEquals([
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db':\n",
             "create table if not exists `users` (\n"
             . "    `id` int not null unique,\n"
             . "    `name` varchar(128) not null unique collate utf8mb4_unicode_520_ci,\n"
@@ -439,7 +439,7 @@ class RunSQLCommandTest extends TestCase {
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $code);
@@ -478,7 +478,7 @@ class RunSQLCommandTest extends TestCase {
             "3: Add Column.\n",
             "4: Modify Column.\n",
             "5: Drop Column.\n",
-            "The following query will be executed on the database:\n",
+            "The following query will be executed on the database 'testing_db'\n",
             "drop table `users`;\n"
             . "create table if not exists `users` (\n"
             . "    `id` int not null unique,\n"
@@ -492,7 +492,7 @@ class RunSQLCommandTest extends TestCase {
             . "default charset = utf8mb4\n"
             . "collate = utf8mb4_unicode_520_ci;\n",
             "Continue?(Y/n)\n",
-            "Info: Executing the query...\n",
+            "Info: Executing query on database testing_db...\n",
             "Success: Query executed without errors.\n"
         ], $runner->getOutput());
         $this->assertEquals(0, $code);

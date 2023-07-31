@@ -12,6 +12,7 @@ namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
 use webfiori\cli\CommandArgument;
+use webfiori\database\Database;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
 use webfiori\file\File;
@@ -130,11 +131,12 @@ class RunSQLQueryCommand extends CLICommand {
             $schema->table($tableObj->getNormalName())->dropCol($selectedCol);
         }
     }
-    private function confirmExecute($schema) {
+    private function confirmExecute(Database $schema) {
         $noConfirmExec = $this->isArgProvided('--no-confirm');
-
+        $dbName = $schema->getConnectionInfo()->getDBName();
+        
         if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
-            $this->println('The following query will be executed on the database:');
+            $this->println("The following query will be executed on the database '$dbName':");
             $this->println($schema->getLastQuery(), [
                 'color' => 'blue'
             ]);
@@ -153,7 +155,7 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     private function executeQ(DB $schema) {
-        $this->info('Executing the query...');
+        $this->info('Executing query on database '.$schema->getConnectionInfo()->getDBName().'...');
         try {
             $schema->execute();
             $this->success('Query executed without errors.');

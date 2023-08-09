@@ -47,10 +47,13 @@ define('MICRO_START', microtime(true));
 class App {
     /**
      * Sets the class that will be used as configuration driver.
+     *
+     * This method must be used before calling the method 'App::start()' in order
+     * to set proper configuration driver.
      * 
      * @param string $clazz The full name of the class including namespace.
      */
-    public function setConfigDriver(string $clazz) {
+    public staticfunction setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
     }
     /**

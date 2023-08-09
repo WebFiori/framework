@@ -53,7 +53,7 @@ class App {
      * 
      * @param string $clazz The full name of the class including namespace.
      */
-    public staticfunction setConfigDriver(string $clazz) {
+    public static function setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
     }
     /**

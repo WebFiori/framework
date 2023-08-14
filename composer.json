@@ -29,7 +29,17 @@
         "webfiori/mailer":"v1.0.6"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpbench/phpbench": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "webfiori\\framework\\": "webfiori/framework/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "webfiori\\tests\\": "tests/"
+        }
     },
     "keywords": [
         "framework",

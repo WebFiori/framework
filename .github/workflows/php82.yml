@@ -35,7 +35,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:9.5.20, composer
+          tools: phpunit:9.5.20, composer, phpbench/phpbench
           
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop
@@ -66,3 +66,6 @@ jobs:
         
       - name: CodeCov
         uses: codecov/codecov-action@v1
+      
+      - name: Bench Marking
+        run: phpbench run tests/webfiori/benchmark --report=default

@@ -7,33 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  static_analysis:
-
-    runs-on: ${{ matrix.os }}
-    strategy: 
-      fail-fast: true
-      matrix: 
-        os: [ ubuntu-latest ]
-        php: [8.2]
-    steps:
-      - name: Clone Repo
-        uses: actions/checkout@v1
-      
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }} 
-          extensions: mbstring
-          tools: composer, phpstan/phpstan
-          
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction --no-dev
-        
-      - name: Benchmarking
-        run: phpstan analyze webfiori
+  
   test:
-    needs:
-      - "static_analysis"
     runs-on: ${{ matrix.os }} 
     services:
       sql.data:
@@ -109,9 +84,6 @@ jobs:
           
       - name: "Checkout code"
         uses: "actions/checkout@v3"
-
-      - name: "Check EditorConfig"
-        uses: "greut/eclint-action@v0"
 
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

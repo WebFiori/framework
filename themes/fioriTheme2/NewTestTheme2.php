@@ -66,4 +66,3 @@ class NewTestTheme2 extends Theme {
     }
 }
 
-return __NAMESPACE__;

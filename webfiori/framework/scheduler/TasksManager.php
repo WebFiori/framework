@@ -348,7 +348,7 @@ class TasksManager {
      * the day.
      * @since 1.0.2
      */
-    public static function hour() : int {
+    public static function getHour() : int {
         return self::get()->timestamp['hour'];
     }
     /**
@@ -421,7 +421,7 @@ class TasksManager {
      *
      * @since 1.0.2
      */
-    public static function minute() : int {
+    public static function getMinute() : int {
         return self::get()->timestamp['minute'];
     }
     /**
@@ -434,7 +434,7 @@ class TasksManager {
      * @return int An integer that represents current month's number.
      * @since 1.0.2
      */
-    public static function month() : int {
+    public static function getMonth() : int {
         return self::get()->timestamp['month'];
     }
     /**
@@ -480,26 +480,31 @@ class TasksManager {
         return false;
     }
     /**
-     * Sets or gets the password that is used to protect tasks execution.
+     * Gets the password that is used to protect tasks execution.
      *
      * The password is used to prevent unauthorized access to execute tasks.
      * The provided password must be 'sha256' hashed string. It is recommended
      * to hash the password externally then use the hash inside your code.
      *
-     * @param string|null $pass If not null, the password will be updated to the
-     * given one.
-     *
      * @return string If the password is set, the method will return it.
      * If not set, the method will return the string 'NO_PASSWORD'.
      *
-     * @since 1.0
      */
-    public static function password(string $pass = null) : string {
-        if ($pass !== null) {
-            self::get()->setPasswordHelper($pass);
-        }
-
+    public static function getPassword() : string {
+        
         return self::get()->getPasswordHelper();
+    }
+    /**
+     * Sets the password that is used to protect tasks execution.
+     * 
+     * The password is used to prevent unauthorized access to execute tasks.
+     * The provided password must be 'sha256' hashed string. It is recommended
+     * to hash the password externally then use the hash inside your code.
+     * 
+     * @param string $pass The password that will be used.
+     */
+    public static function setPassword(string $pass) {
+        self::get()->setPasswordHelper($pass);
     }
     /**
      * Register any task which exist in the folder 'tasks' of the application.
@@ -568,7 +573,7 @@ class TasksManager {
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-is-logged-in') : false;
-        $schedulerPass = TasksManager::password();
+        $schedulerPass = TasksManager::getPassword();
 
         if ($schedulerPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $schedulerPass) {
             self::log('Error: Given password is incorrect.');
@@ -734,8 +739,8 @@ class TasksManager {
      *
      * @since 1.0.7
      */
-    public static function timestamp() : string {
-        $month = self::month();
+    public static function getTimestamp() : string {
+        $month = self::getMonth();
 
         if ($month < 10) {
             $month = '0'.$month;
@@ -745,12 +750,12 @@ class TasksManager {
         if ($day < 10) {
             $day = '0'.$day;
         }
-        $hour = self::hour();
+        $hour = self::getHour();
 
         if ($hour < 10) {
             $hour = '0'.$hour;
         }
-        $minute = self::minute();
+        $minute = self::getMinute();
 
         if ($minute < 10) {
             $minute = '0'.$minute;

@@ -240,4 +240,3 @@ class NewFTestTheme extends Theme {
     }
 }
 
-return __NAMESPACE__;

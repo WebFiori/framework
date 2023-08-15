@@ -118,7 +118,7 @@ class TaskStatusEmail extends EmailMessage {
         $taskTable->setAttribute('border', 1);
         $taskTable->addChild($this->createTableRow('Task Name:', $task->getTaskName()));
         $taskTable->addChild($this->createTableRow('Expression:', $task->getExpression()));
-        $taskTable->addChild($this->createTableRow('Check Started:', TasksManager::timestamp()));
+        $taskTable->addChild($this->createTableRow('Check Started:', TasksManager::getTimestamp()));
         $taskTable->addChild($this->createTableRow('Run Time:', date('Y-m-d H:i:s')));
         $taskTable->addChild($this->createTableRow('PHP Version:', PHP_VERSION));
         $taskTable->addChild($this->createTableRow('Framework Version:', WF_VERSION));

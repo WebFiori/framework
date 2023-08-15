@@ -53,11 +53,11 @@ class ListTasksPage extends BaseTasksPage {
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
                 ])
-                ->addChild('v-text-field', [
-                    'label' => 'Search for a specific task...',
-                    'v-model' => 'search',
-                    'dense', 'outlined'
-                ]);
+            ->addChild('v-text-field', [
+                'label' => 'Search for a specific task...',
+                'v-model' => 'search',
+                'dense', 'outlined'
+            ]);
 
         $row = $this->insert('v-row');
 

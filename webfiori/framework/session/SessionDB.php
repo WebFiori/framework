@@ -72,9 +72,9 @@ class SessionDB extends DB {
      */
     public function getChunksCount(string $sId): int {
         $resultSet = $this->table('session_data')
-                ->selectCount()
-                ->where('s-id', $sId)
-                ->execute();
+            ->selectCount()
+            ->where('s-id', $sId)
+            ->execute();
         $row = $resultSet->getRows()[0];
 
         if ($row['count'] !== null) {
@@ -97,7 +97,7 @@ class SessionDB extends DB {
      */
     public function getSession(string $sId) {
         $this->table('session_data')->select()->where('s-id', $sId)
-                ->orderBy(['chunk-number' => 'a'])->execute();
+            ->orderBy(['chunk-number' => 'a'])->execute();
         $resultSet = $this->getLastResultSet();
 
         if ($resultSet->getRowsCount() != 0) {
@@ -126,10 +126,10 @@ class SessionDB extends DB {
      */
     public function getSessionsIDs(string $olderThan): array {
         return $this->table('sessions')->select()->where('last-used', $olderThan, '<=')->execute()
-                ->map(function ($record)
-                {
-                    return $record['s_id'];
-                })->toArray();
+            ->map(function ($record)
+            {
+                return $record['s_id'];
+            })->toArray();
     }
 
     /**
@@ -178,7 +178,7 @@ class SessionDB extends DB {
             $this->table('sessions')->update([
                 'last-used' => date('Y-m-d H:i:s')
             ])->where('s-id', $sId)
-              ->execute();
+                ->execute();
         } else {
             $this->table('sessions')->insert([
                 's-id' => $sId,
@@ -228,9 +228,9 @@ class SessionDB extends DB {
     private function removeExtraChunks(string $sId, int $chunksCount, int $startNumber) {
         for ($x = 0 ; $x < $chunksCount ; $x++) {
             $this->table('session_data')
-                    ->delete()->where('s-id', $sId)
-                    ->andWhere('chunk-number', $startNumber)
-                    ->execute();
+                ->delete()->where('s-id', $sId)
+                ->andWhere('chunk-number', $startNumber)
+                ->execute();
             $startNumber++;
         }
     }
@@ -252,10 +252,10 @@ class SessionDB extends DB {
             } catch (DatabaseException $ex) {
                 $this->clear();
                 $this->table('session_data')
-                        ->update([
-                            'data' => $chunks[$x]
-                        ])->where('s-id', $sId)
-                        ->andWhere('chunk-number', $x);
+                    ->update([
+                        'data' => $chunks[$x]
+                    ])->where('s-id', $sId)
+                    ->andWhere('chunk-number', $x);
                 $this->execute();
             }
         }

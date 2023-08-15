@@ -85,8 +85,8 @@ class StarterPage extends WebPage {
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'
         ])
-        ->text($icon)
-        ->getParent()->addChild('a', [
+            ->text($icon)
+            ->getParent()->addChild('a', [
             'href' => $link
         ])->text($cardTitle);
         $card->addChild('v-card-text')->text($paragraph);

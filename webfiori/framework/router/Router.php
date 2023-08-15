@@ -479,7 +479,7 @@ class Router {
             $urlSet = new HTMLNode('urlset');
             $urlSet->setIsQuotedAttribute(true);
             $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
-            ->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+                ->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
             $routes = Router::get()->getRoutesHelper();
 
             foreach ($routes['static'] as $route) {

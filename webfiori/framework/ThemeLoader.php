@@ -55,6 +55,9 @@ class ThemeLoader {
      *
      * This method will return an associative array. The key is the theme
      * name and the value is an object of type Theme that contains theme info.
+     * 
+     * @param bool $updateCache If set to true, cached data of descovered themes
+     * will reset and search will be performed again.
      *
      * @return array An associative array that contains all themes information. The name
      * of the theme will be the key and the value is an object of type 'Theme'.
@@ -62,8 +65,8 @@ class ThemeLoader {
      * @throws Exception
      * @since 1.0
      */
-    public static function getAvailableThemes(): array {
-        if (self::$AvailableThemes === null) {
+    public static function getAvailableThemes(bool $updateCache = true): array {
+        if (self::$AvailableThemes === null || $updateCache) {
             self::$AvailableThemes = [];
 
             if (Util::isDirectory(THEMES_PATH, true)) {
@@ -72,7 +75,7 @@ class ThemeLoader {
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                    self::scanDir($filesInDir, $pathToScan);
+                    self::scanDir($filesInDir, $pathToScan, $dir);
                 }
             } else {
                 throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
@@ -239,7 +242,7 @@ class ThemeLoader {
     /**
      * @throws Exception
      */
-    private static function scanDir($filesInDir, $pathToScan) {
+    private static function scanDir($filesInDir, $pathToScan, $dirName) {
         foreach ($filesInDir as $fileName) {
             $fileExt = substr($fileName, -4);
 
@@ -248,8 +251,12 @@ class ThemeLoader {
                 $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
+                
+                if (!class_exists($aCName)) {
+                    $aCName = '\\'.self::THEMES_DIR.'\\'.$dirName.'\\'.$cName;
+                }
 
-                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
+                if (class_exists($aCName)) {
                     $instance = new $aCName();
 
                     if ($instance instanceof Theme) {

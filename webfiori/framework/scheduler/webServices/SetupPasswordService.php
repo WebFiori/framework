@@ -28,7 +28,7 @@ class SetupPasswordService extends AbstractWebService {
         $this->addParameter(new RequestParameter('password'));
     }
     public function isAuthorized() {
-        return TasksManager::password() == 'NO_PASSWORD';
+        return TasksManager::getPassword() == 'NO_PASSWORD';
     }
 
     public function processRequest() {

@@ -47,7 +47,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
 
             return;
         }
-        throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
+        throw new SMTPException('No SMTP connection was found which has the name "'.$sendAccountName.'".');
     }
     public function get(string $label) {
         $langObj = $this->getTranslation();

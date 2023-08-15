@@ -169,7 +169,7 @@ class SchedulerCommandTest extends TestCase {
             "Exception class: Error\n",
             "Exception message: Call to undefined method app\\tasks\Fail2TestTask::undefined()\n",
             "Thrown in: Fail2TestTask\n",
-            "Line: 45\n",
+            "Line: 44\n",
             "Calling the method app\\tasks\Fail2TestTask::onFail()\n",
             "Calling the method app\\tasks\Fail2TestTask::afterExec()\n",
             "Check finished.\n",

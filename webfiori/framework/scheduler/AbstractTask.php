@@ -724,7 +724,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($hoursArr['every-hour'] !== true) {
             $retVal = false;
-            $current = TasksManager::hour();
+            $current = TasksManager::getHour();
             $ranges = $hoursArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -756,7 +756,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($minuteArr['every-minute'] !== true) {
             $retVal = false;
-            $current = TasksManager::minute();
+            $current = TasksManager::getMinute();
             $ranges = $minuteArr['at-range'];
 
             foreach ($ranges as $range) {
@@ -788,7 +788,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($monthsArr['every-month'] !== true) {
             $retVal = false;
-            $current = TasksManager::month();
+            $current = TasksManager::getMonth();
             $ranges = $monthsArr['at-range'];
 
             foreach ($ranges as $range) {

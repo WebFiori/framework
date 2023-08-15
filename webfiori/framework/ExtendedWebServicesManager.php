@@ -209,7 +209,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * @since 1.0
      */
     public function get(string $dir) {
-        return Language::getLabel($dir);
+        return Lang::getLabel($dir);
     }
     /**
      * Returns an associative array that contains HTTP authorization header
@@ -248,7 +248,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     /**
      * Returns the language instance which is linked with the API instance.
      *
-     * @return Language an instance of the class 'Language'.
+     * @return Lang an instance of the class 'Lang'.
      *
      * @since 1.0
      */
@@ -432,6 +432,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         } else {
             $langCode = $tempCode;
         }
-        $this->translation = Language::loadTranslation($langCode);
+        $this->translation = Lang::loadTranslation($langCode);
     }
 }

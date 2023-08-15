@@ -16,6 +16,7 @@ class SchedulerTest extends TestCase {
      * @test
      */
     public function testCreateTask00() {
+        TasksManager::reset();
         $this->assertFalse(TasksManager::createTask('7-1 * * * *'));
     }
 

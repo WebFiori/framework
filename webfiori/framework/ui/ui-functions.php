@@ -10,7 +10,7 @@
  */
 
 use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\Language;
+use webfiori\framework\Lang;
 use webfiori\framework\ui\WebPage;
 use webfiori\http\Response;
 use webfiori\json\JsonI;
@@ -41,7 +41,7 @@ use webfiori\ui\HTMLNode;
  * @throws MissingLangException
  */
 function label(string $path, string $langCode = null) {
-    return Language::getLabel($path, $langCode);
+    return Lang::getLabel($path, $langCode);
 }
 /**
  * Returns the canonical URL of the page.

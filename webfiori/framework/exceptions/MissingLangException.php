@@ -13,7 +13,7 @@ namespace webfiori\framework\exceptions;
 use Exception;
 /**
  * An exception which is thrown when a translation was not found or no object
- * of type 'Language' was found for a language.
+ * of type 'Lang' was found for a language.
  *
  * @author Ibrahim
  */

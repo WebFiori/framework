@@ -29,7 +29,7 @@ use webfiori\http\Request;
  *
  * @version 1.2.2
  */
-class Language {
+class Lang {
     /**
      * A constant for left to right writing direction.
      *
@@ -49,7 +49,7 @@ class Language {
     /**
      * The current active translation object.
      *
-     * @var Language|null
+     * @var Lang|null
      */
     private static $ActiveLang;
     /**
@@ -62,10 +62,7 @@ class Language {
      * An associative array that contains loaded languages.
      *
      * @var array The key of the array represents two
-     * characters language code. The index will contain an object of type <b>Language</b>.
-     * 'Language'.
-     *
-     * @since 1.1
+     * characters language code. The index will contain an object of type <b>Lang</b>.
      */
     private static $loadedLangs = [];
     /**
@@ -103,12 +100,11 @@ class Language {
     }
     /**
      * Returns a reference to an associative array that contains an objects of
-     * type 'Language'.
+     * type 'Lang'.
      *
      * @return array The key of the array represents two
-     * characters language code. The index will contain an object of type 'Language'.
+     * characters language code. The index will contain an object of type 'Lang'.
      *
-     * @since 1.1
      */
     public static function &getLoadedLangs() : array {
         return self::$loadedLangs;
@@ -196,7 +192,7 @@ class Language {
     /**
      * Returns the active translation.
      *
-     * @return Language|null If a translation is active, it is returned as an
+     * @return Lang|null If a translation is active, it is returned as an
      * object. Other than that, null is returned.
      */
     public static function getActive() {
@@ -208,7 +204,6 @@ class Language {
      * @return string Language code in upper case (such as 'AR'). If language
      * code is not set, default is returned which is 'XX'.
      *
-     * @since 1.1
      */
     public function getCode() : string {
         if (isset($this->languageVars['code'])) {
@@ -301,12 +296,11 @@ class Language {
      * was found that matches the given language code. Language files must
      * have the name 'LanguageXX.php' where 'XX' is language code. Also, the method
      * will throw an exception when the translation file is loaded but no object
-     * of type 'Language' was stored in the set of loaded translations.
+     * of type 'Lang' was stored in the set of loaded translations.
      *
-     * @return Language an object of type 'Language' is returned if
+     * @return Lang an object of type 'Lang' is returned if
      * the language was loaded.
      *
-     * @since 1.1
      */
     public static function loadTranslation(string $langCode) {
         $uLangCode = strtoupper(trim($langCode));
@@ -316,19 +310,19 @@ class Language {
 
             return self::getActive();
         }
-        $langClassName = APP_DIR.'\\langs\\Language'.$uLangCode;
+        $langClassName = APP_DIR.'\\langs\\Lang'.$uLangCode;
 
         if (!class_exists($langClassName)) {
             throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');
         }
         $class = new $langClassName();
 
-        if (!($class instanceof Language)) {
-            throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
+        if (!($class instanceof Lang)) {
+            throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \''.Lang::class.'\'.');
         }
 
         if (!isset(self::$loadedLangs[$uLangCode])) {
-            throw new MissingLangException('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
+            throw new MissingLangException('The translation file was found. But no object of type \''.Lang::class.'\' is stored. Make sure that the parameter '
                     .'$addtoLoadedAfterCreate is set to true when creating the language object.');
         }
         self::$ActiveLang = self::$loadedLangs[$uLangCode];

@@ -5,7 +5,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
 use webfiori\framework\App;
-use webfiori\framework\Language;
+use webfiori\framework\Lang;
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
 use webfiori\ui\HTMLNode;
@@ -587,13 +587,13 @@ class PageTest extends TestCase {
         $page = new WebPage();
         $page->setLang('en');
         $lang = $page->getTranslation();
-        $this->assertTrue($lang instanceof Language);
+        $this->assertTrue($lang instanceof Lang);
         $lang2 = $page->getTranslation();
-        $this->assertTrue($lang2 instanceof Language);
+        $this->assertTrue($lang2 instanceof Lang);
         $this->assertTrue($lang === $lang2);
         $page->setLang('ar');
         $lang3 = $page->getTranslation();
-        $this->assertTrue($lang3 instanceof Language);
+        $this->assertTrue($lang3 instanceof Lang);
         $this->assertFalse($lang3 === $lang2);
     }
     /**
@@ -610,7 +610,7 @@ class PageTest extends TestCase {
      */
     public function testUsingLang03() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
+        $this->expectExceptionMessage('The translation file was found. But no object of type \'Lang\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
         $page = new WebPage();
         $page->setLang('jp');
     }

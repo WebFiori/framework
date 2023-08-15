@@ -23,7 +23,7 @@ use webfiori\framework\exceptions\MissingLangException;
 class EmailMessage extends \webfiori\email\EmailMessage {
     /**
      *
-     * @var Language|null
+     * @var Lang|null
      *
      * @since 1.0.5
      */
@@ -61,7 +61,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     /**
      * Returns an object which holds i18n labels.
      *
-     * @return Language|null The returned object labels will be based on the
+     * @return Lang|null The returned object labels will be based on the
      * language of the email. If no translation is loaded, the method will
      * return null.
      *
@@ -99,7 +99,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     private function usingLanguage() {
         if ($this->getLang() !== null) {
             try {
-                $this->tr = Language::loadTranslation($this->getLang());
+                $this->tr = Lang::loadTranslation($this->getLang());
             } catch (MissingLangException $ex) {
                 throw new MissingLangException($ex->getMessage());
             }

@@ -520,6 +520,9 @@ class TasksManager {
             });
         }
     }
+    /**
+     * Reset all attributes of tasks manager to defaults.
+     */
     public static function reset() {
         self::get()->timestamp = [
             'month' => intval(date('m')),

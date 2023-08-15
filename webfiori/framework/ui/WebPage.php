@@ -17,7 +17,7 @@ use webfiori\framework\App;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
-use webfiori\framework\Language;
+use webfiori\framework\Lang;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
@@ -185,7 +185,7 @@ class WebPage {
     private $titleSep;
     /**
      *
-     * @var Language|null
+     * @var Lang|null
      */
     private $tr;
     /**
@@ -567,12 +567,11 @@ class WebPage {
     /**
      * Returns an object which holds i18n labels.
      *
-     * @return Language The returned object labels will be based on the
+     * @return Lang The returned object labels will be based on the
      * language of the page.
      *
-     * @since 1.0
      */
-    public function getTranslation() : Language {
+    public function getTranslation() : Lang {
         return $this->tr;
     }
     /**
@@ -1118,18 +1117,18 @@ class WebPage {
     /**
      * Sets the writing direction of the page.
      *
-     * @param string $dir Language::DIR_LTR or Language::DIR_RTL.
+     * @param string $dir Lang::DIR_LTR or Lang::DIR_RTL.
      *
      * @return boolean True if the direction was not set and its the first time to set.
      * if it was set before, the method will return false.
-     * @throws Exception If the writing direction is not Language::DIR_LTR or Language::DIR_RTL.
+     * @throws Exception If the writing direction is not Lang::DIR_LTR or Lang::DIR_RTL.
      *
      * @since 1.0
      */
     public function setWritingDir(string $dir = 'ltr') {
         $dirL = strtolower($dir);
 
-        if ($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL) {
+        if ($dirL == Lang::DIR_LTR || $dirL == Lang::DIR_RTL) {
             $this->contentDir = $dirL;
         }
     }
@@ -1290,16 +1289,14 @@ class WebPage {
      *
      * @throws MissingLangException An exception will be thrown if no language file
      * was found that matches the given language code. Language files must
-     * have the name 'LanguageXX.php' where 'XX' is language code. Also the function
+     * have the name 'LangXX.php' where 'XX' is language code. Also the function
      * will throw an exception when the translation file is loaded but no object
-     * of type 'Language' was stored in the set of loaded translations.
-     *
-     * @since 1.0
+     * of type 'Lang' was stored in the set of loaded translations.
      */
     private function usingLanguage() {
         if ($this->getLangCode() !== null) {
             try {
-                $this->tr = Language::loadTranslation($this->getLangCode());
+                $this->tr = Lang::loadTranslation($this->getLangCode());
             } catch (MissingLangException $ex) {
                 if (!$this->skipLangCheck) {
                     throw new MissingLangException($ex->getMessage());

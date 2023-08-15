@@ -1,8 +1,6 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\App;
 
 /**
@@ -26,7 +24,7 @@ class CreateThemeTest extends CreateTestCase {
             'themes\\fiori',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",

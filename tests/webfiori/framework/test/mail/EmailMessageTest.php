@@ -4,9 +4,9 @@ namespace webfiori\framework\test\mail;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use webfiori\email\SMTPAccount;
+use webfiori\framework\App;
 use webfiori\framework\EmailMessage;
 use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\App;
 /**
  * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *
@@ -16,51 +16,10 @@ class EmailMessageTest extends TestCase {
     /**
      * @test
      */
-    public function testLang00() {
-        $acc = new SMTPAccount([
-            'port' => 587,
-            'server-address' => 'outlook.office365.com',
-            'user' => 'randomxyz@hotmail.com',
-            'pass' => '???',
-            'sender-name' => 'Ibrahim',
-            'sender-address' => 'randomxyz@hotmail.com',
-            'account-name' => 'no-reply'
-        ]);
-        App::getConfig()->addOrUpdateSMTPAccount($acc);
-        $message = new EmailMessage();
-        $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
-        $this->assertNull($message->getTranslation());
-    }
-    /**
-     * @test
-     */
-    public function testLang01() {
-        $this->expectException(MissingLangException::class);
-        $message = new EmailMessage();
-        $message->setLang('KR');
-    }
-    /**
-     * @test
-     */
-    public function testLang02() {
-        $message = new EmailMessage();
-        $message->setLang('EN');
-        $this->assertNotNull($message->getTranslation());
-    }
-    /**
-     * @test
-     */
-    public function testLang03() {
-        $message = new EmailMessage();
-        $message->setLang('EN');
-        $this->assertNotNull($message->getTranslation());
-        $this->assertEquals([
-            'direction' => 'ltr'
-        ], $message->getDocument()->getBody()->getStyle());
-        $message->setLang('ar');
-        $this->assertEquals([
-            'direction' => 'rtl'
-        ], $message->getDocument()->getBody()->getStyle());
+    public function test00() {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('No SMTP account was found which has the name "not exist".');
+        $message = new EmailMessage('not exist');
     }
     /**
      * @test
@@ -123,6 +82,55 @@ class EmailMessageTest extends TestCase {
     /**
      * @test
      */
+    public function testLang00() {
+        $acc = new SMTPAccount([
+            'port' => 587,
+            'server-address' => 'outlook.office365.com',
+            'user' => 'randomxyz@hotmail.com',
+            'pass' => '???',
+            'sender-name' => 'Ibrahim',
+            'sender-address' => 'randomxyz@hotmail.com',
+            'account-name' => 'no-reply'
+        ]);
+        App::getConfig()->addOrUpdateSMTPAccount($acc);
+        $message = new EmailMessage();
+        $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
+        $this->assertNull($message->getTranslation());
+    }
+    /**
+     * @test
+     */
+    public function testLang01() {
+        $this->expectException(MissingLangException::class);
+        $message = new EmailMessage();
+        $message->setLang('KR');
+    }
+    /**
+     * @test
+     */
+    public function testLang02() {
+        $message = new EmailMessage();
+        $message->setLang('EN');
+        $this->assertNotNull($message->getTranslation());
+    }
+    /**
+     * @test
+     */
+    public function testLang03() {
+        $message = new EmailMessage();
+        $message->setLang('EN');
+        $this->assertNotNull($message->getTranslation());
+        $this->assertEquals([
+            'direction' => 'ltr'
+        ], $message->getDocument()->getBody()->getStyle());
+        $message->setLang('ar');
+        $this->assertEquals([
+            'direction' => 'rtl'
+        ], $message->getDocument()->getBody()->getStyle());
+    }
+    /**
+     * @test
+     */
     public function testSetPriority00() {
         $sm = new EmailMessage('no-reply');
         $sm->setPriority(-2);
@@ -137,13 +145,5 @@ class EmailMessageTest extends TestCase {
         $this->assertSame(1,$sm->getPriority());
         $sm->setPriority(0);
         $this->assertSame(0,$sm->getPriority());
-    }
-    /**
-     * @test
-     */
-    public function test00() {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('No SMTP account was found which has the name "not exist".');
-        $message = new EmailMessage('not exist');
     }
 }

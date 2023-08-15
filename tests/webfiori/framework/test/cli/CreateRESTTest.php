@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
@@ -125,13 +124,14 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\UpdateFirstNameOfSuperUserService',
             '\\app\\apis\\super\\UpdateIsHappyOfSuperUserService'
         ];
+
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));
-        
+
         foreach ($apiClazzes as $clazz) {
             $this->removeClass($clazz);
         }
@@ -257,13 +257,14 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\UpdateIsHappyOfSuperUserXService',
             '\\app\\apis\\super\\UpdateIdOfSuperUserXService'
         ];
+
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));
-        
+
         foreach ($apiClazzes as $clazz) {
             $this->removeClass($clazz);
         }
@@ -390,13 +391,14 @@ class CreateRESTTest extends CreateTestCase {
             '\\app\\apis\\super\\UpdateIdOfSuperUserX9Service',
             '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service'
         ];
+
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));
         $this->assertTrue(class_exists($dbClazz));
-        
+
         foreach ($apiClazzes as $clazz) {
             $this->removeClass($clazz);
         }

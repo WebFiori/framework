@@ -13,7 +13,7 @@ use webfiori\framework\User;
 class UsersQuery extends MySQLQuery {
     /**
      *
-     * @var MySQLTable 
+     * @var MySQLTable
      */
     private $table;
     public function __construct() {
@@ -32,7 +32,7 @@ class UsersQuery extends MySQLQuery {
         $this->setTable($this->table);
     }
     /**
-     * 
+     *
      * @param User $user
      */
     public function addUser($user) {

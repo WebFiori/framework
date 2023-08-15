@@ -1,12 +1,10 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\file\File;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\App;
 /**
  * Description of CreateTableTest
@@ -54,7 +52,7 @@ class CreateTableTest extends TestCase {
         "12: decimal\n",
         "13: double\n",
         "14: float\n",
-        "15: boolean\n", 
+        "15: boolean\n",
         "16: bool\n",
         "17: bit\n",
     ];
@@ -82,7 +80,7 @@ class CreateTableTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
@@ -99,7 +97,7 @@ class CreateTableTest extends TestCase {
         $this->assertEquals([
             '`id`'
         ], $testObj->getColsNames());
-        
+
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -120,7 +118,6 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
-        
     }
     /**
      * @test
@@ -142,11 +139,11 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool01Table';
@@ -163,10 +160,10 @@ class CreateTableTest extends TestCase {
         $this->assertEquals([
             '[id]'
         ], $testObj->getColsNames());
-        
+
         $col = $testObj->getColByKey('id');
         $this->assertFalse($col->isIdentity());
-        
+
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -186,7 +183,101 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
-        
+    }
+    /**
+     * @test
+     */
+    public function testCreateTable02() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'mysql',
+            'Cool02Table',
+            '',
+            'cool_table_02',
+            '',
+            'id',
+            '1',
+            '11',
+            'y',
+            'y',
+            'The unique ID of the cool thing.',
+            'y',
+
+            'id',
+            'y',
+
+            'name',
+            '3',//type
+            '400',//size
+            'n',//primary
+            'n',//unique
+            '',//default
+            'n',//null,
+            'The name of the user',//optional comment
+            'n',
+
+            'n',
+            'n'
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'table'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $output = $runner->getOutput();
+        $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
+        $clazz = '\\app\\database\\Cool02Table';
+        $this->removeClass($clazz);
+        $testObj = new $clazz();
+        $this->assertTrue($testObj instanceof MySQLTable);
+        $this->assertEquals('`cool_table_02`', $testObj->getName());
+        $this->assertNull($testObj->getComment());
+        $this->assertEquals(2, $testObj->getColsCount());
+        $this->assertEquals([
+            'id',
+            'name'
+        ], $testObj->getColsKeys());
+        $this->assertEquals([
+            '`id`',
+            '`name`'
+        ], $testObj->getColsNames());
+
+        $this->assertEquals(array_merge([
+            "Database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter database table name: Enter = 'cool_02_table'\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            ], self::MYSQL_COLS_TYPES, [
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column auto increment?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Warning: The table already has a key with name 'id'.\n",
+            "Would you like to add another column?(y/N)\n",
+            ], self::MYSQL_COLS_TYPES, [
+
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column unique?(y/N)\n",
+            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
+            "Can this column have null values?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to create an entity class that maps to the database table?(y/N)\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
+        ]), $output);
     }
     /**
      * @test
@@ -201,7 +292,7 @@ class CreateTableTest extends TestCase {
             '',
             'cool_table_03',
             '',
-            
+
             'id',
             '1',
             '11',
@@ -209,7 +300,7 @@ class CreateTableTest extends TestCase {
             'y',
             'The unique ID of the cool thing.',
             'y',
-            
+
             'name',
             '3',//type
             '400',//size
@@ -219,7 +310,7 @@ class CreateTableTest extends TestCase {
             'n',//null,
             'The name of the user',//optional comment
             'y',
-            
+
             'creation-date',
             '4',//type
             'n',//primary
@@ -233,11 +324,11 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
@@ -259,7 +350,7 @@ class CreateTableTest extends TestCase {
             '`name`',
             '`creation_date`'
         ], $testObj->getColsNames());
-        
+
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -300,103 +391,6 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
-        
-    }
-    /**
-     * @test
-     */
-    public function testCreateTable02() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'mysql',
-            'Cool02Table',
-            '',
-            'cool_table_02',
-            '',
-            'id',
-            '1',
-            '11',
-            'y',
-            'y',
-            'The unique ID of the cool thing.',
-            'y',
-            
-            'id',
-            'y',
-            
-            'name',
-            '3',//type
-            '400',//size
-            'n',//primary
-            'n',//unique
-            '',//default
-            'n',//null,
-            'The name of the user',//optional comment
-            'n',
-            
-            'n',
-            'n'
-        ]);
-        
-        $runner->setArgsVector([
-            'webfiori',
-            'create',
-            '--c' => 'table' 
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $output = $runner->getOutput();
-        $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
-        $clazz = '\\app\\database\\Cool02Table';
-        $this->removeClass($clazz);
-        $testObj = new $clazz();
-        $this->assertTrue($testObj instanceof MySQLTable);
-        $this->assertEquals('`cool_table_02`', $testObj->getName());
-        $this->assertNull($testObj->getComment());
-        $this->assertEquals(2, $testObj->getColsCount());
-        $this->assertEquals([
-            'id',
-            'name'
-        ], $testObj->getColsKeys());
-        $this->assertEquals([
-            '`id`',
-            '`name`'
-        ], $testObj->getColsNames());
-        
-        $this->assertEquals(array_merge([
-            "Database type:\n",
-            "0: mysql\n",
-            "1: mssql\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Enter database table name: Enter = 'cool_02_table'\n",
-            "Enter your optional comment about the table:\n",
-            "Now you have to add columns to the table.\n",
-            ], self::MYSQL_COLS_TYPES, [
-            "Enter column size:\n",
-            "Is this column primary?(y/N)\n",
-            "Is this column auto increment?(y/N)\n",
-            "Enter your optional comment about the column:\n",
-            "Success: Column added.\n",
-            "Would you like to add another column?(y/N)\n",
-            "Enter a name for column key:\n",
-            "Warning: The table already has a key with name 'id'.\n",
-            "Would you like to add another column?(y/N)\n",
-            ], self::MYSQL_COLS_TYPES, [
-            
-            "Enter column size:\n",
-            "Is this column primary?(y/N)\n",
-            "Is this column unique?(y/N)\n",
-            "Enter default value (Hit \"Enter\" to skip): Enter = ''\n",
-            "Can this column have null values?(y/N)\n",
-            "Enter your optional comment about the column:\n",
-            "Success: Column added.\n",
-            "Would you like to add another column?(y/N)\n",
-            
-            "Would you like to add foreign keys to the table?(y/N)\n",
-            "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
-        ]), $output);
-        
     }
     /**
      * @test
@@ -423,11 +417,11 @@ class CreateTableTest extends TestCase {
             'y',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
@@ -435,7 +429,7 @@ class CreateTableTest extends TestCase {
         $clazz = '\\app\\entity\\MySuperCoolEntity00';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
-        
+
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -461,7 +455,6 @@ class CreateTableTest extends TestCase {
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
             'Info: Entity class was created at "'.ROOT_PATH.DS.'app'.DS."entity\".\n",
         ]), $output);
-        
     }
     /**
      * @test
@@ -484,15 +477,16 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool05Table';
         $this->assertTrue(class_exists($clazz));
+
         return $clazz;
     }
     /**
@@ -532,11 +526,11 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $output = $runner->getOutput();
@@ -611,7 +605,7 @@ class CreateTableTest extends TestCase {
             'y',
             'The unique ID of the cool thing.',
             'y',
-            
+
             'age',
             '1',
             'n',
@@ -623,11 +617,11 @@ class CreateTableTest extends TestCase {
             'n',
             'n'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'create',
-            '--c' => 'table' 
+            '--c' => 'table'
         ]);
         $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool011Table';
@@ -646,10 +640,10 @@ class CreateTableTest extends TestCase {
             '[id]',
             '[age]'
         ], $testObj->getColsNames());
-        
+
         $col = $testObj->getColByKey('id');
         $this->assertTrue($col->isIdentity());
-        
+
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -677,7 +671,6 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $runner->getOutput());
-        
     }
     private function removeClass($classPath) {
         $file = new File(ROOT_PATH.$classPath.'.php');

@@ -12,7 +12,7 @@ use phMysql\MySQLTable;
 class UserContactInfo extends MySQLQuery {
     /**
      *
-     * @var MySQLTable 
+     * @var MySQLTable
      */
     private $table;
     public function __construct() {

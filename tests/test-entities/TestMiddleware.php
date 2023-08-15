@@ -15,15 +15,11 @@ class TestMiddleware extends AbstractMiddleware {
         $this->addToGroup('global');
     }
     public function after(Request $request, Response $response) {
-        
     }
 
     public function afterSend(Request $request, Response $response) {
-        
     }
 
     public function before(Request $request, Response $response) {
-        
     }
-
 }

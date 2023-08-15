@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test;
 
 use app\database\TestTable;
@@ -28,7 +27,7 @@ class DBTest extends TestCase {
      */
     public function test01() {
         $this->expectException(DatabaseException::class);
-        
+
         $conn = new ConnectionInfo('mysql', 'root', '12345', 'testing_db', '127.0.0.1');
         $db = new DB($conn);
         $db->addTable(new TestTable());
@@ -39,11 +38,11 @@ class DBTest extends TestCase {
      */
     public function test02() {
         $this->expectException(DatabaseException::class);
-        
+
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $db = new DB($conn);
         $db->addTable(new TestTable());
-        
+
         $db->table('test')->select()->execute();
     }
     /**

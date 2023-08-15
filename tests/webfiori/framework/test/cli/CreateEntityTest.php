@@ -43,7 +43,7 @@ class CreateEntityTest extends CreateTestCase {
             "Would you like to add another attribute?(y/N)\n",
             "Enter attribute name:\n",
             "Warning: Unable to add attribute.\n",
-            
+
             "Would you like to add another attribute?(y/N)\n",
             "Generating your entity...\n",
             "Success: Entity class created.\n"
@@ -102,7 +102,7 @@ class CreateEntityTest extends CreateTestCase {
             "Would you like to add another attribute?(y/N)\n",
             "Enter attribute name:\n",
             "Warning: Unable to add attribute.\n",
-            
+
             "Would you like to add another attribute?(y/N)\n",
             "Generating your entity...\n",
             "Success: Entity class created.\n"
@@ -111,4 +111,3 @@ class CreateEntityTest extends CreateTestCase {
         $this->removeClass('\\app\\entity\\NewEntity');
     }
 }
-

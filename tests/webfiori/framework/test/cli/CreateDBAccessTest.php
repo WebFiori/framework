@@ -1,9 +1,7 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\file\File;
 use webfiori\framework\App;
 
 /**
@@ -92,7 +90,7 @@ class CreateDBAccessTest extends CreateTestCase {
         $conn->setName('Test Connection');
         App::getConfig()->removeAllDBConnections();
         App::getConfig()->addOrUpdateDBConnection($conn);
-        
+
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

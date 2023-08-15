@@ -14,7 +14,6 @@ class ListThemesCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -44,7 +43,6 @@ class ListThemesCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -66,13 +64,12 @@ class ListThemesCommandTest extends TestCase {
      * @test
      */
     public function test02() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-themes',
-            '--theme-name="Not Exist"' 
+            '--theme-name="Not Exist"'
         ]);
         $runner->start();
         $this->assertEquals([

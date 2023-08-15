@@ -1,9 +1,9 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\LangClassWriter;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Language;
+use webfiori\framework\writers\LangClassWriter;
 /**
  *
  * @author Ibrahim

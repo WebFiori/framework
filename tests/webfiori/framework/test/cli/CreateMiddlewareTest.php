@@ -1,9 +1,8 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\App;
+use webfiori\framework\middleware\AbstractMiddleware;
 
 /**
  * Description of CreateThemeTest
@@ -29,7 +28,7 @@ class CreateMiddlewareTest extends CreateTestCase {
             '',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -72,7 +71,7 @@ class CreateMiddlewareTest extends CreateTestCase {
             'global',
             'n'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter a name for the new class:\n",

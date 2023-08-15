@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
@@ -95,7 +94,7 @@ class AddCommandTest extends TestCase {
         ]);
         $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals(0, $runner->start());
-        
+
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -161,7 +160,7 @@ class AddCommandTest extends TestCase {
             "Would you like to store connection information anyway?(y/N)\n",
         ], $runner->getOutput());
     }
-    
+
     /**
      * @test
      */
@@ -225,7 +224,7 @@ class AddCommandTest extends TestCase {
             '2',
             'FKRR',
         ]);
-        
+
         $this->assertEquals(-1, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",

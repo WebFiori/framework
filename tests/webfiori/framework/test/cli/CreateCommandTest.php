@@ -62,10 +62,10 @@ class CreateCommandTest extends CreateTestCase {
             "9: Quit. <--\n",
         ], $runner->getOutput());
     }
-    
-    
-    
-    
+
+
+
+
     /**
      * @test
      */

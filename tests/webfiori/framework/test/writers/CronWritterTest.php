@@ -1,10 +1,10 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\SchedulerTaskClassWriter;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TaskArgument;
 use webfiori\framework\scheduler\AbstractTask;
+use webfiori\framework\scheduler\TaskArgument;
+use webfiori\framework\writers\SchedulerTaskClassWriter;
 /**
  *
  * @author Ibrahim

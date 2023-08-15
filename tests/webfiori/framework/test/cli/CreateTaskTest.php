@@ -1,9 +1,8 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\App;
+use webfiori\framework\scheduler\AbstractTask;
 
 /**
  * Description of CreatetaskTest
@@ -29,7 +28,7 @@ class CreateTaskTest extends CreateTestCase {
             'N',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -54,10 +53,10 @@ class CreateTaskTest extends CreateTestCase {
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
-    
+
     /**
      * @test
-     * 
+     *
      * @depends test00
      */
     public function test01() {
@@ -77,7 +76,7 @@ class CreateTaskTest extends CreateTestCase {
             'N',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -106,10 +105,10 @@ class CreateTaskTest extends CreateTestCase {
         $this->removeClass('\\app\\tasks\\SuperCoolTask');
         $this->removeClass($clazz);
     }
-    
+
     /**
      * @test
-     * 
+     *
      */
     public function test02() {
         $runner = App::getRunner();
@@ -128,7 +127,7 @@ class CreateTaskTest extends CreateTestCase {
             'N',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -159,7 +158,7 @@ class CreateTaskTest extends CreateTestCase {
     }
     /**
      * @test
-     * 
+     *
      */
     public function test03() {
         $runner = App::getRunner();
@@ -185,7 +184,7 @@ class CreateTaskTest extends CreateTestCase {
             '2021-07-07',
             'n'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter a name for the new class:\n",
@@ -217,7 +216,7 @@ class CreateTaskTest extends CreateTestCase {
         $arg1 = $task->getArgument('start');
         $this->assertEquals('Start date of the report.', $arg1->getDescription());
         $this->assertNull($arg1->getDefault());
-        
+
         $arg2 = $task->getArgument('end');
         $this->assertEquals('End date of the report.', $arg2->getDescription());
         $this->assertEquals('2021-07-07', $arg2->getDefault());

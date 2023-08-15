@@ -27,18 +27,18 @@ class SessionsManagerTest extends TestCase {
         $this->assertFalse(SessionsManager::remove('xyz'));
         $this->assertFalse(SessionsManager::set('xyz','hello'));
         $this->assertNull(SessionsManager::pull('xyz'));
-        
+
         SessionsManager::start('hello');
         $this->assertEquals(1, count(SessionsManager::getSessions()));
         $activeSesstion = SessionsManager::getActiveSession();
         $this->assertFalse($activeSesstion->isRefresh());
         $this->assertTrue($activeSesstion->isRunning());
-        
+
         $this->assertNotNull($activeSesstion);
         $this->assertEquals('hello', $activeSesstion->getName());
         $this->assertEquals(7200, $activeSesstion->getDuration());
         $this->assertEquals(SessionStatus::NEW, $activeSesstion->getStatus());
-        
+
         $activeSesstion->set('var-1', 'Good');
         $activeSesstion->set('var-2', 'Bad');
         $activeSesstion->set('var-3', 'Average');
@@ -47,34 +47,34 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals('Bad', SessionsManager::get(' var-2 '));
         $this->assertEquals('Average', SessionsManager::get('var-3 '));
         $this->assertEquals('Almost Good', SessionsManager::get('var-4 '));
-        
+
         SessionsManager::pauseAll();
         $this->assertFalse($activeSesstion->isRunning());
         $this->assertNull(SessionsManager::get('var-1 '));
         $this->assertNull(SessionsManager::get(' var-2 '));
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get('var-4 '));
-        
+
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertEquals(SessionStatus::PAUSED, $activeSesstion->getStatus());
-        
+
         $activeSesstion->start();
         $this->assertTrue($activeSesstion->isRunning());
-        
+
         $this->assertNotNull(SessionsManager::getActiveSession());
         $this->assertEquals(SessionStatus::RESUMED, $activeSesstion->getStatus());
         $this->assertEquals('Good', SessionsManager::get('var-1 '));
         $this->assertEquals('Bad', SessionsManager::get(' var-2 '));
         $this->assertEquals('Average', SessionsManager::get('var-3 '));
         $this->assertEquals('Almost Good', SessionsManager::get('var-4 '));
-        
+
         $this->assertEquals('Good', SessionsManager::pull('var-1 '));
         $this->assertNull(SessionsManager::pull('var-1 '));
         $this->assertTrue(SessionsManager::remove('var-2'));
         $this->assertFalse(SessionsManager::remove('var-2'));
         $this->assertNull(SessionsManager::get('var-1 '));
         $this->assertNull(SessionsManager::get(' var-2 '));
-        
+
         //Start New Sesstion
         SessionsManager::start('another-one', [
             'duration' => 5,
@@ -88,10 +88,10 @@ class SessionsManagerTest extends TestCase {
         $this->assertTrue($active2->isRunning());
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get(' var-4 '));
-        
+
         $active2->set('super-var', 'I m super.');
         $this->assertEquals('I m super.', SessionsManager::get('super-var'));
-        
+
         $active2->close();
         $this->assertNull(SessionsManager::getActiveSession());
         $activeSesstion->start();
@@ -99,7 +99,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertNull(SessionsManager::get('super-var'));
         $this->assertEquals(7200, SessionsManager::getActiveSession()->getDuration());
         $this->assertEquals(SessionStatus::PAUSED, $active2->getStatus());
-        
+
         SessionsManager::start('another-one');
         $this->assertEquals(SessionStatus::PAUSED, $activeSesstion->getStatus());
         $this->assertEquals(SessionStatus::RESUMED, $active2->getStatus());
@@ -113,20 +113,6 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals(300, SessionsManager::getActiveSession()->getDuration());
         $this->assertNull(SessionsManager::get('super-var'));
         SessionsManager::validateStorage();
-    }
-    /**
-     * @test
-     */
-    public function testGetSessionIDFromRequest() {
-        $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
-        putenv('REQUEST_METHOD=GET');
-        $_GET['my-s'] = 'super';
-        $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
-        
-        $_POST['my-s'] = 'xyz';
-        putenv('REQUEST_METHOD=POST');
-        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
-        
     }
     /**
      * @test
@@ -155,7 +141,7 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::start('hello');
         $sessions = SessionsManager::getSessions();
         $this->assertEquals([
-            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; domain=127.0.0.1; path=/; Secure; HttpOnly; SameSite=Lax' 
+            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; domain=127.0.0.1; path=/; Secure; HttpOnly; SameSite=Lax'
             ], SessionsManager::getCookiesHeaders());
     }
     /**
@@ -182,19 +168,6 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDatabaseSession01
-     */
-    public function testInitSessionsDb() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
-        $conn->setName('sessions-connection');
-        App::getConfig()->addOrUpdateDBConnection($conn);
-        SessionsManager::reset();
-        $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables()->execute();
-        $this->assertTrue(true);
-    }
-    /**
-     * @test
      * @depends testInitSessionsDb
      */
     public function testDatabaseSession02() {
@@ -204,25 +177,25 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         SessionsManager::setStorage($sto);
-        
+
         $this->assertEquals(0, count(SessionsManager::getSessions()));
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertNull(SessionsManager::get('xyz'));
         $this->assertFalse(SessionsManager::remove('xyz'));
         $this->assertFalse(SessionsManager::set('xyz','hello'));
         $this->assertNull(SessionsManager::pull('xyz'));
-        
+
         SessionsManager::start('hello');
         $this->assertEquals(1, count(SessionsManager::getSessions()));
         $activeSesstion = SessionsManager::getActiveSession();
         $this->assertFalse($activeSesstion->isRefresh());
         $this->assertTrue($activeSesstion->isRunning());
-        
+
         $this->assertNotNull($activeSesstion);
         $this->assertEquals('hello', $activeSesstion->getName());
         $this->assertEquals(7200, $activeSesstion->getDuration());
         $this->assertEquals(SessionStatus::NEW, $activeSesstion->getStatus());
-        
+
         $activeSesstion->set('var-1', 'Good');
         $activeSesstion->set('var-2', 'Bad');
         $activeSesstion->set('var-3', 'Average');
@@ -231,34 +204,34 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals('Bad', SessionsManager::get(' var-2 '));
         $this->assertEquals('Average', SessionsManager::get('var-3 '));
         $this->assertEquals('Almost Good', SessionsManager::get('var-4 '));
-        
+
         SessionsManager::pauseAll();
         $this->assertFalse($activeSesstion->isRunning());
         $this->assertNull(SessionsManager::get('var-1 '));
         $this->assertNull(SessionsManager::get(' var-2 '));
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get('var-4 '));
-        
+
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertEquals(SessionStatus::PAUSED, $activeSesstion->getStatus());
-        
+
         $activeSesstion->start();
         $this->assertTrue($activeSesstion->isRunning());
-        
+
         $this->assertNotNull(SessionsManager::getActiveSession());
         $this->assertEquals(SessionStatus::RESUMED, $activeSesstion->getStatus());
         $this->assertEquals('Good', SessionsManager::get('var-1 '));
         $this->assertEquals('Bad', SessionsManager::get(' var-2 '));
         $this->assertEquals('Average', SessionsManager::get('var-3 '));
         $this->assertEquals('Almost Good', SessionsManager::get('var-4 '));
-        
+
         $this->assertEquals('Good', SessionsManager::pull('var-1 '));
         $this->assertNull(SessionsManager::pull('var-1 '));
         $this->assertTrue(SessionsManager::remove('var-2'));
         $this->assertFalse(SessionsManager::remove('var-2'));
         $this->assertNull(SessionsManager::get('var-1 '));
         $this->assertNull(SessionsManager::get(' var-2 '));
-        
+
         //Start New Sesstion
         SessionsManager::start('another-one', [
             'duration' => 5,
@@ -272,10 +245,10 @@ class SessionsManagerTest extends TestCase {
         $this->assertTrue($active2->isRunning());
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get(' var-4 '));
-        
+
         $active2->set('super-var', 'I m super.');
         $this->assertEquals('I m super.', SessionsManager::get('super-var'));
-        
+
         $active2->close();
         $this->assertNull(SessionsManager::getActiveSession());
         $activeSesstion->start();
@@ -283,7 +256,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertNull(SessionsManager::get('super-var'));
         $this->assertEquals(7200, SessionsManager::getActiveSession()->getDuration());
         $this->assertEquals(SessionStatus::PAUSED, $active2->getStatus());
-        
+
         SessionsManager::start('another-one');
         $this->assertEquals(SessionStatus::PAUSED, $activeSesstion->getStatus());
         $this->assertEquals(SessionStatus::RESUMED, $active2->getStatus());
@@ -313,5 +286,31 @@ class SessionsManagerTest extends TestCase {
         $sto->dropTables();
         SessionsManager::setStorage($sto);
         SessionsManager::start('hello');
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionIDFromRequest() {
+        $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
+        putenv('REQUEST_METHOD=GET');
+        $_GET['my-s'] = 'super';
+        $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
+
+        $_POST['my-s'] = 'xyz';
+        putenv('REQUEST_METHOD=POST');
+        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
+    }
+    /**
+     * @test
+     * @depends testDatabaseSession01
+     */
+    public function testInitSessionsDb() {
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('sessions-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables()->execute();
+        $this->assertTrue(true);
     }
 }

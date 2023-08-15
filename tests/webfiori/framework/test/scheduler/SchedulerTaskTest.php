@@ -3,9 +3,9 @@ namespace webfiori\framework\test\scheduler;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\scheduler\BaseTask;
 use webfiori\framework\scheduler\TaskArgument;
+use webfiori\framework\scheduler\TasksManager;
 /**
  *
  * @author Ibrahim
@@ -87,15 +87,15 @@ class SchedulerTaskTest extends TestCase {
         $arg1 = $job->getArgument('one');
         $this->assertEquals('one', $arg1->getName());
         $this->assertEquals('Arg #1', $arg1->getDescription());
-        
+
         $arg2 = $job->getArgument('new-arg');
         $this->assertEquals('new-arg', $arg2->getName());
         $this->assertEquals('NO DESCRIPTION', $arg2->getDescription());
-        
+
         $arg3 = $job->getArgument('three');
         $this->assertEquals('three', $arg3->getName());
         $this->assertEquals('The Third Arg', $arg3->getDescription());
-        
+
         $this->assertEquals([
             'one', 'new-arg', 'three'
         ], $job->getExecArgsNames());
@@ -182,22 +182,21 @@ class SchedulerTaskTest extends TestCase {
         $this->assertFalse($task->isHour());
         $this->assertFalse($task->isMonth());
         $this->assertTrue($task->isDayOfMonth());
-        
-            $this->assertequals('{'
-            . '"name":"SCHEDULER-TASK",'
-            . '"expression":"15 8 * jan-mar 0,mon,3-5",'
-            . '"args":[],'
-            . '"description":"NO DESCRIPTION",'
-            . '"is_time":false,'
-            . '"time":{'
-            . '"is_minute":false,'
-            . '"is_day_of_week":true,'
-            . '"is_month":false,'
-            . '"is_hour":false,'
-            . '"is_day_of_month":true'
-            . '}'
-            . '}', $task->toJSON().'');
-       
+
+        $this->assertequals('{'
+        .'"name":"SCHEDULER-TASK",'
+        .'"expression":"15 8 * jan-mar 0,mon,3-5",'
+        .'"args":[],'
+        .'"description":"NO DESCRIPTION",'
+        .'"is_time":false,'
+        .'"time":{'
+        .'"is_minute":false,'
+        .'"is_day_of_week":true,'
+        .'"is_month":false,'
+        .'"is_hour":false,'
+        .'"is_day_of_month":true'
+        .'}'
+        .'}', $task->toJSON().'');
     }
     /**
      * @test
@@ -366,165 +365,6 @@ class SchedulerTaskTest extends TestCase {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5-a * * * *\'.');
         $task = new BaseTask('5-a * * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager00() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'\'.');
-        $task = new BaseTask('');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager01() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'11-100 * * * *\'.');
-        $task = new BaseTask('11-100 * * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager02() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'*/60 * * * *\'.');
-        $task = new BaseTask('*/60 * * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager03() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* 15-24 * * *\'.');
-        $task = new BaseTask('* 15-24 * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager04() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* */24 * * *\'.');
-        $task = new BaseTask('* */24 * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager05() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * 25-37 * *\'.');
-        $task = new BaseTask('* * 25-37 * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager06() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-13 *\'.');
-        $task = new BaseTask('* * * 12-13 *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager07() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * 13 *\'.');
-        $task = new BaseTask('* * * 13 *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager08() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-1 *\'.');
-        $task = new BaseTask('* * * 12-1 *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager09() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * 5-16 *\'.');
-        $task = new BaseTask('* * * 5-16 *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager10() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
-        $task = new BaseTask('* * * * 0-7');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager11() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
-        $task = new BaseTask('* * * * 0-7');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager12() {
-        $task = new BaseTask('* * * * 0-6');
-        $this->assertEquals('* * * * 0-6',$task->getExpression());
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager13() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 7\'.');
-        $task = new BaseTask('* * * * 7');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager14() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
-        $task = new BaseTask('40-30 * * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager15() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
-        $task = new BaseTask('40-30 * * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager16() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 1,2,7,8\'.');
-        $task = new BaseTask('* * * * 1,2,7,8');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager17() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* 23-8 * * *\'.');
-        $task = new BaseTask('* 23-8 * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager18() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13,14,24 * * *\'.');
-        $task = new BaseTask('* 0-13,14,24 * * *');
-    }
-    /**
-     * @test
-     */
-    public function testTasksManager19() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13 * 5,6,13 *\'.');
-        $task = new BaseTask('* 0-13 * 5,6,13 *');
     }
     /**
      * @test
@@ -708,14 +548,6 @@ class SchedulerTaskTest extends TestCase {
     /**
      * @test
      */
-    public function testSetName00() {
-        $job = new BaseTask();
-        TasksManager::registerTasks();
-        $this->assertFalse($job->setTaskName('Fail 1 '));
-    }
-    /**
-     * @test
-     */
     public function testExecute04() {
         $job = new BaseTask();
         $job->dailyAt(23);
@@ -749,6 +581,328 @@ class SchedulerTaskTest extends TestCase {
         $r2 = $job->exec(true);
         $this->assertTrue($r2);
         $this->assertFalse($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth00() {
+        $job = new BaseTask();
+        $job->everyMonthOn(1);
+        TasksManager::setDayOfMonth(1);
+        $this->assertTrue($job->isDayOfMonth());
+
+        for ($x = 2 ; $x < 31 ; $x++) {
+            TasksManager::setDayOfMonth($x);
+            $this->assertFalse($job->isDayOfMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth01() {
+        $job = new BaseTask('5 4 1-10,25-29 * *');
+
+        for ($x = 1 ; $x <= 10 ; $x++) {
+            TasksManager::setDayOfMonth($x);
+            $this->assertTrue($job->isDayOfMonth());
+        }
+
+        for ($x = 11 ; $x <= 24 ; $x++) {
+            TasksManager::setDayOfMonth($x);
+            $this->assertFalse($job->isDayOfMonth());
+        }
+
+        for ($x = 25 ; $x <= 29 ; $x++) {
+            TasksManager::setDayOfMonth($x);
+            $this->assertTrue($job->isDayOfMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfMonth02() {
+        $job = new BaseTask('5 4 1,3,4,10,29 * *');
+
+        TasksManager::setDayOfMonth(1);
+        $this->assertTrue($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(3);
+        $this->assertTrue($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(4);
+        $this->assertTrue($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(10);
+        $this->assertTrue($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(29);
+        $this->assertTrue($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(11);
+        $this->assertFalse($job->isDayOfMonth());
+
+        TasksManager::setDayOfMonth(2);
+        $this->assertFalse($job->isDayOfMonth());
+    }
+
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek00() {
+        $job = new BaseTask();
+        $job->weeklyOn('sun');
+        TasksManager::setDayOfWeek(0);
+        $this->assertTrue($job->isDayOfWeek());
+
+        for ($x = 1 ; $x < 7 ; $x++) {
+            TasksManager::setDayOfWeek($x);
+            $this->assertFalse($job->isDayOfWeek());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek01() {
+        $job = new BaseTask('5 4 * * 0-3,5-6');
+
+        for ($x = 0 ; $x <= 3 ; $x++) {
+            TasksManager::setDayOfWeek($x);
+            $this->assertTrue($job->isDayOfWeek());
+        }
+        TasksManager::setDayOfWeek(4);
+        $this->assertFalse($job->isDayOfWeek());
+
+        TasksManager::setDayOfWeek(5);
+        $this->assertTrue($job->isDayOfWeek());
+        TasksManager::setDayOfWeek(6);
+        $this->assertTrue($job->isDayOfWeek());
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek02() {
+        $job = new BaseTask('5 4 * * 0,3,6');
+
+        TasksManager::setDayOfWeek(0);
+        $this->assertTrue($job->isDayOfWeek());
+
+        TasksManager::setDayOfWeek(3);
+        $this->assertTrue($job->isDayOfWeek());
+
+        TasksManager::setDayOfWeek(6);
+        $this->assertTrue($job->isDayOfWeek());
+
+        TasksManager::setDayOfWeek(1);
+        $this->assertFalse($job->isDayOfWeek());
+
+        TasksManager::setDayOfWeek(5);
+        $this->assertFalse($job->isDayOfWeek());
+    }
+    /**
+     * @test
+     */
+    public function testIsHour00() {
+        $job = new BaseTask();
+        $job->everyHour(1);
+
+        for ($x = 0 ; $x < 24 ; $x++) {
+            TasksManager::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsHour01() {
+        $job = new BaseTask('5 0-2,12-19 1-10,25-29 * *');
+
+        for ($x = 0 ; $x <= 2 ; $x++) {
+            TasksManager::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+
+        for ($x = 3 ; $x <= 11 ; $x++) {
+            TasksManager::setHour($x);
+            $this->assertFalse($job->isHour());
+        }
+
+        for ($x = 12 ; $x <= 19 ; $x++) {
+            TasksManager::setHour($x);
+            $this->assertTrue($job->isHour());
+        }
+
+        for ($x = 20 ; $x <= 23 ; $x++) {
+            TasksManager::setHour($x);
+            $this->assertFalse($job->isHour());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsHour02() {
+        $job = new BaseTask('5 4,8,9,13,16 1,3,4,10,29 * *');
+
+        TasksManager::setHour(4);
+        $this->assertTrue($job->isHour());
+
+        TasksManager::setHour(8);
+        $this->assertTrue($job->isHour());
+
+        TasksManager::setHour(9);
+        $this->assertTrue($job->isHour());
+
+        TasksManager::setHour(13);
+        $this->assertTrue($job->isHour());
+
+        TasksManager::setHour(16);
+        $this->assertTrue($job->isHour());
+
+        TasksManager::setHour(11);
+        $this->assertFalse($job->isHour());
+
+        TasksManager::setHour(2);
+        $this->assertFalse($job->isHour());
+    }
+
+
+    /**
+     * @test
+     */
+    public function testIsMinute00() {
+        $job = new BaseTask();
+        $job->dailyAt(0, 25);
+        TasksManager::setMinute(25);
+        $this->assertTrue($job->isMinute());
+
+        for ($x = 0 ; $x < 25 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+
+        for ($x = 26 ; $x < 59 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMinute01() {
+        $job = new BaseTask('5-10,20-40 4 * * 0-3,5-6');
+
+        for ($x = 0 ; $x <= 4 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+
+        for ($x = 5 ; $x <= 10 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertTrue($job->isMinute());
+        }
+
+        for ($x = 11 ; $x <= 19 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+
+        for ($x = 20 ; $x <= 40 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertTrue($job->isMinute());
+        }
+
+        for ($x = 41 ; $x <= 59 ; $x++) {
+            TasksManager::setMinute($x);
+            $this->assertFalse($job->isMinute());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMinute02() {
+        $job = new BaseTask('5,20,40,59 4 * * 0,3,6');
+
+        TasksManager::setMinute(5);
+        $this->assertTrue($job->isMinute());
+
+        TasksManager::setMinute(20);
+        $this->assertTrue($job->isMinute());
+
+        TasksManager::setMinute(40);
+        $this->assertTrue($job->isMinute());
+
+        TasksManager::setMinute(59);
+        $this->assertTrue($job->isMinute());
+
+        TasksManager::setMinute(0);
+        $this->assertFalse($job->isMinute());
+
+        TasksManager::setMinute(1);
+        $this->assertFalse($job->isMinute());
+    }
+
+    /**
+     * @test
+     */
+    public function testIsMonth00() {
+        $job = new BaseTask();
+        $job->onMonth(5);
+        TasksManager::setMonth(5);
+        $this->assertTrue($job->isMonth());
+
+        for ($x = 1 ; $x < 4 ; $x++) {
+            TasksManager::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+
+        for ($x = 6 ; $x < 13 ; $x++) {
+            TasksManager::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth01() {
+        $job = new BaseTask('* 4 * 1-3,9-12 *');
+
+        for ($x = 1 ; $x <= 3 ; $x++) {
+            TasksManager::setMonth($x);
+            $this->assertTrue($job->isMonth());
+        }
+
+        for ($x = 4 ; $x <= 8 ; $x++) {
+            TasksManager::setMonth($x);
+            $this->assertFalse($job->isMonth());
+        }
+
+        for ($x = 9 ; $x <= 12 ; $x++) {
+            TasksManager::setMonth($x);
+            $this->assertTrue($job->isMonth());
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth02() {
+        $job = new BaseTask('5,20,40,59 4 * 1,5,8,4,12 0,3,6');
+
+        TasksManager::setMonth(1);
+        $this->assertTrue($job->isMonth());
+
+        TasksManager::setMonth(5);
+        $this->assertTrue($job->isMonth());
+
+        TasksManager::setMonth(8);
+        $this->assertTrue($job->isMonth());
+
+        TasksManager::setMonth(4);
+        $this->assertTrue($job->isMonth());
+
+        TasksManager::setMonth(12);
+        $this->assertTrue($job->isMonth());
+
+        TasksManager::setMinute(1);
+        $this->assertFalse($job->isMinute());
     }
     /**
      * @test
@@ -814,6 +968,24 @@ class SchedulerTaskTest extends TestCase {
         $this->assertTrue($job->onMonth(2, '20', '10:00'));
         $this->assertEquals('0 10 20 2 *',$job->getExpression());
     }
+    /**
+     * @test
+     */
+    public function testSetName00() {
+        $job = new BaseTask();
+        TasksManager::registerTasks();
+        $this->assertFalse($job->setTaskName('Fail 1 '));
+    }
+    /**
+     * @test
+     */
+    public function testSetOnExc00() {
+        $job = new BaseTask();
+        $job->setOnFailure(function()
+        {
+        }, ['1',2]);
+        $this->assertTrue(true);
+    }
     public function testSetTaskName00() {
         $job = new BaseTask();
         $job->setTaskName('Hello Task');
@@ -826,12 +998,161 @@ class SchedulerTaskTest extends TestCase {
     /**
      * @test
      */
-    public function testSetOnExc00() {
-        $job = new BaseTask();
-        $job->setOnFailure(function()
-        {
-        }, ['1',2]);
-        $this->assertTrue(true);
+    public function testTasksManager00() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'\'.');
+        $task = new BaseTask('');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager01() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'11-100 * * * *\'.');
+        $task = new BaseTask('11-100 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager02() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'*/60 * * * *\'.');
+        $task = new BaseTask('*/60 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager03() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 15-24 * * *\'.');
+        $task = new BaseTask('* 15-24 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager04() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* */24 * * *\'.');
+        $task = new BaseTask('* */24 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager05() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 25-37 * *\'.');
+        $task = new BaseTask('* * 25-37 * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager06() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-13 *\'.');
+        $task = new BaseTask('* * * 12-13 *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager07() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * 13 *\'.');
+        $task = new BaseTask('* * * 13 *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager08() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-1 *\'.');
+        $task = new BaseTask('* * * 12-1 *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager09() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * 5-16 *\'.');
+        $task = new BaseTask('* * * 5-16 *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager10() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
+        $task = new BaseTask('* * * * 0-7');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager11() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
+        $task = new BaseTask('* * * * 0-7');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager12() {
+        $task = new BaseTask('* * * * 0-6');
+        $this->assertEquals('* * * * 0-6',$task->getExpression());
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager13() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 7\'.');
+        $task = new BaseTask('* * * * 7');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager14() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
+        $task = new BaseTask('40-30 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager15() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
+        $task = new BaseTask('40-30 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager16() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * * * 1,2,7,8\'.');
+        $task = new BaseTask('* * * * 1,2,7,8');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager17() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 23-8 * * *\'.');
+        $task = new BaseTask('* 23-8 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager18() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13,14,24 * * *\'.');
+        $task = new BaseTask('* 0-13,14,24 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testTasksManager19() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 0-13 * 5,6,13 *\'.');
+        $task = new BaseTask('* 0-13 * 5,6,13 *');
     }
     /**
      * @test
@@ -903,312 +1224,5 @@ class SchedulerTaskTest extends TestCase {
         $this->assertFalse($job->weeklyOn('0','23:60'));
         $this->assertFalse($job->weeklyOn('0','24:00'));
         $this->assertTrue($job->weeklyOn('0','00:00'));
-    }
-    /**
-     * @test
-     */
-    public function testIsDayOfMonth00() {
-        $job = new BaseTask();
-        $job->everyMonthOn(1);
-        TasksManager::setDayOfMonth(1);
-        $this->assertTrue($job->isDayOfMonth());
-        for ($x = 2 ; $x < 31 ; $x++) {
-            TasksManager::setDayOfMonth($x);
-            $this->assertFalse($job->isDayOfMonth());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsDayOfMonth01() {
-        $job = new BaseTask('5 4 1-10,25-29 * *');
-
-        for ($x = 1 ; $x <= 10 ; $x++) {
-            TasksManager::setDayOfMonth($x);
-            $this->assertTrue($job->isDayOfMonth());
-        }
-        for ($x = 11 ; $x <= 24 ; $x++) {
-            TasksManager::setDayOfMonth($x);
-            $this->assertFalse($job->isDayOfMonth());
-        }
-        for ($x = 25 ; $x <= 29 ; $x++) {
-            TasksManager::setDayOfMonth($x);
-            $this->assertTrue($job->isDayOfMonth());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsDayOfMonth02() {
-        $job = new BaseTask('5 4 1,3,4,10,29 * *');
-
-        TasksManager::setDayOfMonth(1);
-        $this->assertTrue($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(3);
-        $this->assertTrue($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(4);
-        $this->assertTrue($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(10);
-        $this->assertTrue($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(29);
-        $this->assertTrue($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(11);
-        $this->assertFalse($job->isDayOfMonth());
-        
-        TasksManager::setDayOfMonth(2);
-        $this->assertFalse($job->isDayOfMonth());
-    }
-    
-    /**
-     * @test
-     */
-    public function testIsDayOfWeek00() {
-        $job = new BaseTask();
-        $job->weeklyOn('sun');
-        TasksManager::setDayOfWeek(0);
-        $this->assertTrue($job->isDayOfWeek());
-        for ($x = 1 ; $x < 7 ; $x++) {
-            TasksManager::setDayOfWeek($x);
-            $this->assertFalse($job->isDayOfWeek());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsDayOfWeek01() {
-        $job = new BaseTask('5 4 * * 0-3,5-6');
-
-        for ($x = 0 ; $x <= 3 ; $x++) {
-            TasksManager::setDayOfWeek($x);
-            $this->assertTrue($job->isDayOfWeek());
-        }
-        TasksManager::setDayOfWeek(4);
-        $this->assertFalse($job->isDayOfWeek());
-        
-        TasksManager::setDayOfWeek(5);
-        $this->assertTrue($job->isDayOfWeek());
-        TasksManager::setDayOfWeek(6);
-        $this->assertTrue($job->isDayOfWeek());
-    }
-    /**
-     * @test
-     */
-    public function testIsDayOfWeek02() {
-        $job = new BaseTask('5 4 * * 0,3,6');
-
-        TasksManager::setDayOfWeek(0);
-        $this->assertTrue($job->isDayOfWeek());
-        
-        TasksManager::setDayOfWeek(3);
-        $this->assertTrue($job->isDayOfWeek());
-        
-        TasksManager::setDayOfWeek(6);
-        $this->assertTrue($job->isDayOfWeek());
-        
-        TasksManager::setDayOfWeek(1);
-        $this->assertFalse($job->isDayOfWeek());
-        
-        TasksManager::setDayOfWeek(5);
-        $this->assertFalse($job->isDayOfWeek());
-    }
-    
-     
-    /**
-     * @test
-     */
-    public function testIsMinute00() {
-        $job = new BaseTask();
-        $job->dailyAt(0, 25);
-        TasksManager::setMinute(25);
-        $this->assertTrue($job->isMinute());
-        for ($x = 0 ; $x < 25 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertFalse($job->isMinute());
-        }
-        for ($x = 26 ; $x < 59 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertFalse($job->isMinute());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsMinute01() {
-        $job = new BaseTask('5-10,20-40 4 * * 0-3,5-6');
-
-        for ($x = 0 ; $x <= 4 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertFalse($job->isMinute());
-        }
-        for ($x = 5 ; $x <= 10 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertTrue($job->isMinute());
-        }
-        for ($x = 11 ; $x <= 19 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertFalse($job->isMinute());
-        }
-        for ($x = 20 ; $x <= 40 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertTrue($job->isMinute());
-        }
-        for ($x = 41 ; $x <= 59 ; $x++) {
-            TasksManager::setMinute($x);
-            $this->assertFalse($job->isMinute());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsMinute02() {
-        $job = new BaseTask('5,20,40,59 4 * * 0,3,6');
-
-        TasksManager::setMinute(5);
-        $this->assertTrue($job->isMinute());
-        
-        TasksManager::setMinute(20);
-        $this->assertTrue($job->isMinute());
-        
-        TasksManager::setMinute(40);
-        $this->assertTrue($job->isMinute());
-        
-        TasksManager::setMinute(59);
-        $this->assertTrue($job->isMinute());
-        
-        TasksManager::setMinute(0);
-        $this->assertFalse($job->isMinute());
-        
-        TasksManager::setMinute(1);
-        $this->assertFalse($job->isMinute());
-    }
-    /**
-     * @test
-     */
-    public function testIsHour00() {
-        $job = new BaseTask();
-        $job->everyHour(1);
-
-        for ($x = 0 ; $x < 24 ; $x++) {
-            TasksManager::setHour($x);
-            $this->assertTrue($job->isHour());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsHour01() {
-        $job = new BaseTask('5 0-2,12-19 1-10,25-29 * *');
-
-        for ($x = 0 ; $x <= 2 ; $x++) {
-            TasksManager::setHour($x);
-            $this->assertTrue($job->isHour());
-        }
-        for ($x = 3 ; $x <= 11 ; $x++) {
-            TasksManager::setHour($x);
-            $this->assertFalse($job->isHour());
-        }
-        for ($x = 12 ; $x <= 19 ; $x++) {
-            TasksManager::setHour($x);
-            $this->assertTrue($job->isHour());
-        }
-        for ($x = 20 ; $x <= 23 ; $x++) {
-            TasksManager::setHour($x);
-            $this->assertFalse($job->isHour());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsHour02() {
-        $job = new BaseTask('5 4,8,9,13,16 1,3,4,10,29 * *');
-
-        TasksManager::setHour(4);
-        $this->assertTrue($job->isHour());
-        
-        TasksManager::setHour(8);
-        $this->assertTrue($job->isHour());
-        
-        TasksManager::setHour(9);
-        $this->assertTrue($job->isHour());
-        
-        TasksManager::setHour(13);
-        $this->assertTrue($job->isHour());
-        
-        TasksManager::setHour(16);
-        $this->assertTrue($job->isHour());
-        
-        TasksManager::setHour(11);
-        $this->assertFalse($job->isHour());
-        
-        TasksManager::setHour(2);
-        $this->assertFalse($job->isHour());
-    }
-    
-    /**
-     * @test
-     */
-    public function testIsMonth00() {
-        $job = new BaseTask();
-        $job->onMonth(5);
-        TasksManager::setMonth(5);
-        $this->assertTrue($job->isMonth());
-        
-        for ($x = 1 ; $x < 4 ; $x++) {
-            TasksManager::setMonth($x);
-            $this->assertFalse($job->isMonth());
-        }
-        for ($x = 6 ; $x < 13 ; $x++) {
-            TasksManager::setMonth($x);
-            $this->assertFalse($job->isMonth());
-        }
-    }
-    /**
-     * @test
-     */
-    public function testIsMonth01() {
-        $job = new BaseTask('* 4 * 1-3,9-12 *');
-
-        for ($x = 1 ; $x <= 3 ; $x++) {
-            TasksManager::setMonth($x);
-            $this->assertTrue($job->isMonth());
-        }
-        for ($x = 4 ; $x <= 8 ; $x++) {
-            TasksManager::setMonth($x);
-            $this->assertFalse($job->isMonth());
-        }
-        for ($x = 9 ; $x <= 12 ; $x++) {
-            TasksManager::setMonth($x);
-            $this->assertTrue($job->isMonth());
-        }
-        
-    }
-    /**
-     * @test
-     */
-    public function testIsMonth02() {
-        $job = new BaseTask('5,20,40,59 4 * 1,5,8,4,12 0,3,6');
-
-        TasksManager::setMonth(1);
-        $this->assertTrue($job->isMonth());
-        
-        TasksManager::setMonth(5);
-        $this->assertTrue($job->isMonth());
-        
-        TasksManager::setMonth(8);
-        $this->assertTrue($job->isMonth());
-        
-        TasksManager::setMonth(4);
-        $this->assertTrue($job->isMonth());
-        
-        TasksManager::setMonth(12);
-        $this->assertTrue($job->isMonth());
-        
-        TasksManager::setMinute(1);
-        $this->assertFalse($job->isMinute());
     }
 }

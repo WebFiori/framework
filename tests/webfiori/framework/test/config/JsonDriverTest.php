@@ -7,7 +7,7 @@ use webfiori\framework\config\JsonDriver;
  *
  * @author Ibrahim
  */
-class JsonDriverTest extends TestCase{
+class JsonDriverTest extends TestCase {
     /**
      * @test
      */
@@ -22,7 +22,7 @@ class JsonDriverTest extends TestCase{
         $this->assertEquals('Stable',$driver->getAppVersionType());
         $this->assertEquals('https://127.0.0.1',$driver->getBaseURL());
         $this->assertEquals([
-            
+
         ],$driver->getDBConnections());
         $this->assertEquals([
             'AR' => '',
@@ -41,7 +41,7 @@ class JsonDriverTest extends TestCase{
         $this->assertEquals('',$driver->getHomePage());
         $this->assertEquals('EN',$driver->getPrimaryLanguage());
         $this->assertEquals([
-            
+
         ],$driver->getSMTPConnections());
         $this->assertEquals('NO_PASSWORD',$driver->getSchedulerPassword());
         $this->assertEquals('',$driver->getTheme());

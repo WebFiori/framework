@@ -2,11 +2,11 @@
 namespace webfiori\framework\test\scheduler;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\router\Router;
 use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\scheduler\webUI\ListTasksPage;
-use webfiori\framework\router\Router;
+use webfiori\framework\scheduler\webUI\TasksLoginPage;
 /**
  *
  * @author Ibrahim
@@ -17,6 +17,45 @@ class SchedulerTest extends TestCase {
      */
     public function testCreateTask00() {
         $this->assertFalse(TasksManager::createTask('7-1 * * * *'));
+    }
+
+
+    /**
+     * @test
+     */
+    public function testDailyTask00() {
+        $this->assertTrue(TasksManager::dailyTask('00:00', 'Task Xy', function()
+        {
+        }));
+        $job = TasksManager::getTask('Task Xy');
+        $this->assertNotNull($job);
+    }
+    /**
+     * @test
+     */
+    public function testDailyTask01() {
+        $this->assertFalse(TasksManager::dailyTask('23:65:6', 'Task X', function()
+        {
+        }));
+    }
+    /**
+     * @test
+     */
+    public function testDailyTask02() {
+        $this->assertFalse(TasksManager::dailyTask('24:00', 'Task X', function()
+        {
+        }));
+    }
+    /**
+     * @test
+     */
+    public function testDailyTask03() {
+        $this->assertTrue(TasksManager::dailyTask('23:00', 'Task Ok2', function(TasksManager $task, TestCase $c)
+        {
+            $c->assertEquals('Task Ok2', $task->activeTask()->getTaskName());
+        }, [TasksManager::get(), $this]));
+        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        TasksManager::run('', 'Task Ok2', true);
     }
     /**
      * @test
@@ -34,6 +73,69 @@ class SchedulerTest extends TestCase {
         TasksManager::createTask('17 * * * *', 'Task 4');
         $job = TasksManager::getTask('Task 3');
         $this->assertEquals('16 * * * *',$job->getExpression());
+    }
+
+    /**
+     * @test
+     */
+    public function testMonthlyTask00() {
+        $this->assertTrue(TasksManager::monthlyTask(1, '00:00', 'Task Xyz', function()
+        {
+        }));
+        $job = TasksManager::getTask('Task Xyz');
+        $this->assertNotNull($job);
+    }
+    /**
+     * @test
+     */
+    public function testMonthlyTask01() {
+        $this->assertFalse(TasksManager::monthlyTask(44, '23:65:6', 'Task X', function()
+        {
+        }));
+    }
+    /**
+     * @test
+     */
+    public function testMonthlyTask02() {
+        $this->assertFalse(TasksManager::monthlyTask(2, '24:00', 'Task X', function()
+        {
+        }));
+    }
+    /**
+     * @test
+     */
+    public function testMonthlyTask03() {
+        $this->assertTrue(TasksManager::monthlyTask(15, '23:00', 'Task Ok3', function(TasksManager $task, TestCase $c)
+        {
+            $c->assertEquals('Task Ok3', $task->activeTask()->getTaskName());
+        }, [TasksManager::get(), $this]));
+        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        TasksManager::run('', 'Task Ok3', true);
+        $this->assertEquals('TASK_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
+    }
+    /**
+     * @test
+     */
+    public function testRoutes() {
+        Router::removeAll();
+        TasksManager::initRoutes();
+        $this->assertEquals(5, Router::routesCount());
+
+        $route1 = Router::getUriObj('/scheduler');
+        $this->assertNotNull($route1);
+        $this->assertEquals(TasksLoginPage::class, $route1->getRouteTo());
+
+        $route2 = Router::getUriObj('/scheduler/login');
+        $this->assertNotNull($route2);
+        $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
+
+        $route3 = Router::getUriObj('/scheduler/tasks');
+        $this->assertNotNull($route3);
+        $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
+
+        $route4 = Router::getUriObj('/scheduler/apis/{action}');
+        $this->assertNotNull($route4);
+        $this->assertEquals(TasksServicesManager::class, $route4->getRouteTo());
     }
     /**
      * @test
@@ -87,107 +189,5 @@ class SchedulerTest extends TestCase {
         }, [TasksManager::get(), $this]));
         $this->assertEquals('NO_PASSWORD', TasksManager::password());
         TasksManager::run('', 'Task Ok', true);
-    }
-    
-    
-    /**
-     * @test
-     */
-    public function testDailyTask00() {
-        $this->assertTrue(TasksManager::dailyTask('00:00', 'Task Xy', function()
-        {
-        }));
-        $job = TasksManager::getTask('Task Xy');
-        $this->assertNotNull($job);
-    }
-    /**
-     * @test
-     */
-    public function testDailyTask01() {
-        $this->assertFalse(TasksManager::dailyTask('23:65:6', 'Task X', function()
-        {
-        }));
-    }
-    /**
-     * @test
-     */
-    public function testDailyTask02() {
-        $this->assertFalse(TasksManager::dailyTask('24:00', 'Task X', function()
-        {
-        }));
-    }
-    /**
-     * @test
-     */
-    public function testDailyTask03() {
-        $this->assertTrue(TasksManager::dailyTask('23:00', 'Task Ok2', function(TasksManager $task, TestCase $c)
-        {
-            $c->assertEquals('Task Ok2', $task->activeTask()->getTaskName());
-        }, [TasksManager::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', TasksManager::password());
-        TasksManager::run('', 'Task Ok2', true);
-    }
-    
-    /**
-     * @test
-     */
-    public function testMonthlyTask00() {
-        $this->assertTrue(TasksManager::monthlyTask(1, '00:00', 'Task Xyz', function()
-        {
-        }));
-        $job = TasksManager::getTask('Task Xyz');
-        $this->assertNotNull($job);
-    }
-    /**
-     * @test
-     */
-    public function testMonthlyTask01() {
-        $this->assertFalse(TasksManager::monthlyTask(44, '23:65:6', 'Task X', function()
-        {
-        }));
-    }
-    /**
-     * @test
-     */
-    public function testMonthlyTask02() {
-        $this->assertFalse(TasksManager::monthlyTask(2, '24:00', 'Task X', function()
-        {
-        }));
-    }
-    /**
-     * @test
-     */
-    public function testMonthlyTask03() {
-        $this->assertTrue(TasksManager::monthlyTask(15, '23:00', 'Task Ok3', function(TasksManager $task, TestCase $c)
-        {
-            $c->assertEquals('Task Ok3', $task->activeTask()->getTaskName());
-        }, [TasksManager::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', TasksManager::password());
-        TasksManager::run('', 'Task Ok3', true);
-        $this->assertEquals('TASK_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
-    }
-    /**
-     * @test
-     */
-    public function testRoutes() {
-        Router::removeAll();
-        TasksManager::initRoutes();
-        $this->assertEquals(5, Router::routesCount());
-        
-        $route1 = Router::getUriObj('/scheduler');
-        $this->assertNotNull($route1);
-        $this->assertEquals(TasksLoginPage::class, $route1->getRouteTo());
-        
-        $route2 = Router::getUriObj('/scheduler/login');
-        $this->assertNotNull($route2);
-        $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
-        
-        $route3 = Router::getUriObj('/scheduler/tasks');
-        $this->assertNotNull($route3);
-        $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
-        
-        $route4 = Router::getUriObj('/scheduler/apis/{action}');
-        $this->assertNotNull($route4);
-        $this->assertEquals(TasksServicesManager::class, $route4->getRouteTo());
     }
 }

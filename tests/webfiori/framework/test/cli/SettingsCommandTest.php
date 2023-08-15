@@ -41,7 +41,7 @@ class SettingsCommandTest extends TestCase {
             "    Pages Titles:\n",
             "        AR => افتراضي\n",
             "        EN => Default\n",
-            
+
         ], $runner->getOutput());
     }
 }

@@ -1,10 +1,9 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\commands\VersionCommand;
 use webfiori\cli\Runner;
+use webfiori\framework\cli\commands\VersionCommand;
 /**
  * Description of VersionCommandTest
  *

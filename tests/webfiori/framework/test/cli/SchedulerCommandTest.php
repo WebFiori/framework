@@ -1,10 +1,9 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\App;
+use webfiori\framework\scheduler\TasksManager;
 /**
  * Description of CronCommandTest
  *
@@ -267,7 +266,7 @@ class SchedulerCommandTest extends TestCase {
         TasksManager::execLog(true);
         TasksManager::password('123456');
         TasksManager::registerTasks();
-        
+
         $runner->setInputs([
             'N'
         ]);
@@ -295,7 +294,7 @@ class SchedulerCommandTest extends TestCase {
     public function test09() {
         $runner = App::getRunner();
         $runner->setInputs([
-            
+
         ]);
         $runner->setArgsVector([
             'webfiori',
@@ -394,7 +393,7 @@ class SchedulerCommandTest extends TestCase {
         TasksManager::execLog(true);
         TasksManager::password(hash('sha256', '123456'));
         TasksManager::registerTasks();
-        
+
         $runner->setInputs([
             'Y',
             '2021-01-01',

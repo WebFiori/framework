@@ -20,8 +20,8 @@ class RouterBench {
         }
         Router::closure([
             'path' => 'hello',
-            'route-to' => function () {
-            
+            'route-to' => function ()
+            {
             }
         ]);
     }

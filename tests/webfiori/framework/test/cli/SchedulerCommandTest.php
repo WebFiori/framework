@@ -29,7 +29,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        TasksManager::password(hash('sha256', '123456'));
+        TasksManager::setPassword(hash('sha256', '123456'));
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -264,7 +264,7 @@ class SchedulerCommandTest extends TestCase {
         $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
-        TasksManager::password('123456');
+        TasksManager::setPassword('123456');
         TasksManager::registerTasks();
 
         $runner->setInputs([
@@ -391,7 +391,7 @@ class SchedulerCommandTest extends TestCase {
         $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
-        TasksManager::password(hash('sha256', '123456'));
+        TasksManager::setPassword(hash('sha256', '123456'));
         TasksManager::registerTasks();
 
         $runner->setInputs([

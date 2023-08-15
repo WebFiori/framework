@@ -29,7 +29,8 @@
         "webfiori/mailer":"v1.0.6"
     },
     "require-dev": {
-        "phpbench/phpbench": "^1.0"
+        "phpbench/phpbench": "^1.0",
+        "symplify/easy-coding-standard":"12.0.6"
     },
     "autoload": {
         "psr-4": {

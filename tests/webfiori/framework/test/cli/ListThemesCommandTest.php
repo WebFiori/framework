@@ -36,7 +36,7 @@ class ListThemesCommandTest extends TestCase {
             "Author URL:     : https://ibrahim-binalshikh.me\n",
             "License:        : MIT\n",
             "License URL:    : https://opensource.org/licenses/MIT\n",
-            "Theme Desription: This theme is in before loaded.\n",
+            "Theme Desription: Colofull Theme.\n",
         ], $runner->getOutput());
     }
     /**

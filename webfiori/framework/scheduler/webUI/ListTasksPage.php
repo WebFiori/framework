@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler\webUI;
 
@@ -14,14 +14,14 @@ use webfiori\file\File;
 use webfiori\http\Response;
 /**
  * A view to display information about scheduled tasks.
- * 
- * The view will show a table of all scheduled tasks. The table will include 
+ *
+ * The view will show a table of all scheduled tasks. The table will include
  * the following information about each task:
  * <ul>
  * <li>The name of the task.</li>
  * <li>Its cron expression.</li>
  * <li>
- * 5 columns that shows if it is time to execute the task or not 
+ * 5 columns that shows if it is time to execute the task or not
  * (Yes, No). The columns are:
  * <ul>
  * <li>Is Minute: Is it current minute in the hour to run the task.</li>
@@ -32,9 +32,9 @@ use webfiori\http\Response;
  * </ul>
  * </li>
  * </ul>
- * Also, there is a section that shows execution logs 
+ * Also, there is a section that shows execution logs
  * of tasks.
- * 
+ *
  * @version 1.0
  */
 class ListTasksPage extends BaseTasksPage {

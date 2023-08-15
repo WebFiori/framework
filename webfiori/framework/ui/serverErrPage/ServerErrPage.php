@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2023 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\ui\serverErrPage;
 
@@ -14,7 +14,7 @@ use webfiori\error\AbstractHandler;
 use webfiori\framework\ui\WebPage;
 use webfiori\ui\HTMLNode;
 /**
- * A page which is used to display exception information when it is thrown or 
+ * A page which is used to display exception information when it is thrown or
  * any other errors.
  *
  * @author Ibrahim
@@ -23,10 +23,10 @@ use webfiori\ui\HTMLNode;
 class ServerErrPage extends WebPage {
     /**
      * Creates a new instance of the class.
-     * 
+     *
      * @param AbstractHandler $throwableOrErr The handler which is
      * used to handle exceptions.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(AbstractHandler $throwableOrErr) {

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\writers;
 
@@ -24,12 +24,12 @@ class SchedulerTaskClassWriter extends ClassWriter {
     private $task;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $taskName The name of the task.
-     * 
+     *
      * @param string $taskDesc A short description that description what does the
      * task do.
-     * 
+     *
      * @param array $argsArr An associative array that holds any arguments that
      * the task needs.
      */
@@ -57,7 +57,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
     }
     /**
      * Adds new execution argument to the task.
-     * 
+     *
      * @param TaskArgument $arg An object which holds argument information.
      */
     public function addArgument(TaskArgument $arg) {
@@ -66,7 +66,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
     /**
      * Returns the object which holds the basic information of the task that will
      * be created.
-     * 
+     *
      * @return BaseTask
      */
     public function getTask() : BaseTask {
@@ -74,7 +74,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
     }
     /**
      * Returns the description of the task.
-     * 
+     *
      * @return string The description of the task. Default return value is 'No Description'.
      */
     public function getTaskDescription() : string {
@@ -82,7 +82,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
     }
     /**
      * Returns the name of the task.
-     * 
+     *
      * @return string The name of the task. Default return value is 'New Task'.
      */
     public function getTaskName() : string {
@@ -90,12 +90,12 @@ class SchedulerTaskClassWriter extends ClassWriter {
     }
     /**
      * Sets the description of the task.
-     * 
+     *
      * The description is usually used to describe what does the task will do
      * when it gets executed.
-     * 
+     *
      * @param string $taskDesc The description of the task. Must be non-empty string.
-     * 
+     *
      * @return bool If the description is set, the method will return true. Other then
      * that, the method will return false.
      */
@@ -104,12 +104,12 @@ class SchedulerTaskClassWriter extends ClassWriter {
     }
     /**
      * Sets the name of the task.
-     * 
+     *
      * The name is a unique string which is used by each created task. It acts as
      * an identifier for the task.
-     * 
+     *
      * @param string $taskName The name of the task. Must be non-empty string.
-     * 
+     *
      * @return bool If the name is set, the method will return true. Other then
      * that, the method will return false.
      */

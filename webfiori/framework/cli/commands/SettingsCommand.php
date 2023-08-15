@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -20,7 +20,7 @@ use webfiori\framework\App;
 class SettingsCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--show-config'. This command is used to display 
+     * The command will have name '--show-config'. This command is used to display
      * the configuration of the framework.
      */
     public function __construct() {
@@ -28,7 +28,7 @@ class SettingsCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * @return int If the command executed without any errors, the 
+     * @return int If the command executed without any errors, the
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */

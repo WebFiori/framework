@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler;
 
@@ -17,37 +17,37 @@ use webfiori\json\JsonI;
  * A class that represents execution argument of a task.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.3.1
  */
 class TaskArgument implements JsonI {
     /**
-     * 
+     *
      * @var string
-     * 
+     *
      * @since 1.0
      */
     private $argName;
     private $argVal;
     private $default;
     /**
-     * 
+     *
      * @var string
-     * 
+     *
      * @since 1.0
      */
     private $description;
     /**
      * Creates new instance of the class.
-     * 
-     * @param string $name The name of the argument. It will be considered invalid 
+     *
+     * @param string $name The name of the argument. It will be considered invalid
      * if it contains one of the following characters: '=', '&', '#' and '?'.
-     * 
-     * @param string $desc A string that describes how the argument will affect 
+     *
+     * @param string $desc A string that describes how the argument will affect
      * task execution. It must be non-empty string in order to be set.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $name, string $desc = '') {
@@ -59,10 +59,10 @@ class TaskArgument implements JsonI {
     }
     /**
      * Returns the default value of the argument.
-     * 
+     *
      * The default value is usually used if the argument has no value
      * provided.
-     * 
+     *
      * @return string|null If default value is set, it's returned as string.
      * Other than that, null is returned.
      */
@@ -71,10 +71,10 @@ class TaskArgument implements JsonI {
     }
     /**
      * Returns argument description.
-     * 
-     * @return string A string that describes how the argument will affect task 
+     *
+     * @return string A string that describes how the argument will affect task
      * execution. Default return value is 'NO DESCRIPTION'.
-     *  
+     *
      * @since 1.0
      */
     public function getDescription() : string {
@@ -82,9 +82,9 @@ class TaskArgument implements JsonI {
     }
     /**
      * Returns the name of the argument.
-     * 
+     *
      * @return string The name of the argument.
-     * 
+     *
      * @since 1.0
      */
     public function getName() : string {
@@ -92,11 +92,11 @@ class TaskArgument implements JsonI {
     }
     /**
      * Returns the value of task argument.
-     * 
-     * 
-     * @return string|null If the value of the argument is set, it will be returned 
+     *
+     *
+     * @return string|null If the value of the argument is set, it will be returned
      * as string. Other than that, null is returned.
-     * 
+     *
      * @since 1.0
      */
     public function getValue() {
@@ -105,7 +105,7 @@ class TaskArgument implements JsonI {
     /**
      * Sets a default value for the argument to use in case it was not
      * provided.
-     * 
+     *
      * @param string $default A string that represents the default value
      * of the argument.
      */
@@ -117,13 +117,13 @@ class TaskArgument implements JsonI {
     }
     /**
      * Sets a description for the argument.
-     * 
-     * @param string $desc A string that describes how the argument will affect 
+     *
+     * @param string $desc A string that describes how the argument will affect
      * task execution. It must be non-empty string in order to be set.
-     * 
-     * @return boolean If the description is set, the method will return true. 
+     *
+     * @return boolean If the description is set, the method will return true.
      * false if not set.
-     * 
+     *
      * @since 1.0
      */
     public function setDescription(string $desc): bool {
@@ -139,10 +139,10 @@ class TaskArgument implements JsonI {
     }
     /**
      * Sets the name of the argument.
-     * 
-     * @param string $name The name of the argument. It will be considered invalid 
+     *
+     * @param string $name The name of the argument. It will be considered invalid
      * if it contains one of the following characters: '=', '&', '#' and '?'.
-     * 
+     *
      * @throws InvalidArgumentException If the name of the argument is invalid.
      */
     public function setName(string $name) {
@@ -159,7 +159,7 @@ class TaskArgument implements JsonI {
     }
     /**
      * Sets the value of the argument.
-     * 
+     *
      * @param string $val A string that represents the value of the argument.
      */
     public function setValue(string $val) {
@@ -167,13 +167,13 @@ class TaskArgument implements JsonI {
     }
     /**
      * Returns an object that represents the argument in JSON.
-     * 
+     *
      * @return Json An object that holds the following JSON attributes:
      * <ul>
      * <li>name</li>
      * <li>description</li>
      * </ul>
-     * 
+     *
      * @since 1.0
      */
     public function toJSON() : Json {

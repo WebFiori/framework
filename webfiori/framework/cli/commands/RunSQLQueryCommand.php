@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -20,11 +20,11 @@ use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\DB;
 /**
- * A command which can be used to execute SQL queries on 
+ * A command which can be used to execute SQL queries on
  * specific database.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
  */
 class RunSQLQueryCommand extends CLICommand {
@@ -41,7 +41,7 @@ class RunSQLQueryCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * 
+     *
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
@@ -67,7 +67,7 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     /**
-     * 
+     *
      * @param type $schema
      * @param type $selectedQuery
      * @param type $colsKeys
@@ -257,7 +257,7 @@ class RunSQLQueryCommand extends CLICommand {
         }
     }
     /**
-     * 
+     *
      * @param DB $schema
      * @param Table $tableObj
      */

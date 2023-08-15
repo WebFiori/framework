@@ -1,23 +1,23 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\ui;
 
 /**
- * A page which is shown to the framework users when the developer has not 
+ * A page which is shown to the framework users when the developer has not
  * configured any routes.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.3.0
  */
 class StarterPage extends WebPage {

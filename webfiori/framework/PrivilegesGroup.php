@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -14,59 +14,59 @@ use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**
  * A class that represents a set of privileges.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.1.1
  */
 class PrivilegesGroup implements JsonI {
     /**
      * An array that contains all child groups of this group.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.1
      */
     private $childGroups;
     /**
      * The unique Identifier of the group.
-     * 
-     * @var string 
-     * 
+     *
+     * @var string
+     *
      * @since 1.0
      */
     private $groupId;
     /**
      * The name of the group.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $groupName;
     /**
      * A parent group that this group belongs to.
-     * 
-     * @var PrivilegesGroup 
-     * 
+     *
+     * @var PrivilegesGroup
+     *
      * @since 1.1
      */
     private $parentGroup;
     /**
      * An array which contains group privileges.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $privilegesArr;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $gId The ID of the group. Default is 'GROUP'.
-     * 
+     *
      * @param string $gName The name of the group. Default is 'G_NAME'.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $gId = 'GROUP', string $gName = 'G_NAME') {
@@ -85,12 +85,12 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Returns an array that contains all group privileges.
-     * 
-     * The array does not include the privileges of parent group or child 
+     *
+     * The array does not include the privileges of parent group or child
      * groups.
-     * 
+     *
      * @return array An array that contains an objects of type 'Privilege'.
-     * 
+     *
      * @since 1.0
      */
     public function &privileges() : array {
@@ -98,14 +98,14 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Adds new privilege to the array of group privileges.
-     * 
-     * @param Privilege $pr An object of type Privilege. Note that 
-     * the privilege will be added only if there is no privilege in 
+     *
+     * @param Privilege $pr An object of type Privilege. Note that
+     * the privilege will be added only if there is no privilege in
      * the group which has the same ID.
-     * 
-     * @return boolean The method will return true if the privilege was 
+     *
+     * @return boolean The method will return true if the privilege was
      * added. false otherwise.
-     * 
+     *
      * @since 1.0
      */
     public function addPrivilege(Privilege $pr) : bool {
@@ -120,9 +120,9 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Returns an array that contains all child groups of the group.
-     * 
+     *
      * @return array An array that contains an objects of type 'PrivilegesGroup'.
-     * 
+     *
      * @since 1.1
      */
     public function childGroups() : array {
@@ -130,9 +130,9 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Returns the ID of the group.
-     * 
+     *
      * @return string The ID of the group. Default value is 'GROUP'.
-     * 
+     *
      * @since 1.0
      */
     public function getID() : string {
@@ -140,12 +140,12 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Returns the name of the group.
-     * 
-     * The name can be used to give a meaningful description of the group 
+     *
+     * The name can be used to give a meaningful description of the group
      * (like a label).
-     * 
+     *
      * @return string The name of the group. Default value is 'G_NAME'.
-     * 
+     *
      * @since 1.0
      */
     public function getName() : string {
@@ -153,12 +153,12 @@ class PrivilegesGroup implements JsonI {
     }
 
     /**
-     * Returns an object of type 'PrivilegesGroup' that represents the parent 
+     * Returns an object of type 'PrivilegesGroup' that represents the parent
      * group of 'this' group.
-     * 
-     * @return PrivilegesGroup|null If the parent group is set, the method will 
+     *
+     * @return PrivilegesGroup|null If the parent group is set, the method will
      * return it. If it is not set, the method will return null.
-     * 
+     *
      * @since 1.1
      */
     public function getParentGroup() {
@@ -167,18 +167,18 @@ class PrivilegesGroup implements JsonI {
 
     /**
      * Checks if the group has the given privilege or not.
-     * 
-     * This method will only check the given group (does not include parent). 
-     * 
+     *
+     * This method will only check the given group (does not include parent).
+     *
      * @param Privilege $p An object of type 'Privilege'.
-     * 
-     * @param boolean $checkChildGroups If this parameter is set to true, the 
-     * search for the privilege will include child groups. By default, it will 
+     *
+     * @param boolean $checkChildGroups If this parameter is set to true, the
+     * search for the privilege will include child groups. By default, it will
      * be set to true.
-     * 
-     * @return boolean The method will return true if the group has the given 
+     *
+     * @return boolean The method will return true if the group has the given
      * privilege. false if not.
-     * 
+     *
      * @since 1.0
      */
     public function hasPrivilege(Privilege $p, bool $checkChildGroups = true) : bool {
@@ -204,9 +204,9 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Checks if provided group ID is valid or not.
-     * 
+     *
      * @param string $id The ID of the privilege or the group.
-     * 
+     *
      * @return bool If valid, true is returned. False otherwise.
      */
     public static function isValidID(string $id) : bool {
@@ -225,16 +225,16 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Sets the ID of the group.
-     * 
-     * The ID of the group can only consist of the following characters: [A-Z], 
-     * [a-z], [0-9] and underscore. In addition, it must not be the same as the 
+     *
+     * The ID of the group can only consist of the following characters: [A-Z],
+     * [a-z], [0-9] and underscore. In addition, it must not be the same as the
      * ID of the parent groups or child groups.
-     * 
+     *
      * @param string $id The ID of the group.
-     * 
-     * @return boolean If the ID of the group is updated, the method will return 
+     *
+     * @return boolean If the ID of the group is updated, the method will return
      * true. If not updated, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function setID(string $id) : bool {
@@ -276,15 +276,15 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Sets the name of the group.
-     * 
+     *
      * The name is used just to give a meaning to the group.
-     * 
-     * @param string $name The name of the group. It must be non-empty string 
+     *
+     * @param string $name The name of the group. It must be non-empty string
      * in order to update.
-     * 
-     * @return boolean If group name is updated, the method will return true. 
+     *
+     * @return boolean If group name is updated, the method will return true.
      * If not updated, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public function setName(string $name) : bool {
@@ -300,15 +300,15 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Sets or unset parent privileges group.
-     * 
-     * @param PrivilegesGroup|null $group If the given parameter is an object of 
-     * type 'PrivilegesGroup', the parent group will be set if it has different 
-     * ID other than 'this' group. If null reference is passed, the parent group will be 
+     *
+     * @param PrivilegesGroup|null $group If the given parameter is an object of
+     * type 'PrivilegesGroup', the parent group will be set if it has different
+     * ID other than 'this' group. If null reference is passed, the parent group will be
      * unset. Default value is null.
-     * 
-     * @return boolean If the class attribute value was updated, the method will 
+     *
+     * @return boolean If the class attribute value was updated, the method will
      * return true. Other than that, the method will return false.
-     * 
+     *
      * @since 1.1
      */
     public function setParentGroup(PrivilegesGroup $group = null) : bool {
@@ -330,7 +330,7 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Returns an object of type Json that contains group info as JSON string.
-     * 
+     *
      * The generated JSON string will have the following format:
      * <p>
      * {<br/>
@@ -340,10 +340,10 @@ class PrivilegesGroup implements JsonI {
      * &nbsp;&nbsp;"privileges":[]<br/>
      * &nbsp;&nbsp;"child-groups":[]<br/>
      * }
-     * </p> 
-     * See the class "Privilege" for more information on the JSON string that 
+     * </p>
+     * See the class "Privilege" for more information on the JSON string that
      * will be generated by each privilege in the privileges array.
-     * 
+     *
      * @return Json
      */
     public function toJSON() : Json {
@@ -378,10 +378,10 @@ class PrivilegesGroup implements JsonI {
     }
     /**
      * Checks if a group has specific privilege or not.
-     * 
+     *
      * @param PrivilegesGroup $group The group that will be checked
-     * 
-     * @param Privilege $p The privilege that will be checked. 
+     *
+     * @param Privilege $p The privilege that will be checked.
      */
     private function hasPrivilegeHelper(PrivilegesGroup $group, Privilege $p) {
         $hasPr = false;

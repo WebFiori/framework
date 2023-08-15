@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -18,11 +18,11 @@ use webfiori\file\File;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\writers\LangClassWriter;
 /**
- * A class that can be used to modify basic configuration settings of 
- * the web application. 
+ * A class that can be used to modify basic configuration settings of
+ * the web application.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.5.3
  */
 class ConfigController {
@@ -36,10 +36,10 @@ class ConfigController {
     private $since101;
     /**
      * An instance of the class.
-     * 
+     *
      * @var ConfigController
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $singleton;
     private function __construct() {
@@ -109,9 +109,9 @@ class ConfigController {
     }
     /**
      * Creates the class 'Env'.
-     * 
+     *
      * By default, the class will be created inside the folder 'APP_DIR/config'.
-     * 
+     *
      * @throws Exception The method will throw an exception if the method
      * was unable to create the class.
      */
@@ -376,9 +376,9 @@ class ConfigController {
     }
     /**
      * Returns a single instance of the class.
-     * 
+     *
      * @return ConfigController
-     * 
+     *
      * @since 1.0
      */
     public static function get(): ConfigController {
@@ -389,13 +389,13 @@ class ConfigController {
         return self::$singleton;
     }
     /**
-     * Returns a string that represents the name of admin theme of the web 
+     * Returns a string that represents the name of admin theme of the web
      * application.
-     * 
+     *
      * Note that if theme is not set the method will return empty string.
-     * 
+     *
      * @return string
-     * 
+     *
      * @since 1.0
      */
     public function getAdminTheme(): string {
@@ -403,10 +403,10 @@ class ConfigController {
     }
     /**
      * Returns an associative array that holds application version info.
-     * 
-     * @return array The array will have the following indices: 'version', 
+     *
+     * @return array The array will have the following indices: 'version',
      * 'version-type' and 'release-date'.
-     * 
+     *
      * @since 1.5.2
      */
     public function getAppVersionInfo(): array {
@@ -414,22 +414,22 @@ class ConfigController {
     }
     /**
      * Returns the base URL which is use as a value for the tag &gt;base&lt;.
-     * 
+     *
      * @return string
-     * 
+     *
      * @since 1.0
      */
     public function getBase(): string {
         return $this->configVars['site']['base-url'];
     }
     /**
-     * Returns a string that represents the name of the base theme of the web 
+     * Returns a string that represents the name of the base theme of the web
      * application.
-     * 
+     *
      * Note that if theme is not set the method will return empty string.
-     * 
-     * @return string 
-     * 
+     *
+     * @return string
+     *
      * @since 1.0
      */
     public function getBaseTheme() : string {
@@ -437,22 +437,22 @@ class ConfigController {
     }
     /**
      * Returns an array that holds database connections.
-     * 
-     * @return array The indices of the array are names of the connections and 
+     *
+     * @return array The indices of the array are names of the connections and
      * the value of each index is an object of type 'ConnectionInfo'.
-     * 
+     *
      * @since 1.0
      */
     public function getDatabaseConnections(): array {
         return $this->configVars['database-connections'];
     }
     /**
-     * Returns an array that holds different descriptions for the web application 
+     * Returns an array that holds different descriptions for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the description.
-     * 
+     *
      * @since 1.0
      */
     public function getDescriptions(): array {
@@ -460,9 +460,9 @@ class ConfigController {
     }
     /**
      * Returns a link that represents the home page of the web application.
-     * 
+     *
      * @return string|null
-     * 
+     *
      * @since 1.0
      */
     public function getHomePage() {
@@ -470,52 +470,52 @@ class ConfigController {
     }
     /**
      * Returns a string that represents primary language of the web application.
-     * 
+     *
      * @return string A two characters string such as 'EN'.
-     * 
+     *
      * @since 1.0
      */
     public function getPrimaryLang(): string {
         return $this->configVars['site']['primary-lang'];
     }
     /**
-     * Returns password hash of the password which is used to protect background 
+     * Returns password hash of the password which is used to protect background
      * tasks from unauthorized execution.
-     * 
-     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
+     *
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no
      * password.
-     * 
+     *
      * @since 1.5.2
      */
     public function getSchedulerPassword(): string {
         return $this->configVars['scheduler-password'];
     }
     /**
-     * Returns an associative array that contains website configuration 
+     * Returns an associative array that contains website configuration
      * info.
-     * 
-     * The returned array will have the following indices: 
+     *
+     * The returned array will have the following indices:
      * <ul>
-     * <li><b>website-names</b>: A sub associative array. The index of the 
-     * array will be language code (such as 'EN') and the value 
+     * <li><b>website-names</b>: A sub associative array. The index of the
+     * array will be language code (such as 'EN') and the value
      * will be the name of the website in the given language.</li>
-     * <li><b>base-url</b>: The URL at which system pages will be served from. 
+     * <li><b>base-url</b>: The URL at which system pages will be served from.
      * usually, this URL is used in the tag 'base' of the web page.</li>
-     * <li><b>title-sep</b>: A character or a string that is used 
+     * <li><b>title-sep</b>: A character or a string that is used
      * to separate website name from web page title.</li>
      * <li><b>home-page</b>: The URL of the home page of the website.</li>
-     * <li><b>base-theme</b>: The name of the theme that will be used to style 
+     * <li><b>base-theme</b>: The name of the theme that will be used to style
      * website UI.</li>
      * <li><b>primary-lang</b>: Primary language of the website.
-     * <li><b>admin-theme</b>: The name of the theme that is used to style 
+     * <li><b>admin-theme</b>: The name of the theme that is used to style
      * admin web pages.</li>
-     * <li><b>descriptions</b>: A sub associative array. The index of the 
-     * array will be language code (such as 'EN') and the value 
+     * <li><b>descriptions</b>: A sub associative array. The index of the
+     * array will be language code (such as 'EN') and the value
      * will be the general website description in the given language.</li></li>
-     * </ul> 
-     * @return array An associative array that contains website configuration 
+     * </ul>
+     * @return array An associative array that contains website configuration
      * info.
-     * 
+     *
      * @since 1.0
      */
     public function getSiteConfigVars(): array {
@@ -523,45 +523,45 @@ class ConfigController {
     }
     /**
      * Returns an array that holds SMTP connections.
-     * 
-     * @return array The indices of the array are names of the connections and 
+     *
+     * @return array The indices of the array are names of the connections and
      * the value of each index is an object of type 'SMTPAccount'.
-     * 
+     *
      * @since 1.0
      */
     public function getSMTPAccounts(): array {
         return $this->configVars['smtp-connections'];
     }
     /**
-     * Returns an array that holds different page titles for the web application 
+     * Returns an array that holds different page titles for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the title.
-     * 
+     *
      * @since 1.0
      */
     public function getTitles(): array {
         return $this->configVars['site']['titles'];
     }
     /**
-     * Returns a string that represents the string that will be used to separate 
+     * Returns a string that represents the string that will be used to separate
      * website name from page title.
-     * 
+     *
      * @return string
-     * 
+     *
      * @since 1.0
      */
     public function getTitleSep(): string {
         return $this->configVars['site']['title-sep'];
     }
     /**
-     * Returns an array that holds different names for the web application 
+     * Returns an array that holds different names for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the name.
-     * 
+     *
      * @since 1.0
      */
     public function getWebsiteNames(): array {
@@ -635,9 +635,9 @@ class ConfigController {
     }
     /**
      * Sets the configuration that will be used by the class.
-     * 
+     *
      * @param Config $cfg
-     * 
+     *
      * @since 1.5.3
      */
     public function setConfig(Config $cfg) {

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -21,30 +21,30 @@ use webfiori\http\Response;
  * A class which has utility methods which are related to themes loading.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0.1
  */
 class ThemeLoader {
     /**
      * The directory where themes are located in.
-     * 
+     *
      * @since 1.0
      */
     const THEMES_DIR = 'themes';
     /**
      * An array that contains all available themes.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.0
      */
     private static $AvailableThemes;
     /**
      * An array that contains all loaded themes.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $loadedThemes = [];
     private function __construct() {
@@ -83,11 +83,11 @@ class ThemeLoader {
     }
     /**
      * Returns an array which contains all loaded themes.
-     * 
-     * @return array An associative array which contains all loaded themes. 
-     * The index will be theme name and the value is an object of type 'Theme' 
+     *
+     * @return array An associative array which contains all loaded themes.
+     * The index will be theme name and the value is an object of type 'Theme'
      * which contains theme info.
-     * 
+     *
      * @since 1.0
      */
     public static function getLoadedThemes(): array {
@@ -95,13 +95,13 @@ class ThemeLoader {
     }
     /**
      * Checks if a theme is loaded or not given its name.
-     * 
+     *
      * @param string $themeName The name of the theme.
-     * 
-     * @return boolean The method will return true if 
+     *
+     * @return boolean The method will return true if
      * the theme was found in the array of loaded themes. false
      * if not.
-     * 
+     *
      * @since 1.0
      */
     public static function isThemeLoaded(string $themeName): bool {
@@ -139,9 +139,9 @@ class ThemeLoader {
     }
     /**
      * Reset the array which contains all loaded themes.
-     * 
+     *
      * By calling this method, all loaded themes will be unloaded.
-     * 
+     *
      * @since 1.0
      */
     public static function resetLoaded() {

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
@@ -17,7 +17,7 @@ use webfiori\framework\writers\CLICommandClassWriter;
  * A helper class which is used to help in creating CLI command classes using CLI.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
  */
 class CreateCLIClassHelper extends CreateClassHelper {
@@ -27,7 +27,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
     private $cliWriter;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {

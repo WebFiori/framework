@@ -1,25 +1,25 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\session;
 
 use webfiori\database\DatabaseException;
 use webfiori\framework\DB;
 /**
- * A class which includes all database related operations to add, update, 
+ * A class which includes all database related operations to add, update,
  * and delete sessions from a database.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.1.1
  */
 class SessionDB extends DB {
@@ -190,7 +190,7 @@ class SessionDB extends DB {
     }
     /**
      * Split session data into smaller chunks.
-     * 
+     *
      * @param string $data
      * @return array
      */

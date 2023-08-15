@@ -8,9 +8,9 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
- * The name of the directory at which the developer will have his own application 
+ * The name of the directory at which the developer will have his own application
  * code.
- * 
+ *
  * @since 2.3.0
  */
 define('APP_DIR', 'app');
@@ -42,7 +42,7 @@ class Index {
         $this->loadAppClass();
         /**
          * This where magic will start.
-         * 
+         *
          * Planting application seed into the ground and make your work bloom.
          */
         App::start();
@@ -66,7 +66,7 @@ class Index {
     }
     /**
      * Try to load the class 'App'.
-     * 
+     *
      * @throws Exception
      */
     private function loadAppClass() {

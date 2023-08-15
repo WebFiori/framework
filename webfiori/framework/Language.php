@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -15,78 +15,78 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
 
 /**
- * A class that is can be used to make the application ready for 
+ * A class that is can be used to make the application ready for
  * Internationalization (i18n).
- * 
- * In order to create a language file, the developer must extend this class. 
- * The language class must be added to the namespace 'app/langs' and the name 
- * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
- * represents language code. The directory at which the language file must exist in 
+ *
+ * In order to create a language file, the developer must extend this class.
+ * The language class must be added to the namespace 'app/langs' and the name
+ * of language file must be 'LanguageXX.php' where 'XX' are two characters that
+ * represents language code. The directory at which the language file must exist in
  * is not important, but it is recommended to add them to the folder 'app/langs'
  * of the framework.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.2.2
  */
 class Language {
     /**
      * A constant for left to right writing direction.
-     * 
-     * @var string 
-     * 
+     *
+     * @var string
+     *
      * @since 1.0
      */
     const DIR_LTR = 'ltr';
     /**
      * A constant for right to left writing direction.
-     * 
-     * @var string 
-     * 
+     *
+     * @var string
+     *
      * @since 1.0
      */
     const DIR_RTL = 'rtl';
     /**
      * The current active translation object.
-     * 
+     *
      * @var Language|null
      */
     private static $ActiveLang;
     /**
      * An array that contains language definition.
-     * 
+     *
      * @var array
      */
     private $languageVars;
     /**
      * An associative array that contains loaded languages.
-     * 
-     * @var array The key of the array represents two 
+     *
+     * @var array The key of the array represents two
      * characters language code. The index will contain an object of type <b>Language</b>.
      * 'Language'.
-     * 
-     * @since 1.1 
+     *
+     * @since 1.1
      */
     private static $loadedLangs = [];
     /**
-     * An attribute that will be set to 'true' if the language 
+     * An attribute that will be set to 'true' if the language
      * is added to the set of loaded languages.
-     * 
+     *
      * @var bool
-     * 
-     * @since 1.2 
+     *
+     * @since 1.2
      */
     private $loadLang;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $dir 'ltr' or 'rtl'. Default is 'ltr'.
-     * 
+     *
      * @param string $code Language code (such as 'AR'). Default is 'XX'
      *
-     * @param bool $addtoLoadedAfterCreate If set to true, the language object that 
+     * @param bool $addtoLoadedAfterCreate If set to true, the language object that
      * will be created will be added to the set of loaded languages. Default is true.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $dir = 'ltr', string $code = 'XX', bool $addtoLoadedAfterCreate = true) {
@@ -102,27 +102,27 @@ class Language {
         }
     }
     /**
-     * Returns a reference to an associative array that contains an objects of 
+     * Returns a reference to an associative array that contains an objects of
      * type 'Language'.
-     * 
-     * @return array The key of the array represents two 
+     *
+     * @return array The key of the array represents two
      * characters language code. The index will contain an object of type 'Language'.
-     * 
+     *
      * @since 1.1
      */
     public static function &getLoadedLangs() : array {
         return self::$loadedLangs;
     }
     /**
-     * Creates a sub-array for defining language variables given initial set 
+     * Creates a sub-array for defining language variables given initial set
      * of variables.
-     * 
-     * @param string $dir A string that looks like a 
+     *
+     * @param string $dir A string that looks like a
      * directory.
-     * 
-     * @param array $labels An associative array. The key will act as the variable 
+     *
+     * @param array $labels An associative array. The key will act as the variable
      * name and the value of the key will act as the variable value.
-     * 
+     *
      * @since 1.2.1
      */
     public function createAndSet(string $dir, array $labels) {
@@ -131,15 +131,15 @@ class Language {
     }
     /**
      * Creates a sub array to define language variables.
-     * 
-     * @param string $dir A string that looks like a 
-     * directory. For example, if the given string is 'general', 
-     * an array with key name 'general' will be created. Another example is 
-     * if the given string is 'pages/login', two arrays will be created. The 
-     * top one will have the key value 'pages' and another one inside 
+     *
+     * @param string $dir A string that looks like a
+     * directory. For example, if the given string is 'general',
+     * an array with key name 'general' will be created. Another example is
+     * if the given string is 'pages/login', two arrays will be created. The
+     * top one will have the key value 'pages' and another one inside
      * the pages array with key value 'login'. Also, this value can be
      * something like 'pages.login'.
-     * 
+     *
      * @since 1.0
      */
     public function createDirectory(string $dir) {
@@ -162,15 +162,15 @@ class Language {
     }
     /**
      * Returns the value of a language variable.
-     * 
+     *
      * @param string $name A directory to the language variable (such as 'pages/login/login-label').
      * This also can be a string similar to 'pages.login.login-label'.
-     * 
-     * @return string|array If the given directory represents a label, the 
-     * function will return its value. If it represents an array, the array will 
-     * be returned. If nothing was found, the returned value will be the passed 
-     * value to the function. 
-     * 
+     *
+     * @return string|array If the given directory represents a label, the
+     * function will return its value. If it represents an array, the array will
+     * be returned. If nothing was found, the returned value will be the passed
+     * value to the function.
+     *
      * @since 1.0
      */
     public function get(string $name) {
@@ -195,7 +195,7 @@ class Language {
     }
     /**
      * Returns the active translation.
-     * 
+     *
      * @return Language|null If a translation is active, it is returned as an
      * object. Other than that, null is returned.
      */
@@ -204,10 +204,10 @@ class Language {
     }
     /**
      * Returns the language code that the object represents.
-     * 
-     * @return string Language code in upper case (such as 'AR'). If language 
+     *
+     * @return string Language code in upper case (such as 'AR'). If language
      * code is not set, default is returned which is 'XX'.
-     * 
+     *
      * @since 1.1
      */
     public function getCode() : string {
@@ -263,9 +263,9 @@ class Language {
     }
     /**
      * Returns an associative array that contains language variables definition.
-     * 
-     * @return array An associative array that contains language variables definition. 
-     * 
+     *
+     * @return array An associative array that contains language variables definition.
+     *
      * @since 1.0
      */
     public function getLanguageVars() : array {
@@ -273,9 +273,9 @@ class Language {
     }
     /**
      * Returns language writing direction.
-     * 
+     *
      * @return string 'ltr' or 'rtl'.
-     * 
+     *
      * @since 1.0
      */
     public function getWritingDir() : string {
@@ -283,10 +283,10 @@ class Language {
     }
     /**
      * Checks if the language is added to the set of loaded languages or not.
-     * 
-     * @return bool The function will return true if the language is added to 
+     *
+     * @return bool The function will return true if the language is added to
      * the set of loaded languages.
-     * 
+     *
      * @since 1.2
      */
     public function isLoaded() : bool {
@@ -294,18 +294,18 @@ class Language {
     }
     /**
      * Loads a language file based on language code.
-     * 
+     *
      * @param string $langCode A two digits language code (such as 'ar').
-     * 
-     * @throws MissingLangException An exception will be thrown if no language file 
-     * was found that matches the given language code. Language files must 
+     *
+     * @throws MissingLangException An exception will be thrown if no language file
+     * was found that matches the given language code. Language files must
      * have the name 'LanguageXX.php' where 'XX' is language code. Also, the method
-     * will throw an exception when the translation file is loaded but no object 
+     * will throw an exception when the translation file is loaded but no object
      * of type 'Language' was stored in the set of loaded translations.
-     * 
-     * @return Language an object of type 'Language' is returned if 
+     *
+     * @return Language an object of type 'Language' is returned if
      * the language was loaded.
-     * 
+     *
      * @since 1.1
      */
     public static function loadTranslation(string $langCode) {
@@ -337,7 +337,7 @@ class Language {
     }
     /**
      * Removes all loaded languages.
-     * 
+     *
      * @since 1.2.2
      */
     public static function reset() {
@@ -346,18 +346,18 @@ class Language {
     }
     /**
      * Sets or updates a language variable.
-     * 
+     *
      * Note that the variable will be set only if the directory does exist.
-     * 
-     * @param string $dir A string that looks like a 
-     * directory. 
-     * 
-     * @param string $varName The name of the variable. Note that if the name 
+     *
+     * @param string $dir A string that looks like a
+     * directory.
+     *
+     * @param string $varName The name of the variable. Note that if the name
      * of the variable is set, and it was an array, it will become a string
      * which has the given name and value.
-     * 
+     *
      * @param string $varValue The value of the variable.
-     * 
+     *
      * @since 1.0
      */
     public function set(string $dir, string $varName, string $varValue) {
@@ -381,12 +381,12 @@ class Language {
     }
     /**
      * Sets the code of the language.
-     * 
+     *
      * @param string $code Language code (such as 'AR').
-     * 
-     * @return bool The method will return true if the language 
+     *
+     * @return bool The method will return true if the language
      * code is set. If not set, the method will return false.
-     * 
+     *
      * @since 1.1
      */
     public function setCode(string $code) : bool {
@@ -411,14 +411,14 @@ class Language {
     }
     /**
      * Sets multiple language variables.
-     * 
-     * @param string $dir A string that looks like a 
-     * directory. 
-     * 
-     * @param array $arr An associative array. The key will act as the variable 
-     * name and the value of the key will act as the variable value. The value 
+     *
+     * @param string $dir A string that looks like a
+     * directory.
+     *
+     * @param array $arr An associative array. The key will act as the variable
+     * name and the value of the key will act as the variable value. The value
      * can be a sub associative array of labels or simple strings.
-     * 
+     *
      * @since 1.0
      */
     public function setMultiple(string $dir, array $arr = []) {
@@ -433,14 +433,14 @@ class Language {
     }
     /**
      * Sets language writing direction.
-     * 
+     *
      * @param string $dir 'ltr' or 'rtl'. Letters case does not matter.
-     * 
-     * @return bool The method will return <b>true</b> if the language 
+     *
+     * @return bool The method will return <b>true</b> if the language
      * writing direction is updated. The only case that the method
      * will return <b>false</b> is when the writing direction is invalid (
      * Any value other than 'ltr' and 'rtl').
-     * 
+     *
      * @since 1.0
      */
     public function setWritingDir(string $dir) : bool {
@@ -456,13 +456,13 @@ class Language {
     }
     /**
      * Unload translation based on its language code.
-     * 
+     *
      * @param string $langCode A two digits language code (such as 'ar').
-     * 
-     * @return bool If the translation file was unloaded, the method will 
+     *
+     * @return bool If the translation file was unloaded, the method will
      * return true. If not, the method will return false.
-     * 
-     * @since 1.2 
+     *
+     * @since 1.2
      */
     public static function unloadTranslation(string $langCode): bool {
         $uLangCode = strtoupper(trim($langCode));

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\session;
 
@@ -17,15 +17,15 @@ use webfiori\framework\exceptions\SessionException;
  * A session storage engine which uses database to store session state.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.1.0
  */
 class DatabaseSessionStorage implements SessionStorage {
     /**
      *
-     * @var SessionDB 
+     * @var SessionDB
      */
     private $dbController;
 
@@ -48,7 +48,7 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Drop the tables which are used to store session information.
-     * 
+     *
      * The method will drop two tables, the table 'session_data' and the
      * table 'sessions'.
      */
@@ -65,7 +65,7 @@ class DatabaseSessionStorage implements SessionStorage {
     /**
      * Returns the instance at which the storage is using to send queries to
      * database and read sessions.
-     * 
+     *
      * @return SessionDB An instance of the class SessionDB.
      */
     public function getController() : SessionDB {
@@ -73,14 +73,14 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Reads session state.
-     * 
-     * 
+     *
+     *
      * @param string $sessionId The unique identifier of the session.
-     * 
-     * @return string|null The method will return a string that represents the 
-     * session if it was found. If no session was found which has the given ID, the method 
+     *
+     * @return string|null The method will return a string that represents the
+     * session if it was found. If no session was found which has the given ID, the method
      * will return null.
-     * 
+     *
      * @since 1.0
      */
     public function read(string $sessionId) {
@@ -88,9 +88,9 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Stops a session and remove its state from the database.
-     * 
+     *
      * @param string $sessionId The unique identifier of the session.
-     * 
+     *
      * @since 1.0
      */
     public function remove(string $sessionId) {
@@ -98,13 +98,13 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Store session state.
-     * 
-     * 
+     *
+     *
      * @param string $sessionId The ID of the session that will be stored.
-     * 
-     * @param string $serializedSession A string that represents the session in 
+     *
+     * @param string $serializedSession A string that represents the session in
      * serialized form.
-     * 
+     *
      * @since 1.0
      */
     public function save(string $sessionId, string $serializedSession) {

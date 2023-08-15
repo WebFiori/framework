@@ -1,19 +1,19 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\scheduler\TasksManager;
 use webfiori\http\Response;
 /**
- * A page which is used to show login form to enter login information to 
+ * A page which is used to show login form to enter login information to
  * access tasks management web interface.
  *
  * @author Ibrahim

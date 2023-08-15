@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler;
 
@@ -16,33 +16,33 @@ use webfiori\framework\EmailMessage;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 /**
- * A class which can be used to send an email regarding the status of 
+ * A class which can be used to send an email regarding the status of
  * background task execution.
- * 
- * This class must be only used in one of the abstract methods of a 
- * background task since using it while no task is active will have no 
+ *
+ * This class must be only used in one of the abstract methods of a
+ * background task since using it while no task is active will have no
  * effect.
- * 
- * The email that will be sent will contain technical information about 
- * the task in addition to a basic log file that shows execution steps. Also, 
- * it will contain any log messages which was added by using the method 
+ *
+ * The email that will be sent will contain technical information about
+ * the task in addition to a basic log file that shows execution steps. Also,
+ * it will contain any log messages which was added by using the method
  * 'TasksManager::log()'.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.0.2
  */
 class TaskStatusEmail extends EmailMessage {
     /**
      * Creates new instance of the class.
-     * 
-     * @param string $sendAccName The name of SMTP account that will be 
+     *
+     * @param string $sendAccName The name of SMTP account that will be
      * used to send the message.
-     * 
-     * @param array $receivers An associative array of receivers. The 
-     * indices are the addresses of the receivers and the values are the 
+     *
+     * @param array $receivers An associative array of receivers. The
+     * indices are the addresses of the receivers and the values are the
      * names of the receivers (e.g. 'xy@example.com' => 'Super User');
-     * 
+     *
      * @since 1.0
      */
     public function __construct($sendAccName, array $receivers = []) {
@@ -106,7 +106,7 @@ class TaskStatusEmail extends EmailMessage {
         return $row;
     }
     /**
-     * 
+     *
      * @param AbstractTask $task
      * @return HTMLNode
      */

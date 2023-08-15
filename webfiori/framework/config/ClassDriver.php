@@ -10,7 +10,7 @@ use webfiori\http\Uri;
 
 /**
  * A configuration driver which is used to store configuration on PHP class.
- * 
+ *
  * This driver will
  * create a class called 'AppConfig' on the directory APP_DIR/config and
  * use it to read and write configurations.
@@ -35,15 +35,15 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Adds application environment variable to the configuration.
-     * 
+     *
      * The variables which are added using this method will be defined as
      * a named constant at run time using the function 'define'. This means
      * the constant will be accesaable anywhere within the appllication's environment.
-     * 
+     *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
-     * 
+     *
      * @param mixed $value The value of the constant.
-     * 
+     *
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
@@ -65,7 +65,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Adds new SMTP account or Updates an existing one.
-     * 
+     *
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      */
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
@@ -74,9 +74,9 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns application name.
-     * 
+     *
      * @param string $langCode Language code such as 'AR' or 'EN'.
-     * 
+     *
      * @return string|null If the name of the application
      * does exist in the given language, the method should return it.
      * If no such name, the method should return null.
@@ -87,12 +87,12 @@ class ClassDriver implements ConfigurationDriver {
         }
     }
     /**
-     * Returns an array that holds different names for the web application 
+     * Returns an array that holds different names for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the name.
-     * 
+     *
      */
     public function getAppNames(): array {
         return $this->configVars['site']['website-names'];
@@ -100,7 +100,7 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Returns a string that represents the date at which the version of
      * the application was released at.
-     * 
+     *
      * @return string A string in the format 'YYYY-MM-DD'.
      */
     public function getAppReleaseDate() : string {
@@ -108,7 +108,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns version number of the application.
-     * 
+     *
      * @return string The method should return a string in the format 'x.x.x' if
      * semantic versioning is used.
      */
@@ -117,7 +117,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns a string that represents the type of application version.
-     * 
+     *
      * @return string A string such as 'alpha', 'beta' or 'rc'.
      */
     public function getAppVersionType() : string {
@@ -125,10 +125,10 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns the base URL that is used to fetch resources.
-     * 
+     *
      * The return value of this method is usually used by the tag 'base'
      * of website pages.
-     * 
+     *
      * @return string the base URL.
      */
     public function getBaseURL(): string {
@@ -136,13 +136,13 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns database connection information given connection name.
-     * 
+     *
      * @param string $conName The name of the connection.
-     * 
+     *
      * @return ConnectionInfo|null The method will return an object of type
      * ConnectionInfo if a connection info was found for the given connection name.
      * Other than that, the method will return null.
-     * 
+     *
      */
     public function getDBConnection(string $conName) {
         foreach ($this->getDBConnections() as $connNameStored => $connObj) {
@@ -153,7 +153,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns an associative array that contain the information of database connections.
-     * 
+     *
      * @return array An associative array of objects of type ConnectionInfo.
      */
     public function getDBConnections(): array {
@@ -166,10 +166,10 @@ class ClassDriver implements ConfigurationDriver {
         }
     }
     /**
-     * Returns an array that holds different descriptions for the web application 
+     * Returns an array that holds different descriptions for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the description.
      */
     public function getDescriptions(): array {
@@ -177,7 +177,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns an associative array of application constants.
-     * 
+     *
      * @return array The indices of the array are names of the constants and
      * values are sub-associative arrays. Each sub-array will have two indices,
      * 'value' and 'description'.
@@ -187,7 +187,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns a string that represents the URL of home page of the application.
-     * 
+     *
      * @return string
      */
     public function getHomePage() : string {
@@ -195,7 +195,7 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns a two-letters string that represents primary language of the application.
-     * 
+     *
      * @return string A two-letters string that represents primary language of the application.
      */
     public function getPrimaryLanguage() : string {
@@ -215,13 +215,13 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Returns SMTP connection given its name.
-     * 
+     *
      * @param string $name The name of the account.
-     * 
+     *
      * @return SMTPAccount|null If the account is found, The method
      * will return an object of type SMTPAccount. Else, the
      * method will return null.
-     * 
+     *
      */
     public function getSMTPConnection(string $name) {
         if (isset($this->getSMTPConnections()[$name])) {
@@ -245,10 +245,10 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Returns the default title at which a web page will use in case no title
      * is specified.
-     * 
+     *
      * @param string $lang A two-letter string that represents language code.
      * The returned value will be specific to selected language.
-     * 
+     *
      * @return string The default title at which a web page will use in case no title
      * is specified.
      */
@@ -261,10 +261,10 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Initialize configuration driver.
-     * 
+     *
      * This method should be used to create application configuration and
      * pubulate it with default values if needed.
-     * 
+     *
      * @param bool $reCreate If the configuration is exist and this one is set
      * to true, the method should remove existing configuration and re-create it
      * using default values.
@@ -404,9 +404,9 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Sets or updates default web page title for a specific display language.
-     * 
+     *
      * @param string $title The title that will be set.
-     * 
+     *
      * @param string $langCode The display language at which the title will be
      * set or updated for.
      */

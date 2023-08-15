@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\writers;
 
@@ -23,7 +23,7 @@ use webfiori\framework\DB;
  */
 class DBClassWriter extends ClassWriter {
     /**
-     * 
+     *
      * @var Table
      */
     private $associatedTable;
@@ -34,11 +34,11 @@ class DBClassWriter extends ClassWriter {
     private $whereArr;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $className The name of the class that will be created.
-     * 
+     *
      * @param string $ns The namespace at which the class will belong to.
-     * 
+     *
      * @param Table $table The table instance at which the class will build
      * database operations based on.
      */
@@ -54,7 +54,7 @@ class DBClassWriter extends ClassWriter {
     /**
      * Returns the name of the connection at which the generated class will use to connect
      * to database.
-     * 
+     *
      * @return string|null The name of the connection. If not set, null is returned.
      */
     public function getConnectionName() {
@@ -62,10 +62,10 @@ class DBClassWriter extends ClassWriter {
     }
     /**
      * Returns the name of the entity at which the class will use to map records.
-     * 
+     *
      * The name of the entity is taken from entity mapper which is associated
      * with the table at which database operations are based on.
-     * 
+     *
      * @return string Class name of the entity.
      */
     public function getEntityName() : string {
@@ -74,7 +74,7 @@ class DBClassWriter extends ClassWriter {
     /**
      * Returns the table instance at which the class will build
      * database operations based on.
-     * 
+     *
      * @return Table|null If the table is set, it will be returned as an object.
      * If not set, null is returned.
      */
@@ -84,11 +84,11 @@ class DBClassWriter extends ClassWriter {
     /**
      * Returns an array that contains the keys of columns which are set as primary
      * unique or identity.
-     * 
+     *
      * Note that if the table has identity column, only the key of this column
      * is returned. Other than that, the keys of the primary columns and
      * unique columns are returned.
-     * 
+     *
      * @return array An array that contains the keys of columns which are set as primary
      * or unique.
      */
@@ -119,7 +119,7 @@ class DBClassWriter extends ClassWriter {
     /**
      * Include update methods for each single column in the table that
      * is not unique.
-     * 
+     *
      * If this method is called, the writer will write one method for every
      * column in the table to update its value.
      */
@@ -128,7 +128,7 @@ class DBClassWriter extends ClassWriter {
     }
     /**
      * Checks if each non-unique table column will have its own update method.
-     * 
+     *
      * @return bool If each column will have its own update method, true is
      * returned. False otherwise.
      */
@@ -138,7 +138,7 @@ class DBClassWriter extends ClassWriter {
     /**
      * Sets the name of the connection at which the generated class will use to connect
      * to database.
-     * 
+     *
      * @param string $connName The name of the connection as it was set in the
      * class 'AppConfig' of the application.
      */
@@ -152,7 +152,7 @@ class DBClassWriter extends ClassWriter {
     /**
      * Sets the table at which the class will create logic to perform operations
      * on.
-     * 
+     *
      * @param Table $t
      */
     public function setTable(Table $t) {
@@ -169,15 +169,15 @@ class DBClassWriter extends ClassWriter {
     }
     /**
      * Maps key name to entity method name.
-     * 
+     *
      * @param string $colKey The name of column key such as 'user-id'.
-     * 
-     * @param string $prefix The type of the method. This one can have only two values, 
+     *
+     * @param string $prefix The type of the method. This one can have only two values,
      * 's' for setter method and 'g' for getter method. Default is 'g'.
-     * 
-     * @return string The name of the mapped method name. If the passed column 
+     *
+     * @return string The name of the mapped method name. If the passed column
      * key is empty string, the method will return empty string.
-     * 
+     *
      * @since 1.0
      */
     public static function toMethodName(string $colKey, $prefix = 'g') {

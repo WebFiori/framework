@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler;
 
@@ -20,32 +20,32 @@ use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**
- * An abstract class that contains basic functionality for implementing background 
+ * An abstract class that contains basic functionality for implementing background
  * tasks.
- * 
+ *
  * This class uses an implementation which is similar to cron for scheduling tasks.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0.3
  */
 abstract class AbstractTask implements JsonI {
     /**
      * A constant that indicates a sub cron expression is of type 'multi-value'.
-     * 
+     *
      * @since 1.0
      */
     const ANY_VAL = '*';
     /**
      * A constant that indicates a sub cron expression is invalid.
-     * 
+     *
      * @since 1.0
      */
     const INV_VAL = 'inv';
     /**
-     * An associative array which holds the names and the numbers of year 
+     * An associative array which holds the names and the numbers of year
      * months.
-     * 
+     *
      * @since 1.0
      */
     const MONTHS_NAMES = [
@@ -54,26 +54,26 @@ abstract class AbstractTask implements JsonI {
     ];
     /**
      * A constant that indicates a sub cron expression is of type 'range'.
-     * 
+     *
      * @since 1.0
      */
     const RANGE_VAL = 'r';
     /**
      * A constant that indicates a sub cron expression is of type 'specific value'.
-     * 
+     *
      * @since 1.0
      */
     const SPECIFIC_VAL = 'spe';
     /**
      * A constant that indicates a sub cron expression is of type 'step value'.
-     * 
+     *
      * @since 1.0
      */
     const STEP_VAL = 's';
     /**
-     * An associative array which holds the names and the numbers of week 
+     * An associative array which holds the names and the numbers of week
      * days.
-     * 
+     *
      * @since 1.0
      */
     const WEEK_DAYS = [
@@ -81,75 +81,75 @@ abstract class AbstractTask implements JsonI {
     ];
     /**
      * The command which is used to execute the task.
-     * 
+     *
      * @var SchedulerCommand
-     * 
-     * @since 1.0.1 
+     *
+     * @since 1.0.1
      */
     private $command;
     /**
      * The full cron expression.
-     * 
-     * @var string 
-     * 
+     *
+     * @var string
+     *
      * @since 1.0
      */
     private $cronExpr;
     /**
-     * An array that contains custom attributes which can be provided on 
+     * An array that contains custom attributes which can be provided on
      * task execution.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.0
      */
     private $customAttrs;
     /**
      * A boolean which is set to true if the task is forced to execute.
-     * 
+     *
      * @var bool
-     * 
+     *
      * @since 1.0
      */
     private $isForced;
     /**
-     * A boolean which is set to true if the task was 
+     * A boolean which is set to true if the task was
      * successfully executed.
-     * 
+     *
      * @var bool
-     * 
+     *
      * @since 1.0
      */
     private $isSuccess;
     /**
      * A string that describes what does the task do.
-     * 
+     *
      * @var string
      */
     private $taskDesc;
     /**
      * An array which contains all task details after parsing cron expression.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.0
      */
     private $taskDetails;
     /**
      * A name for the task.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $taskName;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $taskName The name of the task.
-     * 
-     * @param string $when A cron expression. An exception will be thrown if 
-     * the given expression is invalid. 
+     *
+     * @param string $when A cron expression. An exception will be thrown if
+     * the given expression is invalid.
      * The parts of the expression are as follows:
      * <ul>
      * <li>First part is minutes (0-59)</li>
@@ -159,12 +159,12 @@ abstract class AbstractTask implements JsonI {
      * <li>Last part is day of the week (0-6)</li>
      * </ul>
      * Default is '* * * * *' which means run the task every minute.
-     * 
+     *
      * @param string $description A description for the task. Shown in scheduler
      * web interface or CLI.
-     * 
+     *
      * @throws Exception
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $taskName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
@@ -190,20 +190,20 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Adds new execution argument.
-     * 
-     * An execution argument is an argument that can be supplied to the 
+     *
+     * An execution argument is an argument that can be supplied to the
      * task in case of force execute. They will appear in tasks management control panel.
-     * They also can be provided to the task when executing it 
+     * They also can be provided to the task when executing it
      * throw CLI as 'arg-name="argVal".
      * The argument name must follow the following rules:
      * <ul>
      * <li>Must be non-empty string.</li>
      * <li>Must not contain '#', '?', '&', '=' or space.</li>
      * </ul>
-     * 
-     * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an 
+     *
+     * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an
      * object of type TaskArgument.
-     * 
+     *
      * @since 1.0
      */
     public function addExecutionArg($nameOrObj) {
@@ -221,11 +221,11 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Adds multiple execution arguments at one shot.
-     * 
-     * @param array $argsArr An array that contains the names of the 
+     *
+     * @param array $argsArr An array that contains the names of the
      * arguments. This also can be an associative array. The indices
      * are arguments names and the values are argument options.
-     * 
+     *
      * @since 1.0
      */
     public function addExecutionArgs(array $argsArr) {
@@ -248,35 +248,35 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Run some routines after the task is executed.
-     * 
-     * The developer can implement this method to perform some actions after the 
-     * task is executed. Note that the method will get executed if the task is failed 
-     * or successfully completed. It is optional to implement that method. The developer can 
+     *
+     * The developer can implement this method to perform some actions after the
+     * task is executed. Note that the method will get executed if the task is failed
+     * or successfully completed. It is optional to implement that method. The developer can
      * leave the body of the method empty.
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     public abstract function afterExec();
     /**
      * Schedules a task using specific cron expression.
-     * 
-     * For more information on cron expressions, go to 
-     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
-     * the method does not support year field. This means 
-     * the expression will have only 5 fields. Notes about the expression: 
+     *
+     * For more information on cron expressions, go to
+     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that
+     * the method does not support year field. This means
+     * the expression will have only 5 fields. Notes about the expression:
      * <ul>
      * <li>Step values are not supported for months.</li>
      * <li>Step values are not supported for day of week.</li>
      * <li>Step values are not supported for day of month.</li>
      * </ul>
-     * 
-     * @param string $when A cron expression (such as '8 15 * * 1'). Default 
+     *
+     * @param string $when A cron expression (such as '8 15 * * 1'). Default
      * is '* * * * *' which means run the task every minute.
-     * 
-     * @return bool If the given cron expression is valid, the method will 
-     * set the time of task as specified by the expression and return 
+     *
+     * @return bool If the given cron expression is valid, the method will
+     * set the time of task as specified by the expression and return
      * true. If the expression is invalid, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public function cron(string $when = '* * * * *') : bool {
@@ -313,21 +313,21 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Schedules a task to run daily at specific hour and minute.
-     * 
-     * The task will be executed every day at the given hour and minute. The 
-     * function uses 24 hours mode. If no parameters are given, 
-     * The default time is 00:00 which means that the task will be executed 
+     *
+     * The task will be executed every day at the given hour and minute. The
+     * function uses 24 hours mode. If no parameters are given,
+     * The default time is 00:00 which means that the task will be executed
      * daily at midnight.
-     * 
-     * @param int $hour A number between 0 and 23 inclusive. 0 Means daily at 
+     *
+     * @param int $hour A number between 0 and 23 inclusive. 0 Means daily at
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
-     * @param int $minute A number between 0 and 59 inclusive. Represents the 
+     * @param int $minute A number between 0 and 59 inclusive. Represents the
      * minute part of an hour. Default is 0.
-     * 
-     * @return bool If task time is set, the method will return true. If 
-     * not set, the method will return false. It will not set only if the 
+     *
+     * @return bool If task time is set, the method will return true. If
+     * not set, the method will return false. It will not set only if the
      * given time is not correct.
-     * 
+     *
      * @since 1.0
      */
     public function dailyAt(int $hour = 0, int $minute = 0) : bool {
@@ -339,9 +339,9 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Schedules a task to run every hour.
-     * 
+     *
      * The task will run at the start of the hour.
-     * 
+     *
      * @since 1.0.2
      */
     public function everyHour() {
@@ -349,15 +349,15 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Schedules a task to run every month on specific day and time.
-     * 
-     * @param int $dayNum The number of the day. It can be any value between 
+     *
+     * @param int $dayNum The number of the day. It can be any value between
      * 1 and 31 inclusive.
-     * 
+     *
      * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
-     * 
-     * @return bool If the time for the task is set, the method will 
+     *
+     * @return bool If the time for the task is set, the method will
      * return true. If not, it will return false.
-     * 
+     *
      * @since 1.0.1
      */
     public function everyMonthOn(int $dayNum = 1, string $time = '00:00') : bool {
@@ -377,21 +377,21 @@ abstract class AbstractTask implements JsonI {
         return false;
     }
     /**
-     * Execute the event which should run when it is time to execute the task. 
-     * 
-     * This method will be called automatically when task URL is accessed. The 
-     * method will check if it is time to execute the associated event or 
-     * not. If it is the time, The event will be executed. If 
-     * the task is forced to execute, the event that is associated with the 
+     * Execute the event which should run when it is time to execute the task.
+     *
+     * This method will be called automatically when task URL is accessed. The
+     * method will check if it is time to execute the associated event or
+     * not. If it is the time, The event will be executed. If
+     * the task is forced to execute, the event that is associated with the
      * task will be executed even if it is not the time to execute the task.
-     * 
-     * @param bool $force If set to true, the task will be forced to execute 
+     *
+     * @param bool $force If set to true, the task will be forced to execute
      * even if it is not task time. Default is false.
-     * 
-     * @return bool If the event that is associated with the task is executed, 
+     *
+     * @return bool If the event that is associated with the task is executed,
      * the method will return true (Even if the task did not finish successfully).
-     * If it is not executed, the method will return false. 
-     * 
+     * If it is not executed, the method will return false.
+     *
      * @since 1.0
      */
     public function exec(bool $force = false): bool {
@@ -420,27 +420,27 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Execute the task.
-     * 
+     *
      * The code that will be in the body of that method is the code that will be
      * executed if it is time to run the task or the task is forced to
      * execute. The developer must implement this method in a way it returns null or true
-     * if the task is executed successfully. If the implementation of the method 
+     * if the task is executed successfully. If the implementation of the method
      * throws an exception, the task will be considered as failed.
-     * 
-     * @return bool|null If the task successfully completed, the method should 
+     *
+     * @return bool|null If the task successfully completed, the method should
      * return null or true. If the task failed, the method should return false.
-     * 
+     *
      * @since 1.0
      */
     public abstract function execute();
     /**
-     * Returns an associative array that contains the values of 
+     * Returns an associative array that contains the values of
      * custom execution parameters.
-     * 
-     * @return array An associative array. The keys are parameters names and 
-     * the values are the values which are given as input. If a value 
+     *
+     * @return array An associative array. The keys are parameters names and
+     * the values are the values which are given as input. If a value
      * is not provided, it will be set to null.
-     * 
+     *
      * @since 1.0
      */
     public function getArgsValues() : array {
@@ -454,13 +454,13 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns task argument as an object given its name.
-     * 
+     *
      * @param string $argName The name of the argument.
-     * 
+     *
      * @return TaskArgument|null If an argument which has the given name was added
      * to the task, the method will return it as an object. Other than that, the
      * method will return null.
-     * 
+     *
      * @since 1.0.3
      */
     public function getArgument(string $argName) {
@@ -472,9 +472,9 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns an array that holds execution arguments of the task.
-     * 
+     *
      * @return array An array that holds objects of type 'TaskArgument'.
-     * 
+     *
      * @since 1.0.2
      */
     public function getArguments() : array {
@@ -482,17 +482,17 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns the value of a custom execution argument.
-     * 
-     * The value of the argument can be supplied through the table that will 
-     * appear in tasks management control panel. If the execution is performed through 
+     *
+     * The value of the argument can be supplied through the table that will
+     * appear in tasks management control panel. If the execution is performed through
      * CLI, the value of the argument can be supplied to the task as arg-name="Arg Val".
-     * 
+     *
      * @param string $name the name of execution argument.
-     * 
-     * @return string|null If the argument does exist on the task and its value 
+     *
+     * @return string|null If the argument does exist on the task and its value
      * is provided, the method will return its value. If it is not provided, or
      * it does not exist on the task, the method will return null.
-     * 
+     *
      * @since 1.0
      */
     public function getArgValue(string $name) {
@@ -527,11 +527,11 @@ abstract class AbstractTask implements JsonI {
 
     /**
      * Returns the command that was used to execute the task.
-     * 
+     *
      * Note that the command will be null if not executed from CLI environment.
-     * 
-     * @return SchedulerCommand|null 
-     * 
+     *
+     * @return SchedulerCommand|null
+     *
      * @since 1.0.1
      */
     public function getCommand() {
@@ -539,24 +539,24 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns task description.
-     * 
-     * Task description is a string which is used to describe what does the task 
+     *
+     * Task description is a string which is used to describe what does the task
      * do.
-     * 
+     *
      * @return string Task description. Default return value is 'NO DESCRIPTION'.
-     * 
+     *
      * @since 1.0.2
      */
     public function getDescription() : string {
         return $this->taskDesc;
     }
     /**
-     * Returns an array that contains the names of added custom 
+     * Returns an array that contains the names of added custom
      * execution attributes.
-     * 
-     * @return array An indexed array that contains all added 
+     *
+     * @return array An indexed array that contains all added
      * custom execution attributes names.
-     * 
+     *
      * @since 1.0
      */
     public function getExecArgsNames() : array {
@@ -567,32 +567,32 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns the cron expression which is associated with the task.
-     * 
+     *
      * @return string The cron expression which is associated with the task.
-     * 
+     *
      * @since 1.0
      */
     public function getExpression() : string {
         return $this->cronExpr;
     }
     /**
-     * Returns an associative array which contains details about the timings 
+     * Returns an associative array which contains details about the timings
      * at which the task will be executed.
-     * 
-     * @return array The array will have the following indices: 
+     *
+     * @return array The array will have the following indices:
      * <ul>
-     * <li><b>minutes</b>: Contains sub arrays which has info about the minutes 
+     * <li><b>minutes</b>: Contains sub arrays which has info about the minutes
      * at which the task will be executed.</li>
-     * <li><b>hours</b>: Contains sub arrays which has info about the hours 
+     * <li><b>hours</b>: Contains sub arrays which has info about the hours
      * at which the task will be executed.</li>
-     * <li><b>days-of-month</b>: Contains sub arrays which has info about the days of month 
+     * <li><b>days-of-month</b>: Contains sub arrays which has info about the days of month
      * at which the task will be executed.</li>
-     * <li><b>months</b>: Contains sub arrays which has info about the months 
+     * <li><b>months</b>: Contains sub arrays which has info about the months
      * at which the task will be executed.</li>
-     * <li><b>days-of-week</b>: Contains sub arrays which has info about the days of week 
+     * <li><b>days-of-week</b>: Contains sub arrays which has info about the days of week
      * at which the task will be executed.</li>
      * </ul>
-     * 
+     *
      * @since 1.0
      */
     public function getTaskDetails() : array {
@@ -600,14 +600,14 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns the name of the task.
-     * 
-     * The name is used to make different tasks unique. Each task must 
-     * have its own name. Also, the name of the task is used to force task 
-     * execution. It can be supplied as a part of task URL. 
-     * 
-     * @return string The name of the task. If no name is set, the function will return 
+     *
+     * The name is used to make different tasks unique. Each task must
+     * have its own name. Also, the name of the task is used to force task
+     * execution. It can be supplied as a part of task URL.
+     *
+     * @return string The name of the task. If no name is set, the function will return
      * 'SCHEDULER-TASK'.
-     * 
+     *
      * @since 1.0
      */
     public function getTaskName() : string {
@@ -615,12 +615,12 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Checks if an argument with specific name belongs to the task or not.
-     * 
+     *
      * @param string $name The name of the argument that will be checked.
-     * 
-     * @return bool If an argument with the given name already exist, the 
+     *
+     * @return bool If an argument with the given name already exist, the
      * method will return true. False if not.
-     * 
+     *
      * @since 1.0.2
      */
     public function hasArg(string $name) : bool {
@@ -633,12 +633,12 @@ abstract class AbstractTask implements JsonI {
         return $added;
     }
     /**
-     * Checks if current day of month in time is a day at which the task must be 
+     * Checks if current day of month in time is a day at which the task must be
      * executed.
-     * 
-     * @return bool The method will return true if the current day of month in 
+     *
+     * @return bool The method will return true if the current day of month in
      * time is a day at which the task must be executed.
-     * 
+     *
      * @since 1.0
      */
     public function isDayOfMonth() : bool {
@@ -666,12 +666,12 @@ abstract class AbstractTask implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current day of week in time is a day at which the task must be 
+     * Checks if current day of week in time is a day at which the task must be
      * executed.
-     * 
-     * @return bool The method will return true if the current day of week in 
+     *
+     * @return bool The method will return true if the current day of week in
      * time is a day at which the task must be executed.
-     * 
+     *
      * @since 1.0
      */
     public function isDayOfWeek() : bool {
@@ -700,22 +700,22 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Checks if the task is forced to execute or not.
-     * 
-     * @return bool If the task was forced to execute, the method will return 
+     *
+     * @return bool If the task was forced to execute, the method will return
      * true. Other than that, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function isForced() : bool {
         return $this->isForced;
     }
     /**
-     * Checks if current hour in time is an hour at which the task must be 
+     * Checks if current hour in time is an hour at which the task must be
      * executed.
-     * 
-     * @return bool The method will return true if the current hour in 
+     *
+     * @return bool The method will return true if the current hour in
      * time is an hour at which the task must be executed.
-     * 
+     *
      * @since 1.0
      */
     public function isHour() : bool {
@@ -742,12 +742,12 @@ abstract class AbstractTask implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current minute in time is a minute at which the task must be 
+     * Checks if current minute in time is a minute at which the task must be
      * executed.
-     * 
-     * @return bool The method will return true if the current minute in 
+     *
+     * @return bool The method will return true if the current minute in
      * time is a minute at which the task must be executed.
-     * 
+     *
      * @since 1.0
      */
     public function isMinute() : bool {
@@ -774,12 +774,12 @@ abstract class AbstractTask implements JsonI {
         return $retVal;
     }
     /**
-     * Checks if current month in time is a month at which the task must be 
+     * Checks if current month in time is a month at which the task must be
      * executed.
-     * 
-     * @return bool The method will return true if the current month in 
+     *
+     * @return bool The method will return true if the current month in
      * time is a month at which the task must be executed.
-     * 
+     *
      * @since 1.0
      */
     public function isMonth() : bool {
@@ -808,11 +808,11 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Checks if task name is valid or not.
-     * 
+     *
      * This method is also used to validate names of task arguments.
-     * 
+     *
      * @param string $val The name of the task.
-     * 
+     *
      * @return bool If valid, the method will return true. False otherwise.
      */
     public static function isNameValid(string $val) : bool {
@@ -834,17 +834,17 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Returns true if the task was executed successfully.
-     * 
+     *
      * The value returned by this method will depend on the return value
-     * of the value which is returned by the method AbstractTask::execute(). 
-     * If the method returned null or true, then it means the task 
-     * was successfully executed. If it returns false, this means the task did 
-     * not execute successfully. If it throws an exception, then the task is 
+     * of the value which is returned by the method AbstractTask::execute().
+     * If the method returned null or true, then it means the task
+     * was successfully executed. If it returns false, this means the task did
+     * not execute successfully. If it throws an exception, then the task is
      * not successfully completed.
-     * 
-     * @return bool True if the task was executed successfully. False 
+     *
+     * @return bool True if the task was executed successfully. False
      * if not.
-     * 
+     *
      * @since 1.0
      */
     public function isSuccess() : bool {
@@ -852,10 +852,10 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Checks if it's time to execute the task or not.
-     * 
+     *
      * @return bool If it's time to execute the task, the method will return true.
      * If not, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function isTime() : bool {
@@ -863,33 +863,33 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Run some routines if the task is executed and failed to completed successfully.
-     * 
-     * The status of failure or success depends on the implementation of the method 
+     *
+     * The status of failure or success depends on the implementation of the method
      * AbstractTask::execute().
-     * The developer can implement this method to take actions after the 
+     * The developer can implement this method to take actions after the
      * task is executed and failed to complete.
-     * It is optional to implement that method. The developer can 
+     * It is optional to implement that method. The developer can
      * leave the body of the method empty.
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     public abstract function onFail();
     /**
      * Schedules a task to run at specific day and time in a specific month.
-     * 
-     * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive 
+     *
+     * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive
      * or 3 letters month name. Default is 'jan'.
-     * 
-     * @param int $dayNum The number of day in the month starting from 1 up to 
+     *
+     * @param int $dayNum The number of day in the month starting from 1 up to
      * 31 inclusive. Default is 1.
-     * 
+     *
      * @param string $time A time in the form 'HH:MM'. hh can have any value
      * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
      * default is '00:00'.
-     * 
-     * @return bool If the time for the task is set, the method will 
+     *
+     * @return bool If the time for the task is set, the method will
      * return true. If not, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function onMonth($monthNameOrNum = 'jan', int $dayNum = 1, string $time = '00:00') : bool {
@@ -917,22 +917,22 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Run some routines if the task is executed and completed successfully.
-     * 
-     * The status of failure or success depends on the implementation of the method 
+     *
+     * The status of failure or success depends on the implementation of the method
      * AbstractTask::execute().
-     * The developer can implement this method to perform actions after the 
+     * The developer can implement this method to perform actions after the
      * task is executed and failed to complete.
-     * It is optional to implement that method. The developer can 
+     * It is optional to implement that method. The developer can
      * leave the body of the method empty.
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     public abstract function onSuccess();
     /**
      * Associate the task with the command that was used to execute the task.
-     * 
+     *
      * @param SchedulerCommand $command
-     * 
+     *
      * @since 1.0.1
      */
     public function setCommand(SchedulerCommand $command) {
@@ -940,14 +940,14 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Sets task description.
-     * 
+     *
      * Task description is a string which is used to describe what does the task do.
-     * 
+     *
      * @param string $desc Task description.
-     * 
+     *
      * @return bool If the description is set, the method will return true. Other than
      * that, the method will return false.
-     * 
+     *
      * @since 1.0.2
      */
     public function setDescription(string $desc) : bool {
@@ -963,21 +963,21 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Sets an optional name for the task.
-     * 
-     * The name is used to make different tasks unique. Each task must 
-     * have its own name. Also, the name of the task is used to force task 
-     * execution. It can be supplied as a part of task URL. 
-     * 
-     * Note that task name will be considered invalid 
+     *
+     * The name is used to make different tasks unique. Each task must
+     * have its own name. Also, the name of the task is used to force task
+     * execution. It can be supplied as a part of task URL.
+     *
+     * Note that task name will be considered invalid
      * if it contains one of the following characters: '=', '&', '#' and '?'.
-     * 
+     *
      * @param string $name The name of the task.
-     * 
+     *
      * @return bool If task name is set, the method will return true. If not,
      * the method will return false. The method will not set the name only if
      * given value is empty string or the given name was used by a task which
      * was already scheduled.
-     * 
+     *
      * @since 1.0
      */
     public function setTaskName(string $name) : bool {
@@ -1032,17 +1032,17 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Schedules a task to run weekly at specific week day and time.
-     * 
+     *
      * @param int $dayNameOrNum A 3 letter day name (such as 'sun' or 'tue') or a day number from 0 to 6.
      * 0 for sunday. Default is 0.
-     * 
+     *
      * @param string $time A time in the form 'HH:MM'. HH can have any value
      * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
      * default is '00:00'.
-     * 
-     * @return bool If the time for the task is set, the method will 
+     *
+     * @return bool If the time for the task is set, the method will
      * return true. If not, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function weeklyOn($dayNameOrNum = 0, string $time = '00:00'): bool {
@@ -1069,11 +1069,11 @@ abstract class AbstractTask implements JsonI {
     }
     /**
      * Calls one of the abstract methods of the class.
-     * 
+     *
      * This method is only used by the method AbstractTask::exec().
-     * 
+     *
      * @param string $fName The name of the method.
-     * 
+     *
      * @return null|boolean
      */
     private function callMethod(string $fName) {
@@ -1087,7 +1087,7 @@ abstract class AbstractTask implements JsonI {
         }
     }
     /**
-     * 
+     *
      * @param string $dayOfWeekField
      * @return bool
      * @since 1.0
@@ -1136,7 +1136,7 @@ abstract class AbstractTask implements JsonI {
         return $dayAttrs;
     }
     /**
-     * 
+     *
      * @param string $hoursField
      * @return bool
      * @since 1.0
@@ -1194,7 +1194,7 @@ abstract class AbstractTask implements JsonI {
         return $hoursAttrs;
     }
     /**
-     * 
+     *
      * @param string $minutesField
      * @return bool|array
      * @since 1.0
@@ -1252,7 +1252,7 @@ abstract class AbstractTask implements JsonI {
         return $minuteAttrs;
     }
     /**
-     * 
+     *
      * @param string $monthField
      * @return bool
      * @since 1.0
@@ -1312,7 +1312,7 @@ abstract class AbstractTask implements JsonI {
         ];
     }
     /**
-     * 
+     *
      * @param string $dayOfMonthField
      * @return bool
      * @since 1.0
@@ -1378,7 +1378,7 @@ abstract class AbstractTask implements JsonI {
         return $c->getArgValue($name);
     }
     /**
-     * 
+     *
      * @param string $expr
      * @return string
      * @since 1.0
@@ -1525,11 +1525,11 @@ abstract class AbstractTask implements JsonI {
         return false;
     }
     /**
-     * Sets the value of the property which is used to check if the task is 
+     * Sets the value of the property which is used to check if the task is
      * forced to execute or not.
-     * 
+     *
      * @param bool $bool True or false.
-     * 
+     *
      * @since 1.0
      */
     private function setIsForced(bool $bool) {

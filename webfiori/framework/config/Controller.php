@@ -27,7 +27,7 @@ class Controller {
     }
     /**
      * Creates a copy of current configuration driver to another one.
-     * 
+     *
      * @param ConfigurationDriver $new An instance of the driver at which the
      * active configuration will be copied to. Note that if the driver is
      * same as active one, nothing will be copied.
@@ -67,9 +67,9 @@ class Controller {
     }
     /**
      * Returns a single instance of the class.
-     * 
+     *
      * @return Controller
-     * 
+     *
      */
     public static function get(): Controller {
         if (self::$singleton === null) {
@@ -80,7 +80,7 @@ class Controller {
     }
     /**
      * Returns the driver that was set to read and write application configuration.
-     * 
+     *
      * @return ConfigurationDriver
      */
     public static function getDriver() : ConfigurationDriver {
@@ -88,7 +88,7 @@ class Controller {
     }
     /**
      * Sets the driver that will be used to read and write configuration.
-     * 
+     *
      * @param ConfigurationDriver $driver Configuration driver.
      */
     public static function setDriver(ConfigurationDriver $driver) {
@@ -98,7 +98,7 @@ class Controller {
     /**
      * Reads application environment variables and updates the class which holds
      * application environment variables.
-     * 
+     *
      * @throws InitializationException
      */
     public static function updateEnv() {

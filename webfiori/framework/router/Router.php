@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\router;
 
@@ -26,10 +26,10 @@ use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 /**
- * The basic class that is used to route user requests to the correct 
+ * The basic class that is used to route user requests to the correct
  * location.
- * 
- * The developer can use this class to create a readable URIs to system resources. 
+ *
+ * The developer can use this class to create a readable URIs to system resources.
  * In general, there are 4 types of routes:
  * <ul>
  * <li>View route.</li>
@@ -38,114 +38,114 @@ use webfiori\ui\HTMLNode;
  * <li>Custom route.</li>
  * </ul>
  * <p>
- * A view route is a route that points to a file which exist inside the directory 
+ * A view route is a route that points to a file which exist inside the directory
  * 'app/pages'. They are simply web pages (HTML or PHP).
  * </p>
- * <p>An API route is a route that points to a file which exist inside the 
- * directory 'app/apis'. This folder usually contains PHP files which extends 
+ * <p>An API route is a route that points to a file which exist inside the
+ * directory 'app/apis'. This folder usually contains PHP files which extends
  * the class 'ExtendedWebServicesManager' or the class 'WebServicesManager'.
  * </p>
  * <p>
- * A closure route is simply a function that will be executed when the 
+ * A closure route is simply a function that will be executed when the
  * user visits the URL.
  * </p>
  * <p>
- * A customized route is a route that can point to any file which exist inside 
- * the framework scope. For example, The developer might create a folder 
- * 'my-files' and inside it, he might add 'my-view.html'. Then he can add a route 
+ * A customized route is a route that can point to any file which exist inside
+ * the framework scope. For example, The developer might create a folder
+ * 'my-files' and inside it, he might add 'my-view.html'. Then he can add a route
  * to it as follows:
  * <pre>
  * Router::addRoute([<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=>'/my-files/my-view.html'<br/>
  * ]);
- * </pre> 
+ * </pre>
  * </p>
  * <p>
- * In addition to creating routes using files, it is possible to have routes which 
+ * In addition to creating routes using files, it is possible to have routes which
  * points to classes as follows:
  * <pre>
  * Router::addRoute([<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=> MyClass::class<br/>
  * ]);
- * </pre> 
+ * </pre>
  * </p>
  * @author Ibrahim
  * @version 1.4.0
  */
 class Router {
     /**
-     * A constant that represents API route. It is simply the root directory where APIs 
+     * A constant that represents API route. It is simply the root directory where APIs
      * should be created.
-     * 
+     *
      * @since 1.0
      */
     const API_ROUTE = DS.APP_DIR.DS.'apis';
     /**
-     * A constant that represents closure route. The value of the 
+     * A constant that represents closure route. The value of the
      * constant is 'func'.
-     * 
+     *
      * @since 1.0
      */
     const CLOSURE_ROUTE = 'func';
     /**
      * A constant for custom directory route.
-     * 
+     *
      * @since 1.0
      */
     const CUSTOMIZED = DS;
     /**
-     * A constant that represents view route. It is simply the root directory where web 
+     * A constant that represents view route. It is simply the root directory where web
      * pages should be created.
-     * 
+     *
      * @since 1.0
      */
     const VIEW_ROUTE = DS.APP_DIR.DS.'pages';
     /**
      *
-     * @var type 
-     * 
+     * @var type
+     *
      * @since 1.1
      */
     private $baseUrl;
     /**
-     * A callback function to call in case if a rout is 
+     * A callback function to call in case if a rout is
      * not found.
-     * 
-     * @var callable 
-     * 
+     *
+     * @var callable
+     *
      * @since 1.0
      */
     private $onNotFound;
     /**
      * A single instance of the router.
-     * 
+     *
      * @var Router
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $router;
     /**
      * An array which contains an objects of type 'RouteUri'.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $routes;
     /**
-     * An object of type 'RouterUri' which represents the route that the 
+     * An object of type 'RouterUri' which represents the route that the
      * user was sent to.
-     * 
-     * @var RouterUri 
-     * 
+     *
+     * @var RouterUri
+     *
      * @since 1.3.5
      */
     private $uriObj;
     /**
      * Creates new instance of 'Router'
-     * 
+     *
      * @since 1.0
      */
     private function __construct() {
@@ -174,55 +174,55 @@ class Router {
     }
     /**
      * Adds new route to a file inside the root folder.
-     * 
-     * @param array $options An associative array of options. Available options 
-     * are: 
+     *
+     * @param array $options An associative array of options. Available options
+     * are:
      * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
-     * in the path. To include a parameter in the path, its name must be enclosed 
-     * between {}. The value of the parameter will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. Note that its possible to get the value of the 
+     * <li><b>path</b>: The path part of the URI. For example, if the
+     * requested URI is 'http://www.example.com/user/ibrahim', the path
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters
+     * in the path. To include a parameter in the path, its name must be enclosed
+     * between {}. The value of the parameter will be stored in either the array
+     * $_GET or $_POST after the requested URI is resolved. If we use the same
+     * example above to get any user profile, We would add the following as
+     * a path: 'user/{username}'. In this case, username will be available in
+     * $_GET['username']. Note that its possible to get the value of the
      * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b></li>
-     * <li><b>route-to</b>: The path to the file that the route will point to. 
+     * <li><b>route-to</b>: The path to the file that the route will point to.
      * It can be any file in the scope of the variable ROOT_PATH.</li>
-     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
-     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Note that if the PHP file that 
+     * <li><b>as-api</b>: If this parameter is set to true, the route will be
+     * treated as if it was an API route. This means that the constant 'API_ROUTE'
+     * will be initiated when a request is made to the route. Note that if the PHP file that
      * the route is pointing to represent an API, no need to add this option. Default is false.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>languages</b>: An indexed array that contains the languages at 
-     * which the resource can have. Each language is represented as two 
+     * <li><b>languages</b>: An indexed array that contains the languages at
+     * which the resource can have. Each language is represented as two
      * characters such as 'AR'.</li>
-     * <li><b>vars-values</b>: An optional associative array which contains sub 
-     * indexed arrays that contains possible values for URI vars. This one is 
+     * <li><b>vars-values</b>: An optional associative array which contains sub
+     * indexed arrays that contains possible values for URI vars. This one is
      * used when building the sitemap.</li>
-     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
-     * route. This also can be a middleware group. In addition to that, this can 
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the
+     * route. This also can be a middleware group. In addition to that, this can
      * be an array that holds middleware names or middleware groups names.</li>
-     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to
      * the basic site map which can be generated by the router class.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>action</b>: If the class that the route is pointing to 
+     * <li><b>action</b>: If the class that the route is pointing to
      * represent a controller, this index can have the value of the
      * action that will be performed (the name of the class method).</li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * @return bool The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
+     *
+     * @return bool The method will return true if the route was created.
+     * If a route for the given path was already created, the method will return
      * false.
-     * 
+     *
      * @since 1.2
      */
     public static function addRoute(array $options) : bool {
@@ -232,51 +232,51 @@ class Router {
     }
     /**
      * Adds new route to a web services set.
-     * 
-     * Note that the route which created using this method will be added to 
+     *
+     * Note that the route which created using this method will be added to
      * 'global' and 'api' middleware groups.
-     * 
-     * @param array $options An associative array that contains route 
+     *
+     * @param array $options An associative array that contains route
      * options. Available options are:
      * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
-     * in the path. To include a parameter in the path, its name must be enclosed 
-     * between {}. The value of the parameter will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. Note that its possible to get the value of the 
-     * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b>. 
-     * Note that for any route that points to a web services set, a parameter which 
+     * <li><b>path</b>: The path part of the URI. For example, if the
+     * requested URI is 'http://www.example.com/user/ibrahim', the path
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters
+     * in the path. To include a parameter in the path, its name must be enclosed
+     * between {}. The value of the parameter will be stored in either the array
+     * $_GET or $_POST after the requested URI is resolved. If we use the same
+     * example above to get any user profile, We would add the following as
+     * a path: 'user/{username}'. In this case, username will be available in
+     * $_GET['username']. Note that its possible to get the value of the
+     * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b>.
+     * Note that for any route that points to a web services set, a parameter which
      * has the name 'service-name' must be added.</li>
-     * <li><b>route-to</b>: The path to the API file. The root folder for 
-     * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
-     * value of this parameter must be '/get-user-profile.php'. If the API is in a 
+     * <li><b>route-to</b>: The path to the API file. The root folder for
+     * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the
+     * value of this parameter must be '/get-user-profile.php'. If the API is in a
      * subdirectory inside the APIs directory, then the name of the
      * directory must be included.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>vars-values</b>: An optional associative array which contains sub 
-     * indexed arrays that contains possible values for URI vars. This one is 
+     * <li><b>vars-values</b>: An optional associative array which contains sub
+     * indexed arrays that contains possible values for URI vars. This one is
      * used when building the sitemap.</li>
-     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
-     * route. This also can be a middleware group. In addition to that, this can 
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the
+     * route. This also can be a middleware group. In addition to that, this can
      * be an array that holds middleware names or middleware groups names.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * @return bool The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
+     *
+     * @return bool The method will return true if the route was created.
+     * If a route for the given path was already created, the method will return
      * false.
-     * 
+     *
      * @since 1.2
      */
     public static function api(array $options) : bool {
@@ -287,11 +287,11 @@ class Router {
     }
     /**
      * Returns the base URI which is used to create routes.
-     * 
-     * @return string The base URL which is used to create routes. The returned 
-     * value is based on one of two values. Either the value that is returned 
+     *
+     * @return string The base URL which is used to create routes. The returned
+     * value is based on one of two values. Either the value that is returned
      * by the method 'Util::getBaseURL()' or the method 'SiteConfig::getBaseURL()'.
-     * 
+     *
      * @since 1.3.1
      */
     public static function base() : string {
@@ -300,58 +300,58 @@ class Router {
 
     /**
      * Adds new closure route.
-     * 
-     * Note that the route which created using this method will be added to 
+     *
+     * Note that the route which created using this method will be added to
      * 'global' and 'closure' middleware groups.
-     * 
-     * @param array $options An associative array that contains route 
+     *
+     * @param array $options An associative array that contains route
      * options. Available options are:
      * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
-     * in the path. To include a parameter in the path, its name must be enclosed 
-     * between {}. The value of the parameter will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. Note that its possible to get the value of the 
+     * <li><b>path</b>: The path part of the URI. For example, if the
+     * requested URI is 'http://www.example.com/user/ibrahim', the path
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters
+     * in the path. To include a parameter in the path, its name must be enclosed
+     * between {}. The value of the parameter will be stored in either the array
+     * $_GET or $_POST after the requested URI is resolved. If we use the same
+     * example above to get any user profile, We would add the following as
+     * a path: 'user/{username}'. In this case, username will be available in
+     * $_GET['username']. Note that its possible to get the value of the
      * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b></li>
      * <li><b>route-to</b>: A closure (A PHP function). </li>
-     * <li><b>closure-params</b>: An array that contains values which 
+     * <li><b>closure-params</b>: An array that contains values which
      * can be passed to the closure.</li>
-     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
-     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
+     * <li><b>as-api</b>: If this parameter is set to true, the route will be
+     * treated as if it was an API route. This means that the constant 'API_ROUTE'
      * will be initiated when a request is made to the route. Default is false.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>languages</b>: An indexed array that contains the languages at 
-     * which the resource can have. Each language is represented as two 
+     * <li><b>languages</b>: An indexed array that contains the languages at
+     * which the resource can have. Each language is represented as two
      * characters such as 'AR'.</li>
-     * <li><b>vars-values</b>: An optional associative array which contains sub 
-     * indexed arrays that contains possible values for URI vars. This one is 
+     * <li><b>vars-values</b>: An optional associative array which contains sub
+     * indexed arrays that contains possible values for URI vars. This one is
      * used when building the sitemap.</li>
-     * 
-     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
-     * route. This also can be a middleware group. In addition to that, this can 
+     *
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the
+     * route. This also can be a middleware group. In addition to that, this can
      * be an array that holds middleware names or middleware groups names.</li>
-     * 
-     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     *
+     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to
      * the basic site map which can be generated by the router class.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * 
-     * @return bool The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
+     *
+     *
+     * @return bool The method will return true if the route was created.
+     * If a route for the given path was already created, the method will return
      * false. Also, if <b>'route-to'</b> is not a function, the method will return false.
-     * 
+     *
      * @since 1.2
      */
     public static function closure(array $options) : bool {
@@ -362,27 +362,27 @@ class Router {
     }
     /**
      * Returns the value of the base URI which is appended to the path.
-     * 
+     *
      * This method is similar to calling the method <b>Router::<a href="#base">base()</a></b>.
-     * 
+     *
      * @return string
-     * 
+     *
      * @since 1.0
      */
     public static function getBase() : string {
         return self::get()->baseUrl;
     }
     /**
-     * Returns the value of a parameter which exist in the path part of the 
+     * Returns the value of a parameter which exist in the path part of the
      * URI.
-     * 
-     * @param string $varName The name of the parameter. Note that it must 
+     *
+     * @param string $varName The name of the parameter. Note that it must
      * not include braces.
-     * 
-     * @return string|null The method will return the value of the 
-     * parameter if it was set. If it is not set or routing is still not yet 
+     *
+     * @return string|null The method will return the value of the
+     * parameter if it was set. If it is not set or routing is still not yet
      * happened, the method will return null.
-     * 
+     *
      * @since 1.3.9
      */
     public static function getParameterValue(string $varName) {
@@ -396,14 +396,14 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' which contains route information.
-     * 
-     * When the method Router::route() is called and a route is found, an 
-     * object of type 'RouterUri' is created which has route information. 
-     * 
-     * @return RouterUri|null An object which has route information. If the 
-     * method 'Router::route()' is not yet called or no route was found, 
+     *
+     * When the method Router::route() is called and a route is found, an
+     * object of type 'RouterUri' is created which has route information.
+     *
+     * @return RouterUri|null An object which has route information. If the
+     * method 'Router::route()' is not yet called or no route was found,
      * the method will return null.
-     * 
+     *
      * @since 1.3.5
      */
     public static function getRouteUri() {
@@ -411,13 +411,13 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
-     * 
+     *
      * @param string $path The path part of the URI.
-     * 
-     * @return RouterUri|null If a route was found which has the given path, 
-     * an object of type 'RouterUri' is returned. If no route is found, null 
+     *
+     * @return RouterUri|null If a route was found which has the given path,
+     * an object of type 'RouterUri' is returned. If no route is found, null
      * is returned.
-     * 
+     *
      * @since 1.3.3
      */
     public static function getUriObj(string $path) {
@@ -425,14 +425,14 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' which contains URL route information.
-     * 
+     *
      * @param string $url A string that represents a URL (such as 'https://example.com/my-resource').
-     * 
-     * @return RouterUri|null If a resource was found which has the given route, an 
-     * object of type RouterUri is returned. Other than that, null is returned. Note 
-     * that if the URI is invalid, the method will return null. Also, if the library 
+     *
+     * @return RouterUri|null If a resource was found which has the given route, an
+     * object of type RouterUri is returned. Other than that, null is returned. Note
+     * that if the URI is invalid, the method will return null. Also, if the library
      * 'http' is not loaded, the method will return null.
-     * 
+     *
      * @since 1.3.6
      */
     public static function getUriObjByURL(string $url) {
@@ -448,12 +448,12 @@ class Router {
     }
     /**
      * Checks if a given path has a route or not.
-     * 
+     *
      * @param string $path The path which will be checked (such as '/path1/path2')
-     * 
-     * @return bool The method will return true if the given path 
+     *
+     * @return bool The method will return true if the given path
      * has a route.
-     * 
+     *
      * @since 1.3.8
      */
     public static function hasRoute(string $path): bool {
@@ -463,14 +463,14 @@ class Router {
         return isset($routesArr['static'][$trimmed]) || isset($routesArr['variable'][$trimmed]);
     }
     /**
-     * Adds a route to a basic xml site map. 
-     * 
-     * If this method is called, a route in the form 'http://example.com/sitemam.xml'  
-     * and in the form 'http://example.com/sitemam' will be created. 
-     * The method will check all created routes objects and check if they 
-     * should be included in the site map. Note that if a URI has parameters, it 
+     * Adds a route to a basic xml site map.
+     *
+     * If this method is called, a route in the form 'http://example.com/sitemam.xml'
+     * and in the form 'http://example.com/sitemam' will be created.
+     * The method will check all created routes objects and check if they
+     * should be included in the site map. Note that if a URI has parameters, it
      * will be not included unless possible values are given for the parameter.
-     * 
+     *
      * @since 1.3.2
      */
     public static function incSiteMapRoute() {
@@ -519,7 +519,7 @@ class Router {
     }
     /**
      * Call the closure which was set if a route is not found.
-     * 
+     *
      * @since 1.3.10
      */
     public static function notFound() {
@@ -527,53 +527,53 @@ class Router {
     }
     /**
      * Adds new route to a web page.
-     * 
-     * Note that the route which created using this method will be added to 
+     *
+     * Note that the route which created using this method will be added to
      * 'global' and 'web' middleware groups.
-     * 
-     * @param array $options An associative array that contains route 
+     *
+     * @param array $options An associative array that contains route
      * options. Available options are:
      * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
-     * in the path. To include a parameter in the path, its name must be enclosed 
-     * between {}. The value of the parameter will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
+     * <li><b>path</b>: The path part of the URI. For example, if the
+     * requested URI is 'http://www.example.com/user/ibrahim', the path
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters
+     * in the path. To include a parameter in the path, its name must be enclosed
+     * between {}. The value of the parameter will be stored in either the array
+     * $_GET or $_POST after the requested URI is resolved. If we use the same
+     * example above to get any user profile, We would add the following as
+     * a path: 'user/{username}'. In this case, username will be available in
      * $_GET['username']. </li>
-     * <li><b>route-to</b>: The path to the view file. The root folder for 
-     * all views is '/pages'. If the view name is 'view-user.php', then the 
-     * value of this parameter must be '/view-user.php'. If the view is in a 
+     * <li><b>route-to</b>: The path to the view file. The root folder for
+     * all views is '/pages'. If the view name is 'view-user.php', then the
+     * value of this parameter must be '/view-user.php'. If the view is in a
      * subdirectory inside pages directory, then the name of the
      * directory must be included.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>languages</b>: An indexed array that contains the languages at 
-     * which the resource can have. Each language is represented as two 
+     * <li><b>languages</b>: An indexed array that contains the languages at
+     * which the resource can have. Each language is represented as two
      * characters such as 'AR'.</li>
-     * <li><b>vars-values</b>: An optional associative array which contains sub 
-     * indexed arrays that contains possible values for URI vars. This one is 
+     * <li><b>vars-values</b>: An optional associative array which contains sub
+     * indexed arrays that contains possible values for URI vars. This one is
      * used when building the sitemap.</li>
-     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
-     * route. This also can be a middleware group. In addition to that, this can 
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the
+     * route. This also can be a middleware group. In addition to that, this can
      * be an array that holds middleware names or middleware groups names.</li>
-     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to
      * the basic site map which can be generated by the router class.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * @return bool The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
+     *
+     * @return bool The method will return true if the route was created.
+     * If a route for the given path was already created, the method will return
      * false.
-     * 
+     *
      * @since 1.3.12
      */
     public static function page(array $options) : bool {
@@ -581,14 +581,14 @@ class Router {
     }
     /**
      * Adds a redirect route.
-     * 
-     * @param string $path The path at which when the user visits will be redirected. 
-     * 
+     *
+     * @param string $path The path at which when the user visits will be redirected.
+     *
      * @param string $to A path or a URL at which the user will be sent to.
-     * 
+     *
      * @param int $code HTTP redirect code. Can have one of the following values:
      * 301, 302, 303, 307 and 308. Default is 301 (Permanent redirect).
-     * 
+     *
      * @since 1.3.11
      */
     public static function redirect(string $path, string $to, int $code = 301) {
@@ -612,7 +612,7 @@ class Router {
     }
     /**
      * Remove all routes which has been added to the array of routes.
-     * 
+     *
      * @since 1.3.4
      */
     public static function removeAll() {
@@ -624,12 +624,12 @@ class Router {
     }
     /**
      * Removes a route given its path.
-     * 
+     *
      * @param string $path The path part of route URI.
-     * 
-     * @return bool If the route is removed, the method will return 
+     *
+     * @return bool If the route is removed, the method will return
      * true. If not, The method will return false.
-     * 
+     *
      * @since 1.3.7
      */
     public static function removeRoute(string $path) : bool {
@@ -652,9 +652,9 @@ class Router {
     }
     /**
      * Redirect a URI to its route.
-     * 
+     *
      * @param string $uri The URI.
-     * 
+     *
      * @since 1.2
      */
     public static function route(string $uri) {
@@ -662,10 +662,10 @@ class Router {
     }
     /**
      * Returns an associative array of all available routes.
-     * 
-     * @return array An associative array of all available routes. The 
+     *
+     * @return array An associative array of all available routes. The
      * keys will be requested URIs and the values are the routes.
-     * 
+     *
      * @since 1.2
      */
     public static function routes() : array {
@@ -683,15 +683,15 @@ class Router {
     }
     /**
      * Returns an associative array that contains all routes.
-     * 
-     * The returned array will have two indices, 'static' and 'variable'. The 'static' 
-     * index will contain routes to resources at which they don't contain parameters in 
+     *
+     * The returned array will have two indices, 'static' and 'variable'. The 'static'
+     * index will contain routes to resources at which they don't contain parameters in
      * their path part. Each index of the two will have another sub associative array.
-     * The indices of each sub array ill be URLs that represents the route and 
-     * the value at each index will be an object of type 'RouterUri'. 
-     * 
+     * The indices of each sub array ill be URLs that represents the route and
+     * the value at each index will be an object of type 'RouterUri'.
+     *
      * @return array An associative array that contains all routes.
-     * 
+     *
      * @since 1.3.7
      */
     public static function routesAsRouterUri() : array {
@@ -699,9 +699,9 @@ class Router {
     }
     /**
      * Returns the number of routes at which the router has.
-     * 
+     *
      * @return int Number of routes.
-     * 
+     *
      * @since 1.3.11
      */
     public static function routesCount() : int {
@@ -711,10 +711,10 @@ class Router {
     }
     /**
      * Sets a callback to call in case a given rout is not found.
-     * 
-     * @param callable $func The function which will be called if 
+     *
+     * @param callable $func The function which will be called if
      * the rout is not found.
-     * 
+     *
      * @since 1.3.8
      */
     public static function setOnNotFound(callable $func) {
@@ -722,13 +722,13 @@ class Router {
     }
     /**
      * Adds an object of type 'RouterUri' as new route.
-     * 
+     *
      * @param RouterUri $routerUri An object of type 'RouterUri'.
-     * 
-     * @return bool If the object is added as new route, the method will 
-     * return true. If the given parameter is not an instance of 'RouterUri' 
+     *
+     * @return bool If the object is added as new route, the method will
+     * return true. If the given parameter is not an instance of 'RouterUri'
      * or a route is already added, The method will return false.
-     * 
+     *
      * @since 1.3.2
      */
     public static function uriObj(RouterUri $routerUri) : bool {
@@ -795,52 +795,52 @@ class Router {
     }
     /**
      * Adds new route to the router.
-     * 
-     * @param array $options An associative array of route options. The 
+     *
+     * @param array $options An associative array of route options. The
      * array can have the following indices:
      * <ul>
-     * <li><b>path</b>: The path part of the URI (e.g. '/en/one/two'). If not 
+     * <li><b>path</b>: The path part of the URI (e.g. '/en/one/two'). If not
      * given, the route will represent home page of the website. It's possible
-     * to add parameters to the path using this syntax: '/en/{var-one}/two/{var-two}'. 
-     * The value of the parameter can be accessed later through the 
+     * to add parameters to the path using this syntax: '/en/{var-one}/two/{var-two}'.
+     * The value of the parameter can be accessed later through the
      * array $_GET or the array $_POST.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>route-to</b>:  The location where the URI is going 
-     * to route to (The resource). It can be either a callable or a string which represents 
+     * <li><b>route-to</b>:  The location where the URI is going
+     * to route to (The resource). It can be either a callable or a string which represents
      * the path to a PHP file.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>type</b>: The type of the route. It can have one of 4 
+     * <li><b>type</b>: The type of the route. It can have one of 4
      * values:
      * <ul>
-     * <li><b>Router::VIEW_ROUTE</b>: If the PHP file is inside the folder 
+     * <li><b>Router::VIEW_ROUTE</b>: If the PHP file is inside the folder
      * '/pages' or in other subdirectory under the same folder.</li>
-     * <li><b>Router::API_ROUTE</b> : If the PHP file is inside the folder '/apis' 
+     * <li><b>Router::API_ROUTE</b> : If the PHP file is inside the folder '/apis'
      * or in other subdirectory under the same folder.</li>
-     * <li><b>Router::CUSTOMIZED</b> : If the PHP file is inside the root folder or in 
+     * <li><b>Router::CUSTOMIZED</b> : If the PHP file is inside the root folder or in
      * other subdirectory under the root.</li>
      * <li><b>Router::CLOSURE_ROUTE</b> If the route is a closure.</li>
      * </ul></li>
-     * <li><b>is-api</b>: If this parameter is set to true, the route will be 
-     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
+     * <li><b>is-api</b>: If this parameter is set to true, the route will be
+     * treated as if it was an API route. This means that the constant 'API_ROUTE'
      * will be initiated when a request is made to the route. Default is false.</li>
-     * <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     * <li><b>in-sitemap</b>: If set to true, the given route will be added to
      * the basic site map which can be generated by the router class.</li>
-     * <li><b>closure-params</b>:If the route type is closure route, 
-     * it is possible to pass values to it using this array. 
+     * <li><b>closure-params</b>:If the route type is closure route,
+     * it is possible to pass values to it using this array.
      * </li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * @return bool If the route is added, the method will return true. 
-     * The method one return false only in two cases, either the route type 
+     *
+     * @return bool If the route is added, the method will return true.
+     * The method one return false only in two cases, either the route type
      * is not correct or a similar route was already added.
-     * 
+     *
      * @since 1.0
      */
     private function addRouteHelper1(array $options): bool {
@@ -910,11 +910,11 @@ class Router {
         }
     }
     /**
-     * Checks for provided options and set defaults for the ones which are 
+     * Checks for provided options and set defaults for the ones which are
      * not provided.
-     * 
+     *
      * @param array $options
-     * 
+     *
      * @return array
      */
     private function checkOptionsArr(array $options): array {
@@ -1078,11 +1078,11 @@ class Router {
     }
     /**
      * Removes any extra forward slash in the beginning or the end.
-     * 
+     *
      * @param string $path Any string that represents the path part of a URI.
-     * 
+     *
      * @return string A string in the format '/nice/work/boy'.
-     * 
+     *
      * @since 1.1
      */
     private function fixUriPath(string $path): string {
@@ -1105,9 +1105,9 @@ class Router {
     }
     /**
      * Creates and Returns a single instance of the router.
-     * 
+     *
      * @return Router
-     * 
+     *
      * @since 1.0
      */
     private static function get(): Router {
@@ -1129,13 +1129,13 @@ class Router {
         ];
     }
     /**
-     * Returns an array that holds allowed request methods for fetching the 
+     * Returns an array that holds allowed request methods for fetching the
      * specified resource.
-     * 
+     *
      * @param array $options The array which used to hold route options.
-     * 
-     * @return array If the route has no specific request methods, the 
-     * array will be empty. Other than that, the array will have request 
+     *
+     * @return array If the route has no specific request methods, the
+     * array will be empty. Other than that, the array will have request
      * methods as strings.
      */
     private function getRequestMethodsHelper(array $options): array {
@@ -1167,9 +1167,9 @@ class Router {
     }
     /**
      * Returns an array which contains all routes as RouteURI object.
-     * 
+     *
      * @return array An array which contains all routes as RouteURI object.
-     * 
+     *
      * @since 1.2
      */
     private function getRoutesHelper() : array {
@@ -1177,13 +1177,13 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
-     * 
+     *
      * @param string $path The path part of the URI.
-     * 
-     * @return RouterUri|null If a route was found which has the given path, 
-     * an object of type 'RouterUri' is returned. If no route is found, null 
+     *
+     * @return RouterUri|null If a route was found which has the given path,
+     * an object of type 'RouterUri' is returned. If no route is found, null
      * is returned.
-     * 
+     *
      * @since 1.3.3
      */
     private function getUriObjHelper(string $path) {
@@ -1199,12 +1199,12 @@ class Router {
     }
     /**
      * Checks if a given path has a route or not.
-     * 
+     *
      * @param RouterUri $path The path which will be checked (such as '/path1/path2')
-     * 
-     * @return bool The method will return true if the given path 
+     *
+     * @return bool The method will return true if the given path
      * has a route.
-     * 
+     *
      * @since 1.1
      */
     private function hasRouteHelper($uriObj): bool {
@@ -1222,18 +1222,18 @@ class Router {
     }
     /**
      * Checks if a directory name is a parameter or not.
-     * 
+     *
      * @param string $dir
-     * 
+     *
      * @return bool
-     * 
+     *
      * @since 1.1
      */
     private function isDirectoryAVar(string $dir): bool {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
     /**
-     * 
+     *
      * @param RouterUri $route
      * @throws FileException
      */
@@ -1275,7 +1275,7 @@ class Router {
     }
     /**
      * Send http 301 response code and redirect the request to non-www URI.
-     * 
+     *
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW(RouterUri $uriObj) {
@@ -1307,20 +1307,20 @@ class Router {
     }
     /**
      * Route a given URI to its specified resource.
-     * 
-     * If the router has no routes, the router will send back a '418 - I'm A 
-     * Teapot' response. If the route is available but the file that the 
+     *
+     * If the router has no routes, the router will send back a '418 - I'm A
+     * Teapot' response. If the route is available but the file that the
      * router is routing to do not exist, a '500 - Server Error' Response
-     * with the message 'The resource 'a_resource' was available but its route is not configured correctly.' is 
-     * sent back. If the route is not found, The router will call the function 
+     * with the message 'The resource 'a_resource' was available but its route is not configured correctly.' is
+     * sent back. If the route is not found, The router will call the function
      * that was set by the user in case a route is not found.
-     * 
+     *
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
-     * 
-     * @param bool $loadResource If set to true, the resource that represents the 
-     * route will be loaded. If false, the route will be only resolved. Default 
+     *
+     * @param bool $loadResource If set to true, the resource that represents the
+     * route will be loaded. If false, the route will be only resolved. Default
      * is true.
-     * 
+     *
      * @since 1.0
      */
     private function resolveUrlHelper(string $uri, bool $loadResource = true) {
@@ -1493,22 +1493,22 @@ class Router {
     }
     /**
      * Sets a callback to call in case a given rout is not found.
-     * 
-     * @param callable $function The function which will be called if 
+     *
+     * @param callable $function The function which will be called if
      * the rout is not found.
-     * 
+     *
      * @since 1.0
      */
     private function setOnNotFoundHelper(callable $function) {
         $this->onNotFound = $function;
     }
     /**
-     * 
+     *
      * @param RouterUri $uriRouteObj One URI object taken from stored routes.
-     * 
-     * @param array $requestedPathArr An array that contains requested URI path 
+     *
+     * @param array $requestedPathArr An array that contains requested URI path
      * part.
-     * 
+     *
      * @param string $requestMethod
      */
     private function setUriVarsHelper(RouterUri $uriRouteObj, array $requestedPathArr, string $requestMethod) {
@@ -1543,54 +1543,54 @@ class Router {
     }
     /**
      * Adds new route to a page.
-     * 
+     *
      * A page can be any file that is added inside the folder '/pages'.
-     * 
-     * @param array $options An associative array that contains route 
+     *
+     * @param array $options An associative array that contains route
      * options. Available options are:
      * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
-     * in the path. To include a parameter in the path, its name must be enclosed 
-     * between {}. The value of the parameter will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
+     * <li><b>path</b>: The path part of the URI. For example, if the
+     * requested URI is 'http://www.example.com/user/ibrahim', the path
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters
+     * in the path. To include a parameter in the path, its name must be enclosed
+     * between {}. The value of the parameter will be stored in either the array
+     * $_GET or $_POST after the requested URI is resolved. If we use the same
+     * example above to get any user profile, We would add the following as
+     * a path: 'user/{username}'. In this case, username will be available in
      * $_GET['username']. </li>
-     * <li><b>route-to</b>: The path to the view file. The root folder for 
-     * all views is '/pages'. If the view name is 'view-user.php', then the 
-     * value of this parameter must be '/view-user.php'. If the view is in a 
+     * <li><b>route-to</b>: The path to the view file. The root folder for
+     * all views is '/pages'. If the view name is 'view-user.php', then the
+     * value of this parameter must be '/view-user.php'. If the view is in a
      * subdirectory inside pages directory, then the name of the
      * directory must be included.</li>
      * <li><b>case-sensitive</b>: Make the URL case-sensitive or not.
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default
      * is true.</li>
-     * <li><b>languages</b>: An indexed array that contains the languages at 
-     * which the resource can have. Each language is represented as two 
+     * <li><b>languages</b>: An indexed array that contains the languages at
+     * which the resource can have. Each language is represented as two
      * characters such as 'AR'.</li>
-     * <li><b>vars-values</b>: An optional associative array which contains sub 
-     * indexed arrays that contains possible values for URI vars. This one is 
+     * <li><b>vars-values</b>: An optional associative array which contains sub
+     * indexed arrays that contains possible values for URI vars. This one is
      * used when building the sitemap.</li>
-     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
-     * route. This also can be a middleware group. In addition to that, this can 
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the
+     * route. This also can be a middleware group. In addition to that, this can
      * be an array that holds middleware names or middleware groups names.</li>
-     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     *  <li><b>in-sitemap</b>: If set to true, the given route will be added to
      * the basic site map which can be generated by the router class.</li>
-     * <li><b>methods</b>: An optional array that can have a set of 
-     * allowed request methods for fetching the resource. This can be 
+     * <li><b>methods</b>: An optional array that can have a set of
+     * allowed request methods for fetching the resource. This can be
      * also a single string such as 'GET' or 'POST'.</li>
-     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This
      * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
-     * 
-     * @return bool The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
+     *
+     * @return bool The method will return true if the route was created.
+     * If a route for the given path was already created, the method will return
      * false.
-     * 
+     *
      * @since 1.2
-     * 
+     *
      * @deprecated since version 1.3.12
      */
     private static function view(array $options): bool {

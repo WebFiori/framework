@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -24,9 +24,9 @@ use webfiori\framework\writers\LangClassWriter;
  * A command which is used to add a database connection or SMTP account.
  *
  * @author Ibrahim
- * 
+ *
  * @since 1.1.0
- * 
+ *
  * @version 1.0
  */
 class AddCommand extends CLICommand {
@@ -35,7 +35,7 @@ class AddCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * 
+     *
      * @return int
      */
     public function exec() : int {

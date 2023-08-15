@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler\webUI;
 
@@ -16,9 +16,9 @@ use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 /**
- * A generic view for scheduler related operations. 
- * 
- * It can be extended to create a page which is used to 
+ * A generic view for scheduler related operations.
+ *
+ * It can be extended to create a page which is used to
  * perform some operations on scheduled tasks.
  *
  * @author Ibrahim
@@ -64,7 +64,7 @@ class BaseTasksPage extends WebPage {
     }
 
     /**
-     * 
+     *
      * @return Json
      */
     public function getJson() : Json {
@@ -72,11 +72,11 @@ class BaseTasksPage extends WebPage {
     }
     /**
      * Checks if the user is logged in or not.
-     * 
+     *
      * The method will check if session variable 'scheduler-is-logged-in' is
      * set to true or not. The variable is set when the user successfully
      * logged in.
-     * 
+     *
      * @return bool
      */
     public function isLoggedIn() : bool {

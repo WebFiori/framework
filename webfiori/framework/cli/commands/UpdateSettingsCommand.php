@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -19,11 +19,11 @@ use webfiori\framework\config\Controller;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
 /**
- * This class implements a CLI command which is used to update the settings which are 
+ * This class implements a CLI command which is used to update the settings which are
  * stored in the class 'AppConfing' of the application.
  *
  * @author Ibrahim
- * 
+ *
  * @since 2.3.1
  */
 class UpdateSettingsCommand extends CLICommand {

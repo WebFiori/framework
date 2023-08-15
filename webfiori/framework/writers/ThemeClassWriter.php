@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\writers;
 
@@ -22,11 +22,11 @@ class ThemeClassWriter extends ClassWriter {
     private $name;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param array $classNameInfo An associative array that holds theme class
      * information. The array must have 3 indices, 'path', 'name' and 'namespace'.
-     * The array can have additional indices that could hold theme info. The 
-     * indices are: 
+     * The array can have additional indices that could hold theme info. The
+     * indices are:
      * <ul>
      * <li>name: Holds theme name.</li>
      * </ul>
@@ -41,7 +41,7 @@ class ThemeClassWriter extends ClassWriter {
     }
     /**
      * Returns the name of the theme.
-     * 
+     *
      * @return string The method will return a string that represents the
      * name. Default return value is 'New Theme'.
      */
@@ -66,9 +66,9 @@ class ThemeClassWriter extends ClassWriter {
     }
     /**
      * Sets the name of the theme.
-     * 
+     *
      * @param string $name A non empty string that must be unique to the theme.
-     * 
+     *
      * @return bool If set, the method will return true. False otherwise.
      */
     public function setThemeName(string $name) : bool {

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2022 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler\webUI;
 
@@ -15,7 +15,7 @@ use webfiori\ui\HTMLNode;
 
 /**
  * A table which is used to list all scheduled background tasks.
- * 
+ *
  * This UI component is used by the page which is used to list all
  * scheduled tasks. The table has task information including arguments,
  * description and the ability to force execute it.

@@ -24,6 +24,7 @@ return $config->setRules([
             ]
         ],
         'no_trailing_whitespace' => true,
+        'no_trailing_whitespace_in_comment' => true,
         'blank_line_after_opening_tag' => true,
         'blank_line_after_namespace' => true,
         'elseif' => false,

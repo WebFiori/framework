@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -15,7 +15,7 @@ use webfiori\cli\CommandArgument;
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
 /**
- * A CLI command which is related to executing 
+ * A CLI command which is related to executing
  * background tasks or performing operations on them.
  *
  * @author Ibrahim
@@ -24,14 +24,14 @@ use webfiori\framework\scheduler\TasksManager;
 class SchedulerCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--scheduler'. This command is used to 
-     * perform operations on background tasks. In addition to that, 
+     * The command will have name '--scheduler'. This command is used to
+     * perform operations on background tasks. In addition to that,
      * it will have the following arguments:
      * <ul>
      * <li><b>p</b>: Cron password.</li>
      * <li><b>check</b>: Run check if it is time to execute a task.</li>
      * <li><b>force</b>: Force execution of a task given its name.</li>
-     * <li><b>task-name</b>: The task that will be forced to execute or 
+     * <li><b>task-name</b>: The task that will be forced to execute or
      * its arguments will be shown.</li>
      * <li><b>show-task-args</b>: Show arguments of a task.</li>
      * <li><b>show-log</b>: Display execution log after execution is finished.</li>
@@ -57,7 +57,7 @@ class SchedulerCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * @return int If the command executed without any errors, the 
+     * @return int If the command executed without any errors, the
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */

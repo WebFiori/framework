@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -14,28 +14,28 @@ use Exception;
 use webfiori\framework\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
- * 
- * The class aims to provide all needed utilities to autoload any classes 
- * which are within the scope of the framework. In addition, the developer 
+ *
+ * The class aims to provide all needed utilities to autoload any classes
+ * which are within the scope of the framework. In addition, the developer
  * can add his own custom folders to the autoloader. More to that, the autoloader
- * will load any class which exist in the folder 'vendor' if composer 
- * is used to collect the dependencies. To activate this feature, the constant 
- * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of 
+ * will load any class which exist in the folder 'vendor' if composer
+ * is used to collect the dependencies. To activate this feature, the constant
+ * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of
  * any other component to load classes.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.1.7
  */
 class AutoLoader {
     /**
      * The name of the file that represents autoloader's cache.
-     * @var string 
+     * @var string
      * @since 1.1.6
      */
     const CACHE_NAME = 'autoload.cache';
     /**
-     * An array that contains the possible things that can be performed 
+     * An array that contains the possible things that can be performed
      * if a class has failed to load.
      * The array has the following values:
      * <ul>
@@ -49,19 +49,19 @@ class AutoLoader {
         'do-nothing'
     ];
     /**
-     * An associative array that contains the info which was taken 
+     * An associative array that contains the info which was taken
      * from autoloader's cache file.
      * This one is used to fasten the process of loading classes.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.1.6
      */
     private $cacheArr;
     /**
-     * An array that contains the names of indices that are used by loaded class 
+     * An array that contains the names of indices that are used by loaded class
      * info array.
-     * 
+     *
      * The array have the following indices:
      * <ul>
      * <li>class-name</li>
@@ -69,8 +69,8 @@ class AutoLoader {
      * <li>path</li>
      * <li>loaded-from-cache</li>
      * </ul>
-     * 
-     * @var array 
+     *
+     * @var array
      */
     private static $CLASS_INDICES = [
         'class-name',
@@ -80,43 +80,43 @@ class AutoLoader {
     ];
     /**
      * An array that contains the names of all loaded class.
-     * 
+     *
      * @var array
-     * 
+     *
      * @since 1.1.4
      */
     private $loadedClasses;
     /**
      * A single instance of the class 'AutoLoader'.
-     * 
+     *
      * @var AutoLoader
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $loader;
     /**
-     * A string or callback that indicates what will happen if the loader 
+     * A string or callback that indicates what will happen if the loader
      * is unable to load a class.
-     * 
+     *
      * @var string|callable
-     * 
-     * @since 1.1.3 
+     *
+     * @since 1.1.3
      */
     private $onFail;
     /**
      * The relative root directory that is used to search on.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $rootDir;
     /**
      * An array of folders to search on.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $searchFolders;
 
@@ -180,32 +180,32 @@ class AutoLoader {
     }
     /**
      * Returns a single instance of the class 'AutoLoader'.
-     * 
-     * @param $options array An associative array of options that is used to initialize 
+     *
+     * @param $options array An associative array of options that is used to initialize
      * the autoloader. The available options are:
      * <ul>
-     * <li><b>root</b>: A directory that can be used as a base search folder. 
+     * <li><b>root</b>: A directory that can be used as a base search folder.
      * Default is empty string. Ignored if the constant ROOT_PATH is defined.</li>
-     * <li><b>search-folders</b>: An array which contains a set of folders to search 
+     * <li><b>search-folders</b>: An array which contains a set of folders to search
      * on. Default is an empty array.</li>
-     * <li><b>define-root</b>: If set to true, The autoloader will try to define 
+     * <li><b>define-root</b>: If set to true, The autoloader will try to define
      * the constant 'ROOT_PATH' based on autoload folders.
      * Default is false. Ignored if the constant ROOT_PATH is defined.</li>,
      * <li>
-     * <b>on-load-failure</b>: An attribute that will be used if the 
+     * <b>on-load-failure</b>: An attribute that will be used if the
      * loader is unable to load the class. Possible values are:
      * <ul>
      * <li>'do-nothing'</li>
      * <li>'throw-exception'</li>
-     * <li>A callable that will be called when the class loader is unable 
+     * <li>A callable that will be called when the class loader is unable
      * to load the class.</li>
      * </ul>
      * </li>
      * </ul>
-     * 
+     *
      * @return AutoLoader
-     * 
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public static function get(array $options = [
         'define-root' => false,
@@ -457,19 +457,19 @@ class AutoLoader {
         }
     }
     /**
-     * Adds new search directory to the array of search 
+     * Adds new search directory to the array of search
      * folders.
-     * 
+     *
      * @param string $dir A new directory (such as '/entity/html-php-structs-1.6/html').
-     * 
-     * @param  string $incSubFolders If set to true, even sub-folders will 
+     *
+     * @param  string $incSubFolders If set to true, even sub-folders will
      * be included in the search.
-     * 
-     * @param string $appendRoot If set to true, Root directory of the search will 
+     *
+     * @param string $appendRoot If set to true, Root directory of the search will
      * be added as a prefix to the path.
-     * 
+     *
      * @since 1.0
-     * 
+     *
      * @deprecated since version 1.1.2
      */
     private function addSearchDirectory(string $dir, $incSubFolders = true, $appendRoot = true) {
@@ -540,11 +540,11 @@ class AutoLoader {
         }
     }
     /**
-     * Returns an array string that contains all possible paths for the folder 
+     * Returns an array string that contains all possible paths for the folder
      * 'vendor'.
-     * 
+     *
      * @return array
-     * 
+     *
      * @since 1.1.6
      */
     private static function getComposerVendorDirs(): array {
@@ -576,9 +576,9 @@ class AutoLoader {
     }
     /**
      * Returns the root directory that is used to search inside.
-     * 
+     *
      * @return string The root directory that is used to search inside.
-     * 
+     *
      * @since 1.0
      */
     private function getRoot(): string {
@@ -627,13 +627,13 @@ class AutoLoader {
         }
     }
     /**
-     * 
+     *
      * @param string $className The name of the class to load.
      * @param string $classWithNs Class name including its namespace.
      * @param string $value A path to directory to check in.
-     * @param bool $appendRoot  If set to true, root directory will be 
+     * @param bool $appendRoot  If set to true, root directory will be
      * appended to file path.
-     * @param array $allPaths An array that holds pathes to classes which has 
+     * @param array $allPaths An array that holds pathes to classes which has
      * same name.
      *
      * @return bool True if loaded. False if not.
@@ -708,7 +708,7 @@ class AutoLoader {
     }
     /**
      * Read the file which contains autoloader cached content.
-     * 
+     *
      * @since 1.1.6
      */
     private function readCache() {

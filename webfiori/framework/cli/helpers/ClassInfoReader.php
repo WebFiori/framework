@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
@@ -22,13 +22,13 @@ use webfiori\framework\Util;
  */
 class ClassInfoReader {
     /**
-     * 
+     *
      * @var CLICommand
      */
     private $ownerCommand;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CLICommand $owner The command that owns the reader. Its used to read
      * user input and send output.
      */
@@ -38,11 +38,11 @@ class ClassInfoReader {
 
     /**
      * Reads and returns a string that represents the name of the class that will be created.
-     * 
+     *
      * @param string|null $suffix An optional string to append to the name of the class
      * if it does not exist. For example, If the user input is 'Users' and the
      * value of the suffix is 'Table', the returned value will be 'UsersTable'.
-     * 
+     *
      * @return string A string that represents the name of the class.
      */
     public function getName($suffix = null, $errMsg = 'Invalid class name is given.') {
@@ -51,9 +51,9 @@ class ClassInfoReader {
     /**
      * Reads and returns a string that represents the namespace at which the class
      * will be added to.
-     * 
+     *
      * @param string $defaultNs A default value for the namespace.
-     * 
+     *
      * @return string A string that represents the namespace at which the class
      * will be added to.
      */
@@ -62,7 +62,7 @@ class ClassInfoReader {
     }
     /**
      * Returns the command that owns the instance.
-     * 
+     *
      * @return CLICommand
      */
     public function getOwner() {
@@ -70,17 +70,17 @@ class ClassInfoReader {
     }
     /**
      * Prompts the user to enter class information including name, namespace and path.
-     * 
+     *
      * @param string $defaultNs An optional default namespace to use in case the
      * user did not provide a one. Note that this also will be the default path.
-     * 
+     *
      * @param string $suffix An optional string which will be appended to the
      * name of the class.
-     * 
-     * @return array The method will return an array that contains 3 indices: 
+     *
+     * @return array The method will return an array that contains 3 indices:
      * <ul>
      * <li><b>name</b>: The name of the class.</li>
-     * <li><b>namespace</b>: The namespace of the class. It will be empty string if no 
+     * <li><b>namespace</b>: The namespace of the class. It will be empty string if no
      * namespace is entered.</li>
      * <li><b>path</b>: The location at which the class will be created.</li>
      * </ul>

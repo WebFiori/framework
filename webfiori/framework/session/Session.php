@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\session;
 
@@ -21,111 +21,111 @@ use webfiori\json\JsonI;
  * A class that represents a session.
  *
  * @author Ibrahim
- * 
+ *
  * @since 1.1.0
- * 
+ *
  */
 class Session implements JsonI {
     /**
      * The default lifetime for any new session (in minutes).
-     * 
+     *
      *
      */
     const DEFAULT_SESSION_DURATION = 120;
     /**
      * The IP address of the user who is using the session.
-     * 
+     *
      * @var string
-     * 
+     *
      *
      */
     private $ipAddr;
     /**
-     * A boolean which is set to true if the session timeout will be refreshed 
+     * A boolean which is set to true if the session timeout will be refreshed
      * with every request.
-     * 
+     *
      * @var boolean
-     * 
-     * @since 1.8.8 
+     *
+     * @since 1.8.8
      */
     private $isRef;
     /**
      * A string that represents language code of the session.
-     * 
+     *
      * @var string
-     * 
+     *
      */
     private $langCode;
     /**
      * The lifetime of the session (in minutes).
-     * 
+     *
      * @var int lifetime of the session (in minutes). The default is 10.
-     * 
+     *
      */
     private $lifeTime;
     /**
      * Number of seconds passed since the session was started.
-     * 
+     *
      * @var int
-     * 
+     *
      */
     private $passedTime;
     /**
      * The name of random function which is used in session ID generation.
-     * 
+     *
      * @var string
-     * 
+     *
      */
     private static $randFunc;
     /**
      * The timestamp at which the session was resumed at as Unix timestamp.
-     * 
-     * @var int 
-     * 
+     *
+     * @var int
+     *
      */
     private $resumedAt;
     private $sessionCookie;
     private $sessionStatus;
     /**
      * An object of type 'User' that represents session user.
-     * 
+     *
      * @var SessionUser
-     * 
+     *
      */
     private $sessionUser;
     /**
      * An array that holds session variables.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     private $sessionVariables;
 
     /**
      * The timestamp at which the session was started in as Unix timestamp.
-     * 
-     * @var int 
-     * 
+     *
+     * @var int
+     *
      */
     private $startedAt;
     /**
      * Creates new instance of the class.
-     * 
-     * @param array $options An array that contains session options. Available 
+     *
+     * @param array $options An array that contains session options. Available
      * options are:
      * <ul>
-     * <li><b>name</b>: The name of the session. A valid name can only 
-     * consist of [a-z], [A-Z], [0-9], dash and underscore. This must be 
+     * <li><b>name</b>: The name of the session. A valid name can only
+     * consist of [a-z], [A-Z], [0-9], dash and underscore. This must be
      * provided or the method will throw an exception.</li>
-     * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
-     * greater than or equal to 0. If 0 is given, it means the session is not 
+     * <li><b>duration</b>: The duration of the session in minutes. Must be a number
+     * greater than or equal to 0. If 0 is given, it means the session is not
      * persistent. If the duration is invalid, it will be set to Session::DEFAULT_SESSION_DURATION</li>
-     * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
+     * <li><b>refresh</b>: A boolean which is set to true if session timeout time
      * will be refreshed with every request. Default is false.</li>
      * </ul>
-     * 
+     *
      * @throws SessionException If session name is missing or invalid.
-     * 
+     *
      */
     public function __construct(array $options = []) {
         //used to support older PHP versions which does not have 'random_int'.
@@ -175,18 +175,18 @@ class Session implements JsonI {
     }
     /**
      * Returns a JSON string that represents the session.
-     * 
+     *
      * @return string
-     * 
+     *
      */
     public function __toString() {
         return $this->toJSON().'';
     }
     /**
      * Store session state and pause the session.
-     * 
+     *
      * Note that session state will be stored only if it is running.
-     * 
+     *
      */
     public function close() {
         if ($this->isRunning()) {
@@ -257,11 +257,11 @@ class Session implements JsonI {
     }
     /**
      * Generate a random session ID.
-     * 
+     *
      * @param string|null $sessionName The name of the session.
-     * 
+     *
      * @return string A new random session ID.
-     * 
+     *
      */
     public static function generateSessionID(string $sessionName = null): string {
         $date = date('Y-m-d\TH:i:sO');
@@ -272,12 +272,12 @@ class Session implements JsonI {
     }
     /**
      * Returns the value of a session variable.
-     * 
+     *
      * @param string $varName The name of the variable.
-     * 
-     * @return null|mixed If a variable which has the given name is found, its 
+     *
+     * @return null|mixed If a variable which has the given name is found, its
      * value is returned. If no such variable exist, the method will return null.
-     * 
+     *
      */
     public function get(string $varName) {
         if ($this->isRunning()) {
@@ -290,38 +290,38 @@ class Session implements JsonI {
     }
     /**
      * Returns the cookie which is associated with the cookie.
-     * 
+     *
      * @return HttpCookie An object that holds session cookie information.
      */
     public function getCookie() : HttpCookie {
         return $this->sessionCookie;
     }
     /**
-     * Returns a string which can be passed to the function 'header()' to set session 
+     * Returns a string which can be passed to the function 'header()' to set session
      * cookie.
-     * 
-     * @return string The string that will be returned will have the following 
-     * format: 
-     * '&lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
+     *
+     * @return string The string that will be returned will have the following
+     * format:
+     * '&lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/
      * SameSite=&lt;Lax|None|Strict&gt;'
-     * 
+     *
      */
     public function getCookieHeader() : string {
         return $this->sessionCookie.'';
     }
     /**
      * Returns the amount of time at which the session will live for in seconds.
-     * 
+     *
      * @return int This method will return session duration in seconds. The
      * default duration of any new session is 120 minutes (7200 seconds).
-     * 
+     *
      */
     public function getDuration() : int {
         return intval(round($this->lifeTime * 60));
     }
     /**
      * Returns the ID of the session.
-     * 
+     *
      * @return string The ID of the session.
      */
     public function getId() : string {
@@ -329,27 +329,27 @@ class Session implements JsonI {
     }
     /**
      * Returns the IP address of the client at which the request has come from.
-     * 
+     *
      * @return string
-     * 
+     *
      */
     public function getIp() : string {
         return $this->ipAddr;
     }
     /**
      * Returns session language code.
-     * 
-     * @param bool $forceUpdate Set to true if the language is set and want to 
-     * reset it. The reset process depends on the attribute 
+     *
+     * @param bool $forceUpdate Set to true if the language is set and want to
+     * reset it. The reset process depends on the attribute
      * 'lang'. It can be sent via 'get' request, 'post' request or a cookie. If
-     * no language code is provided and the parameter '$forceUpdate' is set 
-     * to true, 'EN' will be used. If the given 
-     * language code is not in the given array and the parameter '$forceUpdate' is set 
+     * no language code is provided and the parameter '$forceUpdate' is set
+     * to true, 'EN' will be used. If the given
+     * language code is not in the given array and the parameter '$forceUpdate' is set
      * to true, 'EN' will be used.
-     * 
-     * @return string|null two digit language code (such as 'EN'). If the session 
+     *
+     * @return string|null two digit language code (such as 'EN'). If the session
      * is not running or the language is not set, the method will return empty string.
-     * 
+     *
      */
     public function getLangCode(bool $forceUpdate = false) {
         $this->initLang($forceUpdate);
@@ -358,19 +358,19 @@ class Session implements JsonI {
     }
     /**
      * Returns the name of the session.
-     * 
+     *
      * @return string The name of the session as string.
-     * 
+     *
      */
     public function getName() : string {
         return $this->getCookie()->getName();
     }
     /**
      * Returns the number of seconds that has been passed since the session started.
-     * 
-     * @return int The number of seconds that has been passed since the session started. 
+     *
+     * @return int The number of seconds that has been passed since the session started.
      * If the session status is Session::STATUS_INACTIVE, the method will return 0.
-     * 
+     *
      */
     public function getPassedTime() : int {
         return $this->passedTime;
@@ -402,11 +402,11 @@ class Session implements JsonI {
     }
     /**
      * Returns the time at which the session was resumed at in seconds.
-     * 
-     * @return int The time at which the session was resumed at in seconds. If 
-     * the session is not running, the time will be 0. If the session is new, 
+     *
+     * @return int The time at which the session was resumed at in seconds. If
+     * the session is not running, the time will be 0. If the session is new,
      * the time will be the same as start time.
-     * 
+     *
      */
     public function getResumedAt() : int {
         if ($this->isRunning()) {
@@ -417,10 +417,10 @@ class Session implements JsonI {
     }
     /**
      * Returns the time at which the session was started at.
-     * 
-     * @return int The method will return the time in seconds. If the session 
+     *
+     * @return int The method will return the time in seconds. If the session
      * is not running, the method will return 0.
-     * 
+     *
      */
     public function getStartedAt() : int {
         if ($this->isRunning()) {
@@ -431,44 +431,44 @@ class Session implements JsonI {
     }
     /**
      * Returns the status of the session.
-     * 
-     * @return string The status of the session. 
-     * 
+     *
+     * @return string The status of the session.
+     *
      */
     public function getStatus() : string {
         return $this->sessionStatus;
     }
     /**
      * Returns an object of type 'SessionUser' that represents session user.
-     * 
+     *
      * @return SessionUser|null An object of type 'User' that represents session user.
      * If session user is not set, the method will return null.
-     * 
+     *
      */
     public function getUser() {
         return $this->sessionUser;
     }
     /**
      * Returns an associative array that contains all session variables.
-     * 
-     * @return array An associative array that contains all session variables. 
-     * The indices will be variables names and the value of each index is the 
+     *
+     * @return array An associative array that contains all session variables.
+     * The indices will be variables names and the value of each index is the
      * variable value.
-     * 
+     *
      */
     public function getVars() : array {
         return $this->sessionVariables;
     }
     /**
      * Checks if the session has a given value or not.
-     * 
+     *
      * Note that the method will always return false if the session is not running.
-     * 
+     *
      * @param string $varName The name of the variable that has the value.
-     * 
+     *
      * @return bool If the value exist, the method will return true.
      * Other than that, the method will return false.
-     * 
+     *
      */
     public function has(string $varName) : bool {
         if ($this->isRunning()) {
@@ -480,28 +480,28 @@ class Session implements JsonI {
         return false;
     }
     /**
-     * Checks if the session cookie is persistent or not. 
-     * 
-     * A session is persistent if its duration is greater than 0 minutes (has a 
+     * Checks if the session cookie is persistent or not.
+     *
+     * A session is persistent if its duration is greater than 0 minutes (has a
      * duration).
-     * 
-     * @return bool If the session cookie is persistent, the method will return true. 
+     *
+     * @return bool If the session cookie is persistent, the method will return true.
      * false otherwise.
-     * 
+     *
      */
     public function isPersistent() : bool {
         return $this->getDuration() != 0;
     }
     /**
-     * Checks if session timeout time will be refreshed with every request or not. 
-     * 
-     * This method must be called only after calling the method 'SessionManager::initSession()'. 
+     * Checks if session timeout time will be refreshed with every request or not.
+     *
+     * This method must be called only after calling the method 'SessionManager::initSession()'.
      * or it will throw an exception.
-     * 
-     * @return bool true If session timeout time will be refreshed with every request. 
+     *
+     * @return bool true If session timeout time will be refreshed with every request.
      * false if not.
      *
-     * 
+     *
      * @since 1.5
      */
     public function isRefresh() : bool {
@@ -509,10 +509,10 @@ class Session implements JsonI {
     }
     /**
      * Checks if the session is started and running or not.
-     * 
+     *
      * @return bool If the status of the session is Session::STATUS_NEW or Session::STATUS_RESUMED,
      * the method will return true. Other than that, the method will return false.
-     * 
+     *
      */
     public function isRunning() : bool {
         return $this->getStatus() == SessionStatus::NEW || $this->getStatus() == SessionStatus::RESUMED;
@@ -526,13 +526,13 @@ class Session implements JsonI {
     }
     /**
      * Retrieves the value of a session variable and removes it from the session.
-     *  
+     *
      * @param string $varName The name of the variable.
-     * 
-     * @return mixed|null If the variable exist and its value is set, the method 
-     * will return its value. If the value is not set or the session is not 
+     *
+     * @return mixed|null If the variable exist and its value is set, the method
+     * will return its value. If the value is not set or the session is not
      * running, the method will return null.
-     * 
+     *
      */
     public function pull(string $varName) {
         if ($this->isRunning()) {
@@ -544,9 +544,9 @@ class Session implements JsonI {
     }
     /**
      * Re-create session ID.
-     * 
+     *
      * @return string The new ID of the session.
-     * 
+     *
      */
     public function reGenerateID() : string {
         $this->getCookie()->setValue($this->generateSessionID($this->getName()));
@@ -555,13 +555,13 @@ class Session implements JsonI {
     }
     /**
      * Removes the value of a session variable.
-     * 
+     *
      * @param string $varName The name of the variable.
-     * 
-     * @return bool If the value was deleted, the method will return true. 
-     * If the variable does not exist or the variable does not exist, the method 
+     *
+     * @return bool If the value was deleted, the method will return true.
+     * If the variable does not exist or the variable does not exist, the method
      * will return false.
-     * 
+     *
      */
     public function remove(string $varName) : bool {
         if ($this->isRunning()) {
@@ -578,11 +578,11 @@ class Session implements JsonI {
     }
     /**
      * Serialize the session.
-     * 
-     * @return string The method will return a string that represents serialized 
+     *
+     * @return string The method will return a string that represents serialized
      * session data. Note that if openssl is enabled and the cipher aes-256-ctr
      * is supported, returned string will be encrypted.
-     * 
+     *
      */
     public function serialize() : string {
         // Serialize => Encode => [Encrypt]
@@ -605,17 +605,17 @@ class Session implements JsonI {
         return $serializedSession;
     }
     /**
-     * Sets session variable. 
-     * 
+     * Sets session variable.
+     *
      * Note that session variable will be set only if the session is running.
-     * 
+     *
      * @param string $name The name of the variable. Must be non-empty string.
-     * 
+     *
      * @param mixed $val The value of the variable. It can be anything.
-     * 
-     * @return bool If the variable is set, the method will return true. If 
+     *
+     * @return bool If the variable is set, the method will return true. If
      * not, the method will return false.
-     * 
+     *
      */
     public function set(string $name, $val) : bool {
         if ($this->isRunning()) {
@@ -632,16 +632,16 @@ class Session implements JsonI {
     }
     /**
      * Sets session duration.
-     * 
+     *
      * Note that this method will also update the 'expires' attribute of session
-     * cookie. Also, note that if the new duration less than the passed time, 
+     * cookie. Also, note that if the new duration less than the passed time,
      * the session will expire.
-     * 
+     *
      * @param float $time Session duration in minutes.
-     * 
-     * @return bool If session duration is updated, the method will return true. 
+     *
+     * @return bool If session duration is updated, the method will return true.
      * False otherwise.
-     * 
+     *
      */
     public function setDuration(float $time) : bool {
         $asFloat = $time;
@@ -657,33 +657,33 @@ class Session implements JsonI {
         return false;
     }
     /**
-     * Sets if the session timeout will be refreshed with every request 
+     * Sets if the session timeout will be refreshed with every request
      * or not.
-     * 
-     * @param bool $bool If set to true, timeout time will be refreshed. 
+     *
+     * @param bool $bool If set to true, timeout time will be refreshed.
      * Note that the property will be updated only if the session is running.
-     * 
+     *
      */
     public function setIsRefresh(bool $bool) {
         $this->isRef = $bool === true;
     }
     /**
      * Sets the value of the property 'SameSite' of session cookie.
-     * 
-     * @param string $val It can be one of the following values, 'Lax', 'Strict' 
+     *
+     * @param string $val It can be one of the following values, 'Lax', 'Strict'
      * or 'None'. If any other value is provided, it will be ignored.
-     * 
+     *
      */
     public function setSameSite(string $val) {
         $this->getCookie()->setSameSite($val);
     }
     /**
      * Sets the user that represents session user.
-     * 
+     *
      * Note that the user will be set only if the session is active.
-     * 
+     *
      * @param SessionUser $userObj An object of type 'User'.
-     * 
+     *
      */
     public function setUser(SessionUser $userObj) {
         if ($this->isRunning()) {
@@ -715,9 +715,9 @@ class Session implements JsonI {
     }
     /**
      * Returns an object of type 'Json' that represents the session.
-     * 
+     *
      * @return Json
-     * 
+     *
      */
     public function toJSON() : Json {
         $json = new Json([
@@ -766,7 +766,7 @@ class Session implements JsonI {
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
     }
     /**
-     * 
+     *
      * @return string|null
      */
     private function getLangFromRequest() {
@@ -784,24 +784,24 @@ class Session implements JsonI {
         return $lang;
     }
     /**
-     * Initialize session language. 
-     * 
-     * The initialization depends on the attribute 'lang'. 
-     * It can be sent via 'get' request, 'post' request or a cookie. 
-     * If the given language code is not in the given array, 
-     * The used value will depend on the existence of the class 'AppConfig'. 
+     * Initialize session language.
+     *
+     * The initialization depends on the attribute 'lang'.
+     * It can be sent via 'get' request, 'post' request or a cookie.
+     * If the given language code is not in the given array,
+     * The used value will depend on the existence of the class 'AppConfig'.
      * If it is existed, The value that is returned by AppConfig::getPrimaryLanguage()' .
      * If not, 'EN' is used by default.
-     * Also, if the language is set before, it will not be updated unless the 
+     * Also, if the language is set before, it will not be updated unless the
      * parameter '$forceUpdate' is set to true.
-     * 
-     * @param bool $forceUpdate Set to true if the language is set and want to 
+     *
+     * @param bool $forceUpdate Set to true if the language is set and want to
      * reset it. Default is false.
-     * 
+     *
      * @return void The method will return true if the language is set or
-     * updated. Other than that, the method will return false. Default is true which 
+     * updated. Other than that, the method will return false. Default is true which
      * happens when session is not running.
-     * 
+     *
      * @since 1.2
      */
     private function initLang(bool $forceUpdate = false) {

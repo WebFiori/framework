@@ -10,7 +10,7 @@ use webfiori\json\Json;
 /**
  * Application configuration driver which is used to read and write application
  * configuration from JSON file.
- * 
+ *
  * The driver will create a JSON file in the path 'APP_PATH/config' with
  * the name 'app-config.json'. The developer can use the file to
  * modify application configuration.
@@ -20,7 +20,7 @@ use webfiori\json\Json;
 class JsonDriver implements ConfigurationDriver {
     /**
      * The location at which the configuration file will be kept at.
-     * 
+     *
      * @var string The file will be stored at [APP_PATH]/config/app-config.json';
      */
     const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'app-config.json';
@@ -71,15 +71,15 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Adds application environment variable to the configuration.
-     * 
+     *
      * The variables which are added using this method will be defined as
      * a named constant at run time using the function 'define'. This means
      * the constant will be accesaable anywhere within the appllication's environment.
-     * 
+     *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
-     * 
+     *
      * @param mixed $value The value of the constant.
-     * 
+     *
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
@@ -122,12 +122,12 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('app-names')->get(strtoupper(trim($langCode)));
     }
     /**
-     * Returns an array that holds different names for the web application 
+     * Returns an array that holds different names for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the name.
-     * 
+     *
      */
     public function getAppNames(): array {
         $appNamesJson = $this->json->get('app-names');
@@ -192,10 +192,10 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('app-descriptions')->get(strtoupper(trim($langCode)));
     }
     /**
-     * Returns an array that holds different descriptions for the web application 
+     * Returns an array that holds different descriptions for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the description.
      */
     public function getDescriptions(): array {
@@ -284,12 +284,12 @@ class JsonDriver implements ConfigurationDriver {
         return '';
     }
     /**
-     * Returns an array that holds different page titles for the web application 
+     * Returns an array that holds different page titles for the web application
      * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
+     *
+     * @return array The indices of the array are language codes such as 'AR' and
      * the value of the index is the title.
-     * 
+     *
      */
     public function getTitles(): array {
         $titles = $this->json->get('titles');
@@ -355,9 +355,9 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Sets or update default description of the application that will be used
      * by web pages.
-     * 
+     *
      * @param string $description The default description.
-     * 
+     *
      * @param string $langCode The code of the language at which the description
      * will be updated for.
      */
@@ -373,8 +373,8 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Sets the home page of the application.
-     * 
-     * 
+     *
+     *
      * @param string $url The URL of the home page of the website. For example,
      * This page is served when the user visits the domain without specifying a path.
      */
@@ -415,7 +415,7 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Sets the default theme which will be used to style web pages.
-     * 
+     *
      * @param string $theme The name of the theme that will be used to style
      * website UI. This can also be class name of the theme.
      */
@@ -425,9 +425,9 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Sets or updates default web page title for a specific display language.
-     * 
+     *
      * @param string $title The title that will be set.
-     * 
+     *
      * @param string $langCode The display language at which the title will be
      * set or updated for.
      */
@@ -443,7 +443,7 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Sets the string which is used to separate application name from page name.
-     * 
+     *
      * @param string $separator A character or a string that is used
      * to separate application name from web page title. Two common
      * values are '-' and '|'.

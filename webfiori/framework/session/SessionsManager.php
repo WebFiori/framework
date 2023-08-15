@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\session;
 
@@ -17,40 +17,40 @@ use webfiori\http\Request;
  * A class which is used to manage user sessions.
  *
  * @author Ibrahim
- * 
+ *
  * @since 1.1.0
- * 
+ *
  * @version 1.0
  */
 class SessionsManager {
     /**
      * The current active session.
-     * 
+     *
      * @var Session|null
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $activeSession;
     /**
      *
-     * @var SessionsManager 
-     * 
+     * @var SessionsManager
+     *
      * @since 1.0
      */
     private static $inst;
     /**
      * An array that contains all initialized sessions.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $sessionsArr;
     /**
      * The storage interface which is used to store session state.
-     * 
-     * @var SessionStorage 
-     * 
+     *
+     * @var SessionStorage
+     *
      * @since 1.0
      */
     private $sessionStorage;
@@ -79,7 +79,7 @@ class SessionsManager {
     }
     /**
      * Saves the state of the active session and close it.
-     * 
+     *
      * @since 1.0
      */
     public static function close() {
@@ -92,9 +92,9 @@ class SessionsManager {
     }
     /**
      * Destroy the active session.
-     * 
+     *
      * Calling this method when there is no active session will have no effect.
-     * 
+     *
      * @since 1.0
      */
     public static function destroy() {
@@ -107,15 +107,15 @@ class SessionsManager {
     }
     /**
      * Returns the value of a session variable.
-     * 
+     *
      * The value will be taken from the active session.
-     * 
+     *
      * @param string $varName The name of the variable.
-     * 
-     * @return null|mixed If a variable which has the given name is found, its 
+     *
+     * @return null|mixed If a variable which has the given name is found, its
      * value is returned. If no such variable exist or there was no active session,
      * the method will return null.
-     * 
+     *
      * @since 1.0
      */
     public static function get(string $varName) {
@@ -127,11 +127,11 @@ class SessionsManager {
     }
     /**
      * Returns the currently active session.
-     * 
-     * @return Session|null If a session is active, the method will return an 
-     * object of type 'Session' that contains session information. If no 
+     *
+     * @return Session|null If a session is active, the method will return an
+     * object of type 'Session' that contains session information. If no
      * session is active, the method will return null.
-     * 
+     *
      * @since 1.0
      */
     public static function getActiveSession() {
@@ -151,12 +151,12 @@ class SessionsManager {
     }
     /**
      * Returns an array that contains cookies headers values.
-     * 
+     *
      * The returned values can be used to create cookies for sessions.
-     * 
-     * @return array The method will return an array that contains headers values 
+     *
+     * @return array The method will return an array that contains headers values
      * that can be used to create sessions cookies.
-     * 
+     *
      * @since 1.0
      */
     public static function getCookiesHeaders() : array {
@@ -171,12 +171,12 @@ class SessionsManager {
     }
     /**
      * Returns the ID of a session from a cookie given its name.
-     * 
+     *
      * @param string $sessionName The name of the session.
-     * 
+     *
      * @return bool|string If the ID is found, the method will return it.
      * If the session cookie was not found, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function getSessionIDFromCookie(string $sessionName) {
@@ -190,13 +190,13 @@ class SessionsManager {
     }
     /**
      * Return session ID from session cookie, get or post parameter.
-     * 
+     *
      * @return string|bool If session ID is found, the method will
-     * return it. Note that if it is in a cookie, the name of the cookie must 
-     * be the name of the session in order to take the ID from it. If it is 
-     * in GET or POST request, it must be in a parameter with the name 
+     * return it. Note that if it is in a cookie, the name of the cookie must
+     * be the name of the session in order to take the ID from it. If it is
+     * in GET or POST request, it must be in a parameter with the name
      * 'session-id'.
-     * 
+     *
      * @since 1.0
      */
     public static function getSessionIDFromRequest(string $sessionName) {
@@ -215,9 +215,9 @@ class SessionsManager {
     }
     /**
      * Returns an indexed array that contains all created sessions.
-     * 
+     *
      * @return array An array that contains objects of type 'Session'.
-     * 
+     *
      * @since 1.0
      */
     public static function getSessions() : array {
@@ -225,9 +225,9 @@ class SessionsManager {
     }
     /**
      * Returns storage engine which is used to store sessions state.
-     * 
+     *
      * @return SessionStorage
-     * 
+     *
      * @since 1.0
      */
     public static function getStorage() : SessionStorage {
@@ -235,9 +235,9 @@ class SessionsManager {
     }
     /**
      * Checks if the given session name has a cookie or not.
-     * 
+     *
      * @return bool true if a cookie with the name of the session is found. false otherwise.
-     * 
+     *
      * @since 1.0
      */
     public static function hasCookie() : bool {
@@ -253,12 +253,12 @@ class SessionsManager {
     }
     /**
      * Checks if the manager has specific session or not.
-     * 
+     *
      * @param string $sName The name of the session.
-     * 
+     *
      * @return bool If the manager manages a session which has the given name,
      * the method will return true. False otherwise.
-     * 
+     *
      * @since 1.0
      */
     public static function hasSession(string $sName): bool {
@@ -276,11 +276,11 @@ class SessionsManager {
     }
     /**
      * Generate new ID for the active session.
-     * 
-     * @return string|null If there was an active session and new ID is generated 
-     * for it, the method will return the new ID. Other than that, the method 
+     *
+     * @return string|null If there was an active session and new ID is generated
+     * for it, the method will return the new ID. Other than that, the method
      * will return null.
-     * 
+     *
      * @since 1.0
      */
     public static function newId() {
@@ -292,7 +292,7 @@ class SessionsManager {
     }
     /**
      * Stores the status of all sessions and pause them.
-     * 
+     *
      * @since 1.0
      */
     public static function pauseAll() {
@@ -300,13 +300,13 @@ class SessionsManager {
     }
     /**
      * Retrieves the value of a session variable and removes it from the session.
-     *  
+     *
      * @param string $varName The name of the variable.
-     * 
-     * @return mixed|null If the variable exist and its value is set, the method 
+     *
+     * @return mixed|null If the variable exist and its value is set, the method
      * will return its value. If the value is not set or no session is
      * active, the method will return null.
-     * 
+     *
      * @since 1.0
      */
     public static function pull(string $varName) {
@@ -318,12 +318,12 @@ class SessionsManager {
     }
     /**
      * Removes the value of a session variable from the active session.
-     * 
+     *
      * @param string $varName The name of the variable.
-     * 
+     *
      * @return bool If the value was deleted, the method will return true.
      * If the does not exist or no session is active, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function remove(string $varName): bool {
@@ -337,10 +337,10 @@ class SessionsManager {
     }
     /**
      * Reset sessions manager to defaults.
-     * 
+     *
      * This method will clear all sessions, set session storage to 'DefaultSessionStorage',
      * and set active session to null.
-     * 
+     *
      * @since 1.0
      */
     public static function reset() {
@@ -349,17 +349,17 @@ class SessionsManager {
         self::getInstance()->activeSession = null;
     }
     /**
-     * Sets session variable. 
-     * 
+     * Sets session variable.
+     *
      * Note that session variable will be set only if there was an active session.
-     * 
+     *
      * @param string $varName The name of the variable. Must be non-empty string.
-     * 
+     *
      * @param mixed $value The value of the variable. It can be anything.
-     * 
+     *
      * @return bool If the variable is set, the method will return true. If
      * not, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function set(string $varName, $value): bool {
@@ -373,14 +373,14 @@ class SessionsManager {
     }
     /**
      * Sets sessions storage engine.
-     * 
-     * This method is used to create a custom sessions storage engine. The 
-     * framework by default provide one type which is file storage. The 
-     * developer can implement a custom storage engine using the interface 
+     *
+     * This method is used to create a custom sessions storage engine. The
+     * framework by default provide one type which is file storage. The
+     * developer can implement a custom storage engine using the interface
      * 'SessionStorage'.
-     * 
+     *
      * @param SessionStorage $storage The new session storage.
-     * 
+     *
      * @since 1.0
      */
     public static function setStorage(SessionStorage $storage) {
@@ -388,25 +388,25 @@ class SessionsManager {
     }
     /**
      * Starts new session or resumes an existing one.
-     * 
+     *
      * The method will first check if a session which has the given name exist.
-     * if there was such session, it will pause all sessions and resumes selected 
-     * one. If no session was found which has the given name, the method will 
+     * if there was such session, it will pause all sessions and resumes selected
+     * one. If no session was found which has the given name, the method will
      * initialize new session.
-     * 
-     * @param string $sessionName The name of the session that will be resumed 
+     *
+     * @param string $sessionName The name of the session that will be resumed
      * or created.
-     * 
-     * @param array $options An array that contains session options. Available 
+     *
+     * @param array $options An array that contains session options. Available
      * options are:
      * <ul>
-     * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
-     * greater than or equal to 0. If 0 is given, it means the session is not 
+     * <li><b>duration</b>: The duration of the session in minutes. Must be a number
+     * greater than or equal to 0. If 0 is given, it means the session is not
      * persistent.</li>
-     * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
+     * <li><b>refresh</b>: A boolean which is set to true if session timeout time
      * will be refreshed with every request. Default is false.</li>
      * </ul>
-     * 
+     *
      * @throws SessionException If session name is missing or invalid.
      */
     public static function start(string $sessionName, array $options = []) {
@@ -427,16 +427,16 @@ class SessionsManager {
     }
     /**
      * Validate the current status of the storage.
-     * 
-     * This method will go through all sessions which was activated and check the 
-     * status of each one. If the session is new, paused or resumed, the method 
-     * will store session state using specified storage engine. If the status 
-     * of the session is killed, the method will remove session state from 
-     * the storage. In addition to that, the method will garbage-collect all 
+     *
+     * This method will go through all sessions which was activated and check the
+     * status of each one. If the session is new, paused or resumed, the method
+     * will store session state using specified storage engine. If the status
+     * of the session is killed, the method will remove session state from
+     * the storage. In addition to that, the method will garbage-collect all
      * sessions which are not active anymore. The garbage collection algorithm
      * will depend on the way the developer have implemented his own sessions
      * storage engine.
-     * 
+     *
      * @since 1.0
      */
     public static function validateStorage() {
@@ -500,9 +500,9 @@ class SessionsManager {
         return false;
     }
     /**
-     * 
+     *
      * @return SessionsManager
-     * 
+     *
      * @since 1.0
      */
     private static function getInstance(): SessionsManager {

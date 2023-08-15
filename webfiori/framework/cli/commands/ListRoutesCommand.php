@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -20,8 +20,8 @@ use webfiori\framework\router\Router;
 class ListRoutesCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--list-routes'. This command 
-     * is used to list all registered routes and at which resource they 
+     * The command will have name '--list-routes'. This command
+     * is used to list all registered routes and at which resource they
      * point to.
      */
     public function __construct() {
@@ -29,7 +29,7 @@ class ListRoutesCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * @return int If the command executed without any errors, the 
+     * @return int If the command executed without any errors, the
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */

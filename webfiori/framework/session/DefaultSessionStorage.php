@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\session;
 
@@ -17,18 +17,18 @@ use webfiori\framework\exceptions\SessionException;
 /**
  * The default sessions storage engine.
  *
- * This storage engine will store session state as a file in the folder 
- * 'app/sto/sessions'. The name of the file that contains session state 
+ * This storage engine will store session state as a file in the folder
+ * 'app/sto/sessions'. The name of the file that contains session state
  * will be the ID of the session.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  */
 class DefaultSessionStorage implements SessionStorage {
     private $storeLoc;
     /**
      * Creates new instance of the class.
-     * 
+     *
      */
     public function __construct() {
         $sessionsDirName = 'sessions';
@@ -53,12 +53,12 @@ class DefaultSessionStorage implements SessionStorage {
     }
     /**
      * Removes all inactive sessions.
-     * 
+     *
      * This method will check if the constant 'SESSION_GC' is existed and its value
-     * is valid. If exist and valid, it will be used as reference for removing 
-     * old sessions. If it does not exist, the method will remove any inactive 
+     * is valid. If exist and valid, it will be used as reference for removing
+     * old sessions. If it does not exist, the method will remove any inactive
      * session which is older than 30 days.
-     * 
+     *
      */
     public function gc() {
         if (!$this->isStorageDirExist()) {
@@ -83,23 +83,23 @@ class DefaultSessionStorage implements SessionStorage {
     }
     /**
      * Checks if sessions storage location is existed and writable.
-     * 
+     *
      * @return bool If sessions storage location exist and is writable,
      * the method will return true.
-     * 
+     *
      */
     public function isStorageDirExist(): bool {
         return file_exists($this->storeLoc) && is_writable($this->storeLoc);
     }
     /**
      * Checks if session storage file exist or not.
-     * 
+     *
      * Note that this method will first check for existence of storage
      * directory by calling the method DefaultSessionStorage::isStorageDirExist().
-     * 
+     *
      * @return bool If sessions storage file exist and is writable,
      * the method will return true.
-     * 
+     *
      */
     public function isStorageFileExist(string $sId): bool {
         if ($this->isStorageDirExist()) {
@@ -131,9 +131,9 @@ class DefaultSessionStorage implements SessionStorage {
     }
     /**
      * Removes session file.
-     * 
+     *
      * @param string $sessionId The ID of the session.
-     * 
+     *
      */
     public function remove(string $sessionId) {
         if ($this->isStorageFileExist($sessionId)) {

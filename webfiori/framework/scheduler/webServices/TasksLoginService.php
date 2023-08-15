@@ -29,7 +29,7 @@ class TasksLoginService extends AbstractWebService {
     }
 
     public function processRequest() {
-        $schedulerPass = TasksManager::password();
+        $schedulerPass = TasksManager::getPassword();
         $inputHash = hash('sha256', $this->getInputs()['password']);
 
         if ($inputHash == $schedulerPass) {

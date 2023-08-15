@@ -48,7 +48,7 @@ class SchedulerCommand extends CLICommand {
             new CommandArgument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
         ], 'Run tasks scheduler.');
 
-        if (TasksManager::password() != 'NO_PASSWORD') {
+        if (TasksManager::getPassword() != 'NO_PASSWORD') {
             $this->addArg('p', [
                 'optional' => false,
                 'description' => 'Scheduler password.'

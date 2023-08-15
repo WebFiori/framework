@@ -610,7 +610,7 @@ class PageTest extends TestCase {
      */
     public function testUsingLang03() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The translation file was found. But no object of type \'Lang\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
+        $this->expectExceptionMessage('The translation file was found. But no object of type \''.Lang::class.'\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
         $page = new WebPage();
         $page->setLang('jp');
     }

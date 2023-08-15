@@ -54,7 +54,7 @@ class SchedulerTest extends TestCase {
         {
             $c->assertEquals('Task Ok2', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        $this->assertEquals('NO_PASSWORD', TasksManager::getPassword());
         TasksManager::run('', 'Task Ok2', true);
     }
     /**
@@ -109,7 +109,7 @@ class SchedulerTest extends TestCase {
         {
             $c->assertEquals('Task Ok3', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        $this->assertEquals('NO_PASSWORD', TasksManager::getPassword());
         TasksManager::run('', 'Task Ok3', true);
         $this->assertEquals('TASK_NOT_FOUND', TasksManager::run('', 'Not Exist Super'));
     }
@@ -145,12 +145,12 @@ class SchedulerTest extends TestCase {
         TasksManager::setHour(23);
         TasksManager::setMonth(5);
         TasksManager::setMinute(33);
-        $this->assertEquals('05-15 23:33', TasksManager::timestamp());
+        $this->assertEquals('05-15 23:33', TasksManager::getTimestamp());
         TasksManager::setDayOfMonth(1);
         TasksManager::setHour(0);
         TasksManager::setMonth(11);
         TasksManager::setMinute(9);
-        $this->assertEquals('11-01 00:09', TasksManager::timestamp());
+        $this->assertEquals('11-01 00:09', TasksManager::getTimestamp());
     }
     /**
      * @test
@@ -182,12 +182,12 @@ class SchedulerTest extends TestCase {
      * @test
      */
     public function testWeeklyTask03() {
-        TasksManager::password('');
+        TasksManager::setPassword('');
         $this->assertTrue(TasksManager::weeklyTask('sun-23:00', 'Task Ok', function(TasksManager $task, TestCase $c)
         {
             $c->assertEquals('Task Ok', $task->activeTask()->getTaskName());
         }, [TasksManager::get(), $this]));
-        $this->assertEquals('NO_PASSWORD', TasksManager::password());
+        $this->assertEquals('NO_PASSWORD', TasksManager::getPassword());
         TasksManager::run('', 'Task Ok', true);
     }
 }

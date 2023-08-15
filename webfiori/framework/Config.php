@@ -109,18 +109,6 @@ interface Config {
      */
     public function getConfigVersion() : string;
     /**
-     * Returns sha256 hash of the password which is used to prevent unauthorized
-     * access to run the jobs or access scheduler web interface.
-     * 
-     * The password should be hashed before using this method as this one should
-     * return the hashed value. If no password is set, this method should return the 
-     * string 'NO_PASSWORD'.
-     * 
-     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
-     * password.
-     */
-    public function getSchedulerPassword() : string;
-    /**
      * Returns database connection information given connection name.
      * 
      * @param string $conName The name of the connection.
@@ -207,6 +195,18 @@ interface Config {
      * @since 1.0
      */
     public function getReleaseDate() : string;
+    /**
+     * Returns sha256 hash of the password which is used to prevent unauthorized
+     * access to run the jobs or access scheduler web interface.
+     * 
+     * The password should be hashed before using this method as this one should
+     * return the hashed value. If no password is set, this method should return the 
+     * string 'NO_PASSWORD'.
+     * 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
+     * password.
+     */
+    public function getSchedulerPassword() : string;
     /**
      * Returns an array that holds the default page title for different display
      * languages.

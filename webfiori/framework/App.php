@@ -46,28 +46,6 @@ define('MICRO_START', microtime(true));
  */
 class App {
     /**
-     * Sets the class that will be used as configuration driver.
-     * 
-     * @param string $clazz The full name of the class including namespace.
-     */
-    public function setConfigDriver(string $clazz) {
-        self::$ConfigDriver = $clazz;
-    }
-    /**
-     * Returns the class that represents configuration driver.
-     * 
-     * @return string  The full name of the class including namespace.
-     */
-    public static function getConfigDriver() : string {
-        return self::$ConfigDriver;
-    }
-    /**
-     * A string which points to the class that represents configuration driver.
-     * 
-     * @var string
-     */
-    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
-    /**
      * A constant that indicates that the status of the class is 'initialized'.
      * 
      */
@@ -109,6 +87,12 @@ class App {
      */
     private static $CliRunner;
     /**
+     * A string which points to the class that represents configuration driver.
+     * 
+     * @var string
+     */
+    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
+    /**
      * A single instance of the class.
      * 
      * @var App
@@ -149,7 +133,7 @@ class App {
          */
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
-        
+
         $this->setHandlers();
         //Initialize CLI
         self::getRunner();
@@ -255,25 +239,17 @@ class App {
                     }
 
                     self::autoRegisterHelper([
-                        'dir' => $dir, 
-                        'php-file' => $phpFile, 
-                        'folder' => $folder, 
-                        'class-name' => $expl[0], 
-                        'params' => $otherParams, 
+                        'dir' => $dir,
+                        'php-file' => $phpFile,
+                        'folder' => $folder,
+                        'class-name' => $expl[0],
+                        'params' => $otherParams,
                         'callback' => $regCallback,
                         'constructor-params' => $constructorParams
                     ]);
                 }
             }
         }
-    }
-    /**
-     * Returns the instance which is used as main application configuration class.
-     * 
-     * @return ConfigurationDriver
-     */
-    public static function getConfig(): ConfigurationDriver {
-        return Controller::getDriver();
     }
     /**
      * Returns a reference to an instance of 'AutoLoader'.
@@ -297,6 +273,22 @@ class App {
      */
     public static function getClassStatus() {
         return self::$ClassStatus;
+    }
+    /**
+     * Returns the instance which is used as main application configuration class.
+     * 
+     * @return ConfigurationDriver
+     */
+    public static function getConfig(): ConfigurationDriver {
+        return Controller::getDriver();
+    }
+    /**
+     * Returns the class that represents configuration driver.
+     * 
+     * @return string  The full name of the class including namespace.
+     */
+    public static function getConfigDriver() : string {
+        return self::$ConfigDriver;
     }
 
     /**
@@ -376,6 +368,14 @@ class App {
             self::$LC->appConfig = $conf;
         }
     }
+    /**
+     * Sets the class that will be used as configuration driver.
+     * 
+     * @param string $clazz The full name of the class including namespace.
+     */
+    public function setConfigDriver(string $clazz) {
+        self::$ConfigDriver = $clazz;
+    }
 
     /**
      * Start your WebFiori application.
@@ -412,7 +412,7 @@ class App {
         }
         $class = $instanceNs.'\\'.$className;
         try {
-            $reflectionClass = new ReflectionClass($class);  
+            $reflectionClass = new ReflectionClass($class);
 
             $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
 
@@ -428,6 +428,7 @@ class App {
          * Directory separator.
          */
         define('DS', DIRECTORY_SEPARATOR);
+
         if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application 
@@ -537,28 +538,6 @@ class App {
         }
         call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
     }
-
-    /**
-     * @throws FileException
-     */
-    private function initScheduler() {
-        $uriObj = new RouterUri(Request::getRequestedURI(), '');
-        $pathArr = $uriObj->getPathArray();
-
-        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
-            ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
-        }
-
-        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
-            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
-                TasksManager::initRoutes();
-            }
-            TasksManager::password(self::getConfig()->getSchedulerPassword());
-            //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
-            call_user_func(APP_DIR.'\ini\InitTasks::init');
-            TasksManager::registerTasks();
-        }
-    }
     private function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
@@ -618,6 +597,28 @@ class App {
             if (strlen($home) != 0) {
                 Router::redirect('/', App::getConfig()->getHomePage());
             }
+        }
+    }
+
+    /**
+     * @throws FileException
+     */
+    private function initScheduler() {
+        $uriObj = new RouterUri(Request::getRequestedURI(), '');
+        $pathArr = $uriObj->getPathArray();
+
+        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
+            ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
+        }
+
+        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
+            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
+                TasksManager::initRoutes();
+            }
+            TasksManager::password(self::getConfig()->getSchedulerPassword());
+            //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
+            call_user_func(APP_DIR.'\ini\InitTasks::init');
+            TasksManager::registerTasks();
         }
     }
     private function initThemesPath() {

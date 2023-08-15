@@ -113,7 +113,7 @@ class DBClassWriter extends ClassWriter {
         if (count($recordUniqueCols) == 0) {
             $recordUniqueCols = $table->getUniqueColsKeys();
         }
- 
+
         return $recordUniqueCols;
     }
     /**
@@ -398,8 +398,8 @@ class DBClassWriter extends ClassWriter {
             $cols = [];
 
             foreach ($this->getUniqueColsKeys() as $key) {
-                $cols[] = count($cols) == 0 ? 
-                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())' 
+                $cols[] = count($cols) == 0 ?
+                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())'
                         : "->andWhere('$key', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
             $this->append($cols, 4);
@@ -522,8 +522,8 @@ class DBClassWriter extends ClassWriter {
             $uniqueCols = $this->getUniqueColsKeys();
 
             foreach ($uniqueCols as $key) {
-                $whereCols[] = count($whereCols) == 0 ? 
-                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())' 
+                $whereCols[] = count($whereCols) == 0 ?
+                        "->where('$key', \$entity->".EntityMapper::mapToMethodName($key).'())'
                         : "->andWhere('$key', \$entity->".EntityMapper::mapToMethodName($key).'())';
             }
 

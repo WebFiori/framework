@@ -33,8 +33,8 @@ class BaseTasksPage extends WebPage {
             'base' => $this->getBase(),
             'session' => $this->getActiveSession()
         ]);
-        
-        
+
+
 
         $this->setTitle($title);
         $this->setDescription($description);
@@ -53,13 +53,22 @@ class BaseTasksPage extends WebPage {
             'cols' => 12
         ])->addChild('h1')->text($title);
 
-        
-        
-        $this->addBeforeRender(function (BaseTasksPage $view) {
+
+
+        $this->addBeforeRender(function (BaseTasksPage $view)
+        {
             $code = new JsCode();
             $code->addCode('window.data = '.$view->getJson().';');
             $view->getDocument()->getHeadNode()->addChild($code);
         }, 1000);
+    }
+
+    /**
+     * 
+     * @return Json
+     */
+    public function getJson() : Json {
+        return $this->jsonData;
     }
     /**
      * Checks if the user is logged in or not.
@@ -72,14 +81,6 @@ class BaseTasksPage extends WebPage {
      */
     public function isLoggedIn() : bool {
         return $this->getActiveSession()->get('scheduler-is-logged-in') === true;
-    }
-
-    /**
-     * 
-     * @return Json
-     */
-    public function getJson() : Json {
-        return $this->jsonData;
     }
     private function changePageStructure() {
         $this->addBeforeRender(function (WebPage $page)
@@ -115,5 +116,4 @@ class BaseTasksPage extends WebPage {
             ]);
         });
     }
-    
 }

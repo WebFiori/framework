@@ -112,7 +112,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside",
             ' * section, the method might return null.',
             ' */',
-            $this->f('getAsideNode', [], 'HTMLNode'), 
+            $this->f('getAsideNode', [], 'HTMLNode'),
         ], 1);
         $this->append('return new AsideSection();', 2);
         $this->append('}', 1);

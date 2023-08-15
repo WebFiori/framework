@@ -315,7 +315,7 @@ class Language {
             self::$ActiveLang = self::$loadedLangs[$uLangCode];
 
             return self::getActive();
-        } 
+        }
         $langClassName = APP_DIR.'\\langs\\Language'.$uLangCode;
 
         if (!class_exists($langClassName)) {

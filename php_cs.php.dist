@@ -23,6 +23,7 @@ return $config->setRules([
                 'if','return','while','for','foreach','do'
             ]
         ],
+        'no_trailing_whitespace' => true,
         'blank_line_after_opening_tag' => true,
         'blank_line_after_namespace' => true,
         'elseif' => false,

@@ -36,7 +36,6 @@ class CreateBackgroundTask extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         parent::__construct($command, new SchedulerTaskClassWriter());
         $this->taskWriter = $this->getWriter();
-
     }
     public function readClassInfo() {
         $this->setClassInfo(APP_DIR.'\\tasks', 'Task');

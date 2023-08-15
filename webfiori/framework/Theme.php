@@ -183,7 +183,7 @@ abstract class Theme implements JsonI {
         $this->themeLicenseUrl = '';
 
         $reflection = new ReflectionClass($this);
-        $dirExpl = explode(DS, dirname($reflection->getFileName()));       
+        $dirExpl = explode(DS, dirname($reflection->getFileName()));
         $this->themeDir = $dirExpl[count($dirExpl) - 1];
 
         $this->setCssDirName('css');

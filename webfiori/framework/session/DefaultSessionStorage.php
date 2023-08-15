@@ -137,7 +137,6 @@ class DefaultSessionStorage implements SessionStorage {
      */
     public function remove(string $sessionId) {
         if ($this->isStorageFileExist($sessionId)) {
-            
             unlink($this->storeLoc.DS.$sessionId);
         }
     }

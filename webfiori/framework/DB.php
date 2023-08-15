@@ -86,7 +86,7 @@ class DB extends Database {
     public function addTable(Table $table, bool $updateOwnerDb = true) : bool {
         $connType = $this->getConnectionInfo()->getDatabaseType();
 
-        if (($connType == 'mysql' && $table instanceof MySQLTable) 
+        if (($connType == 'mysql' && $table instanceof MySQLTable)
          || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
             foreach ($table->getForeignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);

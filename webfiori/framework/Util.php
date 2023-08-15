@@ -303,7 +303,7 @@ class Util {
             $startDay = $backInTime;
             $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
         } else {
-            //we need to go back to prevuse month. 
+            //we need to go back to prevuse month.
             $prevMonthNum = $thisMonth - 1 != 0 ? $thisMonth - 1 : 12;
             $startMonth = $prevMonthNum < 10 ? '0'.$prevMonthNum : $prevMonthNum;
             $startYear = $prevMonthNum == 12 ? $thisYear - 1 : $thisYear;
@@ -427,7 +427,7 @@ class Util {
             }
 
             return false;
-        } 
+        }
 
         return true;
     }

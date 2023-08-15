@@ -11,8 +11,8 @@
 namespace webfiori\framework\scheduler;
 
 use webfiori\file\File;
-use webfiori\framework\EmailMessage;
 use webfiori\framework\App;
+use webfiori\framework\EmailMessage;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 /**
@@ -98,6 +98,13 @@ class TaskStatusEmail extends EmailMessage {
             $this->addAttachment($file);
         }
     }
+    private function createTableRow($label, $info) {
+        $row = new TableRow();
+        $row->addCell('<b>'.$label.'</b>');
+        $row->addCell($info);
+
+        return $row;
+    }
     /**
      * 
      * @param AbstractTask $task
@@ -129,12 +136,5 @@ class TaskStatusEmail extends EmailMessage {
         }
 
         return $taskTable;
-    }
-    private function createTableRow($label, $info) {
-        $row = new TableRow();
-        $row->addCell('<b>'.$label.'</b>');
-        $row->addCell($info);
-
-        return $row;
     }
 }

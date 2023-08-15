@@ -29,7 +29,7 @@ class Session implements JsonI {
     /**
      * The default lifetime for any new session (in minutes).
      * 
-
+     *
      */
     const DEFAULT_SESSION_DURATION = 120;
     /**
@@ -37,7 +37,7 @@ class Session implements JsonI {
      * 
      * @var string
      * 
- 
+     *
      */
     private $ipAddr;
     /**
@@ -84,13 +84,6 @@ class Session implements JsonI {
      * 
      */
     private $resumedAt;
-    /**
-     * An array that holds session variables.
-     * 
-     * @var array
-     * 
-     */
-    private $sessionVariables;
     private $sessionCookie;
     private $sessionStatus;
     /**
@@ -100,6 +93,13 @@ class Session implements JsonI {
      * 
      */
     private $sessionUser;
+    /**
+     * An array that holds session variables.
+     * 
+     * @var array
+     * 
+     */
+    private $sessionVariables;
 
     /**
      * The timestamp at which the session was started in as Unix timestamp.
@@ -194,6 +194,81 @@ class Session implements JsonI {
             $this->sessionStatus = SessionStatus::PAUSED;
             SessionsManager::pauseAll();
         }
+    }
+
+    /**
+     * Deserialize a session and restore its data in the instance at which the
+     * method is called on.
+     *
+     * @param string $serialized The serialized session as string.
+     *
+     * @return bool If the Un-serialize was successfully completed, the method
+     * will return true. If Deserialize fails, the method will return false.
+     *
+     * @throws SessionException
+     */
+    public function deserialize(string $serialized): bool {
+        $cipherMeth = 'aes-256-ctr';
+        // [Decrypt] => decode => deserialize
+
+        if (in_array($cipherMeth, openssl_get_cipher_methods())) {
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
+
+            //Shall we use IP address in key or not?
+            //It would add more security. But the session will be invalid
+            //If user changes network.
+            $key = $this->getId().$userAgent;
+
+            $iv = substr(hash('sha256', $key), 0,16);
+            $decrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
+
+            if (strlen($decrypted) > 0) {
+                set_error_handler(function ($errNo, $errStr)
+                {
+                    throw  new SessionException($errStr, $errNo);
+                });
+                $sessionObj = unserialize(base64_decode($decrypted));
+                restore_error_handler();
+
+                if ($sessionObj instanceof Session) {
+                    $this->sessionStatus = SessionStatus::RESUMED;
+                    $this->cloneHelper($sessionObj);
+
+                    return true;
+                }
+            }
+        } else {
+            set_error_handler(function ($errNo, $errStr)
+            {
+                throw  new SessionException($errStr, $errNo);
+            });
+            $sessionObj = unserialize(base64_decode($serialized));
+            restore_error_handler();
+
+            if ($sessionObj instanceof Session) {
+                $this->sessionStatus = SessionStatus::RESUMED;
+                $this->cloneHelper($sessionObj);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+    /**
+     * Generate a random session ID.
+     * 
+     * @param string|null $sessionName The name of the session.
+     * 
+     * @return string A new random session ID.
+     * 
+     */
+    public static function generateSessionID(string $sessionName = null): string {
+        $date = date('Y-m-d\TH:i:sO');
+        $hash = hash('sha256', $date);
+        $salt = time() + call_user_func(self::$randFunc, 0, 100);
+
+        return hash('sha256',$hash.$salt.$sessionName);
     }
     /**
      * Returns the value of a session variable.
@@ -515,7 +590,6 @@ class Session implements JsonI {
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            
             //Need to do more research about the security of this approach.
 
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
@@ -524,7 +598,7 @@ class Session implements JsonI {
             $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
-            
+
             return openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
         }
 
@@ -661,67 +735,8 @@ class Session implements JsonI {
             'user' => $this->getUser(),
         ]);
         $json->addArray('vars', $this->getVars(), true);
+
         return $json;
-    }
-
-    /**
-     * Deserialize a session and restore its data in the instance at which the
-     * method is called on.
-     *
-     * @param string $serialized The serialized session as string.
-     *
-     * @return bool If the Un-serialize was successfully completed, the method
-     * will return true. If Deserialize fails, the method will return false.
-     *
-     * @throws SessionException
-     */
-    public function deserialize(string $serialized): bool {
-        $cipherMeth = 'aes-256-ctr';
-        // [Decrypt] => decode => deserialize
-        
-        if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
-
-            //Shall we use IP address in key or not?
-            //It would add more security. But the session will be invalid
-            //If user changes network.
-            $key = $this->getId().$userAgent;
-
-            $iv = substr(hash('sha256', $key), 0,16);
-            $decrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
-
-            if (strlen($decrypted) > 0) {
-                set_error_handler(function ($errNo, $errStr)
-                {
-                    throw  new SessionException($errStr, $errNo);
-                });
-                $sessionObj = unserialize(base64_decode($decrypted));
-                restore_error_handler();
-
-                if ($sessionObj instanceof Session) {
-                    $this->sessionStatus = SessionStatus::RESUMED;
-                    $this->cloneHelper($sessionObj);
-
-                    return true;
-                }
-            }
-        } else {
-            set_error_handler(function ($errNo, $errStr)
-            {
-                throw  new SessionException($errStr, $errNo);
-            });
-            $sessionObj = unserialize(base64_decode($serialized));
-            restore_error_handler();
-
-            if ($sessionObj instanceof Session) {
-                $this->sessionStatus = SessionStatus::RESUMED;
-                $this->cloneHelper($sessionObj);
-
-                return true;
-            }
-        }
-
-        return false;
     }
     private function checkIfExpired() {
         if ($this->getRemainingTime() < 0) {
@@ -740,7 +755,7 @@ class Session implements JsonI {
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
         $this->sessionUser = $session->sessionUser;
-        
+
         $langCodeR = $this->getLangFromRequest();
 
         if ($langCodeR) {
@@ -751,28 +766,13 @@ class Session implements JsonI {
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
     }
     /**
-     * Generate a random session ID.
-     * 
-     * @param string|null $sessionName The name of the session.
-     * 
-     * @return string A new random session ID.
-     * 
-     */
-    public static function generateSessionID(string $sessionName = null): string {
-        $date = date('Y-m-d\TH:i:sO');
-        $hash = hash('sha256', $date);
-        $salt = time() + call_user_func(self::$randFunc, 0, 100);
-
-        return hash('sha256',$hash.$salt.$sessionName);
-    }
-    /**
      * 
      * @return string|null
      */
     private function getLangFromRequest() {
         $langIdx = 'lang';
         $lang = Request::getParam($langIdx);
-        
+
         if ($lang === null) {
             $lang = filter_input(INPUT_COOKIE, $langIdx);
 
@@ -810,7 +810,7 @@ class Session implements JsonI {
                 return;
             }
             //the value of default language.
-            //used in case no language found 
+            //used in case no language found
             //in $_GET['lang'], $_POST['lang'] or in cookie
             $defaultLang = App::getConfig()->getPrimaryLanguage();
             $langCodeFromReq = $this->getLangFromRequest();

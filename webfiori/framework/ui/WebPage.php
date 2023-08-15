@@ -13,6 +13,7 @@ namespace webfiori\framework\ui;
 use Error;
 use Exception;
 use webfiori\collections\LinkedList;
+use webfiori\framework\App;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
@@ -23,7 +24,6 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
 use webfiori\framework\Util;
-use webfiori\framework\App;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
@@ -206,22 +206,6 @@ class WebPage {
         $this->reset();
         global $page;
         $page = $this;
-    }
-    /**
-     * Render HTML or PHP template file and return its content as an object.
-     * 
-     * @param string $path The path to the template file.
-     * 
-     * @param array $args An optional array that contain slots values or 
-     * PHP variables that will be passed to the template.
-     * 
-     * @return HTMLNode The method will return rendered HTML as an instance of the
-     * class HTMLNode.
-     */
-    public function include(string $path, array $args = []) : HTMLNode {
-        return HTMLNode::fromFile($path, array_merge([
-            'page' => $this
-        ], $args));
     }
     /**
      * Adds a function which will be executed before the page is fully rendered.
@@ -667,6 +651,22 @@ class WebPage {
         }
 
         return $user->hasPrivilege($prId);
+    }
+    /**
+     * Render HTML or PHP template file and return its content as an object.
+     * 
+     * @param string $path The path to the template file.
+     * 
+     * @param array $args An optional array that contain slots values or 
+     * PHP variables that will be passed to the template.
+     * 
+     * @return HTMLNode The method will return rendered HTML as an instance of the
+     * class HTMLNode.
+     */
+    public function include(string $path, array $args = []) : HTMLNode {
+        return HTMLNode::fromFile($path, array_merge([
+            'page' => $this
+        ], $args));
     }
     /**
      * Sets the value of the property which is used to determine if the 
@@ -1133,6 +1133,23 @@ class WebPage {
             $this->contentDir = $dirL;
         }
     }
+    private function _getComponent($methToCall, $nodeId) {
+        $loadedTheme = $this->getTheme();
+        $node = new HTMLNode();
+
+        if ($loadedTheme !== null) {
+            $node = $loadedTheme->$methToCall();
+        }
+
+        if ($loadedTheme === null || ($node instanceof HTMLNode)) {
+            $node->setID($nodeId);
+
+            return $node;
+        }
+
+        throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
+                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
+    }
     /**
      * Sets the language of the page based on session language or 
      * request.
@@ -1166,23 +1183,6 @@ class WebPage {
             return;
         }
         $this->setLang($langCodeFromSession);
-    }
-    private function _getComponent($methToCall, $nodeId) {
-        $loadedTheme = $this->getTheme();
-        $node = new HTMLNode();
-
-        if ($loadedTheme !== null) {
-            $node = $loadedTheme->$methToCall();
-        }
-
-        if ($loadedTheme === null || ($node instanceof HTMLNode)) {
-            $node->setID($nodeId);
-
-            return $node;
-        }
-
-        throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
-                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
     }
 
 

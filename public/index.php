@@ -1,11 +1,10 @@
 <?php
-
 namespace webfiori;
 
 use Exception;
+use webfiori\framework\App;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\App;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
@@ -58,6 +57,14 @@ class Index {
         }
     }
     /**
+     * Creates a single instance of the class.
+     */
+    public static function create() {
+        if (self::$instance === null) {
+            self::$instance = new Index();
+        }
+    }
+    /**
      * Try to load the class 'App'.
      * 
      * @throws Exception
@@ -67,20 +74,12 @@ class Index {
         $frameworkPath = ROOT_PATH.$DS.'webfiori'.$DS.'framework';
         $corePath = $frameworkPath;
         $rootClass = $DS.'App.php';
-        
+
         if (file_exists($corePath.$rootClass)) {
             define('WF_CORE_PATH', $corePath);
             require_once $corePath.$rootClass;
         } else {
             throw new Exception('Unable to locate the class "App".');
-        }
-    }
-    /**
-     * Creates a single instance of the class.
-     */
-    public static function create() {
-        if (self::$instance === null) {
-            self::$instance = new Index();
         }
     }
 }

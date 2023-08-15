@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\framework\ui\serverErrPage;
+
 if (!defined('WF_VERBOSE') || WF_VERBOSE === false) {
     return;
 }
@@ -11,19 +12,20 @@ if (!defined('WF_VERBOSE') || WF_VERBOSE === false) {
         </v-card-title>
         <v-card-text>
             <v-list dense>
-                <?php 
+                <?php
                 $index = 0;
-                foreach ($throwableOrErr->getTrace() as $traceEntry) {
-                    ?>
+
+foreach ($throwableOrErr->getTrace() as $traceEntry) {
+    ?>
                 <v-list-item>
                     <v-list-item-title>
                         <?= '#'.$index.' '.$traceEntry?>
                     </v-list-item-title>
                 </v-list-item>
                 <?php
-                    $index++;
-                }
-                ?>
+    $index++;
+}
+?>
             </v-list>
         </v-card-text>
     </v-card>

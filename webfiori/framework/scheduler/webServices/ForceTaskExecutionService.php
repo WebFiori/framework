@@ -11,8 +11,6 @@
 namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\session\SessionsManager;
-use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;

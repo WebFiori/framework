@@ -211,30 +211,6 @@ class ThemeLoader {
             return $themeToLoad;
         }
     }
-
-    /**
-     * @throws Exception
-     */
-    private static function scanDir($filesInDir, $pathToScan) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
-                $aCName = $aNs.$cName;
-
-                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Theme) {
-                        self::$AvailableThemes[$instance->getName()] = $instance;
-                    }
-                }
-            }
-        }
-    }
     private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
             Router::closure([
@@ -257,6 +233,30 @@ class ThemeLoader {
                     $dir
                 ]
             ]);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function scanDir($filesInDir, $pathToScan) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
+                $aCName = $aNs.$cName;
+
+                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Theme) {
+                        self::$AvailableThemes[$instance->getName()] = $instance;
+                    }
+                }
+            }
         }
     }
 }

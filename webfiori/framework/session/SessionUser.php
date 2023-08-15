@@ -24,16 +24,6 @@ interface SessionUser {
      */
     public function getId() : int;
     /**
-     * Checks if a user has privilege or not given its ID.
-     *
-     * @param string $privilege The ID of the privilege.
-     *
-     * @return bool The method should be implemented in a way that it returns
-     * true if the user has specified privilege. False if not.
-     *
-     */
-    public function hasPrivilege(string $privilege) : bool;
-    /**
      * Checks if the user has one of multiple privileges.
      *
      * @param array $privilegesArr An array that contains the IDs of the
@@ -43,4 +33,14 @@ interface SessionUser {
      * will return true. Other than that, the method will return false.
      */
     public function hasAnyPrivilege(array $privilegesArr) : bool;
+    /**
+     * Checks if a user has privilege or not given its ID.
+     *
+     * @param string $privilege The ID of the privilege.
+     *
+     * @return bool The method should be implemented in a way that it returns
+     * true if the user has specified privilege. False if not.
+     *
+     */
+    public function hasPrivilege(string $privilege) : bool;
 }

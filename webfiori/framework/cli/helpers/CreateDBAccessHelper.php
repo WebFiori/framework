@@ -11,8 +11,8 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\Table;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\App;
+use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DBClassWriter;
 
 /**

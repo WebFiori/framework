@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\config;
 
 use webfiori\framework\App;
@@ -16,6 +15,57 @@ class Controller {
     private $driver;
     private static $singleton;
     /**
+     * Creates new instance of the class.
+     */
+    public function __construct() {
+        $driverClazz = App::getConfigDriver();
+        $this->driver = new $driverClazz();
+        $this->driver->initialize();
+    }
+    public function addEnvVar(string $name, $value, string $description = null) {
+        $this->getDriver()->addEnvVar($name, $value, $description);
+    }
+    /**
+     * Creates a copy of current configuration driver to another one.
+     * 
+     * @param ConfigurationDriver $new An instance of the driver at which the
+     * active configuration will be copied to. Note that if the driver is
+     * same as active one, nothing will be copied.
+     */
+    public function copy(ConfigurationDriver $new) {
+        $current = $this->getDriver();
+
+        if (get_class($current) == get_class($new)) {
+            return;
+        }
+
+        foreach ($current->getDBConnections() as $connObj) {
+            $new->addOrUpdateDBConnection($connObj);
+        }
+
+        foreach ($current->getSMTPConnections() as $connObj) {
+            $new->addOrUpdateSMTPAccount($connObj);
+        }
+
+        foreach ($current->getAppNames() as $langCode => $name) {
+            $new->setAppName($name, $langCode);
+        }
+
+        foreach ($current->getDescriptions() as $langCode => $desc) {
+            $new->setDescription($desc, $langCode);
+        }
+
+        foreach ($current->getEnvVars() as $name => $probs) {
+            $new->addEnvVar($name, $probs['value'], $probs['description']);
+        }
+        $new->setPrimaryLanguage($current->getPrimaryLanguage());
+        $new->setTheme($current->getTheme());
+        $new->setSchedulerPassword($current->getSchedulerPassword());
+        $new->setHomePage($current->getHomePage());
+        $new->setTitleSeparator($current->getTitleSeparator());
+        $new->initialize(true);
+    }
+    /**
      * Returns a single instance of the class.
      * 
      * @return Controller
@@ -29,12 +79,12 @@ class Controller {
         return self::$singleton;
     }
     /**
-     * Creates new instance of the class.
+     * Returns the driver that was set to read and write application configuration.
+     * 
+     * @return ConfigurationDriver
      */
-    public function __construct() {
-        $driverClazz = App::getConfigDriver();
-        $this->driver = new $driverClazz();
-        $this->driver->initialize();
+    public static function getDriver() : ConfigurationDriver {
+        return self::get()->driver;
     }
     /**
      * Sets the driver that will be used to read and write configuration.
@@ -46,63 +96,16 @@ class Controller {
         $driver->initialize();
     }
     /**
-     * Creates a copy of current configuration driver to another one.
-     * 
-     * @param ConfigurationDriver $new An instance of the driver at which the
-     * active configuration will be copied to. Note that if the driver is
-     * same as active one, nothing will be copied.
-     */
-    public function copy(ConfigurationDriver $new) {
-        $current = $this->getDriver();
-        if (get_class($current) == get_class($new)) {
-            return;
-        }
-        foreach ($current->getDBConnections() as $connObj) {
-            $new->addOrUpdateDBConnection($connObj);
-        }
-        foreach ($current->getSMTPConnections() as $connObj) {
-            $new->addOrUpdateSMTPAccount($connObj);
-        }
-        foreach ($current->getAppNames() as $langCode => $name) {
-            $new->setAppName($name, $langCode);
-        }
-        foreach ($current->getDescriptions() as $langCode => $desc) {
-            $new->setDescription($desc, $langCode);
-        }
-        foreach ($current->getEnvVars() as $name => $probs) {
-            $new->addEnvVar($name, $probs['value'], $probs['description']);
-        }
-        $new->setPrimaryLanguage($current->getPrimaryLanguage());
-        $new->setTheme($current->getTheme());
-        $new->setSchedulerPassword($current->getSchedulerPassword());
-        $new->setHomePage($current->getHomePage());
-        $new->setTitleSeparator($current->getTitleSeparator());
-        $new->initialize(true);
-    }
-    /**
      * Reads application environment variables and updates the class which holds
      * application environment variables.
      * 
      * @throws InitializationException
      */
     public static function updateEnv() {
-        
         foreach (self::getDriver()->getEnvVars() as $name => $envVar) {
             if (!defined($name)) {
                 define($name, $envVar['value']);
             }
         }
     }
-    public function addEnvVar(string $name, $value, string $description = null) {
-        $this->getDriver()->addEnvVar($name, $value, $description);
-    }
-    /**
-     * Returns the driver that was set to read and write application configuration.
-     * 
-     * @return ConfigurationDriver
-     */
-    public static function getDriver() : ConfigurationDriver {
-        return self::get()->driver;
-    }
-    
 }

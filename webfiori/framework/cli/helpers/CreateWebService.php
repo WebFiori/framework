@@ -48,7 +48,6 @@ class CreateWebService extends CreateClassHelper {
         $this->info('Don\'t forget to add the service to a services manager.');
     }
     private function addParamsToService() {
-
         do {
             $paramObj = new RequestParameter('h');
             $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
@@ -69,7 +68,6 @@ class CreateWebService extends CreateClassHelper {
      * @param RequestParameter $paramObj
      */
     private function setParamName(RequestParameter $paramObj) {
-
         do {
             $paramName = $this->getInput('Enter a name for the request parameter:');
             $validName = $paramObj->setName($paramName);
@@ -80,7 +78,6 @@ class CreateWebService extends CreateClassHelper {
         } while (!$validName);
     }
     private function setServiceName() {
-
         do {
             $serviceName = $this->getInput('Enter a name for the new web service:');
             $validName = $this->serviceObj->setName($serviceName);

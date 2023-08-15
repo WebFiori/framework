@@ -357,6 +357,25 @@ class PrivilegesGroup implements JsonI {
 
         return $j;
     }
+
+    /**
+     *
+     * @param string $id
+     * @param PrivilegesGroup $group
+     * @return bool
+     */
+    private function checkID(string $id, PrivilegesGroup $group): bool {
+        if ($group->getID() == $id) {
+            return true;
+        }
+        $bool = false;
+
+        foreach ($group->childGroups() as $g) {
+            $bool = $bool || $this->checkID($id, $g);
+        }
+
+        return $bool;
+    }
     /**
      * Checks if a group has specific privilege or not.
      * 
@@ -397,24 +416,5 @@ class PrivilegesGroup implements JsonI {
                 return;
             }
         }
-    }
-
-    /**
-     *
-     * @param string $id
-     * @param PrivilegesGroup $group
-     * @return bool
-     */
-    private function checkID(string $id, PrivilegesGroup $group): bool {
-        if ($group->getID() == $id) {
-            return true;
-        }
-        $bool = false;
-
-        foreach ($group->childGroups() as $g) {
-            $bool = $bool || $this->checkID($id, $g);
-        }
-
-        return $bool;
     }
 }

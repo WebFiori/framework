@@ -62,7 +62,6 @@ class CLIUtils {
      * @return string A string that represents a valid class name.
      */
     public static function readClassName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
-
         do {
             $c->readClassName($prompt, $suffix, $errMsg);
             $className = trim($c->getInput($prompt));
@@ -98,7 +97,6 @@ class CLIUtils {
      * @return string A validated string that represents a namespace.
      */
     public static function readNamespace(CLICommand $c, string $defaultNs = '\\', string $prompt = 'Enter class namespace:') : string {
-
         do {
             $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));
             $isNameValid = ClassWriter::isValidNamespace($ns);

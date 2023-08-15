@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\session\SessionsManager;
@@ -23,5 +22,4 @@ abstract class PrivateSchedulerService extends AbstractWebService {
     public function isAuthorized() {
         return SessionsManager::getActiveSession()->get('scheduler-is-logged-in') === true;
     }
-
 }

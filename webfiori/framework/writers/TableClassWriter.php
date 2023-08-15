@@ -147,9 +147,9 @@ class TableClassWriter extends ClassWriter {
      * interface JsonI.
      */
     public function setEntityInfo(string $className, string $namespace, string $path, bool $imlJsonI) {
-        $this->entityMapper = new EntityMapper($this->tableObj, 
-            $className, 
-            $path, 
+        $this->entityMapper = new EntityMapper($this->tableObj,
+            $className,
+            $path,
             $namespace);
         $this->entityMapper->setUseJsonI($imlJsonI);
     }
@@ -226,6 +226,14 @@ class TableClassWriter extends ClassWriter {
             $this->append('class '.$this->getName().' extends MSSQLTable {');
         }
     }
+    private function addAllUse() {
+        if ($this->tableObj instanceof MySQLTable) {
+            $this->addUseStatement("webfiori\database\mysql\MySQLTable");
+        } else if ($this->tableObj instanceof MSSQLTable) {
+            $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
+        }
+        $this->addFksUseTables();
+    }
     private function addColsHelper() {
         $this->append('$this->addColumns([', 2);
 
@@ -257,6 +265,21 @@ class TableClassWriter extends ClassWriter {
             $this->append("], '".$fkObj->getKeyName()."', '".$fkObj->getOnUpdate()."', '".$fkObj->getOnDelete()."');", 2);
         }
     }
+    private function addFksUseTables() {
+        if ($this->tableObj !== null) {
+            $fks = $this->tableObj->getForeignKeys();
+            $addedRefs = [];
+
+            foreach ($fks as $fkObj) {
+                $refTableNs = get_class($fkObj->getSource());
+
+                if (!in_array($refTableNs, $addedRefs)) {
+                    $this->addUseStatement($refTableNs);
+                    $addedRefs[] = $refTableNs;
+                }
+            }
+        }
+    }
     /**
      * 
      * @param MySQLColumn $colObj
@@ -266,10 +289,10 @@ class TableClassWriter extends ClassWriter {
         $this->append("'$key' => [", 3);
         $this->append("'type' => '".$colObj->getDatatype()."',", 4);
 
-        if (($dataType == 'int' && $colObj instanceof MySQLColumn) 
-                || $dataType == 'varchar' 
-                || $dataType == 'decimal' 
-                || $dataType == 'float' 
+        if (($dataType == 'int' && $colObj instanceof MySQLColumn)
+                || $dataType == 'varchar'
+                || $dataType == 'decimal'
+                || $dataType == 'float'
                 || $dataType == 'double'
                 || $dataType == 'binary'
                 || $dataType == 'varbinary'
@@ -319,45 +342,6 @@ class TableClassWriter extends ClassWriter {
         }
         $this->append("],", 3);
     }
-    private function writeConstructor() {
-        $this->append([
-            "/**",
-            " * Creates new instance of the class.",
-            " */",
-            $this->f('__construct'),
-        ], 1);
-        $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
-
-        if ($this->tableObj->getComment() !== null) {
-            $this->append('$this->setComment(\''.$this->tableObj->getComment().'\');', 2);
-        }
-        $this->addColsHelper();
-        $this->addFksHelper();
-        $this->append('}', 1);
-    }
-    private function addAllUse() {
-        if ($this->tableObj instanceof MySQLTable) {
-            $this->addUseStatement("webfiori\database\mysql\MySQLTable");
-        } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
-        }
-        $this->addFksUseTables();
-    }
-    private function addFksUseTables() {
-        if ($this->tableObj !== null) {
-            $fks = $this->tableObj->getForeignKeys();
-            $addedRefs = [];
-
-            foreach ($fks as $fkObj) {
-                $refTableNs = get_class($fkObj->getSource());
-
-                if (!in_array($refTableNs, $addedRefs)) {
-                    $this->addUseStatement($refTableNs);
-                    $addedRefs[] = $refTableNs;
-                }
-            }
-        }
-    }
     /**
      * Extract and return the name of table class based on associated table object.
      * 
@@ -375,5 +359,21 @@ class TableClassWriter extends ClassWriter {
         } else {
             $this->setClassName($split[0]);
         }
+    }
+    private function writeConstructor() {
+        $this->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            $this->f('__construct'),
+        ], 1);
+        $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
+
+        if ($this->tableObj->getComment() !== null) {
+            $this->append('$this->setComment(\''.$this->tableObj->getComment().'\');', 2);
+        }
+        $this->addColsHelper();
+        $this->addFksHelper();
+        $this->append('}', 1);
     }
 }

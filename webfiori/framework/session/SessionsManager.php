@@ -242,13 +242,13 @@ class SessionsManager {
      */
     public static function hasCookie() : bool {
         $active = self::getActiveSession();
-        
+
         if ($active !== null) {
             $sid = self::getSessionIDFromCookie($active->getName());
 
             return $sid !== false;
         }
-        
+
         return false;
     }
     /**
@@ -444,7 +444,7 @@ class SessionsManager {
             $status = $session->getStatus();
 
             if ($status == SessionStatus::NEW ||
-                $status == SessionStatus::PAUSED ||  
+                $status == SessionStatus::PAUSED ||
                 $status == SessionStatus::RESUMED) {
                 self::getStorage()->save($session->getId(), $session->serialize());
             } else if ($status == SessionStatus::KILLED) {

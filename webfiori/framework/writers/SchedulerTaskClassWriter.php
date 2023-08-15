@@ -11,10 +11,10 @@
 namespace webfiori\framework\writers;
 
 use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\scheduler\TaskStatusEmail;
 use webfiori\framework\scheduler\BaseTask;
 use webfiori\framework\scheduler\TaskArgument;
+use webfiori\framework\scheduler\TasksManager;
+use webfiori\framework\scheduler\TaskStatusEmail;
 /**
  * A class which is used to write scheduler tasks classes.
  *

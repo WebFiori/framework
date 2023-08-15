@@ -16,8 +16,8 @@ use webfiori\database\DatabaseException;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\email\SMTPServer;
-use webfiori\framework\DB;
 use webfiori\framework\App;
+use webfiori\framework\DB;
 use webfiori\framework\writers\LangClassWriter;
 
 /**
@@ -84,7 +84,7 @@ class AddCommand extends CLICommand {
                 $connInfoObj->setHost('127.0.0.1');
                 $addConnection = $this->tryConnect($connInfoObj);
             }
-        } 
+        }
 
         if ($addConnection === true) {
             $this->success('Connected. Adding the connection...');
@@ -119,7 +119,7 @@ class AddCommand extends CLICommand {
         $writingDir = $this->select('Select writing direction:', [
             'ltr', 'rtl'
         ]);
-        
+
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
@@ -179,7 +179,6 @@ class AddCommand extends CLICommand {
         }
     }
     private function tryConnect($connectionInfo) {
-
         try {
             $db = new DB($connectionInfo);
             $db->getConnection();

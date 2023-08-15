@@ -89,6 +89,26 @@ class UpdateSettingsCommand extends CLICommand {
 
         return 0;
     }
+    private function addOption(&$optArr, $key, $txt) {
+        $optArr[$key] = $txt;
+    }
+    private function getThemeNs() {
+        return $this->getInput('Enter theme class name with namespace:', null, new InputValidator(function ($themeNs)
+        {
+            if (!class_exists($themeNs)) {
+                return false;
+            }
+            try {
+                $instance = new $themeNs();
+
+                if ($instance instanceof Theme) {
+                    return true;
+                }
+            } catch (Throwable $exc) {
+                return false;
+            }
+        }));
+    }
     private function setAdminTheme() {
         $classNs = $this->getThemeNs();
         Controller::getDriver()->setTheme($classNs);
@@ -105,14 +125,6 @@ class UpdateSettingsCommand extends CLICommand {
         $home = $this->select('Select home page route:', $routes);
         Controller::getDriver()->setHomePage(substr($home, strlen(Router::base()) + 1));
         $this->success('Home page successfully updated.');
-    }
-    private function updateSchedulerPass() {
-        $newPass = $this->getInput('Enter new password:', null, new InputValidator(function (string $val) {
-            return strlen(trim($val)) != 0;
-        }, 'Empty string is not allowed.'));
-
-        Controller::getDriver()->setSchedulerPassword(hash('sha256',$newPass));
-        $this->success('Password successfully updated.');
     }
     private function updateDescription() {
         $lang = $this->whichLang();
@@ -137,6 +149,15 @@ class UpdateSettingsCommand extends CLICommand {
         $newPrimary = $this->select('Select new primary language:', $langs);
         Controller::getDriver()->setPrimaryLanguage($newPrimary);
         $this->success('Primary language successfully updated.');
+    }
+    private function updateSchedulerPass() {
+        $newPass = $this->getInput('Enter new password:', null, new InputValidator(function (string $val)
+        {
+            return strlen(trim($val)) != 0;
+        }, 'Empty string is not allowed.'));
+
+        Controller::getDriver()->setSchedulerPassword(hash('sha256',$newPass));
+        $this->success('Password successfully updated.');
     }
     private function updateTitle() {
         $lang = $this->whichLang();
@@ -181,26 +202,6 @@ class UpdateSettingsCommand extends CLICommand {
         }));
         Controller::getDriver()->setAppVersion($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
         $this->println('Version information successfully updated.');
-    }
-    private function addOption(&$optArr, $key, $txt) {
-        $optArr[$key] = $txt;
-    }
-    private function getThemeNs() {
-        return $this->getInput('Enter theme class name with namespace:', null, new InputValidator(function ($themeNs)
-        {
-            if (!class_exists($themeNs)) {
-                return false;
-            }
-            try {
-                $instance = new $themeNs();
-
-                if ($instance instanceof Theme) {
-                    return true;
-                }
-            } catch (Throwable $exc) {
-                return false;
-            }
-        }));
     }
     private function whichLang() {
         $langs = array_keys(App::getConfig()->getAppNames());

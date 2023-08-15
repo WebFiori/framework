@@ -11,8 +11,8 @@
 namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
-use webfiori\framework\router\Router;
 use webfiori\framework\App;
+use webfiori\framework\router\Router;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;

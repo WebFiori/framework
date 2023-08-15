@@ -153,6 +153,7 @@ class Router {
             'static' => [],
             'variable' => []
         ];
+        !defined('DS') ? define('DS', DIRECTORY_SEPARATOR) : '';
         $this->onNotFound = function ()
         {
             Response::setCode(404);
@@ -455,7 +456,7 @@ class Router {
      * 
      * @since 1.3.8
      */
-    public static function hasRoute(string $path): bool{
+    public static function hasRoute(string $path): bool {
         $routesArr = self::get()->routes;
         $trimmed = self::get()->fixUriPath($path);
 
@@ -506,12 +507,12 @@ class Router {
             Response::addHeader('content-type','text/xml');
         };
         self::closure([
-            'path' => '/sitemap.xml', 
+            'path' => '/sitemap.xml',
             'route-to' => $sitemapFunc,
             'in-sitemap' => true
         ]);
         self::closure([
-            'path' => '/sitemap', 
+            'path' => '/sitemap',
             'route-to' => $sitemapFunc,
             'in-sitemap' => true
         ]);
@@ -743,6 +744,55 @@ class Router {
 
         return false;
     }
+    private function addRouteHelper0($options): bool {
+        $routeTo = $options['route-to'];
+        $caseSensitive = $options['case-sensitive'];
+        $routeType = $options['type'];
+        $incInSiteMap = $options['in-sitemap'];
+        $asApi = $options['as-api'];
+        $closureParams = $options['closure-params'] ;
+        $path = $options['path'];
+
+        if ($routeType == self::CLOSURE_ROUTE && !is_callable($routeTo)) {
+            return false;
+        }
+        $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
+        $routeUri->setAction($options['action']);
+
+        if (!$this->hasRouteHelper($routeUri)) {
+            if ($asApi === true) {
+                $routeUri->setType(self::API_ROUTE);
+            } else {
+                $routeUri->setType($routeType);
+            }
+            $routeUri->setIsInSiteMap($incInSiteMap);
+
+            $routeUri->setRequestMethods($options['methods']);
+
+            foreach ($options['languages'] as $langCode) {
+                $routeUri->addLanguage($langCode);
+            }
+
+            foreach ($options['vars-values'] as $varName => $varValues) {
+                $routeUri->addVarValues($varName, $varValues);
+            }
+            $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
+
+            foreach ($options['middleware'] as $mwName) {
+                $routeUri->addMiddleware($mwName);
+            }
+
+            if ($routeUri->hasParameters()) {
+                $this->routes['variable'][$path] = $routeUri;
+            } else {
+                $this->routes['static'][$path] = $routeUri;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
     /**
      * Adds new route to the router.
      * 
@@ -812,60 +862,11 @@ class Router {
             $routeType = $options['type'];
         }
 
-        if (strlen($this->getBase()) != 0 && ($routeType == self::API_ROUTE || 
-            $routeType == self::VIEW_ROUTE || 
-            $routeType == self::CUSTOMIZED || 
+        if (strlen($this->getBase()) != 0 && ($routeType == self::API_ROUTE ||
+            $routeType == self::VIEW_ROUTE ||
+            $routeType == self::CUSTOMIZED ||
             $routeType == self::CLOSURE_ROUTE)) {
             return $this->addRouteHelper0($options);
-        }
-
-        return false;
-    }
-    private function addRouteHelper0($options): bool {
-        $routeTo = $options['route-to'];
-        $caseSensitive = $options['case-sensitive'];
-        $routeType = $options['type'];
-        $incInSiteMap = $options['in-sitemap'];
-        $asApi = $options['as-api'];
-        $closureParams = $options['closure-params'] ;
-        $path = $options['path'];
-
-        if ($routeType == self::CLOSURE_ROUTE && !is_callable($routeTo)) {
-            return false;
-        }
-        $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-        $routeUri->setAction($options['action']);
-
-        if (!$this->hasRouteHelper($routeUri)) {
-            if ($asApi === true) {
-                $routeUri->setType(self::API_ROUTE);
-            } else {
-                $routeUri->setType($routeType);
-            }
-            $routeUri->setIsInSiteMap($incInSiteMap);
-
-            $routeUri->setRequestMethods($options['methods']);
-
-            foreach ($options['languages'] as $langCode) {
-                $routeUri->addLanguage($langCode);
-            }
-
-            foreach ($options['vars-values'] as $varName => $varValues) {
-                $routeUri->addVarValues($varName, $varValues);
-            }
-            $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
-
-            foreach ($options['middleware'] as $mwName) {
-                $routeUri->addMiddleware($mwName);
-            }
-
-            if ($routeUri->hasParameters()) {
-                $this->routes['variable'][$path] = $routeUri;
-            } else {
-                $this->routes['static'][$path] = $routeUri;
-            }
-
-            return true;
         }
 
         return false;
@@ -946,7 +947,7 @@ class Router {
         } else {
             $asApi = false;
         }
-        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
+        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ?
                 $options['closure-params'] : [];
         $path = isset($options['path']) ? $this->fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
@@ -1102,6 +1103,21 @@ class Router {
 
         return $path;
     }
+    /**
+     * Creates and Returns a single instance of the router.
+     * 
+     * @return Router
+     * 
+     * @since 1.0
+     */
+    private static function get(): Router {
+        if (self::$router != null) {
+            return self::$router;
+        }
+        self::$router = new Router();
+
+        return self::$router;
+    }
     private function getFileDirAndName($absDir): array {
         $explode = explode(DS, $absDir);
         $fileName = $explode[count($explode) - 1];
@@ -1156,7 +1172,7 @@ class Router {
      * 
      * @since 1.2
      */
-    private function getRoutesHelper() : array  {
+    private function getRoutesHelper() : array {
         return $this->routes;
     }
     /**
@@ -1258,6 +1274,38 @@ class Router {
         }
     }
     /**
+     * Send http 301 response code and redirect the request to non-www URI.
+     * 
+     * @param RouterUri $uriObj
+     */
+    private function redirectToNonWWW(RouterUri $uriObj) {
+        Response::setCode(301);
+        $path = '';
+
+        $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));
+
+        for ($x = 1 ; $x < count($uriObj->getPathArray()) ; $x++) {
+            $path .= '/'.$uriObj->getPathArray()[$x];
+        }
+        $queryString = '';
+
+        if (strlen($uriObj->getQueryString()) > 0) {
+            $queryString = '?'.$uriObj->getQueryString();
+        }
+        $fragment = '';
+
+        if (strlen($uriObj->getFragment()) > 0) {
+            $fragment = '#'.$uriObj->getFragment();
+        }
+        $port = '';
+
+        if (strlen($uriObj->getPort()) > 0) {
+            $port = ':'.$uriObj->getPort();
+        }
+        Response::addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
+        Response::send();
+    }
+    /**
      * Route a given URI to its specified resource.
      * 
      * If the router has no routes, the router will send back a '418 - I'm A 
@@ -1288,7 +1336,7 @@ class Router {
             if ($this->searchRoute($routeUri, $uri, $loadResource)) {
                 return;
             }
-            //if no route found, try to replace parameters with values 
+            //if no route found, try to replace parameters with values
             //note that query string vars are optional.
             if ($this->searchRoute($routeUri, $uri, $loadResource, true)) {
                 return;
@@ -1324,7 +1372,7 @@ class Router {
 
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
                 define('API_CALL', true);
-            } 
+            }
 
             if (is_callable($route->getRouteTo())) {
                 if ($loadResource === true) {
@@ -1411,12 +1459,12 @@ class Router {
         }
 
         if ($indexToSearch == 'static') {
-            $route = isset($this->routes[$indexToSearch][$routeUri->getPath()]) ? 
+            $route = isset($this->routes[$indexToSearch][$routeUri->getPath()]) ?
                     $this->routes[$indexToSearch][$routeUri->getPath()] : null;
 
             if ($route instanceof RouterUri) {
                 if (!$route->isCaseSensitive()) {
-                    $isEqual = strtolower($route->getUri()) == 
+                    $isEqual = strtolower($route->getUri()) ==
                     strtolower($routeUri->getUri());
                 } else {
                     $isEqual = $route->getUri() == $routeUri->getUri();
@@ -1484,7 +1532,7 @@ class Router {
                 if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
                     $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));
                 } else if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || Runner::isCLI()) {
-                    //usually, in CLI there is no request method. 
+                    //usually, in CLI there is no request method.
                     //but we store result in $_GET.
                     $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]));
                 }
@@ -1492,53 +1540,6 @@ class Router {
                 break;
             }
         }
-    }
-    /**
-     * Creates and Returns a single instance of the router.
-     * 
-     * @return Router
-     * 
-     * @since 1.0
-     */
-    private static function get(): Router {
-        if (self::$router != null) {
-            return self::$router;
-        }
-        self::$router = new Router();
-
-        return self::$router;
-    }
-    /**
-     * Send http 301 response code and redirect the request to non-www URI.
-     * 
-     * @param RouterUri $uriObj
-     */
-    private function redirectToNonWWW(RouterUri $uriObj) {
-        Response::setCode(301);
-        $path = '';
-
-        $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));
-
-        for ($x = 1 ; $x < count($uriObj->getPathArray()) ; $x++) {
-            $path .= '/'.$uriObj->getPathArray()[$x];
-        }
-        $queryString = '';
-
-        if (strlen($uriObj->getQueryString()) > 0) {
-            $queryString = '?'.$uriObj->getQueryString();
-        }
-        $fragment = '';
-
-        if (strlen($uriObj->getFragment()) > 0) {
-            $fragment = '#'.$uriObj->getFragment();
-        }
-        $port = '';
-
-        if (strlen($uriObj->getPort()) > 0) {
-            $port = ':'.$uriObj->getPort();
-        }
-        Response::addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
-        Response::send();
     }
     /**
      * Adds new route to a page.

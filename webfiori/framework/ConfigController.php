@@ -119,7 +119,7 @@ class ConfigController {
         $this->createAppDirs();
         $DS = DIRECTORY_SEPARATOR;
         //The class GlobalConstants must exist before autoloader.
-        //For this reason, use the 'resource' instead of the class 'File'. 
+        //For this reason, use the 'resource' instead of the class 'File'.
         $path = ROOT_PATH.$DS.APP_DIR.$DS.'config'.$DS."Env.php";
         $resource = fopen($path, 'w');
 
@@ -436,18 +436,6 @@ class ConfigController {
         return $this->configVars['site']['base-theme'];
     }
     /**
-     * Returns password hash of the password which is used to protect background 
-     * tasks from unauthorized execution.
-     * 
-     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
-     * password.
-     * 
-     * @since 1.5.2
-     */
-    public function getSchedulerPassword(): string {
-        return $this->configVars['scheduler-password'];
-    }
-    /**
      * Returns an array that holds database connections.
      * 
      * @return array The indices of the array are names of the connections and 
@@ -489,6 +477,18 @@ class ConfigController {
      */
     public function getPrimaryLang(): string {
         return $this->configVars['site']['primary-lang'];
+    }
+    /**
+     * Returns password hash of the password which is used to protect background 
+     * tasks from unauthorized execution.
+     * 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
+     * password.
+     * 
+     * @since 1.5.2
+     */
+    public function getSchedulerPassword(): string {
+        return $this->configVars['scheduler-password'];
     }
     /**
      * Returns an associative array that contains website configuration 
@@ -683,22 +683,6 @@ class ConfigController {
     }
 
     /**
-     * Updates the password which is used to protect tasks from unauthorized
-     * execution.
-     *
-     * @param string $newPass The new password. If empty string is given, the password
-     * will be set to the string 'NO_PASSWORD'. Note that provided value will
-     * be hashed using SHA256 algorithm.
-     *
-     * @throws FileException
-     * @since 1.5.2
-     */
-    public function updateSchedulerPassword(string $newPass) {
-        $this->configVars['scheduler-password'] = hash('sha256', $newPass);
-        $this->writeAppConfig();
-    }
-
-    /**
      * Adds new SMTP account or Updates an existing one.
      *
      * Note that the connection will be added or updated only if it
@@ -712,6 +696,22 @@ class ConfigController {
      */
     public function updateOrAddEmailAccount(SMTPAccount $emailAccount) {
         $this->configVars[$emailAccount->getAccountName()] = $emailAccount;
+        $this->writeAppConfig();
+    }
+
+    /**
+     * Updates the password which is used to protect tasks from unauthorized
+     * execution.
+     *
+     * @param string $newPass The new password. If empty string is given, the password
+     * will be set to the string 'NO_PASSWORD'. Note that provided value will
+     * be hashed using SHA256 algorithm.
+     *
+     * @throws FileException
+     * @since 1.5.2
+     */
+    public function updateSchedulerPassword(string $newPass) {
+        $this->configVars['scheduler-password'] = hash('sha256', $newPass);
         $this->writeAppConfig();
     }
 
@@ -775,19 +775,19 @@ class ConfigController {
 
         $this->writeAppConfigAddMethods($cFile);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getAccount(string $name)', 
-            'Returns SMTP account given its name.', 
+        $this->writeFuncHeader($cFile,
+            'public function getAccount(string $name)',
+            'Returns SMTP account given its name.',
             [
                 'The method will search for an account with the given name in the set',
                 'of added accounts. If no account was found, null is returned.'
-            ], 
+            ],
             [
                 '$name' => [
                     'type' => 'string',
                     'description' => 'The name of the account.'
                 ]
-            ], 
+            ],
             [
                 'type' => 'SMTPAccount|null',
                 'description' => [
@@ -801,14 +801,14 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getAccounts() : array', 
-            'Returns an associative array that contains all email accounts.', 
+        $this->writeFuncHeader($cFile,
+            'public function getAccounts() : array',
+            'Returns an associative array that contains all email accounts.',
             [
                 'The indices of the array will act as the names of the accounts.',
                 'The value of the index will be an object of type SMTPAccount.'
-            ], 
-            [], 
+            ],
+            [],
             [
                 'type' => 'array',
                 'description' => 'An associative array that contains all email accounts.'
@@ -816,11 +816,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->emailAccounts;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getAdminThemeName() : string', 
-            'Returns the name of the theme that is used in admin control pages.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getAdminThemeName() : string',
+            'Returns the name of the theme that is used in admin control pages.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => 'The name of the theme that is used in admin control pages.'
@@ -828,11 +828,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->adminThemeName;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getBaseThemeName() : string', 
-            'Returns the name of base theme that is used in website pages.', 
-            'Usually, this theme is used for the normally visitors of the website.', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getBaseThemeName() : string',
+            'Returns the name of base theme that is used in website pages.',
+            'Usually, this theme is used for the normally visitors of the website.',
+            [],
             [
                 'type' => 'string',
                 'description' => 'The name of base theme that is used in website pages.'
@@ -840,14 +840,14 @@ class ConfigController {
         $this->a($cFile, "        return \$this->baseThemeName;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getBaseURL() : string', 
-            'Returns the base URL that is used to fetch resources.', 
+        $this->writeFuncHeader($cFile,
+            'public function getBaseURL() : string',
+            'Returns the base URL that is used to fetch resources.',
             [
                 "The return value of this method is usually used by the tag 'base'",
                 'of website pages.'
-            ], 
-            [], 
+            ],
+            [],
             [
                 'type' => 'string',
                 'description' => 'The base URL.'
@@ -855,11 +855,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->baseUrl;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getConfigVersion() : string', 
-            'Returns version number of the configuration file.', 
-            'This value can be used to check for the compatability of configuration file', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getConfigVersion() : string',
+            'Returns version number of the configuration file.',
+            'This value can be used to check for the compatability of configuration file',
+            [],
             [
                 'type' => 'string',
                 'description' => 'The version number of the configuration file.'
@@ -867,11 +867,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->configVision;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getSchedulerPassword() : string', 
-            'Returns sha256 hash of the password which is used to prevent unauthorized access to run the tasks or access scheduler web interface.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getSchedulerPassword() : string',
+            'Returns sha256 hash of the password which is used to prevent unauthorized access to run the tasks or access scheduler web interface.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => "Password hash or the string 'NO_PASSWORD' if there is no password."
@@ -879,16 +879,16 @@ class ConfigController {
         $this->a($cFile, "        return \$this->schedulerPass;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getDBConnection(string $conName)', 
-            'Returns database connection information given connection name.', 
-            '', 
+        $this->writeFuncHeader($cFile,
+            'public function getDBConnection(string $conName)',
+            'Returns database connection information given connection name.',
+            '',
             [
                 '$conName' => [
                     'type' => 'string',
                     'description' => 'The name of the connection.'
                 ]
-            ], 
+            ],
             [
                 'type' => 'ConnectionInfo|null',
                 'description' => [
@@ -905,14 +905,14 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getDBConnections() : array', 
-            'Returns an associative array that contain the information of database connections.', 
+        $this->writeFuncHeader($cFile,
+            'public function getDBConnections() : array',
+            'Returns an associative array that contain the information of database connections.',
             [
                 'The keys of the array will be the name of database connection and the',
                 'value of each key will be an object of type ConnectionInfo.'
-            ], 
-            [], 
+            ],
+            [],
             [
                 'type' => 'array',
                 'description' => 'An associative array.'
@@ -920,16 +920,16 @@ class ConfigController {
         $this->a($cFile, "        return \$this->dbConnections;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getDefaultTitle(string $langCode)', 
-            'Returns the global title of the website that will be used as default page title.', 
-            '', 
+        $this->writeFuncHeader($cFile,
+            'public function getDefaultTitle(string $langCode)',
+            'Returns the global title of the website that will be used as default page title.',
+            '',
             [
                 '$langCode' => [
                     'type' => 'string',
                     'description' => "Language code such as 'AR' or 'EN'."
                 ]
-            ], 
+            ],
             [
                 'type' => 'string|null',
                 'description' => [
@@ -947,16 +947,16 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
 
-        $this->writeFuncHeader($cFile, 
-            'public function getDescription(string $langCode)', 
-            'Returns the global description of the website that will be used as default page description.', 
-            '', 
+        $this->writeFuncHeader($cFile,
+            'public function getDescription(string $langCode)',
+            'Returns the global description of the website that will be used as default page description.',
+            '',
             [
                 '$langCode' => [
                     'type' => 'string',
                     'description' => "Language code such as 'AR' or 'EN'."
                 ]
-            ], 
+            ],
             [
                 'type' => 'string|null',
                 'description' => [
@@ -972,14 +972,14 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getDescriptions() : array', 
-            'Returns an associative array which contains different website descriptions in different languages.', 
+        $this->writeFuncHeader($cFile,
+            'public function getDescriptions() : array',
+            'Returns an associative array which contains different website descriptions in different languages.',
             [
                 'Each index will contain a language code and the value will be the description',
                 'of the website in the given language.'
-            ], 
-            [], 
+            ],
+            [],
             [
                 'type' => 'array',
                 'description' => [
@@ -990,11 +990,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->descriptions;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getHomePage() : string', 
-            'Returns the home page URL of the website.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getHomePage() : string',
+            'Returns the home page URL of the website.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => 'The home page URL of the website.'
@@ -1002,11 +1002,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->homePage;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getPrimaryLanguage() : string', 
-            'Returns the primary language of the website.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getPrimaryLanguage() : string',
+            'Returns the primary language of the website.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => "Language code of the primary language such as 'EN'."
@@ -1014,11 +1014,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->primaryLang;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getReleaseDate() : string', 
-            'Returns the date at which the application was released at.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getReleaseDate() : string',
+            'Returns the date at which the application was released at.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => [
@@ -1029,11 +1029,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->appReleaseDate;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getTitles() : array', 
-            'Returns an array that holds the default page title for different display languages.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getTitles() : array',
+            'Returns an array that holds the default page title for different display languages.',
+            '',
+            [],
             [
                 'type' => 'array',
                 'description' => [
@@ -1044,11 +1044,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->defaultPageTitles;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getTitleSep() : string', 
-            'Returns the character (or string) that is used to separate page title from website name.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getTitleSep() : string',
+            'Returns the character (or string) that is used to separate page title from website name.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => [
@@ -1059,11 +1059,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->titleSep;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getVersion() : string', 
-            'Returns version number of the application.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getVersion() : string',
+            'Returns version number of the application.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => [
@@ -1074,11 +1074,11 @@ class ConfigController {
         $this->a($cFile, "        return \$this->appVersion;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getVersionType() : string', 
-            'Returns a string that represents application release type.', 
-            '', 
-            [], 
+        $this->writeFuncHeader($cFile,
+            'public function getVersionType() : string',
+            'Returns a string that represents application release type.',
+            '',
+            [],
             [
                 'type' => 'string',
                 'description' => [
@@ -1089,16 +1089,16 @@ class ConfigController {
         $this->a($cFile, "        return \$this->appVersionType;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getWebsiteName(string $langCode)', 
-            'Returns the global website name.', 
-            '', 
+        $this->writeFuncHeader($cFile,
+            'public function getWebsiteName(string $langCode)',
+            'Returns the global website name.',
+            '',
             [
                 '$langCode' => [
                     'type' => 'string',
                     'description' => "Language code such as 'AR' or 'EN'."
                 ]
-            ], 
+            ],
             [
                 'type' => 'string|null',
                 'description' => [
@@ -1115,14 +1115,14 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function getWebsiteNames() : array', 
-            'Returns an array which contains different website names in different languages.', 
+        $this->writeFuncHeader($cFile,
+            'public function getWebsiteNames() : array',
+            'Returns an array which contains different website names in different languages.',
             [
                 'Each index will contain a language code and the value will be the name',
                 'of the website in the given language.'
-            ], 
-            [], 
+            ],
+            [],
             [
                 'type' => 'array',
                 'description' => [
@@ -1132,8 +1132,8 @@ class ConfigController {
         $this->a($cFile, "        return \$this->webSiteNames;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->writeFuncHeader($cFile, 
-            'public function removeDBConnections()', 
+        $this->writeFuncHeader($cFile,
+            'public function removeDBConnections()',
             'Removes all stored database connections.');
         $this->a($cFile, "        \$this->dbConnections = [];");
         $this->a($cFile, $this->blockEnd, 1);
@@ -1147,6 +1147,125 @@ class ConfigController {
         $cFile->create(true);
         $cFile->write();
         require_once APP_PATH.'config'.DS.'AppConfig.php';
+    }
+    private function a($file, $str, $tabSize = 0) {
+        $isResource = is_resource($file);
+        $tabStr = $tabSize > 0 ? '    ' : '';
+
+        if (gettype($str) == 'array') {
+            foreach ($str as $subStr) {
+                if ($isResource) {
+                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                } else {
+                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                }
+            }
+        } else {
+            if ($isResource) {
+                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
+            } else {
+                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param File|resource $file
+     * @param array $options
+     */
+    private function addConst($file, array $options) {
+        $this->a($file, "        if (!defined('".$options['name']."')){");
+        $this->a($file, '            /**');
+
+        if (isset($options['summary'])) {
+            $this->a($file, '             * '.$options['summary']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['description'])) {
+            $this->a($file, '             * '.$options['description']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['type'])) {
+            $this->a($file, '             * @var '.$options['type']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['since'])) {
+            $this->a($file, '             * @since '.$options['since']);
+            $this->a($file, '             * ');
+        }
+        $this->a($file, '             */');
+        $val = $options['value'];
+        $this->a($file, "            define('".$options['name']."', $val);");
+        $this->a($file, '        }');
+    }
+    /**
+     * Creates all directories at which the application needs to run.
+     */
+    private function createAppDirs() {
+        $DS = DIRECTORY_SEPARATOR;
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR);
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
+        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
+        $this->mkdir(ROOT_PATH.$DS.'public');
+    }
+    private function mkdir($dir) {
+        if (!is_dir($dir)) {
+            set_error_handler(function (int $errno, string $errstr)
+            {
+                http_response_code(500);
+                die('Unable to create one or more of application directories due to an error: "Code: '.$errno.', Message: '.$errstr.'"');
+            });
+            mkdir($dir);
+            restore_error_handler();
+        }
+    }
+    private function writeAppConfigAddMethods(File $cFile) {
+        $this->writeFuncHeader($cFile,
+            'public function addAccount(SMTPAccount $acc)',
+            'Adds SMTP account.',
+            [
+                'The developer can use this method to add new account during runtime.',
+                'The account will be removed once the program finishes.'
+            ], [
+                '$acc' => [
+                    'type' => 'SMTPAccount',
+                    'description' => [
+                        'An object of type SMTPAccount.'
+                    ]
+                ]
+            ]);
+        $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
+        $this->a($cFile, $this->blockEnd, 1);
+
+        $this->writeFuncHeader($cFile,
+            'public function addDbConnection(ConnectionInfo $connectionInfo)',
+            'Adds new database connection or updates an existing one.',
+            '',
+            [
+                '$connectionInfo' => [
+                    'type' => 'ConnectionInfo',
+                    'description' => [
+                        "An object of type 'ConnectionInfo' that will contain connection information."
+                    ]
+                ]
+            ]);
+        $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
+        $this->a($cFile, $this->blockEnd, 1);
     }
     private function writeAppConfigAttrs($cFile) {
         $this->a($cFile, "<?php");
@@ -1312,6 +1431,24 @@ class ConfigController {
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$webSiteNames;");
     }
+    private function writeAppConfigConstructor(File $cFile) {
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * Creates new instance of the class.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, $this->since10, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    public function __construct() {");
+        $this->a($cFile, "        \$this->configVision = '1.0.1';");
+        $this->a($cFile, "        \$this->initVersionInfo();");
+        $this->a($cFile, "        \$this->initSiteInfo();");
+        $this->a($cFile, "        \$this->initDbConnections();");
+        $this->a($cFile, "        \$this->initSmtpConnections();");
+
+
+        $this->writeSchedulerPass($cFile);
+
+        $this->a($cFile, $this->blockEnd, 1);
+    }
     private function writeAppVersionInfo($cFile) {
         $this->a($cFile, [
             $this->docStart,
@@ -1330,10 +1467,6 @@ class ConfigController {
         ], 2);
 
         $this->a($cFile, $this->blockEnd, 1);
-    }
-    private function writeSchedulerPass($cFile) {
-        $password = $this->getSchedulerPassword();
-        $this->a($cFile, "        \$this->schedulerPass = '".$password."';");
     }
     private function writeDbCon($cFile) {
         $this->a($cFile, $this->docStart, 1);
@@ -1358,162 +1491,6 @@ class ConfigController {
             }
         }
         $this->a($cFile, "        ];");
-        $this->a($cFile, $this->blockEnd, 1);
-    }
-    private function writeSiteTitles($cFile) {
-        $titlesArr = $this->getTitles();
-        $this->a($cFile, "        \$this->defaultPageTitles = [");
-
-        foreach ($titlesArr as $langCode => $title) {
-            $title = str_replace("'", "\'", $title);
-            $this->a($cFile, "            '$langCode' => '$title',");
-
-            if (!class_exists(APP_DIR.'\\langs\\Language'.$langCode)) {
-                //This requires a fix in the future
-                $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
-
-                $writer = new LangClassWriter($langCode, $dir);
-                $writer->writeClass();
-                require_once $writer->getAbsolutePath();
-            }
-        }
-        $this->a($cFile, "        ];");
-    }
-    private function a($file, $str, $tabSize = 0) {
-        $isResource = is_resource($file);
-        $tabStr = $tabSize > 0 ? '    ' : '';
-
-        if (gettype($str) == 'array') {
-            foreach ($str as $subStr) {
-                if ($isResource) {
-                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                } else {
-                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                }
-            }
-        } else {
-            if ($isResource) {
-                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
-            } else {
-                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
-            }
-        }
-    }
-
-    /**
-     *
-     * @param File|resource $file
-     * @param array $options
-     */
-    private function addConst($file, array $options) {
-        $this->a($file, "        if (!defined('".$options['name']."')){");
-        $this->a($file, '            /**');
-
-        if (isset($options['summary'])) {
-            $this->a($file, '             * '.$options['summary']);
-            $this->a($file, '             * ');
-        }
-
-        if (isset($options['description'])) {
-            $this->a($file, '             * '.$options['description']);
-            $this->a($file, '             * ');
-        }
-
-        if (isset($options['type'])) {
-            $this->a($file, '             * @var '.$options['type']);
-            $this->a($file, '             * ');
-        }
-
-        if (isset($options['since'])) {
-            $this->a($file, '             * @since '.$options['since']);
-            $this->a($file, '             * ');
-        }
-        $this->a($file, '             */');
-        $val = $options['value'];
-        $this->a($file, "            define('".$options['name']."', $val);");
-        $this->a($file, '        }');
-    }
-    /**
-     * Creates all directories at which the application needs to run.
-     */
-    private function createAppDirs() {
-        $DS = DIRECTORY_SEPARATOR;
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR);
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
-        $this->mkdir(ROOT_PATH.$DS.'public');
-    }
-    private function mkdir($dir) {
-        if (!is_dir($dir)) {
-            set_error_handler(function (int $errno, string $errstr)
-            {
-                http_response_code(500);
-                die('Unable to create one or more of application directories due to an error: "Code: '.$errno.', Message: '.$errstr.'"');
-            });
-            mkdir($dir);
-            restore_error_handler();
-        }
-    }
-    private function writeAppConfigAddMethods(File $cFile) {
-        $this->writeFuncHeader($cFile, 
-            'public function addAccount(SMTPAccount $acc)', 
-            'Adds SMTP account.', 
-            [
-                'The developer can use this method to add new account during runtime.',
-                'The account will be removed once the program finishes.'
-            ], [
-                '$acc' => [
-                    'type' => 'SMTPAccount',
-                    'description' => [
-                        'An object of type SMTPAccount.'
-                    ]
-                ]
-            ]);
-        $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
-        $this->a($cFile, $this->blockEnd, 1);
-
-        $this->writeFuncHeader($cFile, 
-            'public function addDbConnection(ConnectionInfo $connectionInfo)', 
-            'Adds new database connection or updates an existing one.', 
-            '', 
-            [
-                '$connectionInfo' => [
-                    'type' => 'ConnectionInfo',
-                    'description' => [
-                        "An object of type 'ConnectionInfo' that will contain connection information."
-                    ]
-                ]
-            ]);
-        $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
-        $this->a($cFile, $this->blockEnd, 1);
-    }
-    private function writeAppConfigConstructor(File $cFile) {
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Creates new instance of the class.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function __construct() {");
-        $this->a($cFile, "        \$this->configVision = '1.0.1';");
-        $this->a($cFile, "        \$this->initVersionInfo();");
-        $this->a($cFile, "        \$this->initSiteInfo();");
-        $this->a($cFile, "        \$this->initDbConnections();");
-        $this->a($cFile, "        \$this->initSmtpConnections();");
-
-
-        $this->writeSchedulerPass($cFile);
-
         $this->a($cFile, $this->blockEnd, 1);
     }
     private function writeFuncHeader($cFile, $methSig, $methodSummary = '', $description = [], $params = [], $returns = null) {
@@ -1566,6 +1543,10 @@ class ConfigController {
         $phpDocArr[] = $this->docEnd;
         $phpDocArr[] = $methSig.' {';
         $this->a($cFile, $phpDocArr, 1);
+    }
+    private function writeSchedulerPass($cFile) {
+        $password = $this->getSchedulerPassword();
+        $this->a($cFile, "        \$this->schedulerPass = '".$password."';");
     }
     private function writeSiteDescriptions($cFile) {
         $descArr = $this->getDescriptions();
@@ -1635,6 +1616,25 @@ class ConfigController {
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, "    ");
+    }
+    private function writeSiteTitles($cFile) {
+        $titlesArr = $this->getTitles();
+        $this->a($cFile, "        \$this->defaultPageTitles = [");
+
+        foreach ($titlesArr as $langCode => $title) {
+            $title = str_replace("'", "\'", $title);
+            $this->a($cFile, "            '$langCode' => '$title',");
+
+            if (!class_exists(APP_DIR.'\\langs\\Language'.$langCode)) {
+                //This requires a fix in the future
+                $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
+
+                $writer = new LangClassWriter($langCode, $dir);
+                $writer->writeClass();
+                require_once $writer->getAbsolutePath();
+            }
+        }
+        $this->a($cFile, "        ];");
     }
     private function writeSmtpConn($cFile) {
         $this->a($cFile, $this->docStart, 1);

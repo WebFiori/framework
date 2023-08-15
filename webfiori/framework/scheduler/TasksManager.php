@@ -24,7 +24,6 @@ use webfiori\framework\scheduler\webUI\SetPasswordPage;
 use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
-use const DS;
 /**
  * A class that is used to manage scheduled background tasks.
  * 
@@ -65,13 +64,21 @@ class TasksManager {
      */
     private $command;
     /**
-     * A queue which contains all tasks.
+     * A variable that is set to true if task execution log is enabled.
      * 
-     * @var Queue 
+     * @var bool
      * 
-     * @since 1.0
+     * @since 1.0.1 
      */
-    private $tasksQueue;
+    private $isLogEnabled;
+    /**
+     * An array that contains strings which acts as log messages.
+     * 
+     * @var array
+     * 
+     * @since 1.0.8 
+     */
+    private $logsArray;
     /**
      * An instance of this class
      * 
@@ -81,14 +88,6 @@ class TasksManager {
      */
     private static $tasksManager;
     /**
-     * A variable that is set to true if task execution log is enabled.
-     * 
-     * @var bool
-     * 
-     * @since 1.0.1 
-     */
-    private $isLogEnabled;
-    /**
      *
      * @var array 
      * 
@@ -96,13 +95,13 @@ class TasksManager {
      */
     private $tasksNamesArr;
     /**
-     * An array that contains strings which acts as log messages.
+     * A queue which contains all tasks.
      * 
-     * @var array
+     * @var Queue 
      * 
-     * @since 1.0.8 
+     * @since 1.0
      */
-    private $logsArray;
+    private $tasksQueue;
     /**
      * An array that contains current timestamp. 
      * 
@@ -167,7 +166,7 @@ class TasksManager {
     public static function createTask(string $when = '*/5 * * * *', string $taskName = '', callable $function = null, array $funcParams = []) : bool {
         try {
             $task = new BaseTask($when);
-            
+
             if ($function !== null) {
                 $task->setOnExecution($function, $funcParams);
             }
@@ -282,6 +281,19 @@ class TasksManager {
         return self::$tasksManager;
     }
     /**
+     * Returns the array that contains logged messages.
+     * 
+     * The array will contain the messages which where logged using the method 
+     * <code>TasksManager::log()</code>
+     * 
+     * @return array An array of strings.
+     * 
+     * @since 1.0.8
+     */
+    public static function getLogArray() : array {
+        return self::get()->logsArray;
+    }
+    /**
      * Returns a task given its name.
      * 
      * @param string $taskName The name of the task.
@@ -323,19 +335,6 @@ class TasksManager {
      */
     public static function getTasksNames() : array {
         return self::get()->tasksNamesArr;
-    }
-    /**
-     * Returns the array that contains logged messages.
-     * 
-     * The array will contain the messages which where logged using the method 
-     * <code>TasksManager::log()</code>
-     * 
-     * @return array An array of strings.
-     * 
-     * @since 1.0.8
-     */
-    public static function getLogArray() : array {
-        return self::get()->logsArray;
     }
     /**
      * Returns the number of current hour in the day as integer.
@@ -389,16 +388,6 @@ class TasksManager {
                 ]
             ]
         ]);
-    }
-    /**
-     * Returns a queue of all queued tasks.
-     * 
-     * @return Queue An object of type 'Queue' which contains all queued tasks.
-     * 
-     * @since 1.0
-     */
-    public static function tasksQueue() : Queue {
-        return self::get()->getQueueHelper();
     }
     /**
      * Appends a message to the array that contains logged messages.
@@ -471,7 +460,7 @@ class TasksManager {
      * 
      * @since 1.0.3
      */
-    public static function monthlyTask(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool{
+    public static function monthlyTask(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool {
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
@@ -721,6 +710,16 @@ class TasksManager {
         }
     }
     /**
+     * Returns a queue of all queued tasks.
+     * 
+     * @return Queue An object of type 'Queue' which contains all queued tasks.
+     * 
+     * @since 1.0
+     */
+    public static function tasksQueue() : Queue {
+        return self::get()->getQueueHelper();
+    }
+    /**
      * Returns the time at which tasks check was initialized.
      * 
      * @return string The method will return a time string in the format 
@@ -844,11 +843,10 @@ class TasksManager {
     private function logExecHelper($forced, $task, File $file) {
         if ($forced) {
             $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
-
         } else {
             $file->setRawData('Task \''.$task->getTaskName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
-
         }
+
         if ($task->isSuccess()) {
             $file->setRawData('Execution status: Successfully completed.'."\n");
         } else {

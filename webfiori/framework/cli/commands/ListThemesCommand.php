@@ -74,6 +74,13 @@ class ListThemesCommand extends CLICommand {
 
         return 0;
     }
+    private function isSet($var) {
+        if (strlen($var) == 0) {
+            return '<NOT SET>';
+        }
+
+        return $var;
+    }
 
     private function printThemeObj($themeObj) {
         $spaceSize = 15;
@@ -89,12 +96,5 @@ class ListThemesCommand extends CLICommand {
         $this->println("License: %".$len03."s %s",':', $this->isSet($themeObj->getLicenseName()));
         $this->println("License URL: %".$len04."s %s",':', $this->isSet($themeObj->getLicenseUrl()));
         $this->println("Theme Desription: %s", $this->isSet($themeObj->getDescription()));
-    }
-    private function isSet($var) {
-        if (strlen($var) == 0) {
-            return '<NOT SET>';
-        }
-
-        return $var;
     }
 }

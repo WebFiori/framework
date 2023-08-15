@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\config;
 
 use webfiori\database\ConnectionInfo;
@@ -63,7 +62,7 @@ class JsonDriver implements ConfigurationDriver {
                     "value" => "example.com",
                     "description" => "Host name that will be used when runing the application as command line utility."
                 ])
-            ]), 
+            ]),
             'smtp-connections' => new Json(),
             'database-connections' => new Json(),
         ]);
@@ -113,7 +112,7 @@ class JsonDriver implements ConfigurationDriver {
             'password' => $emailAccount->getPassword(),
             'address' => $emailAccount->getAddress(),
             'sender-name' => $emailAccount->getSenderName(),
-            
+
         ]);
         $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $connectionAsJson);
         $this->writeJson();
@@ -121,6 +120,24 @@ class JsonDriver implements ConfigurationDriver {
 
     public function getAppName(string $langCode) {
         return $this->json->get('app-names')->get(strtoupper(trim($langCode)));
+    }
+    /**
+     * Returns an array that holds different names for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the name.
+     * 
+     */
+    public function getAppNames(): array {
+        $appNamesJson = $this->json->get('app-names');
+        $retVal = [];
+
+        foreach ($appNamesJson->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+
+        return $retVal;
     }
 
     public function getAppReleaseDate() : string {
@@ -141,23 +158,23 @@ class JsonDriver implements ConfigurationDriver {
 
     public function getDBConnection(string $conName) {
         $jsonObj = $this->json->get('database-connections')->get($conName);
-        
+
         if ($jsonObj !== null) {
             return new ConnectionInfo(
-                    $jsonObj->get('type'), 
-                    $jsonObj->get('username'), 
-                    $jsonObj->get('password'), 
-                    $jsonObj->get('database'), 
-                    $jsonObj->get('host'), 
-                    $jsonObj->get('port'), 
-                    $jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
+                $jsonObj->get('type'),
+                $jsonObj->get('username'),
+                $jsonObj->get('password'),
+                $jsonObj->get('database'),
+                $jsonObj->get('host'),
+                $jsonObj->get('port'),
+                $jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
         }
     }
 
     public function getDBConnections(): array {
-                
         $accountsInfo = $this->json->get('database-connections');
         $retVal = [];
+
         foreach ($accountsInfo->getProperties() as $propObj) {
             $jsonObj = $propObj->getValue();
             $acc = new ConnectionInfo($jsonObj->get('type'), $jsonObj->get('username'), $jsonObj->get('password'), $jsonObj->get('database'));
@@ -167,22 +184,42 @@ class JsonDriver implements ConfigurationDriver {
             $acc->setPort($jsonObj->get('port'));
             $retVal[$propObj->getName()] = $acc;
         }
+
         return $retVal;
     }
 
     public function getDescription(string $langCode) {
         return $this->json->get('app-descriptions')->get(strtoupper(trim($langCode)));
     }
+    /**
+     * Returns an array that holds different descriptions for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the description.
+     */
+    public function getDescriptions(): array {
+        $descriptions = $this->json->get('app-descriptions');
+        $retVal = [];
+
+        foreach ($descriptions->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+
+        return $retVal;
+    }
 
     public function getEnvVars(): array {
         $retVal = [];
         $vars = $this->json->get('env-vars');
+
         foreach ($vars->getPropsNames() as $name) {
             $retVal[$name] = [
                 'value' => $this->json->get('env-vars')->get($name)->get('value'),
                 'description' => $this->json->get('env-vars')->get($name)->get('description')
             ];
         }
+
         return $retVal;
     }
 
@@ -194,9 +231,13 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('primary-lang');
     }
 
+    public function getSchedulerPassword(): string {
+        return $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
+    }
+
     public function getSMTPConnection(string $name) {
         $jsonObj = $this->json->get('smtp-connections')->get($name);
-        
+
         if ($jsonObj !== null) {
             return new SMTPAccount([
                 'sender-address' => $jsonObj->get('address'),
@@ -212,8 +253,8 @@ class JsonDriver implements ConfigurationDriver {
     public function getSMTPConnections(): array {
         $accountsInfo = $this->json->get('smtp-connections');
         $retVal = [];
+
         foreach ($accountsInfo->getProperties() as $name => $jsonObj) {
-            
             $acc = new SMTPAccount();
             $acc->setAccountName($name);
             $acc->setAddress($jsonObj->get('address'));
@@ -224,31 +265,49 @@ class JsonDriver implements ConfigurationDriver {
             $acc->setUsername($jsonObj->get('username'));
             $retVal[] = $acc;
         }
-        return $retVal;
-    }
 
-    public function getSchedulerPassword(): string {
-        return $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
+        return $retVal;
     }
 
     public function getTheme(): string {
         return $this->json->get('theme') ?? '';
     }
-
-    public function getTitleSeparator(): string {
-        return $this->json->get('name-separator');
-    }
     public function getTitle(string $lang) : string {
         $titles = $this->json->get('titles');
+
         foreach ($titles->getProperties() as $prob) {
             if ($prob->getName() == $lang) {
                 return $prob->getValue();
             }
         }
+
         return '';
+    }
+    /**
+     * Returns an array that holds different page titles for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the title.
+     * 
+     */
+    public function getTitles(): array {
+        $titles = $this->json->get('titles');
+        $retVal = [];
+
+        foreach ($titles->getProperties() as $prob) {
+            $retVal[$prob->getName()] = $prob->getValue();
+        }
+
+        return $retVal;
+    }
+
+    public function getTitleSeparator(): string {
+        return $this->json->get('name-separator');
     }
     public function initialize(bool $reCreate = false) {
         $path = self::JSON_CONFIG_FILE_PATH;
+
         if (!file_exists($path) || $reCreate) {
             $this->writeJson();
         }
@@ -258,41 +317,21 @@ class JsonDriver implements ConfigurationDriver {
         $f = new File(self::JSON_CONFIG_FILE_PATH);
         $f->remove();
     }
-    private function writeJson() {
-        $file = new File(self::JSON_CONFIG_FILE_PATH);
-        $file->remove();
-        $json = $this->toJSON();
-        $json->setIsFormatted(true);
-        $file->setRawData($json.'');
-        $file->write(false, true);
-    }
-    public function toJSON() : Json {
-        return $this->json;
-    }
     public function removeAllDBConnections() {
-        
         $this->json->add('database-connections', new Json());
         $this->writeJson();
     }
 
     public function removeDBConnection(string $connectionName) {
-        
     }
 
     public function removeSMTPAccount(string $accountName) {
         $this->json->add('smtp-connections', new Json());
         $this->writeJson();
     }
-    private function isValidLangCode($langCode) {
-        $code = strtoupper(trim($langCode));
-        if (strlen($code) != 2) {
-            return false;
-        }
-        return $code;
-    }
     public function setAppName(string $name, string $langCode) {
         $code = $this->isValidLangCode($langCode);
-        
+
         if ($code === false) {
             return;
         }
@@ -312,7 +351,6 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setBaseURL(string $url) {
-        
     }
     /**
      * Sets or update default description of the application that will be used
@@ -325,7 +363,7 @@ class JsonDriver implements ConfigurationDriver {
      */
     public function setDescription(string $description, string $langCode) {
         $code = $this->isValidLangCode($langCode);
-        
+
         if ($code === false) {
             return;
         }
@@ -356,7 +394,7 @@ class JsonDriver implements ConfigurationDriver {
      */
     public function setPrimaryLanguage(string $langCode) {
         $code = $this->isValidLangCode($langCode);
-        
+
         if ($code === false) {
             return;
         }
@@ -386,6 +424,24 @@ class JsonDriver implements ConfigurationDriver {
         $this->writeJson();
     }
     /**
+     * Sets or updates default web page title for a specific display language.
+     * 
+     * @param string $title The title that will be set.
+     * 
+     * @param string $langCode The display language at which the title will be
+     * set or updated for.
+     */
+    public function setTitle(string $title, string $langCode) {
+        $code = $this->isValidLangCode($langCode);
+
+        if ($code === false) {
+            return;
+        }
+        $appNamesJson = $this->json->get('titles');
+        $appNamesJson->add($code, $title);
+        $this->writeJson();
+    }
+    /**
      * Sets the string which is used to separate application name from page name.
      * 
      * @param string $separator A character or a string that is used
@@ -396,70 +452,24 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->add('name-separator', $separator);
         $this->writeJson();
     }
-    /**
-     * Returns an array that holds different names for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the name.
-     * 
-     */
-    public function getAppNames(): array {
-        $appNamesJson = $this->json->get('app-names');
-        $retVal = [];
-        foreach ($appNamesJson->getProperties() as $prob) {
-            $retVal[$prob->getName()] = $prob->getValue();
-        }
-        return $retVal;
+    public function toJSON() : Json {
+        return $this->json;
     }
-    /**
-     * Returns an array that holds different descriptions for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the description.
-     */
-    public function getDescriptions(): array {
-        $descriptions = $this->json->get('app-descriptions');
-        $retVal = [];
-        foreach ($descriptions->getProperties() as $prob) {
-            $retVal[$prob->getName()] = $prob->getValue();
-        }
-        return $retVal;
-    }
-    /**
-     * Returns an array that holds different page titles for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the title.
-     * 
-     */
-    public function getTitles(): array {
-        $titles = $this->json->get('titles');
-        $retVal = [];
-        foreach ($titles->getProperties() as $prob) {
-            $retVal[$prob->getName()] = $prob->getValue();
-        }
-        return $retVal;
-    }
-    /**
-     * Sets or updates default web page title for a specific display language.
-     * 
-     * @param string $title The title that will be set.
-     * 
-     * @param string $langCode The display language at which the title will be
-     * set or updated for.
-     */
-    public function setTitle(string $title, string $langCode) {
-        $code = $this->isValidLangCode($langCode);
-        
-        if ($code === false) {
-            return;
-        }
-        $appNamesJson = $this->json->get('titles');
-        $appNamesJson->add($code, $title);
-        $this->writeJson();
-    }
+    private function isValidLangCode($langCode) {
+        $code = strtoupper(trim($langCode));
 
+        if (strlen($code) != 2) {
+            return false;
+        }
+
+        return $code;
+    }
+    private function writeJson() {
+        $file = new File(self::JSON_CONFIG_FILE_PATH);
+        $file->remove();
+        $json = $this->toJSON();
+        $json->setIsFormatted(true);
+        $file->setRawData($json.'');
+        $file->write(false, true);
+    }
 }

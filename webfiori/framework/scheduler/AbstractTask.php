@@ -169,7 +169,7 @@ abstract class AbstractTask implements JsonI {
      */
     public function __construct(string $taskName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
         $this->taskDesc = '';
-        $this->taskName = ''; 
+        $this->taskName = '';
         $this->setTaskName($taskName);
         $this->setDescription($description);
         $this->customAttrs = [];
@@ -292,10 +292,10 @@ abstract class AbstractTask implements JsonI {
             $monthValidity = $this->checkMonthHelper($split[3]);
             $daysOfWeekValidity = $this->checkDayOfWeekHelper($split[4]);
 
-            if (!($minutesValidity === false || 
-               $hoursValidity === false || 
+            if (!($minutesValidity === false ||
+               $hoursValidity === false ||
                $daysOfMonthValidity === false ||
-               $monthValidity === false || 
+               $monthValidity === false ||
                $daysOfWeekValidity === false)) {
                 $this->taskDetails = [
                     'minutes' => $minutesValidity,
@@ -500,7 +500,7 @@ abstract class AbstractTask implements JsonI {
 
         if ($argObj === null) {
             return null;
-        }      
+        }
 
         $val = $this->getArgValFromRequest($name);
 
@@ -1045,8 +1045,7 @@ abstract class AbstractTask implements JsonI {
      * 
      * @since 1.0
      */
-    public function weeklyOn($dayNameOrNum = 0, string $time = '00:00'): bool
-    {
+    public function weeklyOn($dayNameOrNum = 0, string $time = '00:00'): bool {
         $uDayName = strtoupper($dayNameOrNum);
 
         if (!in_array($uDayName, array_keys(self::WEEK_DAYS))) {
@@ -1301,6 +1300,17 @@ abstract class AbstractTask implements JsonI {
 
         return $monthAttrs;
     }
+    private function createAttrs($suffix): array {
+        return [
+            // *
+            'every-'.$suffix => false,
+            // Steps
+            'every-x-'.$suffix => [],
+            // Exact
+            'at-every-x-'.$suffix => [],
+            'at-range' => []
+        ];
+    }
     /**
      * 
      * @param string $dayOfMonthField
@@ -1347,6 +1357,26 @@ abstract class AbstractTask implements JsonI {
 
         return $monthDaysAttrs;
     }
+
+    private function getArgValFromRequest($name) {
+        $uName = str_replace(' ', '_', $name);
+        $retVal = Request::getParam($name);
+
+        if ($retVal === null) {
+            $retVal = Request::getParam($uName);
+        }
+
+        return $retVal;
+    }
+    private function getArgValFromTerminal($name) {
+        $c = $this->getCommand();
+
+        if ($c === null) {
+            return null;
+        }
+
+        return $c->getArgValue($name);
+    }
     /**
      * 
      * @param string $expr
@@ -1390,92 +1420,6 @@ abstract class AbstractTask implements JsonI {
 
         return $retVal;
     }
-    /**
-     * Checks if a given string represents a number or not.
-     * @param string $str
-     * @return bool
-     */
-    private function isNumberHelper(string $str): bool {
-        $len = strlen($str);
-
-        if ($len != 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $ch = $str[$x];
-
-                if (!($ch >= '0' && $ch <= '9')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     *
-     * @param Throwable $ex
-     * @param string $meth
-     */
-    private function logExeException(Throwable $ex, string $meth = '') {
-        TasksManager::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
-                .'The output of the task might be not as expected.');
-        TasksManager::log('Exception class: '.get_class($ex));
-        TasksManager::log('Exception message: '.$ex->getMessage());
-        TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
-        TasksManager::log('Line: '.$ex->getLine());
-
-
-        if ($meth == 'execute') {
-            $this->isSuccess = false;
-        }
-    }
-
-
-    private function weeklyOnHelper($day,$time): bool{
-        $timeSplit = explode(':', $time);
-
-        if (count($timeSplit) == 2) {
-            $hour = intval($timeSplit[0]);
-            $minute = intval($timeSplit[1]);
-
-            if ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59) {
-                return $this->cron($minute.' '.$hour.' * * '.$day);
-            }
-        }
-
-        return false;
-    }
-    private function createAttrs($suffix): array{
-        return [
-            // *
-            'every-'.$suffix => false,
-            // Steps
-            'every-x-'.$suffix => [],
-            // Exact 
-            'at-every-x-'.$suffix => [],
-            'at-range' => []
-        ];
-    }
-
-    private function getArgValFromRequest($name) {
-        $uName = str_replace(' ', '_', $name);
-        $retVal = Request::getParam($name);
-
-        if ($retVal === null) {
-            $retVal = Request::getParam($uName);
-        }
-
-        return $retVal;
-    }
-    private function getArgValFromTerminal($name) {
-        $c = $this->getCommand();
-
-        if ($c === null) {
-            return null;
-        }
-
-        return $c->getArgValue($name);
-    }
     private function isHourHelper($hoursArr, $current) {
         $hours = $hoursArr['at-every-x-hour'];
         $retVal = in_array($current, $hours);
@@ -1510,6 +1454,26 @@ abstract class AbstractTask implements JsonI {
 
         return $retVal;
     }
+    /**
+     * Checks if a given string represents a number or not.
+     * @param string $str
+     * @return bool
+     */
+    private function isNumberHelper(string $str): bool {
+        $len = strlen($str);
+
+        if ($len != 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $ch = $str[$x];
+
+                if (!($ch >= '0' && $ch <= '9')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
     private function isValidRange(int $start, int $end, int $min, int $max): bool {
         $isValidExpr = true;
 
@@ -1526,6 +1490,25 @@ abstract class AbstractTask implements JsonI {
         }
 
         return $isValidExpr;
+    }
+
+    /**
+     *
+     * @param Throwable $ex
+     * @param string $meth
+     */
+    private function logExeException(Throwable $ex, string $meth = '') {
+        TasksManager::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
+                .'The output of the task might be not as expected.');
+        TasksManager::log('Exception class: '.get_class($ex));
+        TasksManager::log('Exception message: '.$ex->getMessage());
+        TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
+        TasksManager::log('Line: '.$ex->getLine());
+
+
+        if ($meth == 'execute') {
+            $this->isSuccess = false;
+        }
     }
     private function onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum): bool {
         $trimmed = trim($monthNameOrNum);
@@ -1551,5 +1534,21 @@ abstract class AbstractTask implements JsonI {
      */
     private function setIsForced(bool $bool) {
         $this->isForced = $bool === true;
+    }
+
+
+    private function weeklyOnHelper($day,$time): bool {
+        $timeSplit = explode(':', $time);
+
+        if (count($timeSplit) == 2) {
+            $hour = intval($timeSplit[0]);
+            $minute = intval($timeSplit[1]);
+
+            if ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59) {
+                return $this->cron($minute.' '.$hour.' * * '.$day);
+            }
+        }
+
+        return false;
     }
 }

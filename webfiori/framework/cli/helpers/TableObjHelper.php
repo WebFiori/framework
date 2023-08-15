@@ -18,9 +18,9 @@ use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use webfiori\framework\App;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
-use webfiori\framework\App;
 
 /**
  * A CLI class helper which has methods to help in creating and 
@@ -512,11 +512,11 @@ class TableObjHelper {
     private function setSize(Column $colObj) {
         $type = $colObj->getDatatype();
         $helper = $this->getCreateHelper();
-        $mySqlSupportSize = $type == 'int' 
+        $mySqlSupportSize = $type == 'int'
                 || $type == 'varchar'
-                || $type == 'decimal' 
+                || $type == 'decimal'
                 || $type == 'float'
-                || $type == 'double' 
+                || $type == 'double'
                 || $type == 'text';
         $mssqlSupportSize = $type == 'char'
                 || $type == 'nchar'

@@ -50,16 +50,6 @@ class CreateCLIClassHelper extends CreateClassHelper {
 
         $this->writeClass();
     }
-    private function getCommandName(): string {
-        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
-        {
-            if (strlen($val) > 0 && strpos($val, ' ') === false) {
-                return true;
-            }
-
-            return false;
-        }));
-    }
     private function getArgs() : array {
         $argsArr = [];
         $addToMore = true;
@@ -81,6 +71,16 @@ class CreateCLIClassHelper extends CreateClassHelper {
         }
 
         return $argsArr;
+    }
+    private function getCommandName(): string {
+        return $this->getInput('Enter a name for the command:', null, new InputValidator(function ($val)
+        {
+            if (strlen($val) > 0 && strpos($val, ' ') === false) {
+                return true;
+            }
+
+            return false;
+        }));
     }
     private function getFixedValues() : array {
         if (!$this->confirm('Does this argument have a fixed set of values?', false)) {

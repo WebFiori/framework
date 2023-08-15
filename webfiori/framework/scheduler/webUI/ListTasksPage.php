@@ -43,7 +43,7 @@ class ListTasksPage extends BaseTasksPage {
      */
     public function __construct() {
         parent::__construct('Scheduled Tasks', 'A list of scheduled tasks.');
-        
+
         if (!$this->isLoggedIn()) {
             Response::addHeader('location', $this->getBase().'/scheduler/login');
             Response::send();
@@ -75,19 +75,19 @@ class ListTasksPage extends BaseTasksPage {
         if ($file->isExist()) {
             $file->read();
             $data = $file->getRawData();
+
             if (strlen($data) == 0) {
                 $card->addChild('v-card-text')->addChild('pre')->text('Empty log file.');
             } else {
                 $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
             }
-            
         } else {
             $file->create();
             $card->addChild('v-card-text')->addChild('pre', [
                 'style' => 'color:red'
             ])->text('Log file not found!');
         }
-        
+
         $this->insert($this->include('templates/job-execution-status-dialog.html'));
         $this->insert($this->include('templates/job-output-dialog.html'));
     }

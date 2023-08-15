@@ -90,6 +90,7 @@ function title() : string {
 function logVar($message) {
     $js = new HTMLNode('script');
     $type = gettype($message);
+
     if ($type == 'object' || $type == 'resource') {
         if (is_subclass_of($message, JsonI::class)) {
             $js->text("console.log(".$message->toJSON().")", false);
@@ -107,7 +108,7 @@ function logVar($message) {
 }
 function call($methodName) {
     global $page;
-    
+
     if (isset($page) && $page instanceof WebPage) {
         return $page->$methodName();
     }

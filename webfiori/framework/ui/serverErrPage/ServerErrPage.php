@@ -47,7 +47,7 @@ class ServerErrPage extends WebPage {
         });
         $container = $this->insert('v-container');
         $row = $container->addChild('v-row');
-        
+
         $templateVars = [
             'throwableOrErr' => $throwableOrErr
         ];
@@ -55,7 +55,7 @@ class ServerErrPage extends WebPage {
         $row->include('error-details.php', $templateVars);
         $row->include('stack-trace.php', $templateVars);
     }
-    
+
     private function changeDom() {
         $topDiv = new HTMLNode('v-app');
         $topDiv->setID('app');

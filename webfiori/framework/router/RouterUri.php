@@ -484,7 +484,7 @@ class RouterUri extends Uri {
      * @since 1.1
      */
     public function setType(string $type) {
-        if ($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE || 
+        if ($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE ||
                 $type == Router::CUSTOMIZED || $type == Router::VIEW_ROUTE) {
             $this->type = $type;
         }
@@ -514,23 +514,6 @@ class RouterUri extends Uri {
 
         return $node;
     }
-
-    /**
-     * Validate the path part of original URI and the requested one.
-     *
-     * @param Uri $requestedUri
-     * @return bool
-     *
-     * @since 1.0
-     */
-    private function compareUriPathHelper(Uri $requestedUri): bool {
-        $requestedArr = $requestedUri->getComponents();
-
-        $originalPath = $this->getPathArray();
-        $requestedPath = $requestedArr['path'];
-
-        return $this->comparePathHelper($originalPath, $requestedPath);
-    }
     private function comparePathHelper($originalPath, $requestedPath): bool {
         $count = count($originalPath);
         $requestedCount = count($requestedPath);
@@ -556,5 +539,22 @@ class RouterUri extends Uri {
         }
 
         return true;
+    }
+
+    /**
+     * Validate the path part of original URI and the requested one.
+     *
+     * @param Uri $requestedUri
+     * @return bool
+     *
+     * @since 1.0
+     */
+    private function compareUriPathHelper(Uri $requestedUri): bool {
+        $requestedArr = $requestedUri->getComponents();
+
+        $originalPath = $this->getPathArray();
+        $requestedPath = $requestedArr['path'];
+
+        return $this->comparePathHelper($originalPath, $requestedPath);
     }
 }

@@ -11,7 +11,7 @@ $DS = DIRECTORY_SEPARATOR;
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
 
-//an array that contains possible locations at which 
+//an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
@@ -30,7 +30,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
     fprintf(STDOUT,"Run Environment: Linux.\n");
 
     foreach ($WebFioriFrameworkDirs as $dir) {
-        //linux 
+        //linux
         $file = $DS.$dir.'framework'.$DS.'AutoLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 

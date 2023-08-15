@@ -126,7 +126,8 @@ class SessionDB extends DB {
      */
     public function getSessionsIDs(string $olderThan): array {
         return $this->table('sessions')->select()->where('last-used', $olderThan, '<=')->execute()
-                ->map(function ($record) {
+                ->map(function ($record)
+                {
                     return $record['s_id'];
                 })->toArray();
     }
@@ -204,7 +205,7 @@ class SessionDB extends DB {
             $index += $chunkSize;
         }
 
-        //This part is to add any extra remaining 
+        //This part is to add any extra remaining
         //data in the last part of the session
         $remainingChars = $dataLen - count($retVal) * $chunkSize;
 

@@ -11,8 +11,6 @@
 namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\session\SessionsManager;
-use webfiori\http\AbstractWebService;
 use webfiori\json\Json;
 /**
  * A web service which is used to fetch a list of all scheduled tasks.

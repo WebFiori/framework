@@ -126,7 +126,7 @@ class SchedulerCommand extends CLICommand {
 
         if ($taskName === null) {
             $taskName = $this->select('Select one of the scheduled tasks to force:', $tasksNamesArr, count($tasksNamesArr) - 1);
-        } 
+        }
 
         if ($taskName == 'Cancel') {
             $retVal = 0;
@@ -193,7 +193,7 @@ class SchedulerCommand extends CLICommand {
 
         if ($taskName === null) {
             $taskName = $this->select('Select one of the scheduled tasks to show supported args:', TasksManager::getTasksNames());
-        } 
+        }
         $task = TasksManager::getTask($taskName);
 
         $this->println("Task Args:");

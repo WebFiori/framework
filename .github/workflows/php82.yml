@@ -80,7 +80,7 @@ jobs:
         with:
           php-version: "8.1"
           extensions: "mbstring"
-          tools: composer
+          tools: composer, symplify/easy-coding-standard
           
       - name: "Checkout code"
         uses: "actions/checkout@v3"

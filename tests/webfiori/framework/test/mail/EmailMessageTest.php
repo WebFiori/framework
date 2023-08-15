@@ -18,8 +18,25 @@ class EmailMessageTest extends TestCase {
      */
     public function test00() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('No SMTP account was found which has the name "not exist".');
+        $this->expectExceptionMessage('No SMTP connection was found which has the name "not exist".');
         $message = new EmailMessage('not exist');
+    }
+    /**
+     * @test
+     */
+    public function test01() {
+        $acc = new SMTPAccount([
+            'port' => 587,
+            'server-address' => 'outlook.office365.com',
+            'user' => 'randomxyz@hotmail.com',
+            'pass' => '???',
+            'sender-name' => 'Ibrahim',
+            'sender-address' => 'randomxyz@hotmail.com',
+            'account-name' => 'no-reply'
+        ]);
+        App::getConfig()->addOrUpdateSMTPAccount($acc);
+        $message = new EmailMessage();
+        $this->assertEquals('no-reply', $message->getSMTPAccount()->getAccountName());
     }
     /**
      * @test
@@ -83,16 +100,6 @@ class EmailMessageTest extends TestCase {
      * @test
      */
     public function testLang00() {
-        $acc = new SMTPAccount([
-            'port' => 587,
-            'server-address' => 'outlook.office365.com',
-            'user' => 'randomxyz@hotmail.com',
-            'pass' => '???',
-            'sender-name' => 'Ibrahim',
-            'sender-address' => 'randomxyz@hotmail.com',
-            'account-name' => 'no-reply'
-        ]);
-        App::getConfig()->addOrUpdateSMTPAccount($acc);
         $message = new EmailMessage();
         $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
         $this->assertNull($message->getTranslation());

@@ -110,6 +110,17 @@ class AccessTest extends TestCase {
      * @test
      */
     public function test08() {
+        Access::newGroup('SUPER');
+        Access::newGroup('SUB_SUPER', 'SUPER');
+        Access::newGroup('SUB_SUB_SUPER', 'SUB_SUPER');
+        $this->assertFalse(Access::newGroup('SUPER', 'SUB_SUB_SUPER'));
+        $this->assertFalse(Access::newPrivilege('SUB_SUB_SUPER', 'SUPER'));
+        Access::clear();
+    }
+    /**
+     * @test
+     */
+    public function test09() {
         $this->assertTrue(Access::newGroup('ADMINS'));
         $r = Access::newPrivileges('ADMINS', [
             'MODIFY_SYS_SETTINGS'
@@ -141,9 +152,12 @@ class AccessTest extends TestCase {
             'DO_EMP_EVAL','WITHDRAW'
         ]);
         $this->assertTrue(Access::newGroup('EMPLOYER', 'HR'));
-        Access::newPrivileges('EMPLOYER', [
+        $this->assertEquals([
+            'DO_INTERVIEW' => true,
+            'EVALUATE_APLICANT' => true
+        ], Access::newPrivileges('EMPLOYER', [
             'DO_INTERVIEW','EVALUATE_APLICANT'
-        ]);
+        ]));
         $this->assertFalse(Access::newGroup('SYS_USER','HR'));
         $this->assertEquals(2,count(Access::groups()));
         $this->assertEquals(1,count(Access::privileges('ADMINS')));
@@ -156,18 +170,7 @@ class AccessTest extends TestCase {
     }
     /**
      * @test
-     */
-    public function test09() {
-        Access::newGroup('SUPER');
-        Access::newGroup('SUB_SUPER', 'SUPER');
-        Access::newGroup('SUB_SUB_SUPER', 'SUB_SUPER');
-        $this->assertFalse(Access::newGroup('SUPER', 'SUB_SUB_SUPER'));
-        $this->assertFalse(Access::newPrivilege('SUB_SUB_SUPER', 'SUPER'));
-        Access::clear();
-    }
-    /**
-     * @test
-     * @depends test08
+     * @depends test09
      */
     public function testAsArray00() {
         $asArr = Access::asArray();
@@ -181,7 +184,7 @@ class AccessTest extends TestCase {
     }
     /**
      * @test
-     * @depends test08
+     * @depends test09
      */
     public function testCreatePrivilegesStr00() {
         $user = new User();
@@ -192,7 +195,7 @@ class AccessTest extends TestCase {
     }
     /**
      * @test
-     * @depends test08
+     * @depends test09
      */
     public function testCreatePrivilegesStr01() {
         $user = new User();
@@ -202,7 +205,7 @@ class AccessTest extends TestCase {
     }
     /**
      * @test
-     * @depends test08
+     * @depends test09
      */
     public function testCreatePrivilegesStr02() {
         $user = new User();
@@ -213,7 +216,7 @@ class AccessTest extends TestCase {
     }
     /**
      * @test
-     * @depends test08
+     * @depends test09
      */
     public function testCreatePrivilegesStr03() {
         $user = new User();

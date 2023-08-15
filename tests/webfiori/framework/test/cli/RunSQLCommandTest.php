@@ -12,6 +12,7 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function testCLIQuery00() {
+        App::getConfig()->removeAllDBConnections();
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);

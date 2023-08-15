@@ -28,7 +28,7 @@ jobs:
     
     steps: 
       - name: Clone Repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -65,7 +65,34 @@ jobs:
         run: phpunit
         
       - name: CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
+        
+  coding_standards_check:
+    name: "Coding Standards Check"
+    needs:
+      - "test"
+
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Set up PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.1"
+          extensions: "mbstring"
+          tools: composer
+          
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+
+      - name: "Check EditorConfig"
+        uses: "greut/eclint-action@v0"
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction --no-dev
+
+      - name: "Check Style"
+        run: "vendor/bin/ecs check"
+        
   benchmarking:
     needs:
       - "test"
@@ -74,7 +101,7 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [8.2]
+        php: [7.0,7.1,7.2,7.3,7.4,8.0,8.1,8.2]
     steps:
       - name: Clone Repo
         uses: actions/checkout@v1
@@ -84,7 +111,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mbstring
-          tools: phpunit:9.5.20, composer, phpbench/phpbench
+          tools: composer, phpbench/phpbench
           
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

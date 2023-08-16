@@ -89,7 +89,7 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-dev
 
       - name: "Check Style"
-        run: "vendor/bin/ecs check"
+        run: "ecs check"
         
   benchmarking:
     needs:

@@ -46,6 +46,31 @@ define('MICRO_START', microtime(true));
  */
 class App {
     /**
+     * Sets the class that will be used as configuration driver.
+     *
+     * This method must be used before calling the method 'App::start()' in order
+     * to set proper configuration driver.
+     * 
+     * @param string $clazz The full name of the class including namespace. 
+     */
+    public static function setConfigDriver(string $clazz) {
+        self::$ConfigDriver = $clazz;
+    }
+    /**
+     * Returns the class that represents configuration driver.
+     * 
+     * @return string  The full name of the class including namespace.
+     */
+    public static function getConfigDriver() : string {
+        return self::$ConfigDriver;
+    }
+    /**
+     * A string which points to the class that represents configuration driver.
+     * 
+     * @var string
+     */
+    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
+    /**
      * A constant that indicates that the status of the class is 'initialized'.
      *
      */
@@ -544,7 +569,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC11');
+        define('WF_VERSION', '3.0.0-RC14');
         /**
          * A constant that tells the type of framework version.
          *
@@ -560,7 +585,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2023-07-31');
+        define('WF_RELEASE_DATE', '2023-08-13');
     }
 
     /**

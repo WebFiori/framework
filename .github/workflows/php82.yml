@@ -36,7 +36,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:9.5.20, composer
+          tools: phpunit:9.5.20, composer, symplify/easy-coding-standard:12.0.6, phpbench/phpbench:1.2.14
           
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop

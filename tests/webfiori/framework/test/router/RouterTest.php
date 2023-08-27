@@ -23,14 +23,140 @@ class RouterTest extends TestCase {
      */
     public function testAddAPIRoute00() {
         $this->assertTrue(Router::api([
-            'path' => '/call-api-00', 
+            'path' => '/call-api-00',
             'route-to' => '/my-api.php']));
         $this->assertFalse(Router::page([
-            'path' => '/call-api-00', 
+            'path' => '/call-api-00',
             'route-to' => '/my-other-api.php']));
         $this->assertTrue(Router::page([
-            'path' => '/call-api-01', 
+            'path' => '/call-api-01',
             'route-to' => '/my-api.php']));
+    }
+    /**
+     * @test
+     */
+    public function testAddClosureRoute00() {
+        $c1 = function()
+        {
+        };
+        $c2 = function()
+        {
+        };
+        $this->assertTrue(Router::closure([
+            'path' => '/call',
+            'route-to' => $c1
+        ]));
+        $this->assertFalse(Router::closure([
+            'path' => '/call',
+            'route-to' => $c2
+        ]));
+        $this->assertTrue(Router::closure([
+            'path' => '/call-2',
+            'route-to' => $c1
+        ]));
+        $this->assertFalse(Router::closure([
+            'path' => '/call',
+            'route-to' => 'Not Func'
+        ]));
+    }
+    /**
+     * @test
+     */
+    public function testAddViewRoute00() {
+        $this->assertTrue(Router::page([
+            'path' => '/view-something',
+            'route-to' => 'my-view.php']));
+        $this->assertFalse(Router::page([
+            'path' => '/view-something',
+            'route-to' => '/my-other-view.php']));
+        $this->assertTrue(Router::page([
+            'path' => '/view-something-2',
+            'route-to' => '/my-view.php']));
+    }
+    /**
+     * @test
+     */
+    public function testOptionalParam00() {
+        Router::removeAll();
+        Router::setOnNotFound(function()
+        {
+        });
+        Router::closure([
+            'path' => '{var-1}/{var-2?}',
+            'route-to' => function()
+            {
+            }
+        ]);
+        $obj = Router::getUriObj('/{var-1}/{var-2?}');
+        $this->assertNotNull($obj);
+
+        $this->assertEquals(2, count($obj->getParameters()));
+        Router::route(Util::getBaseURL().'/hello/world');
+
+        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
+    }
+    /**
+     * @test
+     */
+    public function testOptionalParam01() {
+        Router::removeAll();
+
+        Router::closure([
+            'path' => '{var-1}/{var-2?}',
+            'route-to' => function()
+            {
+            }
+        ]);
+
+        Router::route(Util::getBaseURL().'/hello');
+        $obj = Router::getRouteUri();
+        $this->assertNotNull($obj);
+        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertNull($obj->getParameterValue('var-2'));
+    }
+    /**
+     * @test
+     */
+    public function testRoute00() {
+        Router::removeAll();
+        Router::setOnNotFound(function()
+        {
+        });
+        Router::closure([
+            'path' => '{var-1}/{var-2}',
+            'route-to' => function()
+            {
+            }
+        ]);
+        $obj = Router::getRouteUri();
+        $this->assertNull($obj);
+        Router::route(Util::getBaseURL().'/hello/world');
+        $obj = Router::getRouteUri();
+        $this->assertTrue($obj instanceof RouterUri);
+        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
+        $this->assertTrue(Router::getParameterValue('var-2') == $obj->getParameterValue('var-2'));
+    }
+    /**
+     * @test
+     */
+    public function testRoute01() {
+        Router::removeAll();
+        Router::setOnNotFound(function()
+        {
+        });
+        Router::closure([
+            'path' => '{var-1}/{var-2}/{var-1}',
+            'route-to' => function()
+            {
+            }
+        ]);
+        Router::route(Util::getBaseURL().'/hello/world/boy');
+        $obj = Router::getRouteUri();
+        $this->assertTrue($obj instanceof RouterUri);
+        $this->assertEquals('boy',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
     }
     /**
      * @test
@@ -76,151 +202,23 @@ class RouterTest extends TestCase {
         ]);
         $this->assertTrue(Router::hasRoute('users'));
         $this->assertTrue(Router::hasRoute('users/view-user/{user-id}'));
-        
+
         $route2 = Router::getUriObj('/users/view-user/{user-id}');
         $this->assertEquals('ViewUserPage.php', $route2->getRouteTo());
         $this->assertFalse($route2->isCaseSensitive());
         $this->assertEquals(['ar', 'en'], $route2->getLanguages());
         $this->assertEquals(['POST'], $route2->getRequestMethods());
-        
+
         $route = Router::getUriObj('/users');
         $this->assertEquals('ListUsers.php', $route->getRouteTo());
         $this->assertEquals(['en'], $route->getLanguages());
         $this->assertEquals(['OPTIONS','GET', 'POST'], $route->getRequestMethods());
         $this->assertTrue($route->isCaseSensitive());
-        
+
         $route3 = Router::getUriObj('/users/get-users/by-name');
         $this->assertEquals('GetUserByName.php', $route3->getRouteTo());
-        
+
         $this->assertEquals(['fr','ar','en'], $route3->getLanguages());
         $this->assertFalse($route3->isCaseSensitive());
-        
-        
-    }
-    /**
-     * @test
-     */
-    public function testAddClosureRoute00() {
-        $c1 = function()
-        {
-        };
-        $c2 = function()
-        {
-        };
-        $this->assertTrue(Router::closure([
-            'path' => '/call', 
-            'route-to' => $c1
-        ]));
-        $this->assertFalse(Router::closure([
-            'path' => '/call', 
-            'route-to' => $c2
-        ]));
-        $this->assertTrue(Router::closure([
-            'path' => '/call-2', 
-            'route-to' => $c1
-        ]));
-        $this->assertFalse(Router::closure([
-            'path' => '/call', 
-            'route-to' => 'Not Func'
-        ]));
-    }
-    /**
-     * @test
-     */
-    public function testAddViewRoute00() {
-        $this->assertTrue(Router::page([
-            'path' => '/view-something',
-            'route-to' => 'my-view.php']));
-        $this->assertFalse(Router::page([
-            'path' => '/view-something', 
-            'route-to' => '/my-other-view.php']));
-        $this->assertTrue(Router::page([
-            'path' => '/view-something-2', 
-            'route-to' => '/my-view.php']));
-    }
-    /**
-     * @test
-     */
-    public function testRoute00() {
-        Router::removeAll();
-        Router::setOnNotFound(function()
-        {
-        });
-        Router::closure([
-            'path' => '{var-1}/{var-2}',
-            'route-to' => function()
-            {
-            }
-        ]);
-        $obj = Router::getRouteUri();
-        $this->assertNull($obj);
-        Router::route(Util::getBaseURL().'/hello/world');
-        $obj = Router::getRouteUri();
-        $this->assertTrue($obj instanceof RouterUri);
-        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
-        $this->assertEquals('world',$obj->getParameterValue('var-2'));
-        $this->assertTrue(Router::getParameterValue('var-2') == $obj->getParameterValue('var-2'));
-    }
-    /**
-     * @test
-     */
-    public function testOptionalParam00() {
-        Router::removeAll();
-        Router::setOnNotFound(function()
-        {
-        });
-        Router::closure([
-            'path' => '{var-1}/{var-2?}',
-            'route-to' => function()
-            {
-            }
-        ]);
-        $obj = Router::getUriObj('/{var-1}/{var-2?}');
-        $this->assertNotNull($obj);
-        
-        $this->assertEquals(2, count($obj->getParameters()));
-        Router::route(Util::getBaseURL().'/hello/world');
-
-        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
-        $this->assertEquals('world',$obj->getParameterValue('var-2'));
-    }
-    /**
-     * @test
-     */
-    public function testOptionalParam01() {
-        Router::removeAll();
-        
-        Router::closure([
-            'path' => '{var-1}/{var-2?}',
-            'route-to' => function()
-            {
-            }
-        ]);
-
-        Router::route(Util::getBaseURL().'/hello');
-        $obj = Router::getRouteUri();
-        $this->assertNotNull($obj);
-        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
-        $this->assertNull($obj->getParameterValue('var-2'));
-    }
-    /**
-     * @test
-     */
-    public function testRoute01() {
-        Router::removeAll();
-        Router::setOnNotFound(function()
-        {
-        });
-        Router::closure([
-            'path' => '{var-1}/{var-2}/{var-1}',
-            'route-to' => function()
-            {
-            }
-        ]);
-        Router::route(Util::getBaseURL().'/hello/world/boy');
-        $obj = Router::getRouteUri();
-        $this->assertTrue($obj instanceof RouterUri);
-        $this->assertEquals('boy',$obj->getParameterValue('var-1'));
-        $this->assertEquals('world',$obj->getParameterValue('var-2'));
     }
 }

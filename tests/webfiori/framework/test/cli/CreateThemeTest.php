@@ -1,9 +1,8 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\App;
+use webfiori\framework\ThemeLoader;
 
 /**
  * Description of CreateThemeTest
@@ -26,7 +25,7 @@ class CreateThemeTest extends CreateTestCase {
             'themes\\fiori',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -47,6 +46,7 @@ class CreateThemeTest extends CreateTestCase {
         ], $runner->getOutput());
 
         $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));
+        $this->assertEquals(3, count(ThemeLoader::getAvailableThemes()));
         $this->removeClass('\\themes\\fiori\\NewTestTheme');
         $this->removeClass('\\themes\\fiori\\AsideSection');
         $this->removeClass('\\themes\\fiori\\FooterSection');

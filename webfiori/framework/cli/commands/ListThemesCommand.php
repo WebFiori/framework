@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -22,10 +22,10 @@ use webfiori\framework\ThemeLoader;
 class ListThemesCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--list-themes'. In addition to that, 
+     * The command will have name '--list-themes'. In addition to that,
      * it will have the following arguments:
      * <ul>
-     * <li><b>theme-name</b>: If specified, only information about given theme 
+     * <li><b>theme-name</b>: If specified, only information about given theme
      * will be shown.</li>
      * </ul>
      */
@@ -36,7 +36,7 @@ class ListThemesCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * @return int If the command executed without any errors, the 
+     * @return int If the command executed without any errors, the
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */
@@ -74,6 +74,13 @@ class ListThemesCommand extends CLICommand {
 
         return 0;
     }
+    private function isSet($var) {
+        if (strlen($var) == 0) {
+            return '<NOT SET>';
+        }
+
+        return $var;
+    }
 
     private function printThemeObj($themeObj) {
         $spaceSize = 15;
@@ -89,12 +96,5 @@ class ListThemesCommand extends CLICommand {
         $this->println("License: %".$len03."s %s",':', $this->isSet($themeObj->getLicenseName()));
         $this->println("License URL: %".$len04."s %s",':', $this->isSet($themeObj->getLicenseUrl()));
         $this->println("Theme Desription: %s", $this->isSet($themeObj->getDescription()));
-    }
-    private function isSet($var) {
-        if (strlen($var) == 0) {
-            return '<NOT SET>';
-        }
-
-        return $var;
     }
 }

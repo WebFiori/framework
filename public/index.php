@@ -1,17 +1,16 @@
 <?php
-
 namespace webfiori;
 
 use Exception;
+use webfiori\framework\App;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\App;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
- * The name of the directory at which the developer will have his own application 
+ * The name of the directory at which the developer will have his own application
  * code.
- * 
+ *
  * @since 2.3.0
  */
 define('APP_DIR', 'app');
@@ -43,7 +42,7 @@ class Index {
         $this->loadAppClass();
         /**
          * This where magic will start.
-         * 
+         *
          * Planting application seed into the ground and make your work bloom.
          */
         App::start();
@@ -58,8 +57,16 @@ class Index {
         }
     }
     /**
+     * Creates a single instance of the class.
+     */
+    public static function create() {
+        if (self::$instance === null) {
+            self::$instance = new Index();
+        }
+    }
+    /**
      * Try to load the class 'App'.
-     * 
+     *
      * @throws Exception
      */
     private function loadAppClass() {
@@ -67,20 +74,12 @@ class Index {
         $frameworkPath = ROOT_PATH.$DS.'webfiori'.$DS.'framework';
         $corePath = $frameworkPath;
         $rootClass = $DS.'App.php';
-        
+
         if (file_exists($corePath.$rootClass)) {
             define('WF_CORE_PATH', $corePath);
             require_once $corePath.$rootClass;
         } else {
             throw new Exception('Unable to locate the class "App".');
-        }
-    }
-    /**
-     * Creates a single instance of the class.
-     */
-    public static function create() {
-        if (self::$instance === null) {
-            self::$instance = new Index();
         }
     }
 }

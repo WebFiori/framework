@@ -1,6 +1,4 @@
 <?php
-
-
 namespace tables;
 
 use webfiori\framework\DB;

@@ -24,7 +24,7 @@ class ListRoutesCommandTest extends TestCase {
         ]);
         $runner->start();
         $this->assertEquals([
-            
+
         ], $runner->getOutput());
     }
     /**

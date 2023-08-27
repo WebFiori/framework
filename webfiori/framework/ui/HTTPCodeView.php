@@ -1,19 +1,19 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\ui;
 
 use webfiori\framework\App;
 use webfiori\ui\HTMLNode;
 /**
- * A basic view which is used to display HTTP error codes taken from 
+ * A basic view which is used to display HTTP error codes taken from
  * language file.
  *
  * @author Ibrahim

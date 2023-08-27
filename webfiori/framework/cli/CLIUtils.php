@@ -14,16 +14,16 @@ use webfiori\framework\writers\ClassWriter;
 class CLIUtils {
     /**
      * Select database connection and return its name as string.
-     * 
+     *
      * This method is used to get connection name from the argument '--connection'.
      * If the argument is not specified, the method will prompt the user to select
      * connection based on the connections stored in the class 'AppConfig' of
      * the application. If no connections are stored in the class 'AppConfig',
      * the method will simply return null.
-     * 
+     *
      * @param CLICommand $c The command which is used to read inputs and send
      * outputs.
-     * 
+     *
      * @return ConnectionInfo|null If a connection was found, the method will return it's
      * information as an object of type 'ConnectionInfo'. Other than that null is returned.
      */
@@ -51,18 +51,17 @@ class CLIUtils {
     }
     /**
      * Reads and validates class name.
-     * 
+     *
      * @param CLICommand $c The command that will be used to read the input from.
-     * 
+     *
      * @param string|null $suffix An optional string to append to class name.
-     * 
+     *
      * @param string $prompt The text that will be shown to the user as prompt for
      * class name.
-     * 
+     *
      * @return string A string that represents a valid class name.
      */
     public static function readClassName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
-
         do {
             $c->readClassName($prompt, $suffix, $errMsg);
             $className = trim($c->getInput($prompt));
@@ -86,19 +85,18 @@ class CLIUtils {
     }
     /**
      * Reads and validates class namespace.
-     * 
+     *
      * @param CLICommand $c The command that will be used to read the input from.
-     * 
+     *
      * @param string $defaultNs An optional string that will be used as default
      * namespace if no input is provided.
-     * 
+     *
      * @param string $prompt The text that will be shown to the user as prompt for
      * the namespace.
-     * 
+     *
      * @return string A validated string that represents a namespace.
      */
     public static function readNamespace(CLICommand $c, string $defaultNs = '\\', string $prompt = 'Enter class namespace:') : string {
-
         do {
             $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));
             $isNameValid = ClassWriter::isValidNamespace($ns);
@@ -113,14 +111,14 @@ class CLIUtils {
     /**
      * Reads the name of database table information and returns an instance of
      * it.
-     * 
+     *
      * This method is used to get table class name from the argument '--table'.
-     * If the argument is not specified or invalid, the method will prompt the 
+     * If the argument is not specified or invalid, the method will prompt the
      * user to enter class name.
-     * 
+     *
      * @param CLICommand $c The command which is used to read inputs and send
-     * outputs. 
-     * 
+     * outputs.
+     *
      * @return Table The method will return an instance of the class if
      * successfully created.
      */

@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\writers\CLICommandClassWriter;;
+use webfiori\framework\writers\CLICommandClassWriter;
 
 class CLICommandClassWriterTest extends TestCase {
     /**

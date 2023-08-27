@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\writers;
 
@@ -29,18 +29,18 @@ class WebServiceWriter extends ClassWriter {
     private $servicesObj;
     /**
      * Creates new instance of the class.
-     * 
-     * @param AbstractWebService $webServicesObj The object that will be written to the 
+     *
+     * @param AbstractWebService $webServicesObj The object that will be written to the
      * class.
-     * 
-     * @param array $classInfoArr An associative array that contains the information 
-     * of the class that will be created. The array must have the following indices: 
+     *
+     * @param array $classInfoArr An associative array that contains the information
+     * of the class that will be created. The array must have the following indices:
      * <ul>
-     * <li><b>name</b>: The name of the class that will be created. If not provided, the 
+     * <li><b>name</b>: The name of the class that will be created. If not provided, the
      * string 'NewClass' is used.</li>
-     * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
+     * <li><b>namespace</b>: The namespace that the class will belong to. If not provided,
      * the namespace 'webfiori' is used.</li>
-     * <li><b>path</b>: The location at which the query will be created on. If not 
+     * <li><b>path</b>: The location at which the query will be created on. If not
      * provided, the constant ROOT_PATH is used. </li>
      * </ul>
      */
@@ -73,49 +73,49 @@ class WebServiceWriter extends ClassWriter {
     }
     /**
      * Adds new request method.
-     * 
-     * The value that will be passed to this method can be any string 
-     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It 
+     *
+     * The value that will be passed to this method can be any string
+     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It
      * can be in upper case or lower case.
-     * 
+     *
      * @param string $meth The request method.
-     * 
+     *
      */
     public function addRequestMethod($meth) {
         $this->servicesObj->addRequestMethod($meth);
     }
     /**
      * Adds new request parameter.
-     * 
-     * The parameter will only be added if no parameter which has the same 
+     *
+     * The parameter will only be added if no parameter which has the same
      * name as the given one is added before.
-     * 
-     * @param RequestParameter|array $param The parameter that will be added. It 
-     * can be an object of type 'RequestParameter' or an associative array of 
+     *
+     * @param RequestParameter|array $param The parameter that will be added. It
+     * can be an object of type 'RequestParameter' or an associative array of
      * options. The array can have the following indices:
      * <ul>
      * <li><b>name</b>: The name of the parameter. It must be provided.</li>
      * <li><b>type</b>: The datatype of the parameter. If not provided, 'string' is used.</li>
-     * <li><b>optional</b>: A boolean. If set to true, it means the parameter is 
+     * <li><b>optional</b>: A boolean. If set to true, it means the parameter is
      * optional. If not provided, 'false' is used.</li>
-     * <li><b>min</b>: Minimum value of the parameter. Applicable only for 
+     * <li><b>min</b>: Minimum value of the parameter. Applicable only for
      * numeric types.</li>
-     * <li><b>max</b>: Maximum value of the parameter. Applicable only for 
+     * <li><b>max</b>: Maximum value of the parameter. Applicable only for
      * numeric types.</li>
-     * <li><b>allow-empty</b>: A boolean. If the type of the parameter is string or string-like 
-     * type and this is set to true, then empty strings will be allowed. If 
+     * <li><b>allow-empty</b>: A boolean. If the type of the parameter is string or string-like
+     * type and this is set to true, then empty strings will be allowed. If
      * not provided, 'false' is used.</li>
-     * <li><b>custom-filter</b>: A PHP function that can be used to filter the 
+     * <li><b>custom-filter</b>: A PHP function that can be used to filter the
      * parameter even further</li>
-     * <li><b>default</b>: An optional default value to use if the parameter is 
+     * <li><b>default</b>: An optional default value to use if the parameter is
      * not provided and is optional.</li>
      * <li><b>description</b>: The description of the attribute.</li>
      * </ul>
-     * 
-     * @return boolean If the given request parameter is added, the method will 
-     * return true. If it was not added for any reason, the method will return 
+     *
+     * @return boolean If the given request parameter is added, the method will
+     * return true. If it was not added for any reason, the method will return
      * false.
-     * 
+     *
      * @since 1.0
      */
     public function addRequestParam($options) : bool {
@@ -143,7 +143,7 @@ class WebServiceWriter extends ClassWriter {
         $this->append('class '.$this->getName().' extends EAbstractWebService {');
     }
     /**
-     * 
+     *
      * @param RequestParameter $param
      */
     private function appendParam($param) {

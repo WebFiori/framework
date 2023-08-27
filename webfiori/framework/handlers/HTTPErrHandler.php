@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2022 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\handlers;
 
@@ -25,7 +25,7 @@ use webfiori\http\Response;
 class HTTPErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
-     * 
+     *
      * This method will set the name of the handler to 'HTTP Errors Handler'.
      */
     public function __construct() {
@@ -34,7 +34,7 @@ class HTTPErrHandler extends AbstractHandler {
     }
     /**
      * Handles the exception.
-     * 
+     *
      * The handler will simply show a server error page with error details
      * if the constant WF_VERBOSE is set to true. If not, it will show
      * general server error message.
@@ -50,9 +50,9 @@ class HTTPErrHandler extends AbstractHandler {
     }
     /**
      * Checks if the handler is active or not.
-     * 
+     *
      * The handler will be active only if route type is Router::VIEW_ROUTE.
-     * 
+     *
      * @return bool True if active. false otherwise.
      */
     public function isActive(): bool {
@@ -72,7 +72,7 @@ class HTTPErrHandler extends AbstractHandler {
     }
     /**
      * Checks if the handler is a shutdown handler or not.
-     * 
+     *
      * @return bool The method will always return true.
      */
     public function isShutdownHandler(): bool {

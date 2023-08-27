@@ -1,22 +1,20 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\database\EntityMapper;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DBClassWriter;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\TableClassWriter;
@@ -30,15 +28,25 @@ use webfiori\json\Json;
 class CreateFullRESTHelper extends CreateClassHelper {
     private $apisNs;
     /**
-     * 
+     *
      * @var DBClassWriter
      */
     private $dbObjWriter;
     /**
-     * 
+     *
      * @var TableClassWriter
      */
     private $tableObjWriter;
+    public function getEntityName() : string {
+        return $this->tableObjWriter->getEntityName();
+    }
+    /**
+     *
+     * @return Table|null
+     */
+    public function getTable() {
+        return $this->tableObjWriter->getTable();
+    }
     public function readInfo() {
         $connection = CLIUtils::getConnectionName($this->getCommand());
 
@@ -79,16 +87,6 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->createDbClass();
         $this->writeServices();
         $this->println("Done.");
-    }
-    public function getEntityName() : string {
-        return $this->tableObjWriter->getEntityName();
-    }
-    /**
-     * 
-     * @return Table|null
-     */
-    public function getTable() {
-        return $this->tableObjWriter->getTable();
     }
     private function addDeleteGetProcessCode(WebServiceWriter $w, $uniqueParamsArr, $type) {
         $dbClassName = $this->dbObjWriter->getName();
@@ -158,7 +156,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
             if ($x != 0 && $ch >= 'A' && $ch <= 'Z') {
                 $suffix .= '-'.strtolower($ch);
                 continue;
-            } 
+            }
             $suffix .= strtolower($ch);
         }
 
@@ -194,7 +192,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $t = $this->getTable();
         $w->addProcessCode('$entity = $this->getObject('.$t->getEntityMapper()->getEntityName().'::class);');
 
-        
+
         $dbClassName = $this->dbObjWriter->getName();
         $entityName = $this->dbObjWriter->getEntityName();
         $w->addProcessCode("");
@@ -278,12 +276,12 @@ class CreateFullRESTHelper extends CreateClassHelper {
             'Get'.$entityName => [
                 'type' => 'GetSingle',
                 'name' => 'get-'.$suffix,
-                'method' => 'get' 
+                'method' => 'get'
             ],
             'GetAll'.$entityName.'s' => [
                 'type' => 'GetAll',
                 'name' => 'get-all-'.$suffix.'s',
-                'method' => 'get' 
+                'method' => 'get'
             ]
         ];
         $w = $this->dbObjWriter;
@@ -300,7 +298,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
                         'type' => $this->getAPIParamType($colObj->getDatatype())
                     ];
                     $idxName = 'Update'.DBClassWriter::toMethodName($colKey, '').'Of'.$entityName;
-                    $servicesPrefix[$idxName] = [ 
+                    $servicesPrefix[$idxName] = [
                         'name' => 'update-'.$colKey.'-of-'.$suffix,
                         'method' => 'post',
                         'type' => 'SingleUpdate',

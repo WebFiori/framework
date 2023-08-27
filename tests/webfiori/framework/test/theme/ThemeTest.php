@@ -1,13 +1,13 @@
 <?php
 namespace webfiori\framework\test\theme;
 
+use const DS;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
 use webfiori\framework\App;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
-use const DS;
 /**
  * Description of ThemeTest
  *
@@ -17,7 +17,29 @@ class ThemeTest extends TestCase {
     public function testAvailableThemes00() {
         $themes = ThemeLoader::getAvailableThemes();
         $this->assertEquals(2, count($themes));
-        
+    }
+    /**
+     * @test
+     */
+    public function testCreateHTMLNode00() {
+        App::getConfig()->setTheme('New Super Theme');
+
+        $theme = ThemeLoader::usingTheme();
+        $this->assertTrue($theme instanceof Theme);
+        $this->assertEquals('New Super Theme', $theme->getName());
+        $node = $theme->createHTMLNode();
+        $this->assertEquals('div', $node->getNodeName());
+
+        $xNode = $theme->createHTMLNode([
+            'name' => 'input',
+            'attributes' => [
+                'type' => 'text'
+            ]
+        ]);
+        $this->assertEquals('input', $xNode->getNodeName());
+        $this->assertEquals([
+            'type' => 'text'
+        ], $xNode->getAttributes());
     }
     /**
      * @test
@@ -27,7 +49,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $this->assertNull($theme);
         $theme = ThemeLoader::usingTheme('New Super Theme');
-                
+
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{"name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":""}',$j.'');
@@ -59,7 +81,7 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testUseTheme01() {
-        App::getConfig()->setTheme(''); 
+        App::getConfig()->setTheme('');
         $theme = ThemeLoader::usingTheme();
         $this->assertNull($theme);
         $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
@@ -68,29 +90,6 @@ class ThemeTest extends TestCase {
         $this->assertEquals(App::getConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
-    }
-    /**
-     * @test
-     */
-    public function testCreateHTMLNode00() {
-        App::getConfig()->setTheme('New Super Theme' ); 
-                
-        $theme = ThemeLoader::usingTheme();
-        $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Super Theme', $theme->getName());
-        $node = $theme->createHTMLNode();
-        $this->assertEquals('div', $node->getNodeName());
-        
-        $xNode = $theme->createHTMLNode([
-            'name' => 'input',
-            'attributes' => [
-                'type' => 'text'
-            ]
-        ]);
-        $this->assertEquals('input', $xNode->getNodeName());
-        $this->assertEquals([
-            'type' => 'text'
-        ], $xNode->getAttributes());
     }
     /**
      * @test

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -21,30 +21,30 @@ use webfiori\http\Response;
  * A class which has utility methods which are related to themes loading.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0.1
  */
 class ThemeLoader {
     /**
      * The directory where themes are located in.
-     * 
+     *
      * @since 1.0
      */
     const THEMES_DIR = 'themes';
     /**
      * An array that contains all available themes.
-     * 
-     * @var array 
-     * 
+     *
+     * @var array
+     *
      * @since 1.0
      */
     private static $AvailableThemes;
     /**
      * An array that contains all loaded themes.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $loadedThemes = [];
     private function __construct() {
@@ -55,6 +55,9 @@ class ThemeLoader {
      *
      * This method will return an associative array. The key is the theme
      * name and the value is an object of type Theme that contains theme info.
+     * 
+     * @param bool $updateCache If set to true, cached data of descovered themes
+     * will reset and search will be performed again.
      *
      * @return array An associative array that contains all themes information. The name
      * of the theme will be the key and the value is an object of type 'Theme'.
@@ -62,8 +65,8 @@ class ThemeLoader {
      * @throws Exception
      * @since 1.0
      */
-    public static function getAvailableThemes(): array {
-        if (self::$AvailableThemes === null) {
+    public static function getAvailableThemes(bool $updateCache = true): array {
+        if (self::$AvailableThemes === null || $updateCache) {
             self::$AvailableThemes = [];
 
             if (Util::isDirectory(THEMES_PATH, true)) {
@@ -72,7 +75,7 @@ class ThemeLoader {
                 foreach ($themesDirs as $dir) {
                     $pathToScan = THEMES_PATH.DS.$dir;
                     $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                    self::scanDir($filesInDir, $pathToScan);
+                    self::scanDir($filesInDir, $pathToScan, $dir);
                 }
             } else {
                 throw new InitializationException(THEMES_PATH.' is not a path or does not exist.');
@@ -83,11 +86,11 @@ class ThemeLoader {
     }
     /**
      * Returns an array which contains all loaded themes.
-     * 
-     * @return array An associative array which contains all loaded themes. 
-     * The index will be theme name and the value is an object of type 'Theme' 
+     *
+     * @return array An associative array which contains all loaded themes.
+     * The index will be theme name and the value is an object of type 'Theme'
      * which contains theme info.
-     * 
+     *
      * @since 1.0
      */
     public static function getLoadedThemes(): array {
@@ -95,13 +98,13 @@ class ThemeLoader {
     }
     /**
      * Checks if a theme is loaded or not given its name.
-     * 
+     *
      * @param string $themeName The name of the theme.
-     * 
-     * @return boolean The method will return true if 
+     *
+     * @return boolean The method will return true if
      * the theme was found in the array of loaded themes. false
      * if not.
-     * 
+     *
      * @since 1.0
      */
     public static function isThemeLoaded(string $themeName): bool {
@@ -139,9 +142,9 @@ class ThemeLoader {
     }
     /**
      * Reset the array which contains all loaded themes.
-     * 
+     *
      * By calling this method, all loaded themes will be unloaded.
-     * 
+     *
      * @since 1.0
      */
     public static function resetLoaded() {
@@ -211,30 +214,6 @@ class ThemeLoader {
             return $themeToLoad;
         }
     }
-
-    /**
-     * @throws Exception
-     */
-    private static function scanDir($filesInDir, $pathToScan) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
-                $aCName = $aNs.$cName;
-
-                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Theme) {
-                        self::$AvailableThemes[$instance->getName()] = $instance;
-                    }
-                }
-            }
-        }
-    }
     private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
             Router::closure([
@@ -257,6 +236,34 @@ class ThemeLoader {
                     $dir
                 ]
             ]);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function scanDir($filesInDir, $pathToScan, $dirName) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
+                $aCName = $aNs.$cName;
+                
+                if (!class_exists($aCName)) {
+                    $aCName = '\\'.self::THEMES_DIR.'\\'.$dirName.'\\'.$cName;
+                }
+
+                if (class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Theme) {
+                        self::$AvailableThemes[$instance->getName()] = $instance;
+                    }
+                }
+            }
         }
     }
 }

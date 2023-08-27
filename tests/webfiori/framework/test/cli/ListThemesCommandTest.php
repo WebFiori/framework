@@ -14,7 +14,6 @@ class ListThemesCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -37,14 +36,13 @@ class ListThemesCommandTest extends TestCase {
             "Author URL:     : https://ibrahim-binalshikh.me\n",
             "License:        : MIT\n",
             "License URL:    : https://opensource.org/licenses/MIT\n",
-            "Theme Desription: This theme is in before loaded.\n",
+            "Theme Desription: Colofull Theme.\n",
         ], $runner->getOutput());
     }
     /**
      * @test
      */
     public function test01() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -66,13 +64,12 @@ class ListThemesCommandTest extends TestCase {
      * @test
      */
     public function test02() {
-        
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
             'webfiori',
             'list-themes',
-            '--theme-name="Not Exist"' 
+            '--theme-name="Not Exist"'
         ]);
         $runner->start();
         $this->assertEquals([

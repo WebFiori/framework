@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use webfiori\cli\CLICommand;
@@ -26,7 +25,7 @@ class CreateCLICommandTest extends CreateTestCase {
             'N',
             '',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "What would you like to create?\n",
@@ -79,7 +78,7 @@ class CreateCLICommandTest extends CreateTestCase {
             '',
             'n'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter a name for the new class:\n",

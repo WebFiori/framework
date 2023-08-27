@@ -23,65 +23,11 @@ class UpdateSettingsCommandTest extends TestCase {
             '--w' => 'q'
         ]);
         $runner->setInputs([]);
-        
-        
+
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
         ], $runner->getOutput());
-
-    }
-    public function testUpdatePrimaryLang() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'primary-lang'
-        ]);
-        $runner->setInputs(['0']);
-        $runner->start();
-        //$this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Select new primary language:\n", 
-            "0: AR\n",
-            "1: EN\n",
-            "Success: Primary language successfully updated.\n"
-        ], $runner->getOutput());
-        $this->assertEquals('AR', Controller::getDriver()->getPrimaryLanguage());
-    }
-    /**
-     * @test
-     */
-    public function testUpdateVersion00() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'version'
-        ]);
-        $runner->setInputs([
-            '2.0.1',
-            'Beta',
-            '99',
-            '99-99-99',
-            '   ',
-        ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            
-            "Application version: Enter = '1.0'\n",
-            "Application version type: Enter = 'Stable'\n",
-            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
-            "Error: Invalid input is given. Try again.\n",
-            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
-            "Error: Invalid input is given. Try again.\n",
-            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
-            "Version information successfully updated.\n"
-        ], $runner->getOutput());
-
-        $this->assertEquals('2.0.1', App::getConfig()->getAppVersion());
-        $this->assertEquals('Beta', App::getConfig()->getAppVersionType());
-        $this->assertEquals(date('Y-m-d'), App::getConfig()->getAppReleaseDate());
     }
 
     /**
@@ -98,7 +44,7 @@ class UpdateSettingsCommandTest extends TestCase {
             'update-settings',
             '--w' => 'app-name'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
@@ -107,7 +53,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Enter new name:\n",
             "Name successfully updated.\n",
         ], $runner->getOutput());
-        
+
         $this->assertEquals('Super App', Controller::getDriver()->getAppName('EN'));
     }
     /**
@@ -121,13 +67,13 @@ class UpdateSettingsCommandTest extends TestCase {
             '0',
             'Super App',
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
             '--w' => 'app-name'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
@@ -156,14 +102,14 @@ class UpdateSettingsCommandTest extends TestCase {
             '          ',
             '  Super App X '
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
             '--w' => 'app-name'
         ]);
-        
-        
+
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "In which language you would like to update?\n",
@@ -178,7 +124,198 @@ class UpdateSettingsCommandTest extends TestCase {
         ], $runner->getOutput());
         $this->assertEquals('Super App X', Controller::getDriver()->getAppName('AR'));
     }
-    
+    /**
+     * @test
+     */
+    public function testUpdateHomePage00() {
+        $runner = App::getRunner();
+        $runner->setInputs();
+
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'home-page'
+        ]);
+
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Info: Router has no routes. Nothing to change.\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testUpdateHomePage01() {
+        Router::page([
+            'path' => 'x/y/z',
+            'route-to' => 'test.txt'
+        ]);
+        $runner = App::getRunner();
+        $runner->setInputs([
+            '0'
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'home-page'
+        ]);
+
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select home page route:\n",
+            "0: https://127.0.0.1/x/y/z\n",
+            "Success: Home page successfully updated.\n",
+        ], $runner->getOutput());
+        $this->assertEquals('x/y/z', Controller::getDriver()->getHomePage());
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePageDescription00() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'EN',
+            'NEW PAGE DESCRIPTION'
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'page-description'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "In which language you would like to update?\n",
+            "0: AR\n",
+            "1: EN\n",
+            "Enter new description:\n",
+            "Success: Description successfully updated.\n"
+        ], $runner->getOutput());
+
+        $this->assertEquals('NEW PAGE DESCRIPTION', App::getConfig()->getDescription('EN'));
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePageTitle00() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'EN',
+            'NEW PAGE'
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'page-title'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "In which language you would like to update?\n",
+            "0: AR\n",
+            "1: EN\n",
+            "Enter new title:\n",
+            "Success: Title successfully updated.\n"
+        ], $runner->getOutput());
+
+        $this->assertEquals('NEW PAGE', App::getConfig()->getTitle('EN'));
+    }
+    public function testUpdatePrimaryLang() {
+        $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'primary-lang'
+        ]);
+        $runner->setInputs(['0']);
+        $runner->start();
+        //$this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select new primary language:\n",
+            "0: AR\n",
+            "1: EN\n",
+            "Success: Primary language successfully updated.\n"
+        ], $runner->getOutput());
+        $this->assertEquals('AR', Controller::getDriver()->getPrimaryLanguage());
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryLang00() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'EN',
+            'NEW PAGE DESCRIPTION'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'page-description'
+        ]);
+
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "In which language you would like to update?\n",
+            "0: AR\n",
+            "1: EN\n",
+            "Enter new description:\n",
+            "Success: Description successfully updated.\n"
+        ], $runner->getOutput());
+        $this->assertEquals('NEW PAGE DESCRIPTION', App::getConfig()->getDescription('EN'));
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryTheme00() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'themes\\fioriTheme2\\NewTestTheme2'
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'theme'
+        ]);
+
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter theme class name with namespace:\n",
+            "Success: Theme successfully updated.\n"
+        ], $runner->getOutput());
+
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryTheme01() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'themes\\greeny\\NotATheme',
+            '',
+            'themes\\fioriTheme2\\NewTestTheme2'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'theme'
+        ]);
+
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Theme successfully updated.\n"
+        ], $runner->getOutput());
+
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+    }
+
     /**
      * @test
      */
@@ -187,13 +324,13 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInputs([
             '123456'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
             '--w' => 'scheduler-pass',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter new password:\n",
@@ -210,13 +347,13 @@ class UpdateSettingsCommandTest extends TestCase {
             '',
             '123'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
             '--w' => 'scheduler-pass',
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Enter new password:\n",
@@ -229,96 +366,19 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testUpdatePageTitle00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'EN',
-            'NEW PAGE'
-        ]);
-        
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'page-title'
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "In which language you would like to update?\n",
-            "0: AR\n",
-            "1: EN\n",
-            "Enter new title:\n",
-            "Success: Title successfully updated.\n"
-        ], $runner->getOutput());
-        
-        $this->assertEquals('NEW PAGE', App::getConfig()->getTitle('EN'));
-    }
-    /**
-     * @test
-     */
-    public function testUpdatePageDescription00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'EN',
-            'NEW PAGE DESCRIPTION'
-        ]);
-        
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'page-description'
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "In which language you would like to update?\n",
-            "0: AR\n",
-            "1: EN\n",
-            "Enter new description:\n",
-            "Success: Description successfully updated.\n"
-        ], $runner->getOutput());
-        
-        $this->assertEquals('NEW PAGE DESCRIPTION', App::getConfig()->getDescription('EN'));
-    }
-    /**
-     * @test
-     */
-    public function testUpdatePrimaryLang00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'EN',
-            'NEW PAGE DESCRIPTION'
-        ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'page-description'
-        ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "In which language you would like to update?\n",
-            "0: AR\n",
-            "1: EN\n",
-            "Enter new description:\n",
-            "Success: Description successfully updated.\n"
-        ], $runner->getOutput());
-        $this->assertEquals('NEW PAGE DESCRIPTION', App::getConfig()->getDescription('EN'));
-    }
-    /**
-     * @test
-     */
     public function testUpdateTitleSep00() {
         $runner = App::getRunner();
         $runner->setInputs([
             '6',
             '+-+'
         ]);
-        
+
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
             '--w' => 'xyz'
         ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
             "Warning: The argument --w has invalid value.\n",
@@ -341,97 +401,36 @@ class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testUpdateHomePage00() {
+    public function testUpdateVersion00() {
         $runner = App::getRunner();
-        $runner->setInputs();
-        
         $runner->setArgsVector([
             'webfiori',
             'update-settings',
-            '--w' => 'home-page'
+            '--w' => 'version'
         ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Info: Router has no routes. Nothing to change.\n",
-        ], $runner->getOutput());
-    }
-    /**
-     * @test
-     */
-    public function testUpdateHomePage01() {
-        Router::page([
-            'path' => 'x/y/z',
-            'route-to' => 'test.txt'
-        ]);
-        $runner = App::getRunner();
         $runner->setInputs([
-            '0'
+            '2.0.1',
+            'Beta',
+            '99',
+            '99-99-99',
+            '   ',
         ]);
-        
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'home-page'
-        ]);
-        
+
         $this->assertEquals(0, $runner->start());
         $this->assertEquals([
-            "Select home page route:\n",
-            "0: https://127.0.0.1/x/y/z\n",
-            "Success: Home page successfully updated.\n",
-        ], $runner->getOutput());
-        $this->assertEquals('x/y/z', Controller::getDriver()->getHomePage());
-    }
-    /**
-     * @test
-     */
-    public function testUpdatePrimaryTheme00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'themes\\fioriTheme2\\NewTestTheme2'
-        ]);
-        
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'theme'
-        ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter theme class name with namespace:\n",
-            "Success: Theme successfully updated.\n"
-        ], $runner->getOutput());
-        
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
-    }
-    /**
-     * @test
-     */
-    public function testUpdatePrimaryTheme01() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'themes\\greeny\\NotATheme',
-            '',
-            'themes\\fioriTheme2\\NewTestTheme2'
-        ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'update-settings',
-            '--w' => 'theme'
-        ]);
-        
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter theme class name with namespace:\n",
+
+            "Application version: Enter = '1.0'\n",
+            "Application version type: Enter = 'Stable'\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Error: Invalid input is given. Try again.\n",
-            "Enter theme class name with namespace:\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Error: Invalid input is given. Try again.\n",
-            "Enter theme class name with namespace:\n",
-            "Success: Theme successfully updated.\n"
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
+            "Version information successfully updated.\n"
         ], $runner->getOutput());
-        
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+
+        $this->assertEquals('2.0.1', App::getConfig()->getAppVersion());
+        $this->assertEquals('Beta', App::getConfig()->getAppVersionType());
+        $this->assertEquals(date('Y-m-d'), App::getConfig()->getAppReleaseDate());
     }
 }

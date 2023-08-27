@@ -1,23 +1,23 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2021 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\Language;
+use webfiori\framework\Lang;
 /**
  * A writer which is used to write any class that represents a language class.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.1
  */
 class LangClassWriter extends ClassWriter {
@@ -25,19 +25,19 @@ class LangClassWriter extends ClassWriter {
     private $dir;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param string $langCode Language code such as 'AR' or 'EN'.
-     * 
-     * @param string $writingDir Writing direction of the language such as 
+     *
+     * @param string $writingDir Writing direction of the language such as
      * 'ltr' or 'rtl'.
-     * 
+     *
      * @since 1.0
      */
     public function __construct($langCode, $writingDir) {
-        parent::__construct('Language'.$langCode, APP_PATH.'langs', APP_DIR."\\langs");
+        parent::__construct('Lang'.$langCode, APP_PATH.'langs', APP_DIR."\\langs");
         $this->code = $langCode;
         $this->dir = $writingDir;
-        $this->addUseStatement(Language::class);
+        $this->addUseStatement(Lang::class);
     }
 
     public function writeClassBody() {
@@ -65,6 +65,6 @@ class LangClassWriter extends ClassWriter {
     }
 
     public function writeClassDeclaration() {
-        $this->append('class '.$this->getName().' extends Language {');
+        $this->append('class '.$this->getName().' extends Lang {');
     }
 }

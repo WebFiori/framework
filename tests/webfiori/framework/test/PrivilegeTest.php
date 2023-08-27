@@ -48,7 +48,7 @@ class PrivilegeTest extends TestCase {
     /**
      * @test
      * @depends testConstructor02
-     * @param Privilege $pr 
+     * @param Privilege $pr
      */
     public function testToJson00($pr) {
         $j = $pr->toJSON();

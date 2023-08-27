@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use webfiori\framework\writers\WebServiceWriter;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\writers\WebServiceWriter;
 use webfiori\http\AbstractWebService;
 /**
  * @author Ibrahim
@@ -100,29 +100,29 @@ class WebServiceWritterTest extends TestCase {
         $writter->removeClass();
         $this->assertTrue($clazzObj instanceof AbstractWebService);
         $this->assertEquals(6, count($clazzObj->getParameters()));
-        
+
         $param1 = $clazzObj->getParameterByName('param-1');
-        
+
         $this->assertEquals('boolean', $param1->getType());
         $this->assertNull($param1->getDefault());
         $this->assertNull($param1->getDescription());
         $this->assertFalse($param1->isOptional());
         $this->assertFalse($param1->isEmptyStringAllowed());
-        
+
         $param2 = $clazzObj->getParameterByName('param-2');
         $this->assertEquals('boolean', $param2->getType());
         $this->assertFalse($param2->getDefault());
         $this->assertEquals('A bool.', $param2->getDescription());
         $this->assertFalse($param2->isOptional());
         $this->assertFalse($param2->isEmptyStringAllowed());
-        
+
         $param3 = $clazzObj->getParameterByName('param-3');
         $this->assertEquals('string', $param3->getType());
         $this->assertEquals('Ok', $param3->getDefault());
         $this->assertNull($param3->getDescription());
         $this->assertTrue($param3->isOptional());
         $this->assertTrue($param3->isEmptyStringAllowed());
-        
+
         $param3 = $clazzObj->getParameterByName('param-6');
         $this->assertEquals('integer', $param3->getType());
         $this->assertEquals(66, $param3->getDefault());

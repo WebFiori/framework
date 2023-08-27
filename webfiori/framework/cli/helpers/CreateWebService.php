@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
@@ -26,7 +26,7 @@ class CreateWebService extends CreateClassHelper {
     private $serviceObj;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
@@ -48,7 +48,6 @@ class CreateWebService extends CreateClassHelper {
         $this->info('Don\'t forget to add the service to a services manager.');
     }
     private function addParamsToService() {
-
         do {
             $paramObj = new RequestParameter('h');
             $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
@@ -65,11 +64,10 @@ class CreateWebService extends CreateClassHelper {
         } while ($addMore);
     }
     /**
-     * 
+     *
      * @param RequestParameter $paramObj
      */
     private function setParamName(RequestParameter $paramObj) {
-
         do {
             $paramName = $this->getInput('Enter a name for the request parameter:');
             $validName = $paramObj->setName($paramName);
@@ -80,7 +78,6 @@ class CreateWebService extends CreateClassHelper {
         } while (!$validName);
     }
     private function setServiceName() {
-
         do {
             $serviceName = $this->getInput('Enter a name for the new web service:');
             $validName = $this->serviceObj->setName($serviceName);

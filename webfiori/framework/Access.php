@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -19,23 +19,23 @@ namespace webfiori\framework;
 class Access {
     /**
      * An instance of the class.
-     * 
+     *
      * @var Access
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $access;
     /**
      * An array which contains an objects of type UsersGroup.
-     * 
+     *
      * @var PrivilegesGroup
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $userGroups;
     /**
      * Creates new instance.
-     * 
+     *
      * @since 1.0
      */
     private function __construct() {
@@ -43,9 +43,9 @@ class Access {
     }
     /**
      * Returns an array that represents all privileges groups and privileges.
-     * 
-     * The returned array will be indexed array. At each index, there will be 
-     * an associative array that represents a privileges group. 
+     *
+     * The returned array will be indexed array. At each index, there will be
+     * an associative array that represents a privileges group.
      * The array will contain the following indices:
      * <ul>
      * <li>group-id</li>
@@ -53,16 +53,16 @@ class Access {
      * <li>child-groups</li>
      * <li>privileges</li>
      * </ul>
-     * The index 'child-groups' will contain an indexed array of all child groups 
-     * of a parent group. The index 'privileges' will contain an indexed array that contains 
-     * all the privileges within a group. Each index of the array will contain 
-     * an associative array that represents a privilege. The array will have 
+     * The index 'child-groups' will contain an indexed array of all child groups
+     * of a parent group. The index 'privileges' will contain an indexed array that contains
+     * all the privileges within a group. Each index of the array will contain
+     * an associative array that represents a privilege. The array will have
      * two indices:
      * <ul>
      * <li>privilege-id</li>
      * <li>given-title</li>
      * </ul>
-     * 
+     *
      * @return array An array that contains all privileges and groups info.
      */
     public static function asArray(): array {
@@ -76,7 +76,7 @@ class Access {
     }
     /**
      * Removes all created user groups and privileges.
-     * 
+     *
      * @since 1.0.4
      */
     public static function clear() {
@@ -84,38 +84,38 @@ class Access {
     }
     /**
      * Creates a string of permissions given a user.
-     * 
-     * This method can be handy in case the developer would like to store 
-     * user privileges in a database. The method might return a string which 
+     *
+     * This method can be handy in case the developer would like to store
+     * user privileges in a database. The method might return a string which
      * might looks like the following string:
-     * <p>'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP'</p>  
-     * where 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 
-     * 'A_GROUP' is the ID of a group that the user has all its privileges. The number 
-     * that comes after the dash is the status of the privilege. Each privilege 
-     * or a group will be separated from the other by a semicolon. 
+     * <p>'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP'</p>
+     * where 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and
+     * 'A_GROUP' is the ID of a group that the user has all its privileges. The number
+     * that comes after the dash is the status of the privilege. Each privilege
+     * or a group will be separated from the other by a semicolon.
      * Also, the group will have the letter 'G' at the start. Note that if the group
      * has subgroups, this means the user will have the privileges of the sub-groups.
-     * 
+     *
      * @param User $user The user which the permissions string will be created from.
-     * 
-     * @return string A string of user privileges and the groups that he belongs to 
+     *
+     * @return string A string of user privileges and the groups that he belongs to
      * (if any).
-     * 
+     *
      * @since 1.0
      */
     public static function createPermissionsStr(User $user): string {
         return Access::get()->createPermissionsStrHelper2($user);
     }
     /**
-     * Returns an object of type UsersGroup given its ID. 
+     * Returns an object of type UsersGroup given its ID.
      * This method can be used to check if a group exist or not. If
      * the method has returned null, this means the group does not exist.
-     * 
+     *
      * @param string $groupId The ID of the group.
-     * 
-     * @return PrivilegesGroup|null If a users group with the given ID was found, 
+     *
+     * @return PrivilegesGroup|null If a users group with the given ID was found,
      * It will be returned. If not, the method will return null.
-     * 
+     *
      * @since 1.0
      */
     public static function getGroup(string $groupId) {
@@ -123,31 +123,31 @@ class Access {
     }
 
     /**
-     * Returns a privilege object given privilege ID. 
-     * 
-     * This method will search all created groups for a privilege which has the 
-     * given ID. If not found, the method will return null. This method also 
+     * Returns a privilege object given privilege ID.
+     *
+     * This method will search all created groups for a privilege which has the
+     * given ID. If not found, the method will return null. This method also
      * can be used to check if a privilege exist or not. If the method
      * has returned null, this means the privilege does not exist.
-     * 
+     *
      * @param string $id The ID of the privilege.
-     * 
-     * @return Privilege|null If a privilege with the given ID was found in 
-     * any user group, It will be returned. If not, the method will return 
+     *
+     * @return Privilege|null If a privilege with the given ID was found in
+     * any user group, It will be returned. If not, the method will return
      * null.
-     * 
+     *
      * @since 1.0
      */
     public static function getPrivilege(string $id) {
         return Access::get()->getPrivilegeHelper0($id);
     }
     /**
-     * Returns an array which contains all top-level user groups. 
-     * 
+     * Returns an array which contains all top-level user groups.
+     *
      * The array will be empty if no user groups has been created.
-     * 
+     *
      * @return array An array that contains an objects of type UsersGroup.
-     * 
+     *
      * @since 1.0
      */
     public static function groups() {
@@ -155,32 +155,32 @@ class Access {
     }
     /**
      * Checks if a users group does exist or not given its ID.
-     * 
+     *
      * @param string $groupId The ID of the group.
-     * 
-     * @return bool The method will return true if a users group 
+     *
+     * @return bool The method will return true if a users group
      * with the given ID was found. false if not.
-     * 
+     *
      * @since 1.0
      */
     public static function hasGroup(string $groupId): bool {
         return self::getGroup($groupId) !== null;
     }
     /**
-     * Checks if a privilege does exist or not given its ID. 
-     * 
-     * The method will search all created groups for a privilege with the 
+     * Checks if a privilege does exist or not given its ID.
+     *
+     * The method will search all created groups for a privilege with the
      * given ID.
-     * 
+     *
      * @param string $id The ID of the privilege.
-     * 
-     * @param string $groupId If it is provided, the search for the privilege 
+     *
+     * @param string $groupId If it is provided, the search for the privilege
      * will be limited to the group which has the given ID.
      *
-     * 
-     * @return bool The method will return true if a privilege 
+     *
+     * @return bool The method will return true if a privilege
      * with the given ID was found. false if not.
-     * 
+     *
      * @since 1.0
      */
     public static function hasPrivilege(string $id,string $groupId = null): bool {
@@ -188,20 +188,20 @@ class Access {
     }
     /**
      * Creates new users group using specific ID.
-     * 
-     * The group is the base for user privileges. After creating it, the developer 
+     *
+     * The group is the base for user privileges. After creating it, the developer
      * can add a set of privileges to the group. Note that the group will not be created
      * if the name of the group contains invalid characters, or it is already
-     * created. In addition, If a parent group has the given new group name, 
+     * created. In addition, If a parent group has the given new group name,
      * it will not be created.
-     * 
-     * @param string $groupId The ID of the group. The ID must not contain 
-     * any of the following characters: ';','-',',' or a space. If the name contains 
+     *
+     * @param string $groupId The ID of the group. The ID must not contain
+     * any of the following characters: ';','-',',' or a space. If the name contains
      * any of the given characters, the group will not be created.
-     * 
-     * @return bool If the group is created, the method will return true. 
+     *
+     * @return bool If the group is created, the method will return true.
      * If not, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function newGroup(string $groupId, $parentGroupId = null): bool {
@@ -209,42 +209,42 @@ class Access {
     }
     /**
      * Creates new privilege in a specific group given its ID.
-     * 
-     * The method will add the privilege only if it does not exist in any of 
+     *
+     * The method will add the privilege only if it does not exist in any of
      * the created groups.
-     * 
-     * @param string $groupId The ID of the group that the privilege will be 
+     *
+     * @param string $groupId The ID of the group that the privilege will be
      * added to. It must be a group in the groups array of the access class.
-     * 
-     * @param string $privilegeId The ID of the privilege. The ID must not contain 
+     *
+     * @param string $privilegeId The ID of the privilege. The ID must not contain
      * any of the following characters, ';','-',',' or a space.
-     * 
-     * @return bool If the privilege was created, the method will return 
+     *
+     * @return bool If the privilege was created, the method will return
      * true. Other than that, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function newPrivilege(string $groupId, string $privilegeId): bool {
         return Access::get()->createPrivilegeHelper($groupId, $privilegeId);
     }
     /**
-     * Creates multiple privileges in a group given its ID. 
-     * 
-     * This method can be used as a shorthand to create multiple privileges in 
+     * Creates multiple privileges in a group given its ID.
+     *
+     * This method can be used as a shorthand to create multiple privileges in
      * a group instead of calling Access::newPrivilege() multiple times.
-     * 
-     * @param string $groupId The ID of the group. The group must be created 
+     *
+     * @param string $groupId The ID of the group. The group must be created
      * before starting to create privileges in it.
-     * 
+     *
      * @param array $prNamesArr An associative array that contains the names of privileges.
-     * 
-     * @return array The method will return an associative array. 
-     * The indices will be the IDs of the privileges and the values will be 
-     * booleans. Each boolean corresponds to the status of each privilege in the array of 
-     * privileges. If the privilege is added, the value will be true. If not, 
+     *
+     * @return array The method will return an associative array.
+     * The indices will be the IDs of the privileges and the values will be
+     * booleans. Each boolean corresponds to the status of each privilege in the array of
+     * privileges. If the privilege is added, the value will be true. If not,
      * it will be false.
-     * 
-     * @since 1.0.1 
+     *
+     * @since 1.0.1
      */
     public static function newPrivileges(string $groupId, array $prNamesArr): array {
         $retVal = [];
@@ -257,16 +257,16 @@ class Access {
         return $retVal;
     }
     /**
-     * Returns an array which contains all privileges 
+     * Returns an array which contains all privileges
      * in a specific group.
-     * 
-     * @param string|null $groupId The ID of the group which its 
-     * privileges will be returned. If null is given, all privileges will be 
+     *
+     * @param string|null $groupId The ID of the group which its
+     * privileges will be returned. If null is given, all privileges will be
      * returned. Default is null.
-     * 
-     * @return array An array which contains an objects of type Privilege. If 
+     *
+     * @return array An array which contains an objects of type Privilege. If
      * the given group ID does not exist, the returned array will be empty.
-     * 
+     *
      * @since 1.0
      */
     public static function privileges(string $groupId = null): array {
@@ -274,22 +274,22 @@ class Access {
     }
     /**
      * Adds privileges to a user given privileges string.
-     * 
-     * @param string $str A string of privileges. The format of the string must 
-     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;G-A_GROUP' where 
-     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 'A_GROUP' 
-     * is the ID of a group that the user belongs to. The number 
-     * that comes after the dash is the status of the privilege. If 0, then the 
-     * user will not have the given privilege. If 1, the user will have the 
-     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. and 
-     * he will belong to the group that has the ID 'A_GROUP'. Each 
+     *
+     * @param string $str A string of privileges. The format of the string must
+     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;G-A_GROUP' where
+     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 'A_GROUP'
+     * is the ID of a group that the user belongs to. The number
+     * that comes after the dash is the status of the privilege. If 0, then the
+     * user will not have the given privilege. If 1, the user will have the
+     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. and
+     * he will belong to the group that has the ID 'A_GROUP'. Each
      * privilege or a group must be separated from the other by a semicolon. Also,
-     * the group must have the letter 'G' at the start. Note that in the given 
-     * example, if 'PRIVILEGE_1' is in 'A_GROUP', he will not have it even if it is 
+     * the group must have the letter 'G' at the start. Note that in the given
+     * example, if 'PRIVILEGE_1' is in 'A_GROUP', he will not have it even if it is
      * in group permissions.
-     * 
+     *
      * @param User $user The user which the permissions will be added to
-     * 
+     *
      * @since 1.0
      */
     public static function resolvePrivileges(string $str, User $user) {
@@ -340,7 +340,7 @@ class Access {
      * Checks if privilege or group ID is equal to another group.
      * @param string $id
      * @param PrivilegesGroup $group
-     * @return bool If a group was found which have the given 
+     * @return bool If a group was found which have the given
      * ID, the method will return true.
      */
     private function checkID(string $id, PrivilegesGroup $group): bool {
@@ -453,7 +453,7 @@ class Access {
         return trim($str,';');
     }
     /**
-     * 
+     *
      * @param string $groupId
      * @param string $privilegeId
      * @return bool Description
@@ -500,7 +500,7 @@ class Access {
         return self::$access;
     }
     /**
-     * 
+     *
      * @param string $groupId
      * @return PrivilegesGroup|null
      * @since 1.0
@@ -546,7 +546,7 @@ class Access {
         return null;
     }
     /**
-     * 
+     *
      * @param string $privilegeId
      * @return Privilege|null
      */
@@ -562,7 +562,7 @@ class Access {
         return null;
     }
     /**
-     * 
+     *
      * @param string $privilegeId
      * @param PrivilegesGroup $group
      * @return Privilege|null

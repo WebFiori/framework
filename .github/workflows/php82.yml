@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
+  
   test:
     runs-on: ${{ matrix.os }} 
     services:
@@ -28,14 +29,14 @@ jobs:
     
     steps: 
       - name: Clone Repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:9.5.20, composer
+          tools: phpunit:9.5.20, composer, symplify/easy-coding-standard:12.0.6, phpbench/phpbench:1.2.14
           
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop
@@ -65,4 +66,55 @@ jobs:
         run: phpunit
         
       - name: CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
+        
+  coding_standards_check:
+    name: "Coding Standards Check"
+    needs:
+      - "test"
+
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Set up PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.1"
+          extensions: "mbstring"
+          tools: composer, symplify/easy-coding-standard:12.0.6
+          
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction --no-dev
+
+      - name: "Check Style"
+        run: "ecs check"
+        
+  benchmarking:
+    needs:
+      - "test"
+    runs-on: ${{ matrix.os }}
+    strategy: 
+      fail-fast: true
+      matrix: 
+        os: [ ubuntu-latest ]
+        php: [8.0,8.1,8.2]
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v1
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }} 
+          extensions: mbstring
+          tools: composer, phpbench/phpbench
+          
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction --no-dev
+        
+      - name: Benchmarking
+        run: phpbench run tests/webfiori/benchmark --report=default
+        
+      

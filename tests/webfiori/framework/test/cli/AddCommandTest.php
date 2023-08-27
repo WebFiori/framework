@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
@@ -95,7 +94,7 @@ class AddCommandTest extends TestCase {
         ]);
         $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals(0, $runner->start());
-        
+
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -161,7 +160,7 @@ class AddCommandTest extends TestCase {
             "Would you like to store connection information anyway?(y/N)\n",
         ], $runner->getOutput());
     }
-    
+
     /**
      * @test
      */
@@ -191,7 +190,7 @@ class AddCommandTest extends TestCase {
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
+        $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
         Controller::getDriver()->initialize();
     }
@@ -225,7 +224,7 @@ class AddCommandTest extends TestCase {
             '2',
             'FKRR',
         ]);
-        
+
         $this->assertEquals(-1, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
@@ -236,7 +235,7 @@ class AddCommandTest extends TestCase {
             "Language code:\n",
             "Error: Invalid language code.\n",
         ], $runner->getOutput());
-        $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
+        $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }
     /**

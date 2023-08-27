@@ -22,7 +22,7 @@ class TestAutoLoader extends TestCase {
         $cArr = explode('\\', 'webfiori\\entity\\AutoLoader');
         $className = $cArr[count($cArr) - 1];
         $classNs = implode('\\', array_slice($cArr, 0, count($cArr) - 1));
-        
+
         $isLoaded = AutoLoader::isLoaded($className, $classNs);
         $this->assertTrue($isLoaded);
     }

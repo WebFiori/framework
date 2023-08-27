@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -23,20 +23,20 @@ use webfiori\framework\exceptions\MissingLangException;
 class EmailMessage extends \webfiori\email\EmailMessage {
     /**
      *
-     * @var Language|null 
-     * 
+     * @var Lang|null
+     *
      * @since 1.0.5
      */
     private $tr;
     /**
      * Creates new instance of the class.
-     * 
-     * @param string $sendAccountName The name of SMTP connection that will be 
-     * used to send the message. It must exist in the class 'AppConfig'. Default 
+     *
+     * @param string $sendAccountName The name of SMTP connection that will be
+     * used to send the message. It must exist in the class 'AppConfig'. Default
      * value is 'no-reply'.
-     * 
+     *
      * @throws SMTPException If the given SMTP connection does not exist.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $sendAccountName = 'no-reply') {
@@ -47,7 +47,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
 
             return;
         }
-        throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
+        throw new SMTPException('No SMTP connection was found which has the name "'.$sendAccountName.'".');
     }
     public function get(string $label) {
         $langObj = $this->getTranslation();
@@ -60,11 +60,11 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     }
     /**
      * Returns an object which holds i18n labels.
-     * 
-     * @return Language|null The returned object labels will be based on the 
-     * language of the email. If no translation is loaded, the method will 
+     *
+     * @return Lang|null The returned object labels will be based on the
+     * language of the email. If no translation is loaded, the method will
      * return null.
-     * 
+     *
      * @since 1.0.5
      */
     public function getTranslation() {
@@ -99,7 +99,7 @@ class EmailMessage extends \webfiori\email\EmailMessage {
     private function usingLanguage() {
         if ($this->getLang() !== null) {
             try {
-                $this->tr = Language::loadTranslation($this->getLang());
+                $this->tr = Lang::loadTranslation($this->getLang());
             } catch (MissingLangException $ex) {
                 throw new MissingLangException($ex->getMessage());
             }

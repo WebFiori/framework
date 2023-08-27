@@ -20,7 +20,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertEquals('app\\database', $writter->getNamespace());
         $this->assertEquals('Table', $writter->getSuffix());
         $this->assertEquals([
-            
+
         ], $writter->getUseStatements());
         $this->assertNull($writter->getEntityName());
         $this->assertNull($writter->getEntityNamespace());
@@ -39,7 +39,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertEquals('app\\database', $writter->getNamespace());
         $this->assertEquals('Table', $writter->getSuffix());
         $this->assertEquals([
-            
+
         ], $writter->getUseStatements());
         $this->assertEquals('MyEntity', $writter->getEntityName());
         $this->assertEquals('app\\entity', $writter->getEntityNamespace());
@@ -65,7 +65,7 @@ class TableWritterTest extends CreateTestCase {
         $writter->setTableType('mssql');
         $writter->setEntityInfo('MyEntity', 'app\\entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
         $this->assertEquals('CoolT2Table', $writter->getName());
-        
+
         $this->assertFalse($writter->getTable() instanceof MySQLTable);
         $this->assertTrue($writter->getTable() instanceof MSSQLTable);
         $writter->writeClass();
@@ -85,7 +85,7 @@ class TableWritterTest extends CreateTestCase {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT3Table');
         $writter->setTableType('mssql');
-        
+
         $writter->getTable()->addColumns([
             'col-1' => [],
             'col-2' => [],
@@ -114,7 +114,7 @@ class TableWritterTest extends CreateTestCase {
     public function test04() {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT4Table');
-        
+
         $writter->getTable()->addColumns([
             'col-1' => [],
             'col-2' => [],
@@ -186,7 +186,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertEquals('`super`', $clazzObj->getName());
         $this->assertEquals(6, $clazzObj->getColsCount());
         $this->assertEquals('The table that holds user info.', $clazzObj->getComment());
-        
+
         $col00 = $clazzObj->getColByKey('col-1');
         $this->assertTrue($col00 instanceof MySQLColumn);
         $this->assertEquals('int', $col00->getDatatype());
@@ -198,8 +198,8 @@ class TableWritterTest extends CreateTestCase {
         $this->assertTrue($col00->isAutoInc());
         $this->assertFalse($col00->isAutoUpdate());
         $this->assertEquals('The unique identifier of the table.', $col00->getComment());
-        
-        
+
+
         $col01 = $clazzObj->getColByKey('col-2');
         $this->assertTrue($col01 instanceof MySQLColumn);
         $this->assertEquals('varchar', $col01->getDatatype());
@@ -211,7 +211,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertFalse($col01->isAutoInc());
         $this->assertFalse($col01->isAutoUpdate());
         $this->assertNull($col01->getComment());
-        
+
         $col04 = $clazzObj->getColByKey('col-4');
         $this->assertTrue($col04 instanceof MySQLColumn);
         $this->assertEquals('bool', $col04->getDatatype());
@@ -219,7 +219,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertFalse($col04->isUnique());
         $this->assertTrue($col04->getDefault());
         $this->assertNull($col04->getComment());
-        
+
         $col05 = $clazzObj->getColByKey('col-5');
         $this->assertTrue($col05 instanceof MySQLColumn);
         $this->assertEquals('bool', $col05->getDatatype());
@@ -227,7 +227,7 @@ class TableWritterTest extends CreateTestCase {
         $this->assertFalse($col05->isUnique());
         $this->assertFalse($col05->getDefault());
         $this->assertNull($col05->getComment());
-        
+
         $col06 = $clazzObj->getColByKey('col-6');
         $this->assertTrue($col06 instanceof MySQLColumn);
         $this->assertEquals('decimal', $col06->getDatatype());

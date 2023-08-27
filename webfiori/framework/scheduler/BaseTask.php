@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2018 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler;
 
@@ -14,19 +14,19 @@ use Exception;
 
 /**
  * A class which provide basic implementation for scheduling tasks.
- * 
- * This class used to provide basic implementation for the class 'AbstractTask'. 
- * It is recommended to not use this class in creating custom tasks. The recommended 
- * option is to extend the class 'AbstractTask'. 
+ *
+ * This class used to provide basic implementation for the class 'AbstractTask'.
+ * It is recommended to not use this class in creating custom tasks. The recommended
+ * option is to extend the class 'AbstractTask'.
  * @author Ibrahim
  * @version 1.0.9
  */
 class BaseTask extends AbstractTask {
     /**
-     * An array which contains the events that will be executed if it is the time 
+     * An array which contains the events that will be executed if it is the time
      * to execute the task.
      * @var array
-     * @since 1.0 
+     * @since 1.0
      */
     private $events;
 
@@ -67,12 +67,12 @@ class BaseTask extends AbstractTask {
     }
     /**
      * Execute the task.
-     * 
-     * @return null|boolean The return value of the method will depend on the 
-     * closure which is set to execute. If no closure is set, the method will 
-     * return null. If it is set, the return value of the closure will be returned 
+     *
+     * @return null|boolean The return value of the method will depend on the
+     * closure which is set to execute. If no closure is set, the method will
+     * return null. If it is set, the return value of the closure will be returned
      * by this method.
-     * 
+     *
      * @since 1.0
      */
     public function execute() {
@@ -86,12 +86,12 @@ class BaseTask extends AbstractTask {
     }
 
     /**
-     * Returns a callable which represents the code that will be 
+     * Returns a callable which represents the code that will be
      * executed when it's time to run the task.
-     * 
+     *
      * @return callable|null A callable which represents the code that will be
      * executed when it's time to run the task.
-     * 
+     *
      * @since 1.0.3
      */
     public function getOnExecution() {
@@ -113,15 +113,15 @@ class BaseTask extends AbstractTask {
 
     /**
      * Sets the event that will be fired in case it is time to execute the task.
-     * 
-     * @param callable $func The function that will be executed if it is the 
-     * time to execute the task. This function can have a return value If the function 
-     * returned null or true, then it means the task was successfully executed. 
+     *
+     * @param callable $func The function that will be executed if it is the
+     * time to execute the task. This function can have a return value If the function
+     * returned null or true, then it means the task was successfully executed.
      * If it returns false, this means the task did not execute successfully.
-     * 
-     * @param array $funcParams An array which can hold some parameters that 
+     *
+     * @param array $funcParams An array which can hold some parameters that
      * can be passed to the function.
-     * 
+     *
      * @since 1.0
      */
     public function setOnExecution(callable $func, array $funcParams = []) {
@@ -135,12 +135,12 @@ class BaseTask extends AbstractTask {
     }
     /**
      * Sets a function to call in case the task function has returned false.
-     * 
+     *
      * @param callable $func The function that will be executed.
-     * 
-     * @param array $params An array of parameters that will be passed to the 
+     *
+     * @param array $params An array of parameters that will be passed to the
      * function.
-     * 
+     *
      * @since 1.0.5
      */
     public function setOnFailure(callable $func, array $params = []) {

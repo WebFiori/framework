@@ -41,6 +41,7 @@ class UserTest extends TestCase {
         $this->assertFalse($u->hasAnyPrivilege([
             'LOW_PR_1'
         ]));
+
         return $u;
     }
     /**
@@ -83,7 +84,7 @@ class UserTest extends TestCase {
         $this->assertFalse($u->inGroup('LOW_GROUP'));
     }
     /**
-     * 
+     *
      * @test
      */
     public function testRemoveAllPrivilege00() {
@@ -94,7 +95,7 @@ class UserTest extends TestCase {
         $this->assertEquals(0,count($u->privileges()));
     }
     /**
-     * 
+     *
      * @param User $u
      * @test
      * @depends testAddPrivilege00
@@ -104,7 +105,7 @@ class UserTest extends TestCase {
         $this->assertFalse($u->hasPrivilege('TOP_PR_1'));
     }
     /**
-     * 
+     *
      * @test
      */
     public function testRemovePrivilege01() {
@@ -121,7 +122,7 @@ class UserTest extends TestCase {
         $this->assertFalse($u->hasPrivilege('LOW_PR_1'));
     }
     /**
-     * 
+     *
      * @test
      */
     public function testRemovePrivilege02() {

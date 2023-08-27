@@ -1,23 +1,23 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\ui;
 
 /**
- * A page which is shown to the framework users when the developer has not 
+ * A page which is shown to the framework users when the developer has not
  * configured any routes.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.3.0
  */
 class StarterPage extends WebPage {
@@ -53,8 +53,8 @@ class StarterPage extends WebPage {
             'cols' => 12,
         ])->addChild('v-row');
         $this->createCard('https://webfiori.com/learn',
-            'mdi-book-open-variant', 
-            'Learn', 
+            'mdi-book-open-variant',
+            'Learn',
             'Documentation is always the first place where developers can find what they need.'
             .'The framework has good documentation base which is still in development and '
             .'content is added and revewed regularly. '
@@ -64,15 +64,15 @@ class StarterPage extends WebPage {
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/docs/webfiori',
             'mdi-book-check-outline',
-            'API Reference', 
+            'API Reference',
             'This reference has all information about core framework classes that a developer '
             .'might need to have specific functionality. In addition to that, it describes all '
             .'uses of every public class attribute and method. It can be handy when developers starts '
             .'using advanced features of the framework.',
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/contribute',
-            'mdi-comment-plus-outline', 
-            'Support The Project', 
+            'mdi-comment-plus-outline',
+            'Support The Project',
             'Want to help in development of the framework or contribute? This place is for you. It holds '
             .'basic instructions on how you may help in supporting the framework in many ways.',
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
@@ -85,8 +85,8 @@ class StarterPage extends WebPage {
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'
         ])
-        ->text($icon)
-        ->getParent()->addChild('a', [
+            ->text($icon)
+            ->getParent()->addChild('a', [
             'href' => $link
         ])->text($cardTitle);
         $card->addChild('v-card-text')->text($paragraph);

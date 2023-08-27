@@ -1,18 +1,18 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\ui;
 
 use webfiori\ui\HTMLNode;
 /**
- * A generic class for showing a floating box in web pages that can have any content 
+ * A generic class for showing a floating box in web pages that can have any content
  * in its body.
  *
  * @author Ibrahim
@@ -21,27 +21,27 @@ use webfiori\ui\HTMLNode;
 class MessageBox extends HTMLNode {
     /**
      * Used to format boxes.
-     * @var int 
+     * @var int
      * @since 1.0
      */
     private static $Count = 0;
     /**
      *
-     * @var boolean 
-     * 
+     * @var boolean
+     *
      * @since 1.0
      */
     private $isInit;
     /**
      * The node that represents the body of the message box.
      * @var HTMLNode
-     * @since 1.0 
+     * @since 1.0
      */
     private $messageBody;
     /**
      * The node that represents the header of the message box.
      * @var HTMLNode
-     * @since 1.0 
+     * @since 1.0
      */
     private $messageHeader;
     /**
@@ -63,7 +63,7 @@ class MessageBox extends HTMLNode {
     }
     /**
      * Returns the node that represents the header of the message.
-     * The returned node can be used to add extra content to the header. 
+     * The returned node can be used to add extra content to the header.
      * By default, the header will have a close button.
      * @return HTMLNode a node that represents the header of message box.
      * @since 1.0
@@ -82,7 +82,7 @@ class MessageBox extends HTMLNode {
     }
     /**
      * Returns the number of message boxes which has been created.
-     * The count will manly depends on the number of instances that was created. 
+     * The count will manly depends on the number of instances that was created.
      * Every instance will increment the value by 1.
      * @return int The number of message boxes which has been created.
      * @since 1.0
@@ -92,10 +92,10 @@ class MessageBox extends HTMLNode {
     }
     /**
      * Checks if the message box is fully initialized.
-     * 
-     * @return boolean The method will return true if the message box is fully 
+     *
+     * @return boolean The method will return true if the message box is fully
      * initialized and its components are ready for use. False if not.
-     * 
+     *
      * @since 1.0
      */
     public function isInitialized() {

@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\framework\scheduler\webUI;
+
 ?>
 <head>
     <base href="<?= baseURL()?>">

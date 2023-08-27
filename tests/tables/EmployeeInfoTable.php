@@ -1,5 +1,4 @@
 <?php
-
 namespace tables;
 
 use webfiori\database\mysql\MySQLTable;
@@ -9,7 +8,6 @@ use webfiori\database\mysql\MySQLTable;
  *
  */
 class EmployeeInfoTable extends MySQLTable {
-
     public function __construct() {
         parent::__construct('users');
         $this->addColumns([
@@ -38,5 +36,4 @@ class EmployeeInfoTable extends MySQLTable {
             ]
         ]);
     }
-
 }

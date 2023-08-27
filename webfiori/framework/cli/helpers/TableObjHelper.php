@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
@@ -18,12 +18,12 @@ use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use webfiori\framework\App;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
-use webfiori\framework\App;
 
 /**
- * A CLI class helper which has methods to help in creating and 
+ * A CLI class helper which has methods to help in creating and
  * modifying table classes.
  *
  * @author Ibrahim BinAlshikh
@@ -33,10 +33,10 @@ class TableObjHelper {
     private $table;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CLICommand $c
-     * 
-     * @param Table $t An instance at which the class will use to create or 
+     *
+     * @param Table $t An instance at which the class will use to create or
      * modify as class.
      */
     public function __construct(CreateTableObj $c, Table $t) {
@@ -45,7 +45,7 @@ class TableObjHelper {
     }
     /**
      * Returns the objects at which the class is using to perform modifications.
-     * 
+     *
      * @return Table
      */
     public function &getTable() : Table {
@@ -53,7 +53,7 @@ class TableObjHelper {
     }
     /**
      * Adds new column to associated table.
-     * 
+     *
      * The method will prompt the user to specify all information of the column
      * including its name, data type, size and so on.
      */
@@ -96,7 +96,7 @@ class TableObjHelper {
     }
     /**
      * Prompt the user to add multiple columns.
-     * 
+     *
      * First, the method will add one column, after that, it will ask if extra
      * column should be added or not. If yes, it will ask for new column information.
      * If not, the loop will stop.
@@ -166,7 +166,7 @@ class TableObjHelper {
         } while ($this->getCreateHelper()->confirm('Would you like to add another foreign key?', false));
     }
     /**
-     * 
+     *
      * @return DB|null
      */
     public function confirmRunQuery() {
@@ -221,7 +221,7 @@ class TableObjHelper {
         }
     }
     /**
-     * 
+     *
      * @return Column
      */
     public function dropColumn() {
@@ -242,7 +242,7 @@ class TableObjHelper {
         return $colToDrop;
     }
     /**
-     * 
+     *
      * @return CreateTableObj
      */
     public function getCreateHelper() : CreateTableObj {
@@ -250,7 +250,7 @@ class TableObjHelper {
     }
     /**
      * Extract and return the name of table class based on associated table object.
-     * 
+     *
      * @return string The name of table class based on associated table object.
      */
     public function getTableClassName() :string {
@@ -265,9 +265,9 @@ class TableObjHelper {
     }
     /**
      * Removes a foreign key from associated table object.
-     * 
+     *
      * The method will simply ask the user which key he would like to remove.
-     * 
+     *
      */
     public function removeFk() {
         $tableObj = $this->getTable();
@@ -315,8 +315,8 @@ class TableObjHelper {
     }
     /**
      * Sets a comment for associated table.
-     * 
-     * The method will prompt the user for optional comment. 
+     *
+     * The method will prompt the user for optional comment.
      * If empty string provided, the comment will not be set.
      */
     public function setTableComment() {
@@ -329,11 +329,11 @@ class TableObjHelper {
     }
     /**
      * Sets the name of the table in the database.
-     * 
+     *
      * The method will prompt the user to set the name of the table as it will
      * appear in the database. This name may not be same as class name
      * of the table.
-     * 
+     *
      * @param string $defaultName A string to set as default table name in case
      * of hitting 'enter' without providing a value.
      */
@@ -388,7 +388,7 @@ class TableObjHelper {
     }
     /**
      * Prompt the user to set an optional comment for table column.
-     * 
+     *
      * @param Column $colObj The object that the comment will be associated with.
      */
     private function addColComment(Column $colObj) {
@@ -418,7 +418,7 @@ class TableObjHelper {
         return $fkCols;
     }
     /**
-     * 
+     *
      * @param MSSQLColumn $colObj
      */
     private function isIdentityCheck($colObj) {
@@ -432,7 +432,7 @@ class TableObjHelper {
         }
     }
     /**
-     * 
+     *
      * @param Column $colObj
      */
     private function isPrimaryCheck(Column $colObj) {
@@ -462,7 +462,7 @@ class TableObjHelper {
         $createHelper->setPath(substr($path, 0, strlen($path) - strlen($cName.'.php')));
     }
     /**
-     * 
+     *
      * @param Column $colObj
      */
     private function setDefaultValue(Column $colObj) {
@@ -486,7 +486,7 @@ class TableObjHelper {
         }
     }
     /**
-     * 
+     *
      * @param Column $colObj
      */
     private function setScale(Column $colObj) {
@@ -506,17 +506,17 @@ class TableObjHelper {
         }
     }
     /**
-     * 
+     *
      * @param Column $colObj
      */
     private function setSize(Column $colObj) {
         $type = $colObj->getDatatype();
         $helper = $this->getCreateHelper();
-        $mySqlSupportSize = $type == 'int' 
+        $mySqlSupportSize = $type == 'int'
                 || $type == 'varchar'
-                || $type == 'decimal' 
+                || $type == 'decimal'
                 || $type == 'float'
-                || $type == 'double' 
+                || $type == 'double'
                 || $type == 'text';
         $mssqlSupportSize = $type == 'char'
                 || $type == 'nchar'

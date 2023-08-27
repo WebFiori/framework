@@ -1,18 +1,18 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2021 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\database\Table;
-use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\App;
+use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DBClassWriter;
 
 /**
@@ -23,7 +23,7 @@ use webfiori\framework\writers\DBClassWriter;
 class CreateDBAccessHelper extends CreateClassHelper {
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
@@ -40,7 +40,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
     }
     /**
      * Returns the table at which the database access class will be associated with.
-     * 
+     *
      * @return Table The table at which the database access class will be associated with.
      */
     public function getTable() : Table {
@@ -93,7 +93,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
     }
     /**
      * Sets the table at which the database access class will be associated with.
-     * 
+     *
      * @param Table $t The table at which the database access class will be associated with.
      */
     public function setTable(Table $t) {

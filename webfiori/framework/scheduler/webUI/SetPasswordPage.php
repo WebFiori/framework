@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\scheduler\TasksManager;
@@ -13,11 +12,11 @@ use webfiori\http\Response;
 class SetPasswordPage extends BaseTasksPage {
     public function __construct() {
         parent::__construct('Set Scheduler Password');
-        
-        if (TasksManager::password() != 'NO_PASSWORD') {
+
+        if (TasksManager::getPassword() != 'NO_PASSWORD') {
             Response::addHeader('location', $this->getBase().'/scheduler/login');
         }
-        
+
         $this->insert($this->include('templates/set-password-form.html'));
     }
 }

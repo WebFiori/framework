@@ -204,7 +204,7 @@ class NewFTestTheme extends Theme {
         return parent::createHTMLNode($options);
     }
     /**
-     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
+     * Returns an object of type 'HTMLNode' that represents aside section of the page.
      *
      * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside
      * section, the method might return null.
@@ -240,4 +240,3 @@ class NewFTestTheme extends Theme {
     }
 }
 
-return __NAMESPACE__;

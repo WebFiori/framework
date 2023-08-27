@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2020 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -21,29 +21,29 @@ use webfiori\json\JsonI;
 class Privilege implements JsonI {
     /**
      * The ID of the privilege.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $code;
     /**
      * The name of the privilege.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $name;
     /**
      * Creates new instance of the class
-     * 
-     * @param string $id The unique identifier of the privilege. Default is 
+     *
+     * @param string $id The unique identifier of the privilege. Default is
      * 'PR'.
-     * 
-     * @param string $name The name of the privilege. It is provided only 
+     *
+     * @param string $name The name of the privilege. It is provided only
      * in case of displaying privilege in some UI view. Default is empty string.
-     * 
+     *
      * @since 1.0
      */
     public function __construct(string $id = 'PR', string $name = '') {
@@ -57,10 +57,10 @@ class Privilege implements JsonI {
     }
     /**
      * Returns the ID of the privilege.
-     * 
-     * @return string The ID of the privilege. If the ID was not set, 
+     *
+     * @return string The ID of the privilege. If the ID was not set,
      * the method will return 'PR'.
-     * 
+     *
      * @since 1.0
      */
     public function getID() : string {
@@ -68,10 +68,10 @@ class Privilege implements JsonI {
     }
     /**
      * Returns the name of the privilege.
-     * 
-     * @return string The name of the privilege. If the name was not updated, 
+     *
+     * @return string The name of the privilege. If the name was not updated,
      * the method will return 'PR_NAME'.
-     * 
+     *
      * @since 1.0
      */
     public function getName() : string {
@@ -79,14 +79,14 @@ class Privilege implements JsonI {
     }
     /**
      * Sets the ID of the privilege
-     * 
-     * @param string $code The ID of the privilege. Only set if the given string 
-     * is not empty. In addition, The ID of the privilege can only consist 
+     *
+     * @param string $code The ID of the privilege. Only set if the given string
+     * is not empty. In addition, The ID of the privilege can only consist
      * of the following characters: [A-Z], [a-z], [0-9] and underscore.
-     * 
-     * @return boolean If the ID of the privilege is updated, the method will return 
+     *
+     * @return boolean If the ID of the privilege is updated, the method will return
      * true. If not updated, it will return false.
-     * 
+     *
      * @since 1.0
      */
     public function setID(string $code): bool {
@@ -106,13 +106,13 @@ class Privilege implements JsonI {
     }
     /**
      * Sets the name of the privilege.
-     * 
-     * @param string $name The name of the privilege. It is only set when 
+     *
+     * @param string $name The name of the privilege. It is only set when
      * the given string is not empty.
-     * 
-     * @return boolean If the privilege name was set, the method will return 
+     *
+     * @return boolean If the privilege name was set, the method will return
      * true. If not set, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public function setName(string $name): bool {
@@ -128,14 +128,14 @@ class Privilege implements JsonI {
     }
     /**
      * Returns an object of type Json that contains group info as JSON string.
-     * 
+     *
      * The generated JSON string will have the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"privilegeId":"",<br/>
      * &nbsp;&nbsp;"name":"",<br/>
      * }
-     * </p> 
+     * </p>
      */
     public function toJSON() : Json {
         $j = new Json();

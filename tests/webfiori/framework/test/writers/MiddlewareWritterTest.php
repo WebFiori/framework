@@ -52,15 +52,15 @@ class MiddlewareWritterTest extends CreateTestCase {
         $this->assertEquals([
             'one-group', 'two-group', 'global'
         ], $writter->getGroups());
-        
+
         $writter->writeClass();
-        
+
         $clazz = $writter->getName(true);
         $this->assertTrue(class_exists($clazz));
         $writter->removeClass();
         $md = new $clazz();
         $this->assertTrue($md instanceof AbstractMiddleware);
-        
+
         $this->assertEquals('Super Middleware', $md->getName());
         $this->assertEquals(100, $md->getPriority());
         $this->assertEquals([

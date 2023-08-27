@@ -1,24 +1,24 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2022 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
-use webfiori\framework\router\Router;
 use webfiori\framework\App;
+use webfiori\framework\router\Router;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
- * 
+ *
  * This handler is also used to handle startup exceptions.
  *
  * @author Ibrahim
@@ -26,7 +26,7 @@ use webfiori\json\Json;
 class APICallErrHandler extends AbstractHandler {
     /**
      * Creates new instance of the class.
-     * 
+     *
      * This method will set the name of the handler to 'API Call Errors Handler.
      */
     public function __construct() {
@@ -72,14 +72,14 @@ class APICallErrHandler extends AbstractHandler {
     }
     /**
      * Checks if the handler is active or not.
-     * 
+     *
      * The handler will be active in following cases:
      * <ul>
      * <li>Class WebfioriApp is in initialization stage.</li>
      * <li>Route type is Router::API_ROUTE.</li>
      * <li>The constant API_CALL is defined and set to true.</li>
      * </ul>
-     * 
+     *
      * @return bool True if active. false otherwise.
      */
     public function isActive(): bool {
@@ -99,7 +99,7 @@ class APICallErrHandler extends AbstractHandler {
     }
     /**
      * Checks if the handler is a shutdown handler or not.
-     * 
+     *
      * @return bool The method will always return true.
      */
     public function isShutdownHandler(): bool {

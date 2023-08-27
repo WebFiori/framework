@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test\scheduler;
 
 use InvalidArgumentException;

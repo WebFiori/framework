@@ -1,15 +1,16 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2018 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\scheduler;
 
+use const DS;
 use Exception;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Runner;
@@ -24,94 +25,93 @@ use webfiori\framework\scheduler\webUI\SetPasswordPage;
 use webfiori\framework\scheduler\webUI\TasksLoginPage;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
-use const DS;
 /**
  * A class that is used to manage scheduled background tasks.
- * 
- * It is used to create tasks, schedule them and execute them. In order to run 
- * the tasks automatically, the developer must add an entry in the following 
+ *
+ * It is used to create tasks, schedule them and execute them. In order to run
+ * the tasks automatically, the developer must add an entry in the following
  * format in crontab:
  * <p><code>* * * * *  /usr/bin/php path/to/webfiori --scheduler check p=&lt;password&gt;</code></p>
- * Where &lt;password&gt; is the password 
- * that was set by the developer to protect the tasks from unauthorized access. 
+ * Where &lt;password&gt; is the password
+ * that was set by the developer to protect the tasks from unauthorized access.
  * If no password is set, then it can be removed from the command.
- * Note that the path to PHP executable might differ from "/usr/bin/php". 
+ * Note that the path to PHP executable might differ from "/usr/bin/php".
  * It depends on where the executable has been installed.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.1.0
  */
 class TasksManager {
     /**
      * The password that is used to access and execute tasks.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $accessPass;
     /**
      * The task which is currently executing.
-     * 
+     *
      * @var BaseTask|null
-     * 
-     * @since 1.0.4 
+     *
+     * @since 1.0.4
      */
     private $activeTask;
     /**
      *
-     * @var CLICommand 
+     * @var CLICommand
      */
     private $command;
     /**
-     * A queue which contains all tasks.
-     * 
-     * @var Queue 
-     * 
-     * @since 1.0
+     * A variable that is set to true if task execution log is enabled.
+     *
+     * @var bool
+     *
+     * @since 1.0.1
      */
-    private $tasksQueue;
+    private $isLogEnabled;
+    /**
+     * An array that contains strings which acts as log messages.
+     *
+     * @var array
+     *
+     * @since 1.0.8
+     */
+    private $logsArray;
     /**
      * An instance of this class
-     * 
-     * @var TasksManager 
-     * 
+     *
+     * @var TasksManager
+     *
      * @since 1.0
      */
     private static $tasksManager;
     /**
-     * A variable that is set to true if task execution log is enabled.
-     * 
-     * @var bool
-     * 
-     * @since 1.0.1 
-     */
-    private $isLogEnabled;
-    /**
      *
-     * @var array 
-     * 
+     * @var array
+     *
      * @since 1.0.9
      */
     private $tasksNamesArr;
     /**
-     * An array that contains strings which acts as log messages.
-     * 
-     * @var array
-     * 
-     * @since 1.0.8 
+     * A queue which contains all tasks.
+     *
+     * @var Queue
+     *
+     * @since 1.0
      */
-    private $logsArray;
+    private $tasksQueue;
     /**
-     * An array that contains current timestamp. 
-     * 
-     * @var array 
+     * An array that contains current timestamp.
+     *
+     * @var array
      */
     private $timestamp;
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @since 1.0
      */
     private function __construct() {
@@ -130,11 +130,11 @@ class TasksManager {
     }
     /**
      * Returns an object that represents the task which is currently being executed.
-     * 
-     * @return BaseTask|null If there is a task which is being executed, the 
-     * method will return as an object. 
+     *
+     * @return BaseTask|null If there is a task which is being executed, the
+     * method will return as an object.
      * If no task is being executed, the method will return null.
-     * 
+     *
      * @since 1.0.4
      */
     public static function activeTask() {
@@ -142,32 +142,32 @@ class TasksManager {
     }
     /**
      * Creates new task using cron expression.
-     * 
-     * The task will be created and scheduled only if the given cron expression 
-     * is valid. For more information on cron expressions, go to 
-     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
-     * the method does not support year field. This means 
+     *
+     * The task will be created and scheduled only if the given cron expression
+     * is valid. For more information on cron expressions, go to
+     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that
+     * the method does not support year field. This means
      * the expression will have only 5 fields.
-     * 
+     *
      * @param string $when A cron expression.
-     * 
+     *
      * @param string $taskName An optional task name.
-     *  
-     * @param callable $function A function to run when it is the time to execute 
+     *
+     * @param callable $function A function to run when it is the time to execute
      * the task.
-     * 
-     * @param array $funcParams An array of parameters that can be passed to the 
-     * function. 
-     * 
-     * @return bool If the task was created and scheduled, the method will 
+     *
+     * @param array $funcParams An array of parameters that can be passed to the
+     * function.
+     *
+     * @return bool If the task was created and scheduled, the method will
      * return true. Other than that, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function createTask(string $when = '*/5 * * * *', string $taskName = '', callable $function = null, array $funcParams = []) : bool {
         try {
             $task = new BaseTask($when);
-            
+
             if ($function !== null) {
                 $task->setOnExecution($function, $funcParams);
             }
@@ -183,21 +183,21 @@ class TasksManager {
     }
     /**
      * Creates a daily task to execute every day at specific hour and minute.
-     * 
+     *
      * @param string $time A time in the form 'HH:MM'. HH can have any value
      * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
-     * 
+     *
      * @param string $name An optional name for the task. Can be null.
-     * 
-     * @param callable $func A function that will be executed once it is the 
+     *
+     * @param callable $func A function that will be executed once it is the
      * time to run the task.
-     * 
-     * @param array $funcParams An optional array of parameters which will be passed to 
+     *
+     * @param array $funcParams An optional array of parameters which will be passed to
      * the callback that will be executed when it's time to execute the task.
-     * 
-     * @return bool If the task was created and scheduled, the method will 
+     *
+     * @return bool If the task was created and scheduled, the method will
      * return true. Other than that, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function dailyTask(string $time, string $name, callable $func, array $funcParams = []): bool {
@@ -218,13 +218,13 @@ class TasksManager {
     }
     /**
      * Returns the number of current day in the current  month as integer.
-     * 
-     * This method is used by the class 'AbstractTask' to validate task 
+     *
+     * This method is used by the class 'AbstractTask' to validate task
      * execution time.
-     * 
-     * @return int An integer that represents current day number in 
+     *
+     * @return int An integer that represents current day number in
      * the current month.
-     * 
+     *
      * @since 1.0.2
      */
     public static function dayOfMonth() : int {
@@ -232,32 +232,32 @@ class TasksManager {
     }
     /**
      * Returns the number of current day in the current  week as integer.
-     * 
-     * This method is used by the class 'AbstractTask' to validate task 
-     * execution time. The method will always return a value between 0 and 6 
+     *
+     * This method is used by the class 'AbstractTask' to validate task
+     * execution time. The method will always return a value between 0 and 6
      * inclusive. 0 Means Sunday and 6 is for Saturday.
-     * 
-     * @return int An integer that represents current day number in 
+     *
+     * @return int An integer that represents current day number in
      * the week.
-     * 
+     *
      * @since 1.0.2
      */
     public static function dayOfWeek() : int {
         return self::get()->timestamp['week-day'];
     }
     /**
-     * Enable or disable logging for tasks execution. 
-     * 
-     * This method is also used to check if logging is enabled or not. If 
-     * execution log is enabled, a log file with the name 'tasks.log' will be 
+     * Enable or disable logging for tasks execution.
+     *
+     * This method is also used to check if logging is enabled or not. If
+     * execution log is enabled, a log file with the name 'tasks.log' will be
      * created in the folder '/logs'.
-     * 
-     * @param bool|null $bool If set to true, a log file that contains the details 
-     * of the executed tasks will be created in 'logs' folder. Default value 
+     *
+     * @param bool|null $bool If set to true, a log file that contains the details
+     * of the executed tasks will be created in 'logs' folder. Default value
      * is null.
-     * 
+     *
      * @return bool If logging is enabled, the method will return true.
-     * 
+     *
      * @since 1.0.1
      */
     public static function execLog(bool $bool = null) : bool {
@@ -269,9 +269,9 @@ class TasksManager {
     }
     /**
      * Returns a singleton of the class.
-     * 
+     *
      * @return TasksManager
-     * 
+     *
      * @since 1.0
      */
     public static function get(): TasksManager {
@@ -282,14 +282,27 @@ class TasksManager {
         return self::$tasksManager;
     }
     /**
+     * Returns the array that contains logged messages.
+     *
+     * The array will contain the messages which where logged using the method
+     * <code>TasksManager::log()</code>
+     *
+     * @return array An array of strings.
+     *
+     * @since 1.0.8
+     */
+    public static function getLogArray() : array {
+        return self::get()->logsArray;
+    }
+    /**
      * Returns a task given its name.
-     * 
+     *
      * @param string $taskName The name of the task.
-     * 
-     * @return BaseTask|null If a task which has the given name was found, 
-     * the method will return an object of type 'AbstractTask' that represents 
+     *
+     * @return BaseTask|null If a task which has the given name was found,
+     * the method will return an object of type 'AbstractTask' that represents
      * the task. Other than that, the method will return null.
-     * 
+     *
      * @since 1.0.5
      */
     public static function getTask(string $taskName) {
@@ -316,44 +329,31 @@ class TasksManager {
     }
     /**
      * Returns an array that contains the names of scheduled tasks.
-     * 
+     *
      * @return array An array that contains the names of scheduled tasks.
-     * 
+     *
      * @since 1.0.9
      */
     public static function getTasksNames() : array {
         return self::get()->tasksNamesArr;
     }
     /**
-     * Returns the array that contains logged messages.
-     * 
-     * The array will contain the messages which where logged using the method 
-     * <code>TasksManager::log()</code>
-     * 
-     * @return array An array of strings.
-     * 
-     * @since 1.0.8
-     */
-    public static function getLogArray() : array {
-        return self::get()->logsArray;
-    }
-    /**
      * Returns the number of current hour in the day as integer.
-     * 
-     * This method is used by the class 'AbstractTask' to validate task 
-     * execution time. The method will always return a value between 0 and 23 
+     *
+     * This method is used by the class 'AbstractTask' to validate task
+     * execution time. The method will always return a value between 0 and 23
      * inclusive.
-     * 
-     * @return int An integer that represents current hour number in 
+     *
+     * @return int An integer that represents current hour number in
      * the day.
      * @since 1.0.2
      */
-    public static function hour() : int {
+    public static function getHour() : int {
         return self::get()->timestamp['hour'];
     }
     /**
      * Creates routes to tasks web interface pages.
-     * 
+     *
      * This method is used to initialize the following routes:
      * <ul>
      * <li>/scheduler</li>
@@ -362,7 +362,7 @@ class TasksManager {
      * <li>/scheduler/tasks</li>
      * <li>/scheduler/tasks/{task-name}</li>
      * </ul>
-     * 
+     *
      * @since 1.1.0
      */
     public static function initRoutes() {
@@ -391,25 +391,15 @@ class TasksManager {
         ]);
     }
     /**
-     * Returns a queue of all queued tasks.
-     * 
-     * @return Queue An object of type 'Queue' which contains all queued tasks.
-     * 
-     * @since 1.0
-     */
-    public static function tasksQueue() : Queue {
-        return self::get()->getQueueHelper();
-    }
-    /**
      * Appends a message to the array that contains logged messages.
-     * 
-     * The main aim of the log is to help developers identify the issues which 
-     * might cause a task to fail. This method can be called in any place to 
+     *
+     * The main aim of the log is to help developers identify the issues which
+     * might cause a task to fail. This method can be called in any place to
      * log a message while the code is executing.
-     * 
-     * @param string $message A string that act as a log message. It will be 
+     *
+     * @param string $message A string that act as a log message. It will be
      * appended as passed without any changes.
-     * 
+     *
      * @since 1.0.8
      */
     public static function log(string $message) {
@@ -421,57 +411,57 @@ class TasksManager {
     }
     /**
      * Returns the number of current minute in the current hour as integer.
-     * 
-     * This method is used by the class 'AbstractTask' to validate task 
-     * execution time. The method will always return a value between 0 and 59 
+     *
+     * This method is used by the class 'AbstractTask' to validate task
+     * execution time. The method will always return a value between 0 and 59
      * inclusive.
-     * 
-     * @return int An integer that represents current minute number in 
+     *
+     * @return int An integer that represents current minute number in
      * the current hour.
-     * 
+     *
      * @since 1.0.2
      */
-    public static function minute() : int {
+    public static function getMinute() : int {
         return self::get()->timestamp['minute'];
     }
     /**
      * Returns the number of current month as integer.
-     * 
-     * This method is used by the class 'AbstracTask' to validate task 
-     * execution time. The method will always return a value between 1 and 12 
+     *
+     * This method is used by the class 'AbstracTask' to validate task
+     * execution time. The method will always return a value between 1 and 12
      * inclusive.
-     * 
+     *
      * @return int An integer that represents current month's number.
      * @since 1.0.2
      */
-    public static function month() : int {
+    public static function getMonth() : int {
         return self::get()->timestamp['month'];
     }
     /**
      * Create a task that will be executed once every month.
-     * 
-     * @param int $dayNumber The day of the month at which the task will be 
+     *
+     * @param int $dayNumber The day of the month at which the task will be
      * executed on. It can have any value between 1 and 31 inclusive.
-     * 
-     * @param string $time A string that represents the time of the day that 
-     * the task will execute on. The format of the time must be 'HH:MM'. where 
-     * HH can have any value from '00' up to '23' and 'MM' can have any value 
+     *
+     * @param string $time A string that represents the time of the day that
+     * the task will execute on. The format of the time must be 'HH:MM'. where
+     * HH can have any value from '00' up to '23' and 'MM' can have any value
      * from '00' up to '59'.
-     * 
+     *
      * @param string $name The name of the task.
-     * 
+     *
      * @param callable $func A function that will be executed when it's time to
      * run the task.
-     * 
-     * @param array $funcParams An optional array of parameters which will be 
+     *
+     * @param array $funcParams An optional array of parameters which will be
      * passed to task function.
-     * 
-     * @return bool If the task was scheduled, the method will return true. 
+     *
+     * @return bool If the task was scheduled, the method will return true.
      * If not, the method will return false.
-     * 
+     *
      * @since 1.0.3
      */
-    public static function monthlyTask(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool{
+    public static function monthlyTask(int $dayNumber, string $time, string $name, callable $func, array $funcParams = []): bool {
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
@@ -490,30 +480,35 @@ class TasksManager {
         return false;
     }
     /**
-     * Sets or gets the password that is used to protect tasks execution.
-     * 
-     * The password is used to prevent unauthorized access to execute tasks. 
-     * The provided password must be 'sha256' hashed string. It is recommended 
+     * Gets the password that is used to protect tasks execution.
+     *
+     * The password is used to prevent unauthorized access to execute tasks.
+     * The provided password must be 'sha256' hashed string. It is recommended
      * to hash the password externally then use the hash inside your code.
-     * 
-     * @param string|null $pass If not null, the password will be updated to the
-     * given one.
-     * 
-     * @return string If the password is set, the method will return it. 
+     *
+     * @return string If the password is set, the method will return it.
      * If not set, the method will return the string 'NO_PASSWORD'.
-     * 
-     * @since 1.0
+     *
      */
-    public static function password(string $pass = null) : string {
-        if ($pass !== null) {
-            self::get()->setPasswordHelper($pass);
-        }
-
+    public static function getPassword() : string {
+        
         return self::get()->getPasswordHelper();
     }
     /**
-     * Register any task which exist in the folder 'tasks' of the application.
+     * Sets the password that is used to protect tasks execution.
      * 
+     * The password is used to prevent unauthorized access to execute tasks.
+     * The provided password must be 'sha256' hashed string. It is recommended
+     * to hash the password externally then use the hash inside your code.
+     * 
+     * @param string $pass The password that will be used.
+     */
+    public static function setPassword(string $pass) {
+        self::get()->setPasswordHelper($pass);
+    }
+    /**
+     * Register any task which exist in the folder 'tasks' of the application.
+     *
      * Note that this method will register tasks only if the framework is running
      * using CLI or the constant 'SCHEDULER_THROUGH_HTTP' is set to true.
      */
@@ -525,6 +520,9 @@ class TasksManager {
             });
         }
     }
+    /**
+     * Reset all attributes of tasks manager to defaults.
+     */
     public static function reset() {
         self::get()->timestamp = [
             'month' => intval(date('m')),
@@ -541,36 +539,36 @@ class TasksManager {
     }
     /**
      * Check each scheduled task and run it if it's time to run it.
-     * 
-     * @param string $pass If tasks scheduler password is set, this value must be 
-     * provided. The given value will be hashed inside the body of the 
-     * method and then compared with the password which was set. Default 
+     *
+     * @param string $pass If tasks scheduler password is set, this value must be
+     * provided. The given value will be hashed inside the body of the
+     * method and then compared with the password which was set. Default
      * is empty string.
-     * 
-     * @param string|null $taskName An optional task name. If specified, only 
+     *
+     * @param string|null $taskName An optional task name. If specified, only
      * the given task will be checked. Default is null.
-     * 
-     * @param bool $force If this attribute is set to true and a task name 
+     *
+     * @param bool $force If this attribute is set to true and a task name
      * was provided, the task will be forced to execute. Default is false.
-     * 
+     *
      * @param SchedulerCommand|null $command If scheduler is executed from CLI, this parameter is
      * provided to set custom execution attributes of a task.
-     * 
-     * @return string|array If scheduler password is set and the given one is 
-     * invalid, the method will return the string 'INV_PASS'. If 
-     * a task name is specified and no task was found which has the given 
-     * name, the method will return the string 'TASK_NOT_FOUND'. Other than that, 
-     * the method will return an associative array which has the 
+     *
+     * @return string|array If scheduler password is set and the given one is
+     * invalid, the method will return the string 'INV_PASS'. If
+     * a task name is specified and no task was found which has the given
+     * name, the method will return the string 'TASK_NOT_FOUND'. Other than that,
+     * the method will return an associative array which has the
      * following indices:
      * <ul>
      * <li><b>total-tasks</b>: Total number of scheduled tasks.</li>
      * <li><b>executed-count</b>: Number of executed tasks.</li>
-     * <li><b>successfully-completed</b>: Number of successfully 
+     * <li><b>successfully-completed</b>: Number of successfully
      * completed tasks.</li>
-     * <li><b>failed</b>: Number of tasks which did not 
+     * <li><b>failed</b>: Number of tasks which did not
      * finish successfully.</li>
      * </ul>
-     * 
+     *
      * @since 1.0.6
      */
     public static function run(string $pass = '', string $taskName = null, bool $force = false, SchedulerCommand $command = null) {
@@ -578,7 +576,7 @@ class TasksManager {
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('scheduler-is-logged-in') : false;
-        $schedulerPass = TasksManager::password();
+        $schedulerPass = TasksManager::getPassword();
 
         if ($schedulerPass != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != $schedulerPass) {
             self::log('Error: Given password is incorrect.');
@@ -625,26 +623,26 @@ class TasksManager {
 
     /**
      * Adds new task to tasks queue.
-     * 
+     *
      * @param AbstractTask $task An instance of the class 'AbstractTask'.
-     * 
+     *
      * @return bool If the task is added, the method will return true.
-     * 
+     *
      * @since 1.0
      */
     public static function scheduleTask(AbstractTask $task) : bool {
         return self::get()->addTaskHelper($task);
     }
     /**
-     * Sets the number of day in the month at which the scheduler started to 
+     * Sets the number of day in the month at which the scheduler started to
      * execute tasks.
-     * 
-     * This method is helpful for the developer to test if tasks will run on 
+     *
+     * This method is helpful for the developer to test if tasks will run on
      * the specified time or not.
-     * 
-     * @param int $dayOfMonth The number of day. 1 for the first day of month and 
+     *
+     * @param int $dayOfMonth The number of day. 1 for the first day of month and
      * 31 for the last day of the month.
-     * 
+     *
      * @since 1.1.1
      */
     public static function setDayOfMonth(int $dayOfMonth) {
@@ -653,15 +651,15 @@ class TasksManager {
         }
     }
     /**
-     * Sets the value of the week at which the scheduler started to 
+     * Sets the value of the week at which the scheduler started to
      * run.
-     * 
-     * This method is helpful for the developer to test if tasks will run on 
+     *
+     * This method is helpful for the developer to test if tasks will run on
      * the specified time or not.
-     * 
-     * @param int $val Numeric representation of the day of the week. 
+     *
+     * @param int $val Numeric representation of the day of the week.
      * 0 for Sunday through 6 for Saturday.
-     * 
+     *
      * @since 1.1.1
      */
     public static function setDayOfWeek(int $val) {
@@ -670,15 +668,15 @@ class TasksManager {
         }
     }
     /**
-     * Sets the hour at which the scheduler started to 
+     * Sets the hour at which the scheduler started to
      * execute tasks.
-     * 
-     * This method is helpful for the developer to test if tasks will run on 
+     *
+     * This method is helpful for the developer to test if tasks will run on
      * the specified time or not.
-     * 
-     * @param int $hour The number of hour. Can be any value between 1 and 
+     *
+     * @param int $hour The number of hour. Can be any value between 1 and
      * 23 inclusive.
-     * 
+     *
      * @since 1.1.1
      */
     public static function setHour(int $hour) {
@@ -687,15 +685,15 @@ class TasksManager {
         }
     }
     /**
-     * Sets the minute at which the scheduler started to 
+     * Sets the minute at which the scheduler started to
      * execute tasks.
-     * 
-     * This method is helpful for the developer to test if tasks will run on 
+     *
+     * This method is helpful for the developer to test if tasks will run on
      * the specified time or not.
-     * 
-     * @param int $minute The number of the minute. Can be any value from 
+     *
+     * @param int $minute The number of the minute. Can be any value from
      * 1 to 59.
-     * 
+     *
      * @since 1.1.1
      */
     public static function setMinute(int $minute) {
@@ -704,15 +702,15 @@ class TasksManager {
         }
     }
     /**
-     * Sets the month at which the scheduler started to 
+     * Sets the month at which the scheduler started to
      * execute tasks.
-     * 
-     * This method is helpful for the developer to test if tasks will run on 
+     *
+     * This method is helpful for the developer to test if tasks will run on
      * the specified time or not.
-     * 
-     * @param int $month The number of the month. Can be any value 
+     *
+     * @param int $month The number of the month. Can be any value
      * between 1 and 12 inclusive.
-     * 
+     *
      * @since 1.1.1
      */
     public static function setMonth(int $month) {
@@ -721,21 +719,31 @@ class TasksManager {
         }
     }
     /**
+     * Returns a queue of all queued tasks.
+     *
+     * @return Queue An object of type 'Queue' which contains all queued tasks.
+     *
+     * @since 1.0
+     */
+    public static function tasksQueue() : Queue {
+        return self::get()->getQueueHelper();
+    }
+    /**
      * Returns the time at which tasks check was initialized.
-     * 
-     * @return string The method will return a time string in the format 
-     * 'YY-DD HH:MM' where: 
+     *
+     * @return string The method will return a time string in the format
+     * 'YY-DD HH:MM' where:
      * <ul>
      * <li>'YY' is month number.</li>
      * <li>'MM' is day number in the current month.</li>
      * <li>'HH' is the hour.</li>
      * <li>'MM' is the minute.</li>
-     * </ul> 
-     * 
+     * </ul>
+     *
      * @since 1.0.7
      */
-    public static function timestamp() : string {
-        $month = self::month();
+    public static function getTimestamp() : string {
+        $month = self::getMonth();
 
         if ($month < 10) {
             $month = '0'.$month;
@@ -745,12 +753,12 @@ class TasksManager {
         if ($day < 10) {
             $day = '0'.$day;
         }
-        $hour = self::hour();
+        $hour = self::getHour();
 
         if ($hour < 10) {
             $hour = '0'.$hour;
         }
-        $minute = self::minute();
+        $minute = self::getMinute();
 
         if ($minute < 10) {
             $minute = '0'.$minute;
@@ -760,24 +768,24 @@ class TasksManager {
     }
     /**
      * Creates a task that will be executed on specific time weekly.
-     * 
+     *
      * @param string $time A string in the format 'D-HH:MM'. 'D' can be a number
-     * between 0 and 6 inclusive or a 3 characters day name such as 'sun'. 0 is 
+     * between 0 and 6 inclusive or a 3 characters day name such as 'sun'. 0 is
      * for Sunday and 6 is for Saturday.
      * 'HH' can have any value between 0 and 23 inclusive. MM can have any value
      * between 0 and 59 inclusive.
-     * 
+     *
      * @param string $name An optional name for the task. Can be null.
-     * 
-     * @param callable|null $func A function that will be executed once it is the 
+     *
+     * @param callable|null $func A function that will be executed once it is the
      * time to run the task.
-     * 
-     * @param array $funcParams An optional array of parameters which will be passed to 
+     *
+     * @param array $funcParams An optional array of parameters which will be passed to
      * the function.
-     * 
-     * @return bool If the task was created and scheduled, the method will 
+     *
+     * @return bool If the task was created and scheduled, the method will
      * return true. Other than that, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public static function weeklyTask(string $time, string $name, callable $func, array $funcParams = []): bool {
@@ -797,7 +805,7 @@ class TasksManager {
         return false;
     }
     /**
-     * 
+     *
      * @param AbstractTask $task
      * @return bool
      * @since 1.0
@@ -819,7 +827,7 @@ class TasksManager {
         return $retVal;
     }
     /**
-     * 
+     *
      * @return string
      * @since 1.0
      */
@@ -831,7 +839,7 @@ class TasksManager {
         return $this->accessPass;
     }
     /**
-     * 
+     *
      * @return Queue
      * @since 1.0
      */
@@ -844,11 +852,10 @@ class TasksManager {
     private function logExecHelper($forced, $task, File $file) {
         if ($forced) {
             $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
-
         } else {
             $file->setRawData('Task \''.$task->getTaskName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
-
         }
+
         if ($task->isSuccess()) {
             $file->setRawData('Execution status: Successfully completed.'."\n");
         } else {
@@ -907,7 +914,7 @@ class TasksManager {
         self::get()->setActiveTaskHelper();
     }
     /**
-     * 
+     *
      * @param AbstractTask|null $task
      * @since 1.0.4
      */
@@ -922,7 +929,7 @@ class TasksManager {
         $this->isLogEnabled = $bool;
     }
     /**
-     * 
+     *
      * @param string $pass
      * @since 1.0
      */

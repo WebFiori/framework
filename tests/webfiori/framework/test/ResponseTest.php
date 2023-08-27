@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\framework\test;
 
 use PHPUnit\Framework\TestCase;
@@ -10,7 +9,6 @@ use webfiori\http\Response;
  *
  * @author Ibrahim
  */
-
 class ResponseTest extends TestCase {
     /**
      * @test
@@ -29,12 +27,21 @@ class ResponseTest extends TestCase {
         $this->assertTrue(Response::addHeader('Set-Cookie', 'name=ok'));
         $this->assertTrue(Response::hasHeader('Set-Cookie'));
         $this->assertTrue(Response::hasHeader('Set-Cookie','name=ok'));
-        
+
         $this->assertTrue(Response::addHeader('Set-Cookie', 'name=good'));
         $this->assertTrue(Response::hasHeader('Set-cookie','name=good'));
-        
+
         $this->assertTrue(Response::addHeader('Set-Cookie', 'name=no'));
         $this->assertTrue(Response::hasHeader('Set-Cookie','name=no'));
+    }
+    /**
+     * @test
+     */
+    public function testClearBody() {
+        Response::write('Hello World!');
+        $this->assertEquals('Hello World!', Response::getBody());
+        Response::clearBody();
+        $this->assertEquals('', Response::getBody());
     }
     /**
      * @test
@@ -49,7 +56,7 @@ class ResponseTest extends TestCase {
      * @test
      * @depends testAddHeader01
      */
-    public function testRemoveHeader01() { 
+    public function testRemoveHeader01() {
         $this->assertTrue(Response::hasHeader('Set-Cookie'));
         $this->assertTrue(Response::removeHeader('Set-cookie', 'name=good'));
         $this->assertFalse(Response::hasHeader('Set-cookie','name=good'));
@@ -67,15 +74,6 @@ class ResponseTest extends TestCase {
         $this->assertFalse(Response::hasHeader('content-type','text/plain'));
         Response::clearHeaders();
         $this->assertEquals(0, count(Response::getHeaders()));
-    }
-    /**
-     * @test
-     */
-    public function testClearBody() {
-        Response::write('Hello World!');
-        $this->assertEquals('Hello World!', Response::getBody());
-        Response::clearBody();
-        $this->assertEquals('', Response::getBody());
     }
     /**
      * @test

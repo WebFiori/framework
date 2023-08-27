@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\router;
 
@@ -18,7 +18,7 @@ use webfiori\http\Uri;
 use webfiori\ui\HTMLNode;
 /**
  * A class that is used to split URIs and get their parameters.
- * 
+ *
  * The main aim of this class is to extract URI parameters including:
  * <ul>
  * <li>Host</li>
@@ -31,99 +31,99 @@ use webfiori\ui\HTMLNode;
  * </ul>
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  * @version 1.5.0
  */
 class RouterUri extends Uri {
     /**
      * The action (class method) that will be performed.
-     * 
+     *
      * @var string|null
-     * 
+     *
      * @since 1.5.0
      */
     private $action;
     private $assignedMiddlewareList;
     /**
-     * 
-     * @var array 
+     *
+     * @var array
      * @since 1.2
      */
     private $closureParams = [];
     /**
-     * A boolean value that is set to true if the URI will be included in 
+     * A boolean value that is set to true if the URI will be included in
      * generated site map.
-     * 
-     * @var bool 
-     * 
+     *
+     * @var bool
+     *
      * @since 1.3
      */
     private $incInSiteMap;
     /**
      * A boolean which is set to true if URI is case-sensitive.
-     * 
-     * @var bool 
-     * 
+     *
+     * @var bool
+     *
      * @since 1.0
      */
     private $isCS;
 
     /**
      * Set to true if the resource that the route points to is dynamic (PHP file or code).
-     * 
+     *
      * @var bool
-     * 
-     * @since 1.3.7 
+     *
+     * @since 1.3.7
      */
     private $isDynamic;
     /**
-     * An array that contains all languages that the resource the URI is pointing 
+     * An array that contains all languages that the resource the URI is pointing
      * to can have.
-     * 
+     *
      * @var array
-     * 
-     * @since 1.3.5 
+     *
+     * @since 1.3.5
      */
     private $languages;
     /**
-     * 
+     *
      * @var Uri|null
      */
     private $requestedUri;
     /**
      * The route which this URI will be routing to.
-     * 
+     *
      * @var mixed This route can be a file or a method.
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private $routeTo;
     /**
      * The type of the route.
-     * 
+     *
      * @var string
-     * 
-     * @since 1.1 
+     *
+     * @since 1.1
      */
     private $type;
     /**
      * Creates new instance.
-     * 
+     *
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
-     * 
+     *
      * @param string|callable $routeTo The file that the route will take the user
      * to. This can be an absolute path to a file, a closure or class
      * name.
-     * 
-     * @param bool $caseSensitive A boolean. If the URI is case-sensitive, 
+     *
+     * @param bool $caseSensitive A boolean. If the URI is case-sensitive,
      * then this value must be set to true. False if not. Default is true.
-     * 
-     * @param array $closureParams If the closure needs to use parameters, 
+     *
+     * @param array $closureParams If the closure needs to use parameters,
      * it is possible to supply them using this array.
-     * 
-     * @throws InvalidArgumentException The method will throw this exception if the 
+     *
+     * @throws InvalidArgumentException The method will throw this exception if the
      * given URI is invalid.
      */
     public function __construct(string $requestedUri, $routeTo, bool $caseSensitive = true, array $closureParams = []) {
@@ -139,12 +139,12 @@ class RouterUri extends Uri {
         $this->addMiddleware('global');
     }
     /**
-     * Adds a language to the set of languages at which the resource that the URI 
+     * Adds a language to the set of languages at which the resource that the URI
      * points to.
-     * 
-     * @param string $langCode A two characters string such as 'AR' that represents 
+     *
+     * @param string $langCode A two characters string such as 'AR' that represents
      * language code.
-     * 
+     *
      * @since 1.3.5
      */
     public function addLanguage(string $langCode) {
@@ -156,9 +156,9 @@ class RouterUri extends Uri {
     }
     /**
      * Adds the URI to middleware or to middleware group.
-     * 
+     *
      * @param string $name The name of the middleware or the group.
-     * 
+     *
      * @since 1.4
      */
     public function addMiddleware(string $name) {
@@ -177,9 +177,9 @@ class RouterUri extends Uri {
     }
     /**
      * Returns the name of the action that will be called in the controller.
-     * 
+     *
      * @return string|null The name of the controller method.
-     * 
+     *
      * @since 1.5.0
      */
     public function getAction() {
@@ -187,14 +187,14 @@ class RouterUri extends Uri {
     }
     /**
      * Returns class name based on the file which the route will point to.
-     * 
-     * The method will try to extract class name from the file which the 
+     *
+     * The method will try to extract class name from the file which the
      * route is pointing to.
      * This only applies to routes which points to PHP classes only.
-     * 
-     * @return string Class name taken from file name. If route type is not 
+     *
+     * @return string Class name taken from file name. If route type is not
      * API o not view, the method will return empty string.
-     * 
+     *
      * @since 1.3.2
      */
     public function getClassName() : string {
@@ -214,22 +214,22 @@ class RouterUri extends Uri {
         return '';
     }
     /**
-     * Returns an array that contains the variables which will be passed to 
+     * Returns an array that contains the variables which will be passed to
      * the closure.
-     * 
+     *
      * @return array
-     * 
+     *
      * @since 1.2
      */
     public function getClosureParams() : array {
         return $this->closureParams;
     }
     /**
-     * Returns an array that contains a set of languages at which the resource that the URI 
+     * Returns an array that contains a set of languages at which the resource that the URI
      * points to can have.
-     * 
+     *
      * @return array An array that contains language codes.
-     * 
+     *
      * @since 1.3.5
      */
     public function getLanguages() : array {
@@ -237,9 +237,9 @@ class RouterUri extends Uri {
     }
     /**
      * Returns a list that holds objects for the middleware.
-     * 
+     *
      * @return LinkedList
-     * 
+     *
      * @since 1.4.0
      */
     public function getMiddleware() : LinkedList {
@@ -248,10 +248,10 @@ class RouterUri extends Uri {
 
     /**
      * Returns an array that contains requested URI information.
-     * 
+     *
      * @return Uri|null If the requested URI is set, the method will return
      * its information contained in an object. Other than that, null is returned.
-     * 
+     *
      * @since 1.3.4
      */
     public function getRequestedUri() {
@@ -259,25 +259,25 @@ class RouterUri extends Uri {
     }
     /**
      * Returns the location where the URI will route to.
-     * 
-     * @return string|callable Usually, the route can be either a callable 
+     *
+     * @return string|callable Usually, the route can be either a callable
      * or a path to a file. The file can be of any type.
-     * 
+     *
      * @since 1.0
      */
     public function getRouteTo() {
         return $this->routeTo;
     }
     /**
-     * Returns an object of type 'HTMLNode' that contains URI information which 
+     * Returns an object of type 'HTMLNode' that contains URI information which
      * can be used to construct XML sitemap.
-     * 
-     * @return array The method will return an array that contains objects 
-     * of type 'HTMLNode' that contains URI information which 
+     *
+     * @return array The method will return an array that contains objects
+     * of type 'HTMLNode' that contains URI information which
      * can be used to construct XML sitemap.
-     * 
+     *
      * @since 1.3.5
-     * 
+     *
      */
     public function getSitemapNodes() : array {
         $retVal = [];
@@ -294,7 +294,7 @@ class RouterUri extends Uri {
     }
     /**
      * Returns the type of element that the URI will route to.
-     * 
+     *
      * The type of the element can be 1 of 4 values:
      * <ul>
      * <li>Router::API_ROUTE</li>
@@ -302,10 +302,10 @@ class RouterUri extends Uri {
      * <li>Router::CLOSURE_ROUTE</li>
      * <li>Router::CUSTOMIZED</li>
      * </ul>
-     * 
-     * @return string The type of element that the URI will route to. Default 
+     *
+     * @return string The type of element that the URI will route to. Default
      * return value is Router::CUSTOMIZED.
-     * 
+     *
      * @since 1.1
      */
     public function getType() : string {
@@ -314,10 +314,10 @@ class RouterUri extends Uri {
 
     /**
      * Checks if the URI has WWW in the host part or not.
-     * 
-     * @return bool If the URI has WWW in the host, the method will return 
+     *
+     * @return bool If the URI has WWW in the host, the method will return
      * true. Other than that, it will return false.
-     * 
+     *
      * @since 1.3.4
      */
     public function hasWWW() : bool {
@@ -327,11 +327,11 @@ class RouterUri extends Uri {
         return $www == 'www';
     }
     /**
-     * Returns the value of the property that tells if the URI is case-sensitive 
+     * Returns the value of the property that tells if the URI is case-sensitive
      * or not.
-     * 
+     *
      * @return bool  True if URI case-sensitive. False if not. Default is false.
-     * 
+     *
      * @since 1.0
      */
     public function isCaseSensitive() : bool {
@@ -339,12 +339,12 @@ class RouterUri extends Uri {
     }
     /**
      * Checks if the resource that the URI is pointing to is dynamic.
-     * 
+     *
      * A resource is considered as dynamic if it is a PHP code or a PHP file.
-     * 
-     * @return bool If the resource is dynamic, the method will return true. 
+     *
+     * @return bool If the resource is dynamic, the method will return true.
      * other than that, the method will return false.
-     * 
+     *
      * @since 1.3.7
      */
     public function isDynamic() : bool {
@@ -352,10 +352,10 @@ class RouterUri extends Uri {
     }
     /**
      * Checks if the URI will be included in auto-generated site map or not.
-     * 
-     * @return bool If the URI will be included, the method will return 
+     *
+     * @return bool If the URI will be included, the method will return
      * true. Default is false.
-     * 
+     *
      * @since 1.3
      */
     public function isInSiteMap() : bool {
@@ -363,9 +363,9 @@ class RouterUri extends Uri {
     }
     /**
      * Sets the name of the action that will be called in the controller.
-     * 
+     *
      * @param string $action The name of the controller method.
-     * 
+     *
      * @since 1.5.0
      */
     public function setAction(string $action) {
@@ -377,10 +377,10 @@ class RouterUri extends Uri {
     }
     /**
      * Sets the array of closure parameters.
-     * 
-     * @param array $arr An array that contains all the values that will be 
+     *
+     * @param array $arr An array that contains all the values that will be
      * passed to the closure.
-     * 
+     *
      * @since 1.2
      */
     public function setClosureParams(array $arr) {
@@ -388,24 +388,24 @@ class RouterUri extends Uri {
     }
     /**
      * Make the URI case-sensitive or not.
-     * 
-     * This is mainly used in case the developer would like to use the 
+     *
+     * This is mainly used in case the developer would like to use the
      * URI in routing.
-     *  
-     * @param bool $caseSensitive True to make it case-sensitive. False to 
+     *
+     * @param bool $caseSensitive True to make it case-sensitive. False to
      * not.
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     public function setIsCaseSensitive(bool $caseSensitive) {
         $this->isCS = $caseSensitive === true;
     }
     /**
      * Sets the value of the property '$incInSiteMap'.
-     * 
-     * @param bool $bool If true is given, the URI will be included 
+     *
+     * @param bool $bool If true is given, the URI will be included
      * in site map.
-     * 
+     *
      * @since 1.3
      */
     public function setIsInSiteMap(bool $bool) {
@@ -413,13 +413,13 @@ class RouterUri extends Uri {
     }
     /**
      * Sets the requested URI.
-     * 
+     *
      * @param string $uri A string that represents requested URI.
-     * 
-     * @return bool If the requested URI is a match with the original URI which 
-     * is stored in the object, it will be set and the method will return true. 
+     *
+     * @return bool If the requested URI is a match with the original URI which
+     * is stored in the object, it will be set and the method will return true.
      * Other than that, the method will return false.
-     * 
+     *
      * @since 1.0
      */
     public function setRequestedUri(string $uri): bool {
@@ -436,10 +436,10 @@ class RouterUri extends Uri {
 
     /**
      * Sets the route which the URI will take to.
-     * 
-     * @param string|Closure $routeTo Usually, the route can be either a 
+     *
+     * @param string|Closure $routeTo Usually, the route can be either a
      * file or it can be a callable. The file can be of any type.
-     * 
+     *
      * @since 1.0
      */
     public function setRoute($routeTo) {
@@ -469,7 +469,7 @@ class RouterUri extends Uri {
     }
     /**
      * Sets the type of element that the URI will route to.
-     * 
+     *
      * The type of the element can be 1 of 4 values:
      * <ul>
      * <li>Router::API_ROUTE</li>
@@ -478,13 +478,13 @@ class RouterUri extends Uri {
      * <li>Router::CUSTOMIZED</li>
      * </ul>
      * If any thing else is given, it won't update.
-     * 
+     *
      * @param string $type The type of element that the URI will route to.
-     * 
+     *
      * @since 1.1
      */
     public function setType(string $type) {
-        if ($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE || 
+        if ($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE ||
                 $type == Router::CUSTOMIZED || $type == Router::VIEW_ROUTE) {
             $this->type = $type;
         }
@@ -514,23 +514,6 @@ class RouterUri extends Uri {
 
         return $node;
     }
-
-    /**
-     * Validate the path part of original URI and the requested one.
-     *
-     * @param Uri $requestedUri
-     * @return bool
-     *
-     * @since 1.0
-     */
-    private function compareUriPathHelper(Uri $requestedUri): bool {
-        $requestedArr = $requestedUri->getComponents();
-
-        $originalPath = $this->getPathArray();
-        $requestedPath = $requestedArr['path'];
-
-        return $this->comparePathHelper($originalPath, $requestedPath);
-    }
     private function comparePathHelper($originalPath, $requestedPath): bool {
         $count = count($originalPath);
         $requestedCount = count($requestedPath);
@@ -556,5 +539,22 @@ class RouterUri extends Uri {
         }
 
         return true;
+    }
+
+    /**
+     * Validate the path part of original URI and the requested one.
+     *
+     * @param Uri $requestedUri
+     * @return bool
+     *
+     * @since 1.0
+     */
+    private function compareUriPathHelper(Uri $requestedUri): bool {
+        $requestedArr = $requestedUri->getComponents();
+
+        $originalPath = $this->getPathArray();
+        $requestedPath = $requestedArr['path'];
+
+        return $this->comparePathHelper($originalPath, $requestedPath);
     }
 }

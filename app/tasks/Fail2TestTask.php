@@ -2,7 +2,6 @@
 namespace app\tasks;
 
 use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\scheduler\TaskStatusEmail;
 /**
  * A background process which was created using the command "create".

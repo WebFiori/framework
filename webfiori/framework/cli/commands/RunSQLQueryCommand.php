@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -20,11 +20,11 @@ use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\DB;
 /**
- * A command which can be used to execute SQL queries on 
+ * A command which can be used to execute SQL queries on
  * specific database.
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
  */
 class RunSQLQueryCommand extends CLICommand {
@@ -41,7 +41,7 @@ class RunSQLQueryCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * 
+     *
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
@@ -64,6 +64,47 @@ class RunSQLQueryCommand extends CLICommand {
             $this->error('No database connections available. Add connections to application configuration or use the command "add".');
 
             return -1;
+        }
+    }
+    /**
+     *
+     * @param type $schema
+     * @param type $selectedQuery
+     * @param type $colsKeys
+     * @param Table $tableObj
+     */
+    private function colQuery(&$schema, $selectedQuery, $colsKeys, $tableObj) {
+        $selectedCol = $this->select('Select the column:', $colsKeys);
+
+        if ($selectedQuery == 'Add Column.') {
+            $schema->table($tableObj->getNormalName())->addCol($selectedCol);
+        } else if ($selectedQuery == 'Modify Column.') {
+            $schema->table($tableObj->getNormalName())->modifyCol($selectedCol);
+        } else if ($selectedQuery == 'Drop Column.') {
+            $schema->table($tableObj->getNormalName())->dropCol($selectedCol);
+        }
+    }
+    private function confirmExecute(Database $schema) {
+        $noConfirmExec = $this->isArgProvided('--no-confirm');
+        $dbName = $schema->getConnectionInfo()->getDBName();
+
+        if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
+            $this->println("The following query will be executed on the database '$dbName':");
+            $this->println($schema->getLastQuery(), [
+                'color' => 'blue'
+            ]);
+        }
+
+        if ($noConfirmExec) {
+            return $this->executeQ($schema);
+        }
+
+        if ($this->confirm('Continue?', true)) {
+            return $this->executeQ($schema);
+        } else {
+            $this->info('Nothing to execute.');
+
+            return 0;
         }
     }
     private function connectionBased($dbConnections) : int {
@@ -101,58 +142,6 @@ class RunSQLQueryCommand extends CLICommand {
 
 
         return $this->generalQuery($schema);
-    }
-    private function schemaBased($schema) {
-        $schemaInst = new $schema();
-
-        if ($schemaInst instanceof DB) {
-            return $this->queryOnSchema($schemaInst);
-        } else {
-            $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
-
-            return -1;
-        }
-    }
-    /**
-     * 
-     * @param type $schema
-     * @param type $selectedQuery
-     * @param type $colsKeys
-     * @param Table $tableObj
-     */
-    private function colQuery(&$schema, $selectedQuery, $colsKeys, $tableObj) {
-        $selectedCol = $this->select('Select the column:', $colsKeys);
-
-        if ($selectedQuery == 'Add Column.') {
-            $schema->table($tableObj->getNormalName())->addCol($selectedCol);
-        } else if ($selectedQuery == 'Modify Column.') {
-            $schema->table($tableObj->getNormalName())->modifyCol($selectedCol);
-        } else if ($selectedQuery == 'Drop Column.') {
-            $schema->table($tableObj->getNormalName())->dropCol($selectedCol);
-        }
-    }
-    private function confirmExecute(Database $schema) {
-        $noConfirmExec = $this->isArgProvided('--no-confirm');
-        $dbName = $schema->getConnectionInfo()->getDBName();
-        
-        if ($this->isArgProvided('--show-sql') || !$noConfirmExec) {
-            $this->println("The following query will be executed on the database '$dbName':");
-            $this->println($schema->getLastQuery(), [
-                'color' => 'blue'
-            ]);
-        }
-
-        if ($noConfirmExec) {
-            return $this->executeQ($schema);
-        }
-
-        if ($this->confirm('Continue?', true)) {
-            return $this->executeQ($schema);
-        } else {
-            $this->info('Nothing to execute.');
-
-            return 0;
-        }
     }
     private function executeQ(DB $schema) {
         $this->info('Executing query on database '.$schema->getConnectionInfo()->getDBName().'...');
@@ -256,8 +245,19 @@ class RunSQLQueryCommand extends CLICommand {
 
         return $this->confirmExecute($schema);
     }
+    private function schemaBased($schema) {
+        $schemaInst = new $schema();
+
+        if ($schemaInst instanceof DB) {
+            return $this->queryOnSchema($schemaInst);
+        } else {
+            $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
+
+            return -1;
+        }
+    }
     /**
-     * 
+     *
      * @param DB $schema
      * @param Table $tableObj
      */

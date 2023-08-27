@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -16,17 +16,17 @@ use webfiori\database\DatabaseException;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\email\SMTPServer;
-use webfiori\framework\DB;
 use webfiori\framework\App;
+use webfiori\framework\DB;
 use webfiori\framework\writers\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.
  *
  * @author Ibrahim
- * 
+ *
  * @since 1.1.0
- * 
+ *
  * @version 1.0
  */
 class AddCommand extends CLICommand {
@@ -35,7 +35,7 @@ class AddCommand extends CLICommand {
     }
     /**
      * Execute the command.
-     * 
+     *
      * @return int
      */
     public function exec() : int {
@@ -84,7 +84,7 @@ class AddCommand extends CLICommand {
                 $connInfoObj->setHost('127.0.0.1');
                 $addConnection = $this->tryConnect($connInfoObj);
             }
-        } 
+        }
 
         if ($addConnection === true) {
             $this->success('Connected. Adding the connection...');
@@ -119,7 +119,7 @@ class AddCommand extends CLICommand {
         $writingDir = $this->select('Select writing direction:', [
             'ltr', 'rtl'
         ]);
-        
+
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
@@ -179,7 +179,6 @@ class AddCommand extends CLICommand {
         }
     }
     private function tryConnect($connectionInfo) {
-
         try {
             $db = new DB($connectionInfo);
             $db->getConnection();

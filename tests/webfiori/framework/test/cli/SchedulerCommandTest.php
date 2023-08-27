@@ -1,10 +1,9 @@
 <?php
-
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\App;
+use webfiori\framework\scheduler\TasksManager;
 /**
  * Description of CronCommandTest
  *
@@ -30,7 +29,7 @@ class SchedulerCommandTest extends TestCase {
      * @test
      */
     public function test01() {
-        TasksManager::password(hash('sha256', '123456'));
+        TasksManager::setPassword(hash('sha256', '123456'));
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
@@ -169,7 +168,7 @@ class SchedulerCommandTest extends TestCase {
             "Exception class: Error\n",
             "Exception message: Call to undefined method app\\tasks\Fail2TestTask::undefined()\n",
             "Thrown in: Fail2TestTask\n",
-            "Line: 45\n",
+            "Line: 44\n",
             "Calling the method app\\tasks\Fail2TestTask::onFail()\n",
             "Calling the method app\\tasks\Fail2TestTask::afterExec()\n",
             "Check finished.\n",
@@ -265,9 +264,9 @@ class SchedulerCommandTest extends TestCase {
         $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
-        TasksManager::password('123456');
+        TasksManager::setPassword('123456');
         TasksManager::registerTasks();
-        
+
         $runner->setInputs([
             'N'
         ]);
@@ -295,7 +294,7 @@ class SchedulerCommandTest extends TestCase {
     public function test09() {
         $runner = App::getRunner();
         $runner->setInputs([
-            
+
         ]);
         $runner->setArgsVector([
             'webfiori',
@@ -392,9 +391,9 @@ class SchedulerCommandTest extends TestCase {
         $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
-        TasksManager::password(hash('sha256', '123456'));
+        TasksManager::setPassword(hash('sha256', '123456'));
         TasksManager::registerTasks();
-        
+
         $runner->setInputs([
             'Y',
             '2021-01-01',

@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\helpers;
 
@@ -25,9 +25,9 @@ use webfiori\json\CaseConverter;
 class CreateTableObj extends CreateClassHelper {
     /**
      * Creates new instance of the class.
-     * 
+     *
      * @param CreateCommand $command A command that is used to call the class.
-     * 
+     *
      * @param Table $t An optional table instance to associate the writer with.
      */
     public function __construct(CLICommand $command) {

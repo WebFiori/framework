@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework;
 
@@ -33,16 +33,16 @@ use webfiori\http\Request;
 use webfiori\http\Response;
 /**
  * The time at which the framework was booted in microseconds as a float.
- * 
+ *
  * @since 1.1.0
  */
 define('MICRO_START', microtime(true));
 /**
- * The instance of this class is used to control basic settings of 
+ * The instance of this class is used to control basic settings of
  * the application. Also, it is the entry point of the application.
- * 
+ *
  * @author Ibrahim
- * 
+ *
  */
 class App {
     /**
@@ -51,7 +51,7 @@ class App {
      * This method must be used before calling the method 'App::start()' in order
      * to set proper configuration driver.
      * 
-     * @param string $clazz The full name of the class including namespace.
+     * @param string $clazz The full name of the class including namespace. 
      */
     public static function setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
@@ -72,51 +72,51 @@ class App {
     private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
     /**
      * A constant that indicates that the status of the class is 'initialized'.
-     * 
+     *
      */
     const STATUS_INITIALIZED = 'INITIALIZED';
     /**
      * A constant that indicates that the status of the class is 'initializing'.
-     * 
+     *
      */
     const STATUS_INITIALIZING = 'INITIALIZING';
     /**
      * A constant that indicates that the status of the class is 'none'.
-     * 
+     *
      */
     const STATUS_NONE = 'NONE';
     /**
-     * 
+     *
      * @var Config
      */
     private $appConfig;
     /**
      * An instance of autoloader class.
-     * 
-     * @var AutoLoader 
-     * 
+     *
+     * @var AutoLoader
+     *
      * @since 1.0
      */
     private static $AU;
     /**
      * A mutex lock to disallow class access during initialization state.
-     * 
+     *
      * @var int
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $ClassStatus = self::STATUS_NONE;
     /**
-     * 
+     *
      * @var Runner
      */
     private static $CliRunner;
     /**
      * A single instance of the class.
-     * 
+     *
      * @var App
-     * 
-     * @since 1.0 
+     *
+     * @since 1.0
      */
     private static $LC;
 
@@ -152,7 +152,7 @@ class App {
          */
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
-        
+
         $this->setHandlers();
         //Initialize CLI
         self::getRunner();
@@ -161,7 +161,7 @@ class App {
         $this->checkStandardLibs();
 
         if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
-            ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
+            Ini::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
@@ -209,25 +209,25 @@ class App {
     }
     /**
      * Register CLI commands or background tasks.
-     * 
-     * @param string $folder The name of the folder that contains the jobs or 
-     * commands. It must be a folder inside 'app' folder or the folder which is defined 
+     *
+     * @param string $folder The name of the folder that contains the jobs or
+     * commands. It must be a folder inside 'app' folder or the folder which is defined
      * by the constant 'APP_DIR'.
-     * 
+     *
      * @param callable $regCallback A callback which is used to register the
      * classes of the folder.
-     * 
+     *
      * @param string|null $suffix A string which is appended to class name.
-     * For example, if class name is 'UsersTable', the suffix in this case would 
-     * be 'Table' If provided, only classes with the specified suffix will 
+     * For example, if class name is 'UsersTable', the suffix in this case would
+     * be 'Table' If provided, only classes with the specified suffix will
      * be considered.
-     * 
+     *
      * @param array $constructorParams An optional array that can hold constructor
      * parameters for objects that will be registered.
-     * 
-     * @param array $otherParams An optional array that can hold extra parameters 
+     *
+     * @param array $otherParams An optional array that can hold extra parameters
      * which will be passed to the register callback.
-     * 
+     *
      * @since 1.3.6
      */
     public static function autoRegister(string $folder, callable $regCallback, string $suffix = null, array $constructorParams = [], array $otherParams = []) {
@@ -258,11 +258,11 @@ class App {
                     }
 
                     self::autoRegisterHelper([
-                        'dir' => $dir, 
-                        'php-file' => $phpFile, 
-                        'folder' => $folder, 
-                        'class-name' => $expl[0], 
-                        'params' => $otherParams, 
+                        'dir' => $dir,
+                        'php-file' => $phpFile,
+                        'folder' => $folder,
+                        'class-name' => $expl[0],
+                        'params' => $otherParams,
                         'callback' => $regCallback,
                         'constructor-params' => $constructorParams
                     ]);
@@ -271,18 +271,10 @@ class App {
         }
     }
     /**
-     * Returns the instance which is used as main application configuration class.
-     * 
-     * @return ConfigurationDriver
-     */
-    public static function getConfig(): ConfigurationDriver {
-        return Controller::getDriver();
-    }
-    /**
      * Returns a reference to an instance of 'AutoLoader'.
-     * 
+     *
      * @return AutoLoader A reference to an instance of 'AutoLoader'.
-     * 
+     *
      * @since 1.2.1
      */
     public static function getAutoloader(): AutoLoader {
@@ -290,16 +282,24 @@ class App {
     }
     /**
      * Returns the status of the class.
-     * 
-     * @return string The returned value will be one of 3 values: 'NONE' if 
-     * the constructor of the class is not called. 'INITIALIZING' if the execution 
-     * is happening inside the constructor of the class. 'INITIALIZED' once the 
+     *
+     * @return string The returned value will be one of 3 values: 'NONE' if
+     * the constructor of the class is not called. 'INITIALIZING' if the execution
+     * is happening inside the constructor of the class. 'INITIALIZED' once the
      * code in the constructor is executed.
-     * 
+     *
      * @since 1.0
      */
     public static function getClassStatus() {
         return self::$ClassStatus;
+    }
+    /**
+     * Returns the instance which is used as main application configuration class.
+     *
+     * @return ConfigurationDriver
+     */
+    public static function getConfig(): ConfigurationDriver {
+        return Controller::getDriver();
     }
 
     /**
@@ -311,7 +311,7 @@ class App {
      */
     public static function getRunner() : Runner {
         if (!class_exists(APP_DIR.'\ini\InitCommands')) {
-            ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
+            Ini::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
         }
 
         if (self::$CliRunner === null) {
@@ -369,9 +369,9 @@ class App {
     /**
      * Sets the configuration object that will be used to configure part of
      * application settings.
-     * 
+     *
      * @param Config $conf
-     * 
+     *
      * @since 2.1.0
      */
     public static function setConfig(Config $conf) {
@@ -415,7 +415,7 @@ class App {
         }
         $class = $instanceNs.'\\'.$className;
         try {
-            $reflectionClass = new ReflectionClass($class);  
+            $reflectionClass = new ReflectionClass($class);
 
             $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
 
@@ -431,11 +431,12 @@ class App {
          * Directory separator.
          */
         define('DS', DIRECTORY_SEPARATOR);
+
         if (!defined('APP_DIR')) {
             /**
-             * The name of the directory at which the developer will have his own application 
+             * The name of the directory at which the developer will have his own application
              * code.
-             * 
+             *
              * @since 2.2.1
              */
             define('APP_DIR','app');
@@ -447,7 +448,7 @@ class App {
         }
         /**
          * The absolute path to application directory.
-         * 
+         *
          * @var string
          */
         define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
@@ -492,10 +493,10 @@ class App {
         if (!defined('STDIN')) {
             /**
              * A constant that represents standard input stream of PHP.
-             * 
-             * The value of the constant is a 'resource' which can be used with 
+             *
+             * The value of the constant is a 'resource' which can be used with
              * all file related PHP functions.
-             * 
+             *
              */
             define('STDIN', fopen('php://stdin', 'r'));
         }
@@ -503,8 +504,8 @@ class App {
         if (!defined('STDOUT')) {
             /**
              * A constant that represents standard output stream of PHP.
-             * 
-             * The value of the constant is a 'resource' which can be used with 
+             *
+             * The value of the constant is a 'resource' which can be used with
              * all file related PHP functions.
              */
             define('STDOUT', fopen('php://stdout', 'w'));
@@ -513,10 +514,10 @@ class App {
         if (!defined('STDERR')) {
             /**
              * A constant that represents standard error output stream of PHP.
-             * 
-             * The value of the constant is a 'resource' which can be used with 
+             *
+             * The value of the constant is a 'resource' which can be used with
              * all file related PHP functions.
-             * 
+             *
              */
             define('STDERR',fopen('php://stderr', 'w'));
         }
@@ -536,55 +537,33 @@ class App {
         self::$AU = AutoLoader::get();
 
         if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
-            ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
+            Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
-    }
-
-    /**
-     * @throws FileException
-     */
-    private function initScheduler() {
-        $uriObj = new RouterUri(Request::getRequestedURI(), '');
-        $pathArr = $uriObj->getPathArray();
-
-        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
-            ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
-        }
-
-        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
-            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
-                TasksManager::initRoutes();
-            }
-            TasksManager::password(self::getConfig()->getSchedulerPassword());
-            //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
-            call_user_func(APP_DIR.'\ini\InitTasks::init');
-            TasksManager::registerTasks();
-        }
     }
     private function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
-         * 
+         *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC14');
+        define('WF_VERSION', '3.0.0-RC15');
         /**
          * A constant that tells the type of framework version.
-         * 
+         *
          * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
-         * 
+         *
          * @since 2.1
          */
         define('WF_VERSION_TYPE', 'Release Candidate');
         /**
          * The date at which the framework version was released.
-         * 
+         *
          * The value of the constant will be a string in the format YYYY-MM-DD.
-         * 
+         *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2023-08-13');
+        define('WF_RELEASE_DATE', '2023-08-27');
     }
 
     /**
@@ -597,7 +576,7 @@ class App {
         });
 
         if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
-            ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
+            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
         call_user_func(APP_DIR.'\ini\InitMiddleware::init');
     }
@@ -610,7 +589,7 @@ class App {
 
         foreach ($routesClasses as $className) {
             if (!class_exists(APP_DIR.'\\ini\\routes\\'.$className)) {
-                ConfigController::get()->createRoutesClass($className);
+                Ini::get()->createRoutesClass($className);
             }
             call_user_func(APP_DIR.'\ini\routes\\'.$className.'::create');
         }
@@ -621,6 +600,28 @@ class App {
             if (strlen($home) != 0) {
                 Router::redirect('/', App::getConfig()->getHomePage());
             }
+        }
+    }
+
+    /**
+     * @throws FileException
+     */
+    private function initScheduler() {
+        $uriObj = new RouterUri(Request::getRequestedURI(), '');
+        $pathArr = $uriObj->getPathArray();
+
+        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
+            Ini::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
+        }
+
+        if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
+            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
+                TasksManager::initRoutes();
+            }
+            TasksManager::getPassword(self::getConfig()->getSchedulerPassword());
+            //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
+            call_user_func(APP_DIR.'\ini\InitTasks::init');
+            TasksManager::registerTasks();
         }
     }
     private function initThemesPath() {

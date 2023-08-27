@@ -1,12 +1,12 @@
 <?php
 /**
  * This file is licensed under MIT License.
- * 
+ *
  * Copyright (c) 2019 Ibrahim BinAlshikh
- * 
- * For more information on the license, please visit: 
+ *
+ * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- * 
+ *
  */
 namespace webfiori\framework\cli\commands;
 
@@ -14,8 +14,8 @@ use webfiori\cli\CLICommand;
 use webfiori\cli\CommandArgument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
-use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateBackgroundTask;
+use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
@@ -25,7 +25,7 @@ use webfiori\framework\cli\helpers\CreateWebService;
 /**
  * A command which is used to automate some common tasks such as
  * creating table classes or controllers.
- * Note that this feature is Experimental and might have issues. Also, it 
+ * Note that this feature is Experimental and might have issues. Also, it
  * might be removed in the future.
  * @author Ibrahim
  * @version 1.0

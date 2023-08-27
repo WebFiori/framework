@@ -427,10 +427,12 @@ class App {
         }
     }
     private function checkAppDir() {
-        /**
-         * Directory separator.
-         */
-        define('DS', DIRECTORY_SEPARATOR);
+        if (!defined('DS')) {
+            /**
+             * Directory separator.
+             */
+           define('DS', DIRECTORY_SEPARATOR);
+        }
 
         if (!defined('APP_DIR')) {
             /**
@@ -446,12 +448,14 @@ class App {
             http_response_code(500);
             die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR.'".');
         }
-        /**
-         * The absolute path to application directory.
-         *
-         * @var string
-         */
-        define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
+        if (!defined('APP_PATH')) {
+            /**
+             * The absolute path to application directory.
+             *
+             * @var string
+             */
+           define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
+        }
     }
 
     /**

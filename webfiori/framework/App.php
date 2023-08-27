@@ -112,12 +112,6 @@ class App {
      */
     private static $CliRunner;
     /**
-     * A string which points to the class that represents configuration driver.
-     *
-     * @var string
-     */
-    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
-    /**
      * A single instance of the class.
      *
      * @var App
@@ -306,14 +300,6 @@ class App {
      */
     public static function getConfig(): ConfigurationDriver {
         return Controller::getDriver();
-    }
-    /**
-     * Returns the class that represents configuration driver.
-     *
-     * @return string  The full name of the class including namespace.
-     */
-    public static function getConfigDriver() : string {
-        return self::$ConfigDriver;
     }
 
     /**

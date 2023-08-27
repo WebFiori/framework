@@ -437,7 +437,7 @@ class ClassDriver implements ConfigurationDriver {
         $this->writeFuncHeader($cFile,
             'public function initConstants()',
             'Initialize application environment constants.');
-        $this->a($cFile, "        \$this->globalConst = [");
+        self::a($cFile, "        \$this->globalConst = [");
 
         foreach ($this->getEnvVars() as $varName => $varProbs) {
             $valType = gettype($varProbs['value']);
@@ -445,27 +445,27 @@ class ClassDriver implements ConfigurationDriver {
             if (!in_array($valType, ['string', 'integer', 'double', 'boolean'])) {
                 continue;
             }
-            $this->a($cFile, "            '$varName' => [");
+            self::a($cFile, "            '$varName' => [");
             $valType = gettype($varProbs['value']);
 
             if ($valType == 'boolean') {
-                $this->a($cFile, "                'value' => ".($varProbs['value'] === true ? 'true' : 'false').',');
+                self::a($cFile, "                'value' => ".($varProbs['value'] === true ? 'true' : 'false').',');
             } else if ($valType == 'integer' || $valType == 'double') {
-                $this->a($cFile, "                'value' => ".$varProbs['value'].',');
+                self::a($cFile, "                'value' => ".$varProbs['value'].',');
             } else if ($valType == 'string') {
-                $this->a($cFile, "                'value' => ".$varProbs['value'].',');
+                self::a($cFile, "                'value' => ".$varProbs['value'].',');
             }
-            $this->a($cFile, "                'description' => '".$varProbs['description']."',");
-            $this->a($cFile, "             ],");
+            self::a($cFile, "                'description' => '".$varProbs['description']."',");
+            self::a($cFile, "             ],");
         }
-        $this->a($cFile, "        ];");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        ];");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getConstants() : array ',
             'Returns an array that contains application environment constants.');
-        $this->a($cFile, "        return \$this->globalConst;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->globalConst;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getAccount(string $name)',
@@ -488,10 +488,10 @@ class ClassDriver implements ConfigurationDriver {
                     'method will return null.'
                 ]
             ]);
-        $this->a($cFile, "        if (isset(\$this->emailAccounts[\$name])) {");
-        $this->a($cFile, "            return \$this->emailAccounts[\$name];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        if (isset(\$this->emailAccounts[\$name])) {");
+        self::a($cFile, "            return \$this->emailAccounts[\$name];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getAccounts() : array',
@@ -505,8 +505,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'array',
                 'description' => 'An associative array that contains all email accounts.'
             ]);
-        $this->a($cFile, "        return \$this->emailAccounts;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->emailAccounts;");
+        self::a($cFile, $this->blockEnd, 1);
 
 
         $this->writeFuncHeader($cFile,
@@ -518,8 +518,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => 'The name of base theme that is used in website pages.'
             ]);
-        $this->a($cFile, "        return \$this->baseThemeName;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->baseThemeName;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getBaseURL() : string',
@@ -533,8 +533,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => 'The base URL.'
             ]);
-        $this->a($cFile, "        return \$this->baseUrl;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->baseUrl;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getConfigVersion() : string',
@@ -545,8 +545,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => 'The version number of the configuration file.'
             ]);
-        $this->a($cFile, "        return \$this->configVision;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->configVision;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getSchedulerPassword() : string',
@@ -557,8 +557,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => "Password hash or the string 'NO_PASSWORD' if there is no password."
             ]);
-        $this->a($cFile, "        return \$this->schedulerPass;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->schedulerPass;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getDBConnection(string $conName)',
@@ -578,13 +578,13 @@ class ClassDriver implements ConfigurationDriver {
                     'Other than that, the method will return null.'
                 ]
             ]);
-        $this->a($cFile, "        \$conns = \$this->getDBConnections();");
-        $this->a($cFile, "        \$trimmed = trim(\$conName);");
-        $this->a($cFile, "        ");
-        $this->a($cFile, "        if (isset(\$conns[\$trimmed])) {");
-        $this->a($cFile, "            return \$conns[\$trimmed];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$conns = \$this->getDBConnections();");
+        self::a($cFile, "        \$trimmed = trim(\$conName);");
+        self::a($cFile, "        ");
+        self::a($cFile, "        if (isset(\$conns[\$trimmed])) {");
+        self::a($cFile, "            return \$conns[\$trimmed];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getDBConnections() : array',
@@ -598,8 +598,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'array',
                 'description' => 'An associative array.'
             ]);
-        $this->a($cFile, "        return \$this->dbConnections;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->dbConnections;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getDefaultTitle(string $langCode)',
@@ -619,13 +619,13 @@ class ClassDriver implements ConfigurationDriver {
                     'If no such title, the method will return null.'
                 ]
             ]);
-        $this->a($cFile, "        \$langs = \$this->getTitles();");
-        $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
-        $this->a($cFile, "        ");
-        $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
-        $this->a($cFile, "            return \$langs[\$langCode];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$langs = \$this->getTitles();");
+        self::a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
+        self::a($cFile, "        ");
+        self::a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
+        self::a($cFile, "            return \$langs[\$langCode];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
 
         $this->writeFuncHeader($cFile,
@@ -646,12 +646,12 @@ class ClassDriver implements ConfigurationDriver {
                     'method will return null.'
                 ]
             ]);
-        $this->a($cFile, "        \$langs = \$this->getDescriptions();");
-        $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
-        $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
-        $this->a($cFile, "            return \$langs[\$langCode];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$langs = \$this->getDescriptions();");
+        self::a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
+        self::a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
+        self::a($cFile, "            return \$langs[\$langCode];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getDescriptions() : array',
@@ -668,8 +668,8 @@ class ClassDriver implements ConfigurationDriver {
                     'in different languages.'
                 ]
             ]);
-        $this->a($cFile, "        return \$this->descriptions;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->descriptions;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getHomePage() : string',
@@ -680,8 +680,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => 'The home page URL of the website.'
             ]);
-        $this->a($cFile, "        return \$this->homePage;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->homePage;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getPrimaryLanguage() : string',
@@ -692,8 +692,8 @@ class ClassDriver implements ConfigurationDriver {
                 'type' => 'string',
                 'description' => "Language code of the primary language such as 'EN'."
             ]);
-        $this->a($cFile, "        return \$this->primaryLang;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->primaryLang;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getReleaseDate() : string',
@@ -707,8 +707,8 @@ class ClassDriver implements ConfigurationDriver {
                     "YYYY-MM-DD' that represents application release date."
                 ]
             ]);
-        $this->a($cFile, "        return \$this->appReleaseDate;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \self::appReleaseDate;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getTitles() : array',
@@ -722,8 +722,8 @@ class ClassDriver implements ConfigurationDriver {
                     'and the values are pages titles.'
                 ]
             ]);
-        $this->a($cFile, "        return \$this->defaultPageTitles;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->defaultPageTitles;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getTitleSep() : string',
@@ -737,8 +737,8 @@ class ClassDriver implements ConfigurationDriver {
                     'will add the two spaces by default.'
                 ]
             ]);
-        $this->a($cFile, "        return \$this->titleSep;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->titleSep;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getTitle(string $langCode)',
@@ -760,10 +760,10 @@ class ClassDriver implements ConfigurationDriver {
                     'method will return empty string.'
                 ]
             ]);
-        $this->a($cFile, "        if (isset(\$this->defaultPageTitles[\$langCode])) {");
-        $this->a($cFile, "            return \$this->defaultPageTitles[\$langCode];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        if (isset(\$this->defaultPageTitles[\$langCode])) {");
+        self::a($cFile, "            return \$this->defaultPageTitles[\$langCode];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getVersion() : string',
@@ -777,8 +777,8 @@ class ClassDriver implements ConfigurationDriver {
                     "form 'x.x.x.x'."
                 ]
             ]);
-        $this->a($cFile, "        return \$this->appVersion;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \self::appVersion;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getVersionType() : string',
@@ -792,8 +792,8 @@ class ClassDriver implements ConfigurationDriver {
                     "'Stable', 'Alpha', 'Beta' and so on."
                 ]
             ]);
-        $this->a($cFile, "        return \$this->appVersionType;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \self::appVersionType;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getWebsiteName(string $langCode)',
@@ -813,13 +813,13 @@ class ClassDriver implements ConfigurationDriver {
                     'method will return null.'
                 ]
             ]);
-        $this->a($cFile, "        \$langs = \$this->getWebsiteNames();");
-        $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
-        $this->a($cFile, "        ");
-        $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
-        $this->a($cFile, "            return \$langs[\$langCode];");
-        $this->a($cFile, "        }");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$langs = \$this->getWebsiteNames();");
+        self::a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
+        self::a($cFile, "        ");
+        self::a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
+        self::a($cFile, "            return \$langs[\$langCode];");
+        self::a($cFile, "        }");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function getWebsiteNames() : array',
@@ -835,24 +835,24 @@ class ClassDriver implements ConfigurationDriver {
                     'An array which contains different website names in different languages.'
                 ]
             ]);
-        $this->a($cFile, "        return \$this->webSiteNames;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        return \$this->webSiteNames;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function removeDBConnections()',
             'Removes all stored database connections.');
-        $this->a($cFile, "        \$this->dbConnections = [];");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$this->dbConnections = [];");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeDbCon($cFile);
         $this->writeSiteInfo($cFile);
         $this->writeSmtpConn($cFile);
         $this->writeAppVersionInfo($cFile);
 
-        $this->a($cFile, "}");
+        self::a($cFile, "}");
         $cFile->write(false, true);
     }
-    private function a($file, $str, $tabSize = 0) {
+    public static function a($file, $str, $tabSize = 0) {
         $isResource = is_resource($file);
         $tabStr = $tabSize > 0 ? '    ' : '';
 
@@ -924,8 +924,8 @@ class ClassDriver implements ConfigurationDriver {
                     ]
                 ]
             ]);
-        $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
+        self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
             'public function addDbConnection(ConnectionInfo $connectionInfo)',
@@ -939,213 +939,213 @@ class ClassDriver implements ConfigurationDriver {
                     ]
                 ]
             ]);
-        $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
+        self::a($cFile, $this->blockEnd, 1);
     }
     private function writeAppConfigAttrs($cFile) {
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR."\\config;");
-        $this->a($cFile, "");
-        $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
-        $this->a($cFile, "use webfiori\\email\\SMTPAccount;");
-        $this->a($cFile, "use webfiori\\http\\Uri;");
-        $this->a($cFile, "/**");
-        $this->a($cFile, " * Configuration class of the application");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @author Ibrahim");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @version 1.0.1");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @since 2.1.0");
-        $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig {");
+        self::a($cFile, "<?php");
+        self::a($cFile, "");
+        self::a($cFile, "namespace ".APP_DIR."\\config;");
+        self::a($cFile, "");
+        self::a($cFile, "use webfiori\\database\\ConnectionInfo;");
+        self::a($cFile, "use webfiori\\email\\SMTPAccount;");
+        self::a($cFile, "use webfiori\\http\\Uri;");
+        self::a($cFile, "/**");
+        self::a($cFile, " * Configuration class of the application");
+        self::a($cFile, " *");
+        self::a($cFile, " * @author Ibrahim");
+        self::a($cFile, " *");
+        self::a($cFile, " * @version 1.0.1");
+        self::a($cFile, " *");
+        self::a($cFile, " * @since 2.1.0");
+        self::a($cFile, " */");
+        self::a($cFile, "class AppConfig {");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An array that holds global constants of the application");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An array that holds global constants of the application");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var array");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$globalConst;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$globalConst;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The date at which the application was released.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The date at which the application was released.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$appReleaseDate;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$appReleaseDate;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * A string that represents the type of the release.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * A string that represents the type of the release.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$appVersionType;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$appVersionType;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Version of the web application.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * Version of the web application.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$appVersion;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$appVersion;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The name of base website UI Theme.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The name of base website UI Theme.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$baseThemeName;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$baseThemeName;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The base URL that is used by all website pages to fetch resource files.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The base URL that is used by all website pages to fetch resource files.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$baseUrl;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$baseUrl;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Configuration file version number.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * Configuration file version number.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$configVision;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$configVision;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Password hash of scheduler sub-system.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * Password hash of scheduler sub-system.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$schedulerPass;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$schedulerPass;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An associative array that will contain database connections.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An associative array that will contain database connections.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var array");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$dbConnections;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$dbConnections;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An array that is used to hold default page titles for different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An array that is used to hold default page titles for different languages.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var array");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$defaultPageTitles;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$defaultPageTitles;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An array that is used to hold default page descriptions for different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An array that is used to hold default page descriptions for different languages.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var array");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$descriptions;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$descriptions;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An array that holds SMTP connections information.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An array that holds SMTP connections information.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$emailAccounts;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$emailAccounts;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The URL of the home page.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The URL of the home page.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$homePage;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$homePage;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The primary language of the website.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The primary language of the website.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$primaryLang;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$primaryLang;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * The character which is used to separate site name from page title.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * The character which is used to separate site name from page title.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$titleSep;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$titleSep;");
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * An array which contains all website names in different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * An array which contains all website names in different languages.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, "     * @var string");
+        self::a($cFile, $this->docEmptyLine, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private \$webSiteNames;");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private \$webSiteNames;");
     }
     private function writeAppConfigConstructor(File $cFile) {
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Creates new instance of the class.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function __construct() {");
-        $this->a($cFile, "        \$this->configVision = '1.0.1';");
-        $this->a($cFile, "        \$this->initVersionInfo();");
-        $this->a($cFile, "        \$this->initSiteInfo();");
-        $this->a($cFile, "        \$this->initDbConnections();");
-        $this->a($cFile, "        \$this->initSmtpConnections();");
-        $this->a($cFile, "        \$this->initConstants();");
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, "     * Creates new instance of the class.");
+        self::a($cFile, $this->docEmptyLine, 1);
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    public function __construct() {");
+        self::a($cFile, "        \$this->configVision = '1.0.1';");
+        self::a($cFile, "        \$this->initVersionInfo();");
+        self::a($cFile, "        \$this->initSiteInfo();");
+        self::a($cFile, "        \$this->initDbConnections();");
+        self::a($cFile, "        \$this->initSmtpConnections();");
+        self::a($cFile, "        \$this->initConstants();");
 
 
         $this->writeSchedulerPass($cFile);
 
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, $this->blockEnd, 1);
     }
     private function writeAppVersionInfo($cFile) {
-        $this->a($cFile, [
+        self::a($cFile, [
             $this->docStart,
             $this->docEnd
         ], 1);
 
-        $this->a($cFile, "private function initVersionInfo() {", 1);
+        self::a($cFile, "private function initVersionInfo() {", 1);
 
 
-        $this->a($cFile, [
-            "\$this->appVersion = '".$this->getAppVersion()."';",
-            "\$this->appVersionType = '".$this->getAppVersionType()."';",
-            "\$this->appReleaseDate = '".$this->getAppReleaseDate()."';"
+        self::a($cFile, [
+            "\self::appVersion = '".$this->getAppVersion()."';",
+            "\self::appVersionType = '".$this->getAppVersionType()."';",
+            "\self::appReleaseDate = '".$this->getAppReleaseDate()."';"
         ], 2);
 
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, $this->blockEnd, 1);
     }
     private function writeDbCon($cFile) {
-        $this->a($cFile, $this->docStart, 1);
+        self::a($cFile, $this->docStart, 1);
 
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private function initDbConnections() {");
-        $this->a($cFile, "        \$this->dbConnections = [");
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private function initDbConnections() {");
+        self::a($cFile, "        \$this->dbConnections = [");
 
 
         $dbCons = $this->getDBConnections();
@@ -1153,17 +1153,17 @@ class ClassDriver implements ConfigurationDriver {
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
                 $cName = $connObj->getName();
-                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
+                self::a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
                         ."'".$connObj->getUsername()."', "
                         ."'".$connObj->getPassword()."', "
                         ."'".$connObj->getDBName()."', "
                         ."'".$connObj->getHost()."', ".$connObj->getPort().", [");
-                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
-                $this->a($cFile, "            ]),");
+                self::a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
+                self::a($cFile, "            ]),");
             }
         }
-        $this->a($cFile, "        ];");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        ];");
+        self::a($cFile, $this->blockEnd, 1);
     }
     private function writeFuncHeader($cFile, $methSig, $methodSummary = '', $description = [], $params = [], $returns = null) {
         $phpDocArr = [
@@ -1214,46 +1214,46 @@ class ClassDriver implements ConfigurationDriver {
         }
         $phpDocArr[] = $this->docEnd;
         $phpDocArr[] = $methSig.' {';
-        $this->a($cFile, $phpDocArr, 1);
+        self::a($cFile, $phpDocArr, 1);
     }
     private function writeSchedulerPass($cFile) {
         $password = $this->getSchedulerPassword();
-        $this->a($cFile, "        \$this->schedulerPass = '".$password."';");
+        self::a($cFile, "        \$this->schedulerPass = '".$password."';");
     }
     private function writeSiteDescriptions($cFile) {
         $descArr = $this->getDescriptions();
-        $this->a($cFile, "        \$this->descriptions = [");
+        self::a($cFile, "        \$this->descriptions = [");
 
         foreach ($descArr as $langCode => $desc) {
             $desc = str_replace("'", "\'", $desc);
-            $this->a($cFile, "            '$langCode' => '$desc',");
+            self::a($cFile, "            '$langCode' => '$desc',");
         }
-        $this->a($cFile, "        ];");
+        self::a($cFile, "        ];");
     }
     private function writeSiteInfo($cFile) {
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private function initSiteInfo() {");
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private function initSiteInfo() {");
 
         $this->writeSiteNames($cFile);
         $this->writeSiteTitles($cFile);
         $this->writeSiteDescriptions($cFile);
 
-        $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
+        self::a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
 
         $sep = $this->getTitleSeparator();
-        $this->a($cFile, "        \$this->titleSep = '$sep';");
+        self::a($cFile, "        \$this->titleSep = '$sep';");
 
         $lang = $this->getPrimaryLanguage();
-        $this->a($cFile, "        \$this->primaryLang = '$lang';");
+        self::a($cFile, "        \$this->primaryLang = '$lang';");
 
 
         $baseTheme = $this->getTheme();
 
         if (class_exists($baseTheme)) {
-            $this->a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
+            self::a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
         } else {
-            $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
+            self::a($cFile, "        \$this->baseThemeName = '$baseTheme';");
         }
 
 
@@ -1262,32 +1262,32 @@ class ClassDriver implements ConfigurationDriver {
         $home = $this->getHomePage();
 
         if ($home === null || strlen($home) == 0) {
-            $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
+            self::a($cFile, "        \$this->homePage = Uri::getBaseURL();");
         } else {
-            $this->a($cFile, "        \$this->homePage = '$home';");
+            self::a($cFile, "        \$this->homePage = '$home';");
         }
 
 
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, $this->blockEnd, 1);
     }
     private function writeSiteNames($cFile) {
         $wNamesArr = $this->getAppNames();
-        $this->a($cFile, "        \$this->webSiteNames = [");
+        self::a($cFile, "        \$this->webSiteNames = [");
 
         foreach ($wNamesArr as $langCode => $name) {
             $name = str_replace("'", "\'", $name);
-            $this->a($cFile, "            '$langCode' => '$name',");
+            self::a($cFile, "            '$langCode' => '$name',");
         }
-        $this->a($cFile, "        ];");
-        $this->a($cFile, "    ");
+        self::a($cFile, "        ];");
+        self::a($cFile, "    ");
     }
     private function writeSiteTitles($cFile) {
         $titlesArr = $this->getTitles();
-        $this->a($cFile, "        \$this->defaultPageTitles = [");
+        self::a($cFile, "        \$this->defaultPageTitles = [");
 
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
-            $this->a($cFile, "            '$langCode' => '$title',");
+            self::a($cFile, "            '$langCode' => '$title',");
 
             if (!class_exists(APP_DIR.'\\langs\\Lang'.$langCode)) {
                 //This requires a fix in the future
@@ -1298,30 +1298,30 @@ class ClassDriver implements ConfigurationDriver {
                 require_once $writer->getAbsolutePath();
             }
         }
-        $this->a($cFile, "        ];");
+        self::a($cFile, "        ];");
     }
     private function writeSmtpConn($cFile) {
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    private function initSmtpConnections() {");
-        $this->a($cFile, "        \$this->emailAccounts = [");
+        self::a($cFile, $this->docStart, 1);
+        self::a($cFile, $this->docEnd, 1);
+        self::a($cFile, "    private function initSmtpConnections() {");
+        self::a($cFile, "        \$this->emailAccounts = [");
 
         $smtpAccArr = $this->getSMTPConnections();
 
         foreach ($smtpAccArr as $smtpAcc) {
             if ($smtpAcc instanceof SMTPAccount) {
-                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
-                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
-                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
-                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
-                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
-                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
-                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
-                $this->a($cFile, "            ]),");
+                self::a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
+                self::a($cFile, "                'port' => ".$smtpAcc->getPort().",");
+                self::a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                self::a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
+                self::a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
+                self::a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                self::a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
+                self::a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
+                self::a($cFile, "            ]),");
             }
         }
-        $this->a($cFile, "        ];");
-        $this->a($cFile, $this->blockEnd, 1);
+        self::a($cFile, "        ];");
+        self::a($cFile, $this->blockEnd, 1);
     }
 }

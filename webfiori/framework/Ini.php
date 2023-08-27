@@ -12,6 +12,7 @@ namespace webfiori\framework;
 
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
+use webfiori\framework\config\ClassDriver;
 /**
  * A class which is used to create application initialization classes.
  *
@@ -54,7 +55,7 @@ class Ini {
         $cFile = new File("$className.php", APP_PATH.'ini');
         $cFile->remove();
         $cFile->create();
-        $this->a($cFile, [
+        ClassDriver::a($cFile, [
             "<?php",
             '',
             "namespace ".APP_DIR."\\ini;",
@@ -62,7 +63,7 @@ class Ini {
             "class $className {",
 
         ]);
-        $this->a($cFile, [
+        ClassDriver::a($cFile, [
             $this->docStart,
             " * $comment",
             $this->docEmptyLine,
@@ -70,9 +71,9 @@ class Ini {
             $this->docEnd,
             'public static function init() {'
         ], 1);
-        $this->a($cFile, "", 3);
-        $this->a($cFile, "}", 1);
-        $this->a($cFile, "}");
+        ClassDriver::a($cFile, "", 3);
+        ClassDriver::a($cFile, "}", 1);
+        ClassDriver::a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
         require_once APP_PATH.'ini'.DS."$className.php";
@@ -92,22 +93,22 @@ class Ini {
     public function createRoutesClass(string $className) {
         $cFile = new File("$className.php", APP_PATH.'ini'.DS.'routes');
         $cFile->remove();
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR."\\ini\\routes;");
-        $this->a($cFile, "");
-        $this->a($cFile, "use webfiori\\framework\\router\\Router;");
-        $this->a($cFile, "");
-        $this->a($cFile, "class $className {");
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Initialize system routes.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public static function create() {");
-        $this->a($cFile, "        //TODO: Add your own routes here.");
-        $this->a($cFile, $this->blockEnd, 1);
-        $this->a($cFile, "}");
+        ClassDriver::a($cFile, "<?php");
+        ClassDriver::a($cFile, "");
+        ClassDriver::a($cFile, "namespace ".APP_DIR."\\ini\\routes;");
+        ClassDriver::a($cFile, "");
+        ClassDriver::a($cFile, "use webfiori\\framework\\router\\Router;");
+        ClassDriver::a($cFile, "");
+        ClassDriver::a($cFile, "class $className {");
+        ClassDriver::a($cFile, $this->docStart, 1);
+        ClassDriver::a($cFile, "     * Initialize system routes.");
+        ClassDriver::a($cFile, $this->docEmptyLine, 1);
+        ClassDriver::a($cFile, $this->since10, 1);
+        ClassDriver::a($cFile, $this->docEnd, 1);
+        ClassDriver::a($cFile, "    public static function create() {");
+        ClassDriver::a($cFile, "        //TODO: Add your own routes here.");
+        ClassDriver::a($cFile, $this->blockEnd, 1);
+        ClassDriver::a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
         require_once $cFile->getAbsolutePath();
@@ -125,27 +126,6 @@ class Ini {
 
         return self::$singleton;
     }
-   
-    private function a($file, $str, $tabSize = 0) {
-        $isResource = is_resource($file);
-        $tabStr = $tabSize > 0 ? '    ' : '';
-
-        if (gettype($str) == 'array') {
-            foreach ($str as $subStr) {
-                if ($isResource) {
-                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                } else {
-                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                }
-            }
-        } else {
-            if ($isResource) {
-                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
-            } else {
-                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
-            }
-        }
-    }
 
     
     /**
@@ -153,23 +133,23 @@ class Ini {
      */
     public static function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR);
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
-        $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
-        $this->mkdir(ROOT_PATH.$DS.'public');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR);
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
+        self::mkdir(ROOT_PATH.$DS.'public');
     }
-    private function mkdir($dir) {
+    public static function mkdir($dir) {
         if (!is_dir($dir)) {
             set_error_handler(function (int $errno, string $errstr)
             {

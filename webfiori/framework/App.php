@@ -161,7 +161,7 @@ class App {
         $this->checkStandardLibs();
 
         if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
-            ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
+            Ini::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
@@ -311,7 +311,7 @@ class App {
      */
     public static function getRunner() : Runner {
         if (!class_exists(APP_DIR.'\ini\InitCommands')) {
-            ConfigController::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
+            Ini::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
         }
 
         if (self::$CliRunner === null) {
@@ -537,7 +537,7 @@ class App {
         self::$AU = AutoLoader::get();
 
         if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
-            ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
+            Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
     }
@@ -576,7 +576,7 @@ class App {
         });
 
         if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
-            ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
+            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
         call_user_func(APP_DIR.'\ini\InitMiddleware::init');
     }
@@ -589,7 +589,7 @@ class App {
 
         foreach ($routesClasses as $className) {
             if (!class_exists(APP_DIR.'\\ini\\routes\\'.$className)) {
-                ConfigController::get()->createRoutesClass($className);
+                Ini::get()->createRoutesClass($className);
             }
             call_user_func(APP_DIR.'\ini\routes\\'.$className.'::create');
         }
@@ -611,7 +611,7 @@ class App {
         $pathArr = $uriObj->getPathArray();
 
         if (!class_exists(APP_DIR.'\ini\InitTasks')) {
-            ConfigController::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
+            Ini::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
         }
 
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {

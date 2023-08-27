@@ -260,7 +260,14 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-    
+    /**
+     * Returns a string that represent the home page of the application.
+     * 
+     * Note that if home page is set to 'BASE_URL' in configuration, the
+     * method will use the base URL as the home page.
+     * 
+     * @return string
+     */
     public function getHomePage() : string {
         $home = $this->json->get('home-page') ?? '';
         if ($home == 'BASE_URL') {

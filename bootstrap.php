@@ -75,12 +75,6 @@ AutoLoader::get([
     'on-load-failure' => 'do-nothing'
 ]);
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
-fprintf(STDOUT,'Class Search Paths:'."\n");
-$dirs = AutoLoader::getFolders();
-
-foreach ($dirs as $dir) {
-    fprintf(STDOUT, $dir."\n");
-}
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
 App::start();

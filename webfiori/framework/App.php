@@ -379,14 +379,6 @@ class App {
             self::$LC->appConfig = $conf;
         }
     }
-    /**
-     * Sets the class that will be used as configuration driver.
-     *
-     * @param string $clazz The full name of the class including namespace.
-     */
-    public function setConfigDriver(string $clazz) {
-        self::$ConfigDriver = $clazz;
-    }
 
     /**
      * Start your WebFiori application.

@@ -18,7 +18,10 @@ use webfiori\json\Json;
  * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
-    private $configFileName;
+    /**
+     * The name of JSON configuration file.
+     */
+    private static $configFileName = 'app-config';
     /**
      * The location at which the configuration file will be kept at.
      *
@@ -32,12 +35,12 @@ class JsonDriver implements ConfigurationDriver {
      * 
      * @param string $name
      */
-    public function setConfigFileName(string $name) {
+    public static function setConfigFileName(string $name) {
         $split = explode('.', trim($name));
         if (count($split) == 2) {
-            $this->configFileName = $split[0];
+            self::$configFileName = $split[0];
         } else if (count($split) == 1) {
-            $this->configFileName = trim($name); 
+            self::$configFileName = trim($name); 
         }
     }
     /**
@@ -46,8 +49,8 @@ class JsonDriver implements ConfigurationDriver {
      * 
      * @return string
      */
-    public function getConfigFileName() : string {
-        return $this->configFileName;
+    public static function getConfigFileName() : string {
+        return self::$configFileName;
     }
     private $json;
     /**
@@ -57,7 +60,7 @@ class JsonDriver implements ConfigurationDriver {
         $this->json = new Json([
             'base-url' => 'DYNAMIC',
             'theme' => null,
-            'home-page' => null,
+            'home-page' => 'BASE_URL',
             'primary-lang' => 'EN',
             'titles' => new Json([
                 'AR' => 'افتراضي',
@@ -92,7 +95,6 @@ class JsonDriver implements ConfigurationDriver {
             'database-connections' => new Json(),
         ], 'none', 'same');
         $this->json->setIsFormatted(true);
-        $this->setConfigFileName('app-config');
     }
     /**
      * Adds application environment variable to the configuration.
@@ -253,7 +255,11 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function getHomePage() : string {
-        return $this->json->get('home-page') ?? '';
+        $home = $this->json->get('home-page') ?? '';
+        if ($home == 'BASE_URL') {
+            return $this->getBaseURL();
+        }
+        return $home;
     }
 
     public function getPrimaryLanguage(): string {
@@ -337,7 +343,7 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('name-separator');
     }
     public function initialize(bool $reCreate = false) {
-        $path = self::JSON_CONFIG_FILE_PATH.$this->getConfigFileName().'.json';
+        $path = self::JSON_CONFIG_FILE_PATH.self::getConfigFileName().'.json';
 
         if (!file_exists($path) || $reCreate) {
             $this->writeJson();
@@ -496,7 +502,7 @@ class JsonDriver implements ConfigurationDriver {
         return $code;
     }
     private function writeJson() {
-        $file = new File(self::JSON_CONFIG_FILE_PATH.$this->getConfigFileName().'.json');
+        $file = new File(self::JSON_CONFIG_FILE_PATH.self::getConfigFileName().'.json');
         $file->remove();
         $json = $this->toJSON();
         $json->setIsFormatted(true);

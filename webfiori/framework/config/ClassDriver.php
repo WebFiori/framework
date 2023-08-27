@@ -707,7 +707,7 @@ class ClassDriver implements ConfigurationDriver {
                     "YYYY-MM-DD' that represents application release date."
                 ]
             ]);
-        self::a($cFile, "        return \self::appReleaseDate;");
+        self::a($cFile, "        return \$this->appReleaseDate;");
         self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
@@ -777,7 +777,7 @@ class ClassDriver implements ConfigurationDriver {
                     "form 'x.x.x.x'."
                 ]
             ]);
-        self::a($cFile, "        return \self::appVersion;");
+        self::a($cFile, "        return \$this->appVersion;");
         self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
@@ -792,7 +792,7 @@ class ClassDriver implements ConfigurationDriver {
                     "'Stable', 'Alpha', 'Beta' and so on."
                 ]
             ]);
-        self::a($cFile, "        return \self::appVersionType;");
+        self::a($cFile, "        return \$this->appVersionType;");
         self::a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile,
@@ -1133,9 +1133,9 @@ class ClassDriver implements ConfigurationDriver {
 
 
         self::a($cFile, [
-            "\self::appVersion = '".$this->getAppVersion()."';",
-            "\self::appVersionType = '".$this->getAppVersionType()."';",
-            "\self::appReleaseDate = '".$this->getAppReleaseDate()."';"
+            "\$this->appVersion = '".$this->getAppVersion()."';",
+            "\$this->appVersionType = '".$this->getAppVersionType()."';",
+            "\$this->appReleaseDate = '".$this->getAppReleaseDate()."';"
         ], 2);
 
         self::a($cFile, $this->blockEnd, 1);

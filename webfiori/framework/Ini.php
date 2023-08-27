@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2020 Ibrahim BinAlshikh
+ * Copyright (c) 2023 Ibrahim BinAlshikh
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -10,36 +10,26 @@
  */
 namespace webfiori\framework;
 
-use Exception;
-use webfiori\database\ConnectionInfo;
-use webfiori\email\SMTPAccount;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
-use webfiori\framework\exceptions\InitializationException;
-use webfiori\framework\writers\LangClassWriter;
 /**
- * A class that can be used to modify basic configuration settings of
- * the web application.
+ * A class which is used to create application initialization classes.
  *
  * @author Ibrahim
  *
- * @version 1.5.3
  */
-class ConfigController {
+class Ini {
     const NL = "\n";
     private $blockEnd;
-    private $configVars;
     private $docEmptyLine;
     private $docEnd;
     private $docStart;
     private $since10;
-    private $since101;
     /**
      * An instance of the class.
      *
-     * @var ConfigController
+     * @var Ini
      *
-     * @since 1.0
      */
     private static $singleton;
     private function __construct() {
@@ -59,7 +49,6 @@ class ConfigController {
      * @param string $comment A PHPDoc comment for class method.
      *
      * @throws FileException
-     * @since 1.5.1
      */
     public function createIniClass(string $className, string $comment) {
         $cFile = new File("$className.php", APP_PATH.'ini');
@@ -99,7 +88,6 @@ class ConfigController {
      * @param string $className The name of the class.
      *
      * @throws FileException
-     * @since 1.5.1
      */
     public function createRoutesClass(string $className) {
         $cFile = new File("$className.php", APP_PATH.'ini'.DS.'routes');
@@ -127,13 +115,12 @@ class ConfigController {
     /**
      * Returns a single instance of the class.
      *
-     * @return ConfigController
+     * @return Ini
      *
-     * @since 1.0
      */
-    public static function get(): ConfigController {
+    public static function get(): Ini {
         if (self::$singleton === null) {
-            self::$singleton = new ConfigController();
+            self::$singleton = new Ini();
         }
 
         return self::$singleton;
@@ -164,7 +151,7 @@ class ConfigController {
     /**
      * Creates all directories at which the application needs to run.
      */
-    private function createAppDirs() {
+    public static function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
         $this->mkdir(ROOT_PATH.$DS.APP_DIR);
         $this->mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');

@@ -40,7 +40,7 @@ class JsonDriverTest extends TestCase {
                 'description' => 'Host name that will be used when runing the application as command line utility.'
             ],
         ],$driver->getEnvVars());
-        $this->assertEquals('',$driver->getHomePage());
+        $this->assertEquals('https://127.0.0.1',$driver->getHomePage());
         $this->assertEquals('EN',$driver->getPrimaryLanguage());
         $this->assertEquals([
 

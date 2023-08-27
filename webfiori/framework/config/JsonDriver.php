@@ -178,7 +178,14 @@ class JsonDriver implements ConfigurationDriver {
     public function getAppVersionType() : string {
         return $this->json->get('version-info')->get('version-type');
     }
-
+    /**
+     * Returns the base URL of the application.
+     * 
+     * Note that if the base is set so 'DYNAMIC' in the configuration, it will
+     * be auto-generated at run time.
+     * 
+     * @return string A string such as 'http://example.com:8989'.
+     */
     public function getBaseURL(): string {
         $val = $this->json->get('base-url');
         if ($val == '' || $val == 'DYNAMIC') {
@@ -253,7 +260,14 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns a string that represent the home page of the application.
+     * 
+     * Note that if home page is set to 'BASE_URL' in configuration, the
+     * method will use the base URL as the home page.
+     * 
+     * @return string
+     */
     public function getHomePage() : string {
         $home = $this->json->get('home-page') ?? '';
         if ($home == 'BASE_URL') {

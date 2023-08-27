@@ -241,6 +241,7 @@ class AccessTest extends TestCase {
     /**
      *
      * @depends testResolvePrivilegesStr01
+     * @test
      */
     public function testCreatePrivilegesStr06() {
         $user = new User();
@@ -280,8 +281,12 @@ class AccessTest extends TestCase {
         Access::newPrivileges('SUB_OF_SUB', [
             'SUB_OF_PR_1','SUB_OF_PR_2','SUB_OF_PR_3'
         ]);
+        Access::newGroup('SUB_OF_SUB2', 'SUB_GROUP');
         $user = new User();
-        Access::resolvePrivileges('G-SUB_OF_SUB;SUB_PR_1-0;SUB_PR_3-1;TOP_PR_2-1', $user);
+        Access::newPrivileges('SUB_OF_SUB', [
+            'SUB2_OF_PR_1','SUB2_OF_PR_2','SUB2_OF_PR_3'
+        ]);
+        Access::resolvePrivileges('G-SUB_OF_SUB;SUB_PR_1-0;SUB_PR_3-1;TOP_PR_2-1;SUB2_OF_PR_1-1', $user);
 
         $this->assertTrue($user->hasPrivilege('SUB_OF_PR_1'));
         $this->assertTrue($user->hasPrivilege('SUB_OF_PR_2'));
@@ -295,6 +300,7 @@ class AccessTest extends TestCase {
 
         $this->assertFalse($user->hasPrivilege('TOP_PR_1'));
         $this->assertTrue($user->hasPrivilege('TOP_PR_2'));
+        $this->assertTrue($user->hasPrivilege('SUB2_OF_PR_1'));
         $this->assertFalse($user->hasPrivilege('TOP_PR_3'));
         $this->assertFalse($user->inGroup('TOP_GROUP'));
 

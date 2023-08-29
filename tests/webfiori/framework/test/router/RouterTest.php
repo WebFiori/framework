@@ -85,7 +85,12 @@ class RouterTest extends TestCase {
             'path' => '{var-1}/{var-2?}',
             'route-to' => function()
             {
-            }
+            },
+            'vars-values' => [
+                'var-1' => [
+                    'hello'
+                ]
+            ]
         ]);
         $obj = Router::getUriObj('/{var-1}/{var-2?}');
         $this->assertNotNull($obj);
@@ -113,6 +118,7 @@ class RouterTest extends TestCase {
         $obj = Router::getRouteUri();
         $this->assertNotNull($obj);
         $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('hello', Router::getParameterValue('var-1'));
         $this->assertNull($obj->getParameterValue('var-2'));
     }
     /**

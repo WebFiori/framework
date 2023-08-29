@@ -470,7 +470,7 @@ class WebPage {
      *
      */
     public function getParameterValue(string $paramName) {
-        Router::getParameterValue($paramName);
+        return Router::getParameterValue($paramName);
     }
     /**
      * Returns an object which holds applied theme information.

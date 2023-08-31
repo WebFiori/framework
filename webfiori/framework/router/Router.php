@@ -951,7 +951,7 @@ class Router {
                 $options['closure-params'] : [];
         $path = isset($options['path']) ? $this->fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
-        $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
+        $varValues = isset($options['vars-values']) && gettype($options['vars-values']) == 'array' ? $options['vars-values'] : [];
 
         $action = '';
 

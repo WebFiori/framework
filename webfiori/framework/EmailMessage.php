@@ -13,14 +13,14 @@ namespace webfiori\framework;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\framework\exceptions\MissingLangException;
-
+use webfiori\email\Email;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
  * @version 1.0.6
  */
-class EmailMessage extends \webfiori\email\EmailMessage {
+class EmailMessage extends Email {
     /**
      *
      * @var Lang|null

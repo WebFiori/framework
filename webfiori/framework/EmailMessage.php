@@ -80,17 +80,18 @@ class EmailMessage extends Email {
      * @param string $lang a two digit language code such as AR or EN. Default
      * value is 'EN'.
      *
+     * @return Email The method will return same instance at which the method is
+     * called on.
+     * 
      * @throws MissingLangException
-     * @since 1.0.5
      */
-    public function setLang(string $lang = 'EN') : bool {
+    public function setLang(string $lang = 'EN') : Email {
         if (parent::setLang($lang)) {
             $this->usingLanguage();
 
-            return true;
         }
 
-        return false;
+        return $this;
     }
 
     /**

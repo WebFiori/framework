@@ -86,11 +86,6 @@ class App {
      */
     const STATUS_NONE = 'NONE';
     /**
-     *
-     * @var Config
-     */
-    private $appConfig;
-    /**
      * An instance of autoloader class.
      *
      * @var AutoLoader
@@ -365,19 +360,6 @@ class App {
         }
 
         return self::$CliRunner;
-    }
-    /**
-     * Sets the configuration object that will be used to configure part of
-     * application settings.
-     *
-     * @param Config $conf
-     *
-     * @since 2.1.0
-     */
-    public static function setConfig(Config $conf) {
-        if (self::$LC) {
-            self::$LC->appConfig = $conf;
-        }
     }
 
     /**

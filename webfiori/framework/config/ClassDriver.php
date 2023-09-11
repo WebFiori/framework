@@ -55,6 +55,15 @@ class ClassDriver implements ConfigurationDriver {
         $this->writeAppConfig();
     }
     /**
+     * Removes specific application environment variable given its name.
+     * 
+     * @param string $name The name of the variable.
+     */
+    public function removeEnvVar(string $name) {
+        unset($this->configVars['env-vars'][$name]);
+        $this->writeAppConfig();
+    }
+    /**
      * Adds new database connections information or update existing connection.
      *
      * @param ConnectionInfo $dbConnectionsInfo An object which holds connection information.

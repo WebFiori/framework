@@ -101,7 +101,7 @@ class JsonDriver implements ConfigurationDriver {
      *
      * The variables which are added using this method will be defined as
      * a named constant at run time using the function 'define'. This means
-     * the constant will be accesaable anywhere within the appllication's environment.
+     * the constant will be accessable anywhere within the application's environment.
      *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
      *
@@ -115,8 +115,17 @@ class JsonDriver implements ConfigurationDriver {
             'value' => $value,
             'description' => $description
         ]));
+        $this->writeJson();
     }
-
+    /**
+     * Removes specific application environment variable given its name.
+     * 
+     * @param string $name The name of the variable.
+     */
+    public function removeEnvVar(string $name) {
+        $this->json->get('env-vars')->remove($name);
+        $this->writeJson();
+    }
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $connectionJAsJson = new Json([
             'type' => $dbConnectionsInfo->getDatabaseType(),
@@ -279,11 +288,34 @@ class JsonDriver implements ConfigurationDriver {
     public function getPrimaryLanguage(): string {
         return $this->json->get('primary-lang');
     }
-
+    /**
+     * Returns sha256 hash of the password which is used to prevent unauthorized
+     * access to run background tasks or access scheduler web interface.
+     *
+     * The password should be hashed before using this method as this one should
+     * return the hashed value. If no password is set, this method will return the
+     * string 'NO_PASSWORD'.
+     *
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no
+     * password.
+     */
     public function getSchedulerPassword(): string {
         return $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
     }
-
+    /**
+     * Returns SMTP connection given its name.
+     *
+     * The method will search
+     * for an account with the given name in the set
+     * of added accounts. If no account was found, null is returned.
+     *
+     * @param string $name The name of the account.
+     *
+     * @return SMTPAccount|null If the account is found, The method
+     * will return an object of type SMTPAccount. Else, the
+     * method will return null.
+     *
+     */
     public function getSMTPConnection(string $name) {
         $jsonObj = $this->json->get('smtp-connections')->get($name);
 
@@ -323,11 +355,26 @@ class JsonDriver implements ConfigurationDriver {
     public function getTheme(): string {
         return $this->json->get('theme') ?? '';
     }
+    /**
+     * Returns the default title at which a web page will use in case no title
+     * is specified.
+     *
+     * @param string $lang A two-letter string that represents language code.
+     * The returned value will be specific to selected language.
+     *
+     * @return string The default title at which a web page will use in case no title
+     * is specified.
+     */
     public function getTitle(string $lang) : string {
         $titles = $this->json->get('titles');
-
+        $langU = strtoupper(trim($lang));
+        
+        if (strlen($langU) == 0) {
+            return '';
+        }
+        
         foreach ($titles->getProperties() as $prob) {
-            if ($prob->getName() == $lang) {
+            if ($prob->getName() == $langU) {
                 return $prob->getValue();
             }
         }
@@ -352,7 +399,12 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns a string that represents the value which is used to separate the
+     * title of a web page from the name of the application.
+     *
+     * @return string
+     */
     public function getTitleSeparator(): string {
         return $this->json->get('name-separator');
     }
@@ -380,6 +432,14 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->add('smtp-connections', new Json());
         $this->writeJson();
     }
+    /**
+     * Sets or updates the name of the application for specific display language.
+     *
+     * @param string $name The name of the application.
+     *
+     * @param string $langCode The language code at which the name of the application will
+     * be updated for.
+     */
     public function setAppName(string $name, string $langCode) {
         $code = $this->isValidLangCode($langCode);
 
@@ -390,8 +450,16 @@ class JsonDriver implements ConfigurationDriver {
         $appNamesJson->add($code, $name);
         $this->writeJson();
     }
-
-
+    /**
+     * Update application version information.
+     *
+     * @param string $vNum Version number such as 1.0.0.
+     *
+     * @param string $vType Version type such as 'Beta', 'Alpha' or 'RC'.
+     *
+     * @param string $releaseDate The date at which the version was released on.
+     *
+     */
     public function setAppVersion(string $vNum, string $vType, string $releaseDate) {
         $this->json->add('version-info', new Json([
             'version' => $vNum,
@@ -488,8 +556,13 @@ class JsonDriver implements ConfigurationDriver {
         if ($code === false) {
             return;
         }
+        $trimmedTitle = trim($title);
+        
+        if (strlen($trimmedTitle) == 0) {
+            return;
+        }
         $appNamesJson = $this->json->get('titles');
-        $appNamesJson->add($code, $title);
+        $appNamesJson->add($code, $trimmedTitle);
         $this->writeJson();
     }
     /**
@@ -500,8 +573,12 @@ class JsonDriver implements ConfigurationDriver {
      * values are '-' and '|'.
      */
     public function setTitleSeparator(string $separator) {
-        $this->json->add('name-separator', $separator);
-        $this->writeJson();
+        $trimmed = trim($separator);
+        
+        if (strlen($trimmed) != 0) {
+            $this->json->add('name-separator', $separator);
+            $this->writeJson();
+        }
     }
     public function toJSON() : Json {
         return $this->json;
@@ -523,4 +600,6 @@ class JsonDriver implements ConfigurationDriver {
         $file->setRawData($json.'');
         $file->write(false, true);
     }
+
+    
 }

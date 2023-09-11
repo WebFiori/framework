@@ -34,7 +34,7 @@ class ServerErrPage extends WebPage {
 
         $this->setTitle('Server Error');
         $this->changeDom();
-        $this->getDocument()->setHeadNode($this->include('head.php', [
+        $this->getDocument()->setHeadNode($this->include('server-err-head.php', [
             'throwableOrErr' => $throwableOrErr
         ]));
 
@@ -51,9 +51,9 @@ class ServerErrPage extends WebPage {
         $templateVars = [
             'throwableOrErr' => $throwableOrErr
         ];
-        $row->include('header.php', $templateVars);
+        $row->include('server-err-header.php', $templateVars);
         $row->include('error-details.php', $templateVars);
-        $row->include('stack-trace.php', $templateVars);
+        $row->include('server-err-stack-trace.php', $templateVars);
     }
 
     private function changeDom() {

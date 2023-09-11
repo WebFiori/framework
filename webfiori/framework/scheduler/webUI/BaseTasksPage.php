@@ -46,7 +46,7 @@ class BaseTasksPage extends WebPage {
             $this->setWebsiteName($siteName);
         }
         $this->changePageStructure();
-        $this->getDocument()->setHeadNode($this->include('templates/head.php'));
+        $this->getDocument()->setHeadNode($this->include('templates/scheduler-head.php'));
 
         $row = $this->insert('v-row');
         $row->addChild('v-col', [

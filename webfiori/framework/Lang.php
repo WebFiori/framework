@@ -20,7 +20,7 @@ use webfiori\http\Request;
  *
  * In order to create a language file, the developer must extend this class.
  * The language class must be added to the namespace 'app/langs' and the name
- * of language file must be 'LanguageXX.php' where 'XX' are two characters that
+ * of language file must be 'LangXX.php' where 'XX' are two characters that
  * represents language code. The directory at which the language file must exist in
  * is not important, but it is recommended to add them to the folder 'app/langs'
  * of the framework.

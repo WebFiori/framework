@@ -203,9 +203,9 @@ class WebPage {
     public function __construct() {
         $this->title = '';
         $this->titleSep = '|';
-        $this->reset();
         global $page;
         $page = $this;
+        $this->reset();
     }
     /**
      * Adds a function which will be executed before the page is fully rendered.

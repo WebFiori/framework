@@ -1504,8 +1504,9 @@ abstract class AbstractTask implements JsonI {
         TasksManager::log('Exception message: '.$ex->getMessage());
         TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
         TasksManager::log('Line: '.$ex->getLine());
-
-
+        TasksManager::log("Stack Trace:");
+        TasksManager::log($ex->getTraceAsString());
+        
         if ($meth == 'execute') {
             $this->isSuccess = false;
         }

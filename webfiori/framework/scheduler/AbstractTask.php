@@ -13,6 +13,7 @@ namespace webfiori\framework\scheduler;
 use Exception;
 use Throwable;
 use webfiori\collections\Queue;
+use webfiori\error\TraceEntry;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
 use webfiori\framework\Util;
@@ -1504,7 +1505,14 @@ abstract class AbstractTask implements JsonI {
         TasksManager::log('Exception message: '.$ex->getMessage());
         TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
         TasksManager::log('Line: '.$ex->getLine());
+        TasksManager::log('Stack Trace:');
+        $index = 0;
 
+        foreach ($ex->getTrace() as $traceEntry) {
+            $e = new TraceEntry($traceEntry);
+            TasksManager::log('#'.$index.' '.$e);
+            $index++;
+        }
 
         if ($meth == 'execute') {
             $this->isSuccess = false;

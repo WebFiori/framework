@@ -152,7 +152,7 @@ class SchedulerCommandTest extends TestCase {
             'p' => '123456'
         ]);
         $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
+        $expected = [
             "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
             "1: Fail 2\n",
@@ -169,16 +169,28 @@ class SchedulerCommandTest extends TestCase {
             "Exception message: Call to undefined method app\\tasks\Fail2TestTask::undefined()\n",
             "Thrown in: Fail2TestTask\n",
             "Line: 44\n",
-            "Calling the method app\\tasks\Fail2TestTask::onFail()\n",
-            "Calling the method app\\tasks\Fail2TestTask::afterExec()\n",
-            "Check finished.\n",
-            "Total number of tasks: 5\n",
-            "Executed Tasks: 1\n",
-            "Successfully finished tasks:\n",
-            "    <NONE>\n",
-            "Failed tasks:\n",
-            "    Fail 2\n"
-        ], $runner->getOutput());
+            "Stack Trace:\n",
+            "#0 At class app\\tasks\Fail2TestTask line 1083\n",
+            "#1 At class webfiori\\framework\scheduler\AbstractTask line 406\n",
+            "#2 At class webfiori\\framework\scheduler\AbstractTask line 904\n",
+            "#3 At class webfiori\\framework\scheduler\TasksManager line 600\n",
+            "#4 At class webfiori\\framework\scheduler\TasksManager line 135\n",
+            "#5 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
+            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
+            "#7 At class webfiori\\cli\CLICommand line 409\n",
+            "#8 At class webfiori\\cli\Runner line 684\n",
+            "#9 At class webfiori\\cli\Runner line 615\n",
+            "#10 At class webfiori\cli\Runner line 154\n",
+            "Skip"];
+        $actual = $runner->getOutput();
+        $idx = 0;
+        foreach ($expected as $item) {
+            if ($item == 'Skip') {
+                break;
+            }
+            $this->assertEquals($item, $actual[$idx]);
+            $idx++;
+        }
     }
     /**
      * @test

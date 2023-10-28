@@ -55,6 +55,10 @@ class App {
      */
     public static function setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
+        
+        if (self::$ClassStatus == self::STATUS_INITIALIZED) {
+            
+        }
     }
     /**
      * Returns the class that represents configuration driver.
@@ -136,7 +140,7 @@ class App {
             mb_regex_encoding($encoding);
         }
         $this->initAutoLoader();
-        $this->loadEnvVars();
+        Controller::get()->updateEnv();
         /**
          * Set memory limit.
          */
@@ -294,7 +298,14 @@ class App {
      * @return ConfigurationDriver
      */
     public static function getConfig(): ConfigurationDriver {
-        return Controller::getDriver();
+        $driver = Controller::getDriver();
+        
+        if (get_class($driver) != self::$ConfigDriver) {
+            Controller::setDriver(new self::$ConfigDriver());
+            Controller::get()->updateEnv();
+            $driver = Controller::getDriver();
+        }
+        return $driver;
     }
 
     /**
@@ -620,9 +631,6 @@ class App {
              */
             define('THEMES_PATH', $themesPath);
         }
-    }
-    private function loadEnvVars() {
-        Controller::get()->updateEnv();
     }
     /**
      * Sets new error and exception handler.

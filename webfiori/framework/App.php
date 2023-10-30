@@ -55,10 +55,6 @@ class App {
      */
     public static function setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
-        
-        if (self::$ClassStatus == self::STATUS_INITIALIZED) {
-            
-        }
     }
     /**
      * Returns the class that represents configuration driver.

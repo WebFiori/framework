@@ -57,6 +57,7 @@ class JsonDriverTest extends TestCase {
      * @test
      */
     public function testSetConfigFileName00() {
+        JsonDriver::setConfigFileName('app-config.json');
         $this->assertEquals('app-config', JsonDriver::getConfigFileName());
         JsonDriver::setConfigFileName('super-conf.json');
         $this->assertEquals('super-conf', JsonDriver::getConfigFileName());

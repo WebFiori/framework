@@ -427,6 +427,7 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
+     * @depends testSetConfigFileName00
      */
     public function testAppWithError00() {
         $this->expectExceptionMessage('The property "username" of the connection "New_Connection" is missing.');

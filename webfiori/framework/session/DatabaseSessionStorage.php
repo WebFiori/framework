@@ -39,7 +39,7 @@ class DatabaseSessionStorage implements SessionStorage {
         try {
             $this->dbController = new SessionDB();
         } catch (DatabaseException $ex) {
-            if (str_contains($ex->getMessage(), '"No connection was found')) {
+            if (strpos($ex->getMessage(), 'sessions-connection') !== false) {
                 throw new SessionException("Connection 'sessions-connection' was not found in application configuration.");
             } else {
                 throw $ex;

@@ -1,10 +1,10 @@
 <?php
 namespace webfiori\framework\config;
 
-use Exception;
 use webfiori\database\ConnectionInfo;
 use webfiori\email\SMTPAccount;
 use webfiori\file\File;
+use webfiori\framework\exceptions\InitializationException;
 use webfiori\http\Uri;
 use webfiori\json\Json;
 
@@ -264,7 +264,7 @@ class JsonDriver implements ConfigurationDriver {
     private function getProp(Json $j, $name, string $connName) {
         $val = $j->get($name);
         if ($val === null) {
-            throw new Exception('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
+            throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
         }
         return $val;
     }

@@ -62,7 +62,7 @@ class DB extends Database {
             }
 
             if (!($conn instanceof ConnectionInfo)) {
-                throw new DatabaseException("No connection was found which has the name '$connName'.");
+                throw new DatabaseException("No connection was found which has the name '$connName'. Driver: ". get_class(App::getConfig()).'.');
             }
         }
         parent::__construct($conn);

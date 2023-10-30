@@ -425,5 +425,14 @@ class JsonDriverTest extends TestCase {
         $this->assertEquals('root', $account->getUsername());
 
     }
-    
+    /**
+     * @test
+     */
+    public function testAppWithError00() {
+        $this->expectExceptionMessage('The property "username" of the connection "New_Connection" is missing.');
+        JsonDriver::setConfigFileName('config-with-err-00');
+        $driver = new JsonDriver();
+        $driver->initialize();
+        $driver->getDBConnections();
+    }
 }

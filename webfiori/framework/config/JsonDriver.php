@@ -4,6 +4,7 @@ namespace webfiori\framework\config;
 use webfiori\database\ConnectionInfo;
 use webfiori\email\SMTPAccount;
 use webfiori\file\File;
+use webfiori\framework\exceptions\InitializationException;
 use webfiori\http\Uri;
 use webfiori\json\Json;
 
@@ -134,8 +135,8 @@ class JsonDriver implements ConfigurationDriver {
             'username' => $dbConnectionsInfo->getUsername(),
             'database' => $dbConnectionsInfo->getDBName(),
             'password' => $dbConnectionsInfo->getPassword(),
-            'extars' => $dbConnectionsInfo->getExtars(),
         ]);
+        $connectionJAsJson->addArray('extras', $dbConnectionsInfo->getExtars(), true);
         $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $connectionJAsJson);
         $this->writeJson();
     }
@@ -207,6 +208,13 @@ class JsonDriver implements ConfigurationDriver {
         $jsonObj = $this->json->get('database-connections')->get($conName);
 
         if ($jsonObj !== null) {
+            $extras = $jsonObj->get('extras');
+            $extrasArr = [];
+            if ($extras instanceof Json) {
+                foreach ($extras->getProperties() as $prop) {
+                    $extrasArr[$prop->getName()] = $prop->getValue();
+                }
+            }
             return new ConnectionInfo(
                 $jsonObj->get('type'),
                 $jsonObj->get('username'),
@@ -214,25 +222,51 @@ class JsonDriver implements ConfigurationDriver {
                 $jsonObj->get('database'),
                 $jsonObj->get('host'),
                 $jsonObj->get('port'),
-                $jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
+                $extrasArr);
         }
     }
-
+    /**
+     * Returns an associative array that contain the information of database connections.
+     *
+     * @return array An associative array. The indices are connections names and
+     * values are objects of type 'ConnectionInfo'.
+     */
     public function getDBConnections(): array {
         $accountsInfo = $this->json->get('database-connections');
         $retVal = [];
 
         foreach ($accountsInfo->getProperties() as $propObj) {
+            $name = $propObj->getName();
             $jsonObj = $propObj->getValue();
-            $acc = new ConnectionInfo($jsonObj->get('type'), $jsonObj->get('username'), $jsonObj->get('password'), $jsonObj->get('database'));
-            $acc->setExtras($jsonObj->get('extras') !== null ? $jsonObj->get('extras') : []);
-            $acc->setHost($jsonObj->get('host'));
+            $acc = new ConnectionInfo(
+                    $this->getProp($jsonObj, 'type', $name), 
+                    $this->getProp($jsonObj, 'username', $name), 
+                    $this->getProp($jsonObj, 'password', $name), 
+                    $this->getProp($jsonObj, 'database', $name));
+            $extrasObj = $jsonObj->get('extras');
+            
+            if ($extrasObj !== null && $extrasObj instanceof Json) {
+                $extrasArr = [];
+                
+                foreach ($extrasObj->getProperties() as $prop) {
+                    $extrasArr[$prop->getName()] = $prop->getValue();
+                }
+                $acc->setExtras($extrasArr);
+            }
+            $acc->setHost($this->getProp($jsonObj, 'host', $name));
             $acc->setName($propObj->getName());
-            $acc->setPort($jsonObj->get('port'));
+            $acc->setPort($this->getProp($jsonObj, 'port', $name));
             $retVal[$propObj->getName()] = $acc;
         }
 
         return $retVal;
+    }
+    private function getProp(Json $j, $name, string $connName) {
+        $val = $j->get($name);
+        if ($val === null) {
+            throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
+        }
+        return $val;
     }
 
     public function getDescription(string $langCode) {
@@ -321,17 +355,21 @@ class JsonDriver implements ConfigurationDriver {
 
         if ($jsonObj !== null) {
             return new SMTPAccount([
-                'sender-address' => $jsonObj->get('address'),
-                'pass' => $jsonObj->get('password'),
-                'port' => $jsonObj->get('port'),
-                'sender-name' => $jsonObj->get('sender-name'),
-                'server-address' => $jsonObj->get('host'),
-                'user' => $jsonObj->get('username'),
+                'sender-address' => $this->getProp($jsonObj, 'address', $name),
+                'pass' => $this->getProp($jsonObj, 'password', $name),
+                'port' => $this->getProp($jsonObj, 'port', $name),
+                'sender-name' => $this->getProp($jsonObj, 'sender-name', $name),
+                'server-address' => $this->getProp($jsonObj, 'host', $name),
+                'user' => $this->getProp($jsonObj, 'username', $name),
                 'account-name' => $name
             ]);
         }
     }
-
+    /**
+     * Returns an array that contains all added SMTP accounts.
+     * 
+     * @return array An array that contains all added SMTP accounts.
+     */
     public function getSMTPConnections(): array {
         $accountsInfo = $this->json->get('smtp-connections');
         $retVal = [];
@@ -340,13 +378,13 @@ class JsonDriver implements ConfigurationDriver {
             $jsonObj = $prop->getValue();
             $acc = new SMTPAccount();
             $acc->setAccountName($name);
-            $acc->setAddress($jsonObj->get('address'));
-            $acc->setPassword($jsonObj->get('password'));
-            $acc->setPort($jsonObj->get('port'));
-            $acc->setSenderName($jsonObj->get('sender-name'));
-            $acc->setServerAddress($jsonObj->get('host'));
-            $acc->setUsername($jsonObj->get('username'));
-            $retVal[] = $acc;
+            $acc->setAddress($this->getProp($jsonObj, 'address', $name));
+            $acc->setPassword($this->getProp($jsonObj, 'password', $name));
+            $acc->setPort($this->getProp($jsonObj, 'port', $name));
+            $acc->setSenderName($this->getProp($jsonObj, 'sender-name', $name));
+            $acc->setServerAddress($this->getProp($jsonObj, 'host', $name));
+            $acc->setUsername($this->getProp($jsonObj, 'username', $name));
+            $retVal[$name] = $acc;
         }
 
         return $retVal;

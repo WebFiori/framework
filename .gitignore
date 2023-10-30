@@ -14,3 +14,4 @@ php-cs-fixer-v2.phar
 app/sto
 app/config/*
 .idea/*
+!/app/config/config-with-err-00.json

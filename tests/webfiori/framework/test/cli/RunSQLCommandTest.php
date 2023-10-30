@@ -6,6 +6,8 @@ use tables\Schema;
 use tables\Schema2;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\App;
+use webfiori\framework\config\Controller;
+use webfiori\framework\config\JsonDriver;
 
 class RunSQLCommandTest extends TestCase {
     /**
@@ -80,6 +82,54 @@ class RunSQLCommandTest extends TestCase {
             "Continue?(Y/n)\n",
             "Info: Executing query on database testing_db...\n",
             "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testCLIQuery02() {
+        
+        JsonDriver::setConfigFileName('run-sql-test');
+        App::setConfigDriver(JsonDriver::class);
+
+        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn->setName('testing-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('run-sql-test');
+        
+        Controller::setDriver($driver);
+        
+        $this->assertTrue(get_class(App::getConfig()) == JsonDriver::class);
+        
+        $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'run-query',
+        ]);
+        $runner->setInputs([
+            '0',
+            '0',
+            'select * from hello;',
+            'y'
+        ]);
+
+
+        $this->assertEquals(1146, $runner->start());
+
+        $this->assertEquals([
+            "Select database connection:\n",
+            "0: testing-connection <--\n",
+            "What type of query you would like to run?\n",
+            "0: Run general query.\n",
+            "1: Run query on table instance.\n",
+            "2: Run query from file.\n",
+            "Please type in SQL query:\n",
+            "The following query will be executed on the database 'testing_db':\n",
+            "select * from hello;\n",
+            "Continue?(Y/n)\n",
+            "Info: Executing query on database testing_db...\n",
+            "Error: 1146 - Table 'testing_db.hello' doesn't exist\n"
         ], $runner->getOutput());
     }
     /**

@@ -57,6 +57,7 @@ class JsonDriverTest extends TestCase {
      * @test
      */
     public function testSetConfigFileName00() {
+        JsonDriver::setConfigFileName('app-config.json');
         $this->assertEquals('app-config', JsonDriver::getConfigFileName());
         JsonDriver::setConfigFileName('super-conf.json');
         $this->assertEquals('super-conf', JsonDriver::getConfigFileName());
@@ -425,5 +426,15 @@ class JsonDriverTest extends TestCase {
         $this->assertEquals('root', $account->getUsername());
 
     }
-    
+    /**
+     * @test
+     * @depends testSetConfigFileName00
+     */
+    public function testAppWithError00() {
+        $this->expectExceptionMessage('The property "username" of the connection "New_Connection" is missing.');
+        JsonDriver::setConfigFileName('config-with-err-00');
+        $driver = new JsonDriver();
+        $driver->initialize();
+        $driver->getDBConnections();
+    }
 }

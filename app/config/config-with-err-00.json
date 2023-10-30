@@ -1,0 +1,48 @@
+{
+    "base-url":"DYNAMIC",
+    "theme":null,
+    "home-page":"BASE_URL",
+    "primary-lang":"EN",
+    "titles":{
+        "AR":"افتراضي",
+        "EN":"Default"
+    },
+    "name-separator":"|",
+    "scheduler-password":"NO_PASSWORD",
+    "app-names":{
+        "AR":"تطبيق",
+        "EN":"Application"
+    },
+    "app-descriptions":{
+        "AR":"",
+        "EN":""
+    },
+    "version-info":{
+        "version":"1.0",
+        "version-type":"Stable",
+        "release-date":"2023-10-30"
+    },
+    "env-vars":{
+        "WF_VERBOSE":{
+            "value":false,
+            "description":"Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production."
+        },
+        "CLI_HTTP_HOST":{
+            "value":"example.com",
+            "description":"Host name that will be used when runing the application as command line utility."
+        }
+    },
+    "smtp-connections":{
+    },
+    "database-connections":{
+        "New_Connection":{
+            "type":"mysql",
+            "host":"localhost",
+            "port":3306,
+            "database":"my_db",
+            "password":"test@222",
+            "extras":{
+            }
+        }
+    }
+}

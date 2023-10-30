@@ -73,7 +73,7 @@ class App {
      * 
      * @var string
      */
-    private static $ConfigDriver = '\\webfiori\\framework\\config\\ClassDriver';
+    private static $ConfigDriver = 'webfiori\\framework\\config\\ClassDriver';
     /**
      * A constant that indicates that the status of the class is 'initialized'.
      *

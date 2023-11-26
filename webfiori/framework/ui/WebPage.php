@@ -756,11 +756,7 @@ class WebPage {
      * @since 1.0
      */
     public function render(bool $formatted = false, bool $returnResult = false) {
-        $this->beforeRenderCallbacks->insertionSort(false);
-
-        foreach ($this->beforeRenderCallbacks as $callbackObj) {
-            $callbackObj->call($this);
-        }
+        $this->invokeBeforeRender();
 
         if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
@@ -770,6 +766,21 @@ class WebPage {
         }
 
         return $this->getDocument();
+    }
+    private function invokeBeforeRender(int $current = 0) {
+        $currentCount = count($this->beforeRenderCallbacks);
+        
+        if ($currentCount == 0 || $currentCount == $current) {
+            return;
+        }
+        $this->beforeRenderCallbacks->get($current)->call($this);
+        $newCount = count($this->beforeRenderCallbacks);
+        if ($newCount != $currentCount) {
+            $this->beforeRenderCallbacks->insertionSort(false);
+            $this->invokeBeforeRender();
+        } else {
+            $this->invokeBeforeRender($current + 1);
+        }
     }
     /**
      * Resets page attributes to default values.

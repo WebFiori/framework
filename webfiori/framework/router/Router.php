@@ -283,7 +283,7 @@ class Router {
         $options['type'] = Router::API_ROUTE;
         self::addToMiddlewareGroup($options, 'api');
 
-        return Router::get()->addRouteHelper1($options);
+        return Router::getInstance()->addRouteHelper1($options);
     }
     /**
      * Returns the base URI which is used to create routes.
@@ -295,7 +295,7 @@ class Router {
      * @since 1.3.1
      */
     public static function base() : string {
-        return Router::get()->getBase();
+        return Router::getInstance()->getBase();
     }
 
     /**
@@ -358,7 +358,7 @@ class Router {
         $options['type'] = Router::CLOSURE_ROUTE;
         self::addToMiddlewareGroup($options, 'closure');
 
-        return Router::get()->addRouteHelper1($options);
+        return Router::getInstance()->addRouteHelper1($options);
     }
     /**
      * Returns the value of the base URI which is appended to the path.
@@ -370,7 +370,7 @@ class Router {
      * @since 1.0
      */
     public static function getBase() : string {
-        return self::get()->baseUrl;
+        return self::getInstance()->baseUrl;
     }
     /**
      * Returns the value of a parameter which exist in the path part of the
@@ -407,7 +407,7 @@ class Router {
      * @since 1.3.5
      */
     public static function getRouteUri() {
-        return self::get()->uriObj;
+        return self::getInstance()->uriObj;
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
@@ -421,7 +421,7 @@ class Router {
      * @since 1.3.3
      */
     public static function getUriObj(string $path) {
-        return self::get()->getUriObjHelper($path);
+        return self::getInstance()->getUriObjHelper($path);
     }
     /**
      * Returns an object of type 'RouterUri' which contains URL route information.
@@ -437,7 +437,7 @@ class Router {
      */
     public static function getUriObjByURL(string $url) {
         try {
-            self::get()->resolveUrlHelper($url, false);
+            self::getInstance()->resolveUrlHelper($url, false);
 
             return self::getRouteUri();
         } catch (Error $ex) {
@@ -457,8 +457,8 @@ class Router {
      * @since 1.3.8
      */
     public static function hasRoute(string $path): bool {
-        $routesArr = self::get()->routes;
-        $trimmed = self::get()->fixUriPath($path);
+        $routesArr = self::getInstance()->routes;
+        $trimmed = self::getInstance()->fixUriPath($path);
 
         return isset($routesArr['static'][$trimmed]) || isset($routesArr['variable'][$trimmed]);
     }
@@ -480,7 +480,7 @@ class Router {
             $urlSet->setIsQuotedAttribute(true);
             $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
                 ->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-            $routes = Router::get()->getRoutesHelper();
+            $routes = Router::getInstance()->getRoutesHelper();
 
             foreach ($routes['static'] as $route) {
                 if ($route->isInSiteMap()) {
@@ -523,7 +523,7 @@ class Router {
      * @since 1.3.10
      */
     public static function notFound() {
-        call_user_func(self::get()->onNotFound);
+        call_user_func(self::getInstance()->onNotFound);
     }
     /**
      * Adds new route to a web page.
@@ -616,8 +616,8 @@ class Router {
      * @since 1.3.4
      */
     public static function removeAll() {
-        self::get()->uriObj = null;
-        self::get()->routes = [
+        self::getInstance()->uriObj = null;
+        self::getInstance()->routes = [
             'static' => [],
             'variable' => []
         ];
@@ -633,16 +633,16 @@ class Router {
      * @since 1.3.7
      */
     public static function removeRoute(string $path) : bool {
-        $pathFix = self::base().self::get()->fixUriPath($path);
+        $pathFix = self::base().self::getInstance()->fixUriPath($path);
         $retVal = false;
 
-        if (isset(self::get()->routes['static'][$pathFix])) {
-            unset(self::get()->routes['static'][$pathFix]);
+        if (isset(self::getInstance()->routes['static'][$pathFix])) {
+            unset(self::getInstance()->routes['static'][$pathFix]);
 
             $retVal = true;
         } else {
-            if (self::get()->routes['variable'][$pathFix]) {
-                unset(self::get()->routes['variable'][$pathFix]);
+            if (self::getInstance()->routes['variable'][$pathFix]) {
+                unset(self::getInstance()->routes['variable'][$pathFix]);
 
                 $retVal = true;
             }
@@ -658,7 +658,7 @@ class Router {
      * @since 1.2
      */
     public static function route(string $uri) {
-        Router::get()->resolveUrlHelper($uri);
+        Router::getInstance()->resolveUrlHelper($uri);
     }
     /**
      * Returns an associative array of all available routes.
@@ -671,11 +671,11 @@ class Router {
     public static function routes() : array {
         $routesArr = [];
 
-        foreach (Router::get()->getRoutesHelper()['static'] as $routeUri) {
+        foreach (Router::getInstance()->getRoutesHelper()['static'] as $routeUri) {
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
 
-        foreach (Router::get()->getRoutesHelper()['variable'] as $routeUri) {
+        foreach (Router::getInstance()->getRoutesHelper()['variable'] as $routeUri) {
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
 
@@ -695,7 +695,7 @@ class Router {
      * @since 1.3.7
      */
     public static function routesAsRouterUri() : array {
-        return self::get()->routes;
+        return self::getInstance()->routes;
     }
     /**
      * Returns the number of routes at which the router has.
@@ -705,7 +705,7 @@ class Router {
      * @since 1.3.11
      */
     public static function routesCount() : int {
-        $routesArr = self::get()->routes;
+        $routesArr = self::getInstance()->routes;
 
         return count($routesArr['variable']) + count($routesArr['static']);
     }
@@ -718,7 +718,7 @@ class Router {
      * @since 1.3.8
      */
     public static function setOnNotFound(callable $func) {
-        self::get()->setOnNotFoundHelper($func);
+        self::getInstance()->setOnNotFoundHelper($func);
     }
     /**
      * Adds an object of type 'RouterUri' as new route.
@@ -732,11 +732,11 @@ class Router {
      * @since 1.3.2
      */
     public static function uriObj(RouterUri $routerUri) : bool {
-        if (!self::get()->hasRouteHelper($routerUri->getPath())) {
+        if (!self::getInstance()->hasRouteHelper($routerUri->getPath())) {
             if ($routerUri->hasVars()) {
-                self::get()->routes['variable'] = $routerUri;
+                self::getInstance()->routes['variable'] = $routerUri;
             } else {
-                self::get()->routes['static'] = $routerUri;
+                self::getInstance()->routes['static'] = $routerUri;
             }
 
             return true;
@@ -1110,7 +1110,7 @@ class Router {
      *
      * @since 1.0
      */
-    private static function get(): Router {
+    private static function getInstance(): Router {
         if (self::$router != null) {
             return self::$router;
         }
@@ -1598,7 +1598,7 @@ class Router {
             $options['type'] = Router::VIEW_ROUTE;
             self::addToMiddlewareGroup($options, 'web');
 
-            return Router::get()->addRouteHelper1($options);
+            return Router::getInstance()->addRouteHelper1($options);
         }
 
         return false;

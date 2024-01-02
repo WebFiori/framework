@@ -228,7 +228,7 @@ class Router {
     public static function addRoute(array $options) : bool {
         $options['type'] = Router::CUSTOMIZED;
 
-        return Router::get()->addRouteHelper1($options);
+        return Router::getInstance()->addRouteHelper1($options);
     }
     /**
      * Adds new route to a web services set.

@@ -13,8 +13,8 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
+use webfiori\http\RequestMethod;
 use webfiori\http\RequestParameter;
 
 /**
@@ -37,7 +37,9 @@ class CreateWebService extends CreateClassHelper {
         $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
         $this->setServiceName();
-        $this->serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
+        $methods = RequestMethod::getAll();
+        array_multisort($methods);
+        $this->serviceObj->addRequestMethod($this->select('Request method:', $methods, 2));
 
         if ($this->confirm('Would you like to add request parameters to the service?', false)) {
             $this->addParamsToService();

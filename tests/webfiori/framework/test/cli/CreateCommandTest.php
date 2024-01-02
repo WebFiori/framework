@@ -88,7 +88,8 @@ class CreateCommandTest extends CreateTestCase {
             'webfiori',
             'create'
         ]);
-        $this->assertEquals(0, $runner->start());
+        $result = $runner->start();
+        $this->assertEquals(0, $result);
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -105,15 +106,15 @@ class CreateCommandTest extends CreateTestCase {
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
             "Enter a name for the new web service:\n",
             "Request method:\n",
-            "0: GET <--\n",
-            "1: HEAD\n",
-            "2: POST\n",
-            "3: PUT\n",
-            "4: DELETE\n",
-            "5: TRACE\n",
-            "6: OPTIONS\n",
-            "7: PATCH\n",
-            "8: CONNECT\n",
+            "0: CONNECT\n",
+            "1: DELETE\n",
+            "2: GET <--\n",
+            "3: HEAD\n",
+            "4: OPTIONS\n",
+            "5: POST\n",
+            "6: PUT\n",
+            "7: TRACE\n",
+            
             "Would you like to add request parameters to the service?(y/N)\n",
             "Choose parameter type:\n",
             "0: array <--\n",

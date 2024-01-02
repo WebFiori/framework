@@ -37,7 +37,9 @@ class CreateWebService extends CreateClassHelper {
         $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
         $this->setServiceName();
-        $this->serviceObj->addRequestMethod($this->select('Request method:', RequestMethod::getAll(), 0));
+        $methods = RequestMethod::getAll();
+        array_multisort($methods);
+        $this->serviceObj->addRequestMethod($this->select('Request method:', $methods, 2));
 
         if ($this->confirm('Would you like to add request parameters to the service?', false)) {
             $this->addParamsToService();

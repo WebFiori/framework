@@ -2,9 +2,11 @@
 namespace webfiori\framework\test\router;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\router\RouteOption;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\Util;
+use webfiori\http\RequestMethod;
 /**
  * Description of RouterTest
  *
@@ -23,14 +25,14 @@ class RouterTest extends TestCase {
      */
     public function testAddAPIRoute00() {
         $this->assertTrue(Router::api([
-            'path' => '/call-api-00',
-            'route-to' => '/my-api.php']));
+            RouteOption::PATH =>  '/call-api-00',
+            RouteOption::TO =>  '/my-api.php']));
         $this->assertFalse(Router::page([
-            'path' => '/call-api-00',
-            'route-to' => '/my-other-api.php']));
+            RouteOption::PATH =>  '/call-api-00',
+            RouteOption::TO =>  '/my-other-api.php']));
         $this->assertTrue(Router::page([
-            'path' => '/call-api-01',
-            'route-to' => '/my-api.php']));
+            RouteOption::PATH =>  '/call-api-01',
+            RouteOption::TO => '/my-api.php']));
     }
     /**
      * @test
@@ -43,20 +45,20 @@ class RouterTest extends TestCase {
         {
         };
         $this->assertTrue(Router::closure([
-            'path' => '/call',
-            'route-to' => $c1
+            RouteOption::PATH =>  '/call',
+            RouteOption::TO =>  $c1
         ]));
         $this->assertFalse(Router::closure([
-            'path' => '/call',
-            'route-to' => $c2
+            RouteOption::PATH =>  '/call',
+            RouteOption::TO =>  $c2
         ]));
         $this->assertTrue(Router::closure([
-            'path' => '/call-2',
-            'route-to' => $c1
+            RouteOption::PATH =>  '/call-2',
+            RouteOption::TO =>  $c1
         ]));
         $this->assertFalse(Router::closure([
-            'path' => '/call',
-            'route-to' => 'Not Func'
+            RouteOption::PATH =>  '/call',
+            RouteOption::TO =>  'Not Func'
         ]));
     }
     /**
@@ -64,14 +66,14 @@ class RouterTest extends TestCase {
      */
     public function testAddViewRoute00() {
         $this->assertTrue(Router::page([
-            'path' => '/view-something',
-            'route-to' => 'my-view.php']));
+            RouteOption::PATH =>  '/view-something',
+            RouteOption::TO =>  'my-view.php']));
         $this->assertFalse(Router::page([
-            'path' => '/view-something',
-            'route-to' => '/my-other-view.php']));
+            RouteOption::PATH =>  '/view-something',
+            RouteOption::TO =>  '/my-other-view.php']));
         $this->assertTrue(Router::page([
-            'path' => '/view-something-2',
-            'route-to' => '/my-view.php']));
+            RouteOption::PATH =>  '/view-something-2',
+            RouteOption::TO =>  '/my-view.php']));
     }
     /**
      * @test
@@ -82,11 +84,11 @@ class RouterTest extends TestCase {
         {
         });
         Router::closure([
-            'path' => '{var-1}/{var-2?}',
-            'route-to' => function()
+            RouteOption::PATH =>  '{var-1}/{var-2?}',
+            RouteOption::TO =>  function()
             {
             },
-            'vars-values' => [
+            RouteOption::VALUES => [
                 'var-1' => [
                     'hello'
                 ]
@@ -108,8 +110,8 @@ class RouterTest extends TestCase {
         Router::removeAll();
 
         Router::closure([
-            'path' => '{var-1}/{var-2?}',
-            'route-to' => function()
+            RouteOption::PATH =>  '{var-1}/{var-2?}',
+            RouteOption::TO =>  function()
             {
             }
         ]);
@@ -130,8 +132,8 @@ class RouterTest extends TestCase {
         {
         });
         Router::closure([
-            'path' => '{var-1}/{var-2}',
-            'route-to' => function()
+            RouteOption::PATH =>  '{var-1}/{var-2}',
+            RouteOption::TO =>  function()
             {
             }
         ]);
@@ -153,8 +155,8 @@ class RouterTest extends TestCase {
         {
         });
         Router::closure([
-            'path' => '{var-1}/{var-2}/{var-1}',
-            'route-to' => function()
+            RouteOption::PATH =>  '{var-1}/{var-2}/{var-1}',
+            RouteOption::TO =>  function()
             {
             }
         ]);
@@ -170,39 +172,39 @@ class RouterTest extends TestCase {
     public function testRoutesGroup00() {
         Router::removeAll();
         Router::page([
-            'path' => 'users',
-            'case-sensitive' => false,
-            'middleware' => 'M1',
-            'languages' => ['EN'],
-            'methods' => 'post',
-            'routes' => [
+            RouteOption::PATH =>  'users',
+            RouteOption::CASE_SENSITIVE => false,
+            RouteOption::MIDDLEWARE => 'M1',
+            RouteOption::LANGS => ['EN'],
+            RouteOption::REQUEST_METHODS => RequestMethod::POST,
+            RouteOption::SUB_ROUTES =>  [
                 [
-                    'path' => 'view-user/{user-id}',
-                    'route-to' => 'ViewUserPage.php',
-                    'languages' => ['AR']
+                    RouteOption::PATH =>  'view-user/{user-id}',
+                    RouteOption::TO =>  'ViewUserPage.php',
+                    RouteOption::LANGS =>  ['AR']
                 ],
                 [
-                    'path' => 'get-users',
-                    'languages' => ['AR'],
-                    'case-sensitive' => true,
-                    'routes' => [
+                    RouteOption::PATH =>  'get-users',
+                    RouteOption::LANGS =>  ['AR'],
+                    RouteOption::CASE_SENSITIVE => true,
+                    RouteOption::SUB_ROUTES =>  [
                         [
-                            'path' => 'by-name',
-                            'route-to' => 'GetUserByName.php',
-                            'languages' => ['FR'],
-                            'case-sensitive' => false,
+                            RouteOption::PATH =>  'by-name',
+                            RouteOption::TO =>  'GetUserByName.php',
+                            RouteOption::LANGS =>  ['FR'],
+                            RouteOption::CASE_SENSITIVE => false,
                         ],
                         [
-                            'path' => 'by-email',
-                            'route-to' => 'GetUserByEmail.php'
+                            RouteOption::PATH =>  'by-email',
+                            RouteOption::TO =>  'GetUserByEmail.php'
                         ]
                     ],
                 ],
                 [
-                    'path' => '/',
-                    'route-to' => 'ListUsers.php',
-                    'case-sensitive' => true,
-                    'methods' => ['options', 'get']
+                    RouteOption::PATH =>  '/',
+                    RouteOption::TO =>  'ListUsers.php',
+                    RouteOption::CASE_SENSITIVE => true,
+                    RouteOption::REQUEST_METHODS => [RequestMethod::OPTIONS, RequestMethod::GET]
                 ]
             ]
         ]);

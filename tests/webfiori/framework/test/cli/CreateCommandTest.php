@@ -89,7 +89,7 @@ class CreateCommandTest extends CreateTestCase {
             'create'
         ]);
         $result = $runner->start();
-        //$this->assertEquals(0, $result);
+        $this->assertEquals(0, $result);
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",

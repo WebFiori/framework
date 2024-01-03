@@ -18,7 +18,7 @@
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
         "ext-openssl": "*",
-        "webfiori/http":"v3.3.7",
+        "webfiori/http":"v3.3.8",
         "webfiori/file":"v1.3.4",
         "webfiori/jsonx":"v3.3.0",
         "webfiori/ui":"v2.6.1",

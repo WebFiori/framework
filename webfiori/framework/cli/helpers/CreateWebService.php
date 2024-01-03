@@ -13,7 +13,7 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\http\ParamTypes;
+use webfiori\http\ParamType;
 use webfiori\http\RequestMethod;
 use webfiori\http\RequestParameter;
 
@@ -52,7 +52,7 @@ class CreateWebService extends CreateClassHelper {
     private function addParamsToService() {
         do {
             $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
+            $paramObj->setType($this->select('Choose parameter type:', ParamType::getTypes(), 0));
             $this->setParamName($paramObj);
             $added = $this->serviceObj->addParameter($paramObj);
             $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));

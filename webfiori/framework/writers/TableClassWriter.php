@@ -254,6 +254,10 @@ class TableClassWriter extends ClassWriter {
         $fks = $this->tableObj->getForeignKeys();
 
         foreach ($fks as $fkObj) {
+
+            if (count($fkObj->getSourceCols()) == 1) {
+                continue;
+            }
             $refTableNs = get_class($fkObj->getSource());
             $cName = $this->getNamespace().'\\'.$this->getName();
             $refTableClassName = '$this';
@@ -276,6 +280,9 @@ class TableClassWriter extends ClassWriter {
     private function addFksUseTables() {
         if ($this->tableObj !== null) {
             $fks = $this->tableObj->getForeignKeys();
+            if (count($fks) != 0) {
+                $this->addUseStatement(FK::class);
+            }
             $addedRefs = [];
 
             foreach ($fks as $fkObj) {
@@ -441,12 +448,9 @@ class TableClassWriter extends ClassWriter {
         $fks = $this->getTable()->getForeignKeys();
         foreach ($fks as $fk) {
             $fk instanceof FK;
-            if (count($fk->getSourceCols()) == 1) {
-                foreach ($fk->getSourceCols() as $sourceCol) {
-                    if ($colObj->getNormalName() == $sourceCol->getNormalName()) {
-                        $this->addFKOptionHelper($colObj, $fk);
-                    }
-                }
+            $sourceCols = array_values($fk->getOwnerCols());
+            if (count($sourceCols) == 1 && $sourceCols[0]->getNormalName() == $colObj->getNormalName()) {
+                $this->addFKOptionHelper($colObj, $fk);
             }
         }
     }
@@ -467,7 +471,6 @@ class TableClassWriter extends ClassWriter {
         $this->append("ColOption::FK_COL => '".$sourceCol."',", 5);
         $this->append("ColOption::FK_ON_UPDATE => ".$this->getFkCond($fk->getOnUpdate()).",", 5);
         $this->append("ColOption::FK_ON_DELETE => ".$this->getFkCond($fk->getOnDelete()).",", 5);
-        $this->getTable()->removeReference($fk->getKeyName());
         $this->append("],", 4);
     }
     private function getFkCond(string $txt) {

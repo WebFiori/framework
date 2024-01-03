@@ -12,6 +12,8 @@ namespace webfiori\framework\writers;
 
 use webfiori\framework\EAbstractWebService;
 use webfiori\http\AbstractWebService;
+use webfiori\http\ParamOption;
+use webfiori\http\ParamType;
 use webfiori\http\RequestParameter;
 
 /**
@@ -49,6 +51,8 @@ class WebServiceWriter extends ClassWriter {
 
         $this->setSuffix('Service');
         $this->addUseStatement(EAbstractWebService::class);
+        $this->addUseStatement(ParamType::class);
+        $this->addUseStatement(ParamOption::class);
         $this->servicesObj = new ServiceHolder();
 
         if ($webServicesObj instanceof AbstractWebService) {
@@ -142,35 +146,87 @@ class WebServiceWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends EAbstractWebService {');
     }
+    private function getType(string $type) {
+        switch ($type) {
+            case 'int': {
+                return 'ParamType::INT';
+            }
+            case 'integer': {
+                return 'ParamType::INT';
+            }
+            case 'string': {
+                return 'ParamType::STRING';
+            }
+            case 'array': {
+                return 'ParamType::ARR';
+            }
+            case 'bool': {
+                return 'ParamType::BOOL';
+            }
+            case 'boolean': {
+                return 'ParamType::BOOL';
+            }
+            case 'double': {
+                return 'ParamType::DOUBLE';
+            }
+            case 'email': {
+                return 'ParamType::EMAIL';
+            }
+            case 'json-obj': {
+                return 'ParamType::JSON_OBJ';
+            }
+            case 'url': {
+                return 'ParamType::URL';
+            }
+        }
+    }
     /**
      *
      * @param RequestParameter $param
      */
     private function appendParam($param) {
         $this->append("'".$param->getName()."' => [", 3);
-        $this->append("'type' => '".$param->getType()."',", 4);
+        
+        $this->append("ParamOption::TYPE => ".$this->getType($param->getType()).",", 4);
 
         if ($param->isOptional()) {
-            $this->append("'optional' => true,", 4);
+            $this->append("ParamOption::OPTIONAL => true,", 4);
         }
-
+        
         if ($param->getDefault() !== null) {
-            $toAppend = "'default' => ".$param->getDefault().",";
+            $toAppend = "ParamOption::DEFAULT => ".$param->getDefault().",";
 
-            if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
-                $toAppend = "'default' => '".$param->getDefault()."',";
-            } else if ($param->getType() == 'boolean') {
-                $toAppend = $param->getDefault() === true ? "'default' => true," : "'default' => false,";
+            if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL) && strlen($param->getDefault()) > 0) {
+                $toAppend = "ParamOption::DEFAULT => '".$param->getDefault()."',";
+            } else if ($param->getType() == ParamType::BOOL) {
+                $toAppend = $param->getDefault() === true ? "ParamOption::DEFAULT => true," : "ParamOption::DEFAULT => false,";
             }
             $this->append($toAppend, 4);
         }
 
-        if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
-            $this->append("'allow-empty' => true,", 4);
+        if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL)) {
+            if ($param->isEmptyStringAllowed()) {
+                $this->append("ParamOption::EMPTY => true,", 4);
+            }
+            if ($param->getMinLength() !== null) {
+                $this->append("ParamOption::MIN_LENGTH => ".$param->getMinLength().",", 4);
+            }
+            if ($param->getMaxLength() !== null) {
+                $this->append("ParamOption::MAX_LENGTH => ".$param->getMaxLength().",", 4);
+            }
+        }
+        
+        if ($param->getType() == ParamType::INT || $param->getType() == ParamType::DOUBLE) {
+            if ($param->getMinValue() !== null) {
+                $this->append("ParamOption::MIN => ".$param->getMinValue().",", 4);
+            }
+            if ($param->getMaxValue() !== null) {
+                $this->append("ParamOption::MAX => ".$param->getMinValue().",", 4);
+            }
         }
 
         if ($param->getDescription() !== null) {
-            $this->append("'description' => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
+            $this->append("ParamOption::DESCRIPTION => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
         }
         $this->append('],', 3);
     }

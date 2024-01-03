@@ -227,7 +227,7 @@ class Session implements JsonI {
                 {
                     throw  new SessionException($errStr, $errNo);
                 });
-                $sessionObj = unserialize(base64_decode($decrypted));
+                $sessionObj = unserialize(base64_decode(trim($decrypted)));
                 restore_error_handler();
 
                 if ($sessionObj instanceof Session) {

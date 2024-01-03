@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a>
+  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/actions/workflows/php83.yml/badge.svg?branch=master"></a>
   <a href="https://codecov.io/gh/WebFiori/framework">
     <img src="https://codecov.io/gh/WebFiori/framework/branch/master/graph/badge.svg" />
   </a>
@@ -29,14 +29,15 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 ## Supported PHP Versions
 | Build Status |
 |:-----------:|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.0/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.1/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.2/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.3/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.4/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.0/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a><br>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php70.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php71.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php72.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php73.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php74.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php80.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php81.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php82.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php83.yml/badge.svg?branch=master"></a><br>|
 
 
 ## Key Features
@@ -64,15 +65,15 @@ Following table shows build status of the standard libraries that the framework 
 
 | Library | Build | Latest |
 |----|----|----|
-| [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/http.svg" /></a> |
-| [File](https://github.com/WebFiori/file) | <a href="https://github.com/WebFiori/file/actions"><img src="https://github.com/WebFiori/file/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/file/releases"><img src="https://img.shields.io/github/release/WebFiori/file.svg" /></a> |
-| [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
-| [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
-| [Collections](https://github.com/WebFiori/collections) | <a href="https://github.com/WebFiori/collections/actions"><img src="https://github.com/WebFiori/collections/workflows/Build%20PHP%208.2/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
-| [Database](https://github.com/WebFiori/database) | <a href="https://github.com/WebFiori/database/actions"><img src="https://github.com/WebFiori/database/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
-| [CLI](https://github.com/WebFiori/cli) | <a href="https://github.com/WebFiori/cli/actions"><img src="https://github.com/WebFiori/cli/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/cli/releases"><img src="https://img.shields.io/github/release/WebFiori/cli.svg" /></a> |
-| [Mailer](https://github.com/WebFiori/mail) | <a href="https://github.com/WebFiori/mail/actions"><img src="https://github.com/WebFiori/err/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/mail/releases"><img src="https://img.shields.io/github/release/WebFiori/mail.svg" /></a> |
-| [Errors and Exceptions Handler](https://github.com/WebFiori/err) | <a href="https://github.com/WebFiori/err/actions"><img src="https://github.com/WebFiori/err/workflows/Build%20PHP%208.2/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/err/releases"><img src="https://img.shields.io/github/release/WebFiori/err.svg" /></a> |
+| [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/http.svg" /></a> |
+| [File](https://github.com/WebFiori/file) | <a href="https://github.com/WebFiori/file/actions"><img src="https://github.com/WebFiori/file/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/file/releases"><img src="https://img.shields.io/github/release/WebFiori/file.svg" /></a> |
+| [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
+| [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
+| [Collections](https://github.com/WebFiori/collections) | <a href="https://github.com/WebFiori/collections/actions"><img src="https://github.com/WebFiori/collections/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
+| [Database](https://github.com/WebFiori/database) | <a href="https://github.com/WebFiori/database/actions"><img src="https://github.com/WebFiori/database/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
+| [CLI](https://github.com/WebFiori/cli) | <a href="https://github.com/WebFiori/cli/actions"><img src="https://github.com/WebFiori/cli/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/cli/releases"><img src="https://img.shields.io/github/release/WebFiori/cli.svg" /></a> |
+| [Mailer](https://github.com/WebFiori/mail) | <a href="https://github.com/WebFiori/mail/actions"><img src="https://github.com/WebFiori/mail/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/mail/releases"><img src="https://img.shields.io/github/release/WebFiori/mail.svg" /></a> |
+| [Errors and Exceptions Handler](https://github.com/WebFiori/err) | <a href="https://github.com/WebFiori/err/actions"><img src="https://github.com/WebFiori/err/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/err/releases"><img src="https://img.shields.io/github/release/WebFiori/err.svg" /></a> |
 
 ## Problems Solved
 

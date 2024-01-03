@@ -366,6 +366,9 @@ class TableClassWriter extends ClassWriter {
             }
             case 'varchar' : { 
                 return 'DataType::VARCHAR';
+            } 
+            default : {
+                return 'varchar';
             }
         }
     }

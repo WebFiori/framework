@@ -442,9 +442,10 @@ class TableClassWriter extends ClassWriter {
         foreach ($fks as $fk) {
             $fk instanceof FK;
             if (count($fk->getSourceCols()) == 1) {
-                $sourceCol = $fk->getSourceCols()[0];
-                if ($colObj->getNormalName() == $sourceCol->getNormalName()) {
-                    $this->addFKOptionHelper($colObj, $fk);
+                foreach ($fk->getSourceCols() as $sourceCol) {
+                    if ($colObj->getNormalName() == $sourceCol->getNormalName()) {
+                        $this->addFKOptionHelper($colObj, $fk);
+                    }
                 }
             }
         }

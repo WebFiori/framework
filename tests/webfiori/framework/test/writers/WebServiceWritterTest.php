@@ -18,6 +18,8 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\ParamType",
+            "webfiori\http\ParamOption"
         ], $writter->getUseStatements());
     }
     /**
@@ -31,6 +33,8 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\ParamType",
+            "webfiori\http\ParamOption"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',
@@ -56,6 +60,8 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\ParamType",
+            "webfiori\http\ParamOption"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',

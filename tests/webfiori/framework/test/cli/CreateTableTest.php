@@ -2,8 +2,10 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\database\DataType;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\database\Table;
 use webfiori\file\File;
 use webfiori\framework\App;
 /**
@@ -486,7 +488,14 @@ class CreateTableTest extends TestCase {
         $this->assertEquals(0, $runner->start());
         $clazz = '\\app\\database\\Cool05Table';
         $this->assertTrue(class_exists($clazz));
-
+        $this->removeClass($clazz);
+        $instance = new $clazz();
+        $instance instanceof Table;
+        $this->assertTrue($instance->hasColumn('id'));
+        $idCol = $instance->getColByKey('id');
+        $this->assertEquals(DataType::INT, $idCol->getDatatype());
+        $this->assertTrue($idCol->isPrimary());
+        $this->assertTrue($idCol->isUnique());
         return $clazz;
     }
     /**
@@ -532,12 +541,13 @@ class CreateTableTest extends TestCase {
             'create',
             '--c' => 'table'
         ]);
-        $this->assertEquals(0, $runner->start());
+        $result = $runner->start();
+        $this->assertEquals(0, $result);
         $output = $runner->getOutput();
         $clazz = '\\app\\database\\Cool06Table';
         $this->assertTrue(class_exists($clazz));
+        
         $this->removeClass($clazz);
-        $this->removeClass($refTable);
         $this->assertEquals(array_merge([
             "Database type:\n",
             "0: mysql\n",
@@ -587,6 +597,13 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
+        
+        $instance = new $clazz();
+        $instance instanceof Table;
+        $this->assertEquals(1, $instance->getForeignKeysCount());
+        $fk = $instance->getForeignKey('ref_table_fk');
+        $this->assertEquals($refTable, '\\'.get_class($fk->getSource()));
+        $this->assertEquals($clazz, '\\'.get_class($fk->getOwner()));
     }
     /**
      * @test

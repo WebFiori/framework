@@ -14,6 +14,7 @@ use webfiori\database\ColOption;
 use webfiori\database\Column;
 use webfiori\database\DataType;
 use webfiori\database\EntityMapper;
+use webfiori\database\FK;
 use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
@@ -253,6 +254,10 @@ class TableClassWriter extends ClassWriter {
         $fks = $this->tableObj->getForeignKeys();
 
         foreach ($fks as $fkObj) {
+
+            if (count($fkObj->getSourceCols()) == 1) {
+                continue;
+            }
             $refTableNs = get_class($fkObj->getSource());
             $cName = $this->getNamespace().'\\'.$this->getName();
             $refTableClassName = '$this';
@@ -275,6 +280,9 @@ class TableClassWriter extends ClassWriter {
     private function addFksUseTables() {
         if ($this->tableObj !== null) {
             $fks = $this->tableObj->getForeignKeys();
+            if (count($fks) != 0) {
+                $this->addUseStatement(FK::class);
+            }
             $addedRefs = [];
 
             foreach ($fks as $fkObj) {
@@ -433,7 +441,56 @@ class TableClassWriter extends ClassWriter {
         if ($colObj->getComment() !== null) {
             $this->append("ColOption::COMMENT => '".$colObj->getComment()."',", 4);
         }
+        $this->addFKOption($colObj);
         $this->append("],", 3);
+    }
+    private function addFKOption(Column $colObj) {
+        $fks = $this->getTable()->getForeignKeys();
+        foreach ($fks as $fk) {
+            $fk instanceof FK;
+            $sourceCols = array_values($fk->getOwnerCols());
+            if (count($sourceCols) == 1 && $sourceCols[0]->getNormalName() == $colObj->getNormalName()) {
+                $this->addFKOptionHelper($colObj, $fk);
+            }
+        }
+    }
+    private function addFKOptionHelper(Column $col, FK $fk) {
+        $refTableNs = get_class($fk->getSource());
+        $cName = $this->getNamespace().'\\'.$this->getName();
+        $refTableClassName = '$this';
+
+        if ($cName != $refTableNs) {
+            $nsSplit = explode('\\', $refTableNs);
+            $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
+        }
+        $keyName = $fk->getKeyName();
+        $sourceCol  = array_keys($fk->getSourceCols())[0];
+        $this->append("ColOption::FK => [", 4);
+        $this->append("ColOption::FK_NAME => '".$keyName."',", 5);
+        $this->append("ColOption::FK_TABLE => ".$refTableClassName.",", 5);
+        $this->append("ColOption::FK_COL => '".$sourceCol."',", 5);
+        $this->append("ColOption::FK_ON_UPDATE => ".$this->getFkCond($fk->getOnUpdate()).",", 5);
+        $this->append("ColOption::FK_ON_DELETE => ".$this->getFkCond($fk->getOnDelete()).",", 5);
+        $this->append("],", 4);
+    }
+    private function getFkCond(string $txt) {
+        switch ($txt) {
+            case 'cascade' :{
+                return 'FK::CASCADE';
+            }
+            case 'no action' :{
+                return 'FK::NO_ACTION';
+            }
+            case 'restrict' :{
+                return 'FK::RESTRICT';
+            }
+            case 'set default' :{
+                return 'FK::SET_DEFAULT';
+            }
+            case 'set null' :{
+                return 'FK::SET_NULL';
+            }
+        }
     }
     /**
      * Extract and return the name of table class based on associated table object.

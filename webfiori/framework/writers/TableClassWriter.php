@@ -368,7 +368,7 @@ class TableClassWriter extends ClassWriter {
                 return 'DataType::VARCHAR';
             } 
             default : {
-                return 'varchar';
+                return 'DataType::VARCHAR';
             }
         }
     }

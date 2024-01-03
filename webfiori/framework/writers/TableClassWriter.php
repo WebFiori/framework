@@ -10,12 +10,17 @@
  */
 namespace webfiori\framework\writers;
 
+use webfiori\database\ColOption;
+use webfiori\database\Column;
+use webfiori\database\DataType;
 use webfiori\database\EntityMapper;
 use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use const APP_DIR;
+use const APP_PATH;
 
 /**
  * A class which is used to write database table classes.
@@ -232,6 +237,8 @@ class TableClassWriter extends ClassWriter {
         } else if ($this->tableObj instanceof MSSQLTable) {
             $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
         }
+        $this->addUseStatement(ColOption::class);
+        $this->addUseStatement(DataType::class);
         $this->addFksUseTables();
     }
     private function addColsHelper() {
@@ -280,6 +287,88 @@ class TableClassWriter extends ClassWriter {
             }
         }
     }
+    private function getType(string $dataType) {
+        switch ($dataType) {
+            case 'bigint' : { 
+                return 'DataType::BIGINT';
+            }
+            case 'binary' : { 
+                return 'DataType::BINARY';
+            }
+            case 'bit' : { 
+                return 'DataType::BIT';
+            }
+            case 'blob' : { 
+                return 'DataType::BLOB';
+            }
+            case 'longblob' : { 
+                return 'DataType::BLOB_LONG';
+            }
+            case 'mediumblob' : { 
+                return 'DataType::BLOB_MEDIUM';
+            }
+            case 'tinyblob' : { 
+                return 'DataType::BLOB_TINY';
+            }
+            case 'bool' : { 
+                return 'DataType::BOOL';
+            }
+            case 'boolean' : { 
+                return 'DataType::BOOL';
+            }
+            case 'char' : { 
+                return 'DataType::CHAR';
+            }
+            case 'date' : { 
+                return 'DataType::DATE';
+            }
+            case 'datetime' : { 
+                return 'DataType::DATETIME';
+            }
+            case 'datetime2' : { 
+                return 'DataType::DATETIME2';
+            }
+            case 'decimal' : { 
+                return 'DataType::DECIMAL';
+            }
+            case 'double' : { 
+                return 'DataType::DOUBLE';
+            }
+            case 'float' : { 
+                return 'DataType::FLOAT';
+            }
+            case 'int' : { 
+                return 'DataType::INT';
+            }
+            case 'money' : { 
+                return 'DataType::MONEY';
+            }
+            case 'nchar' : { 
+                return 'DataType::NCHAR';
+            }
+            case 'nvarchar' : { 
+                return 'DataType::NVARCHAR';
+            }
+            case 'text' : { 
+                return 'DataType::TEXT';
+            }
+            case 'medumtext' : { 
+                return 'DataType::TEXT_MEDIUM';
+            }
+            case 'time' : { 
+                return 'DataType::TIME';
+            }
+            case 'timestamp' : { 
+                return 'DataType::TIMESTAMP';
+            }
+            case 'varbinary' : { 
+                return 'DataType::VARBINARY';
+            }
+            case 'varchar' : { 
+                return 'DataType::VARCHAR';
+            }
+        }
+    }
     /**
      *
      * @param MySQLColumn $colObj
@@ -287,7 +376,7 @@ class TableClassWriter extends ClassWriter {
     private function appendColObj($key, $colObj) {
         $dataType = $colObj->getDatatype();
         $this->append("'$key' => [", 3);
-        $this->append("'type' => '".$colObj->getDatatype()."',", 4);
+        $this->append("ColOption::TYPE => ".$this->getType($colObj->getDatatype()).",", 4);
 
         if (($dataType == 'int' && $colObj instanceof MySQLColumn)
                 || $dataType == 'varchar'
@@ -299,46 +388,47 @@ class TableClassWriter extends ClassWriter {
                 || $dataType == 'char'
                 || $dataType == 'nchar'
                 || $dataType == 'nvarchar') {
-            $this->append("'size' => '".$colObj->getSize()."',", 4);
+            
+            $this->append("ColOption::SIZE => '".$colObj->getSize()."',", 4);
 
             if ($dataType == 'decimal') {
-                $this->append("'scale' => '".$colObj->getScale()."',", 4);
+                $this->append("ColOption::SCALE => '".$colObj->getScale()."',", 4);
             }
         }
 
         if ($colObj instanceof MSSQLColumn && $colObj->isIdentity()) {
-            $this->append("'identity' => true,", 4);
+            $this->append("ColOption::IDENTITY => true,", 4);
         }
 
         if ($colObj->isPrimary()) {
-            $this->append("'primary' => true,", 4);
+            $this->append("ColOption::PRIMARY => true,", 4);
 
             if ($colObj instanceof MySQLColumn && $colObj->isAutoInc()) {
-                $this->append("'auto-inc' => true,", 4);
+                $this->append("ColOption::AUTO_INCREMENT => true,", 4);
             }
         }
 
         if ($colObj->isUnique()) {
-            $this->append("'is-unique' => true,", 4);
+            $this->append("ColOption::UNIQUE => true,", 4);
         }
 
         if ($colObj->getDefault() !== null) {
-            $defaultVal = "'default' => '".$colObj->getDefault()."',";
+            $defaultVal = "ColOption::DEFAULT => '".$colObj->getDefault()."',";
 
-            if ($dataType == 'bool' || $dataType == 'boolean') {
-                $defaultVal = $colObj->getDefault() === true ? "'default' => true," : "'default' => false,";
+            if (in_array($dataType, Column::BOOL_TYPES)) {
+                $defaultVal = $colObj->getDefault() === true ? "ColOption::DEFAULT => true," : "ColOption::DEFAULT => false,";
             } else if ($dataType == 'int' || $dataType == 'bigint' || $dataType == 'decimal' || $dataType == 'money') {
-                $defaultVal = "'default' => ".$colObj->getDefault().",";
+                $defaultVal = "ColOption::DEFAULT => ".$colObj->getDefault().",";
             }
             $this->append($defaultVal, 4);
         }
 
         if ($colObj->isNull()) {
-            $this->append("'is-null' => true,", 4);
+            $this->append("ColOption::NULL => true,", 4);
         }
 
         if ($colObj->getComment() !== null) {
-            $this->append("'comment' => '".$colObj->getComment()."',", 4);
+            $this->append("ColOption::COMMENT => '".$colObj->getComment()."',", 4);
         }
         $this->append("],", 3);
     }

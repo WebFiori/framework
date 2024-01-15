@@ -37,9 +37,7 @@ class CreateWebService extends CreateClassHelper {
         $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
         $this->setServiceName();
-        $methods = RequestMethod::getAll();
-        array_multisort($methods);
-        $this->serviceObj->addRequestMethod($this->select('Request method:', $methods, 2));
+        $this->addRequestMethods();
 
         if ($this->confirm('Would you like to add request parameters to the service?', false)) {
             $this->addParamsToService();
@@ -49,16 +47,48 @@ class CreateWebService extends CreateClassHelper {
         $this->writeClass();
         $this->info('Don\'t forget to add the service to a services manager.');
     }
+    public function addRequestMethods() {
+        $added = $this->serviceObj->getRequestMethods();
+        $methods = RequestMethod::getAll();
+        $addOne = true;
+        
+        while ($addOne) {
+            $toSelect = [];
+            foreach ($methods as $method) {
+                if (!in_array($method, $added)) {
+                    $toSelect[] = $method;
+                }
+            }
+            array_multisort($toSelect);
+            $this->serviceObj->addRequestMethod($this->select('Request method:', $toSelect, 2));
+            if (count($toSelect) > 1) {
+                $addOne = $this->confirm('Would you like to add another request method?', false);
+            } else {
+                $addOne = false;
+            }
+        }
+    }
     private function addParamsToService() {
         do {
             $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->select('Choose parameter type:', ParamType::getTypes(), 0));
             $this->setParamName($paramObj);
+            $paramObj->setType($this->select('Choose parameter type:', ParamType::getTypes(), 0));
+            $paramObj->setDescription($this->getInput('Description:'));
             $added = $this->serviceObj->addParameter($paramObj);
             $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));
-
+            if ($paramObj->getType() == ParamType::STRING || $paramObj->getType() == ParamType::URL || $paramObj->getType() == ParamType::EMAIL) {
+                $paramObj->setIsEmptyStringAllowed($this->confirm('Are empty values allowed?', false));
+                $paramObj->setMinLength($this->getCommand()->readInteger('Minimum length:', false));
+                $paramObj->setMaxLength($this->getCommand()->readInteger('Maximum length:', false));
+            }
+            if ($paramObj->getType() == ParamType::INT || $paramObj->getType() == ParamType::DOUBLE) {
+                $method = $paramObj->getType() == ParamType::INT ? 'readInteger' : 'readFloat';
+                $paramObj->setMinValue($this->getCommand()->$method('Minimum value:', false));
+                $paramObj->setMaxValue($this->getCommand()->$method('Maximum value:', false));
+            }
+            
             if ($added) {
-                $this->success('New parameter added to the service \''.$this->serviceObj->getName().'\'.');
+                $this->success('New parameter added.');
             } else {
                 $this->warning('The parameter was not added.');
             }

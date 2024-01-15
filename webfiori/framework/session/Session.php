@@ -227,7 +227,7 @@ class Session implements JsonI {
                 {
                     throw  new SessionException($errStr, $errNo);
                 });
-                $sessionObj = unserialize(base64_decode(trim($decrypted)));
+                $sessionObj = unserialize(base64_decode($decrypted));
                 restore_error_handler();
 
                 if ($sessionObj instanceof Session) {
@@ -586,7 +586,7 @@ class Session implements JsonI {
      */
     public function serialize() : string {
         // Serialize => Encode => [Encrypt]
-        $serializedSession = base64_encode(serialize($this));
+        $serializedSession = base64_encode(trim(serialize($this)));
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {

@@ -219,10 +219,10 @@ class WebServiceWriter extends ClassWriter {
         }
         
         if ($param->getType() == ParamType::INT || $param->getType() == ParamType::DOUBLE) {
-            if ($param->getMinValue() !== null) {
+            if ($param->getMinValue() !== null && ($param->getMinValue() != PHP_INT_MIN && $param->getMinValue() != PHP_FLOAT_MIN)) {
                 $this->append("ParamOption::MIN => ".$param->getMinValue().",", 4);
             }
-            if ($param->getMaxValue() !== null) {
+            if ($param->getMaxValue() !== null && ($param->getMaxValue() != PHP_INT_MAX && $param->getMaxValue() != PHP_FLOAT_MAX)) {
                 $this->append("ParamOption::MAX => ".$param->getMinValue().",", 4);
             }
         }

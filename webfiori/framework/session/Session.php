@@ -209,6 +209,9 @@ class Session implements JsonI {
      */
     public function deserialize(string $serialized): bool {
         $cipherMeth = 'aes-256-ctr';
+        $split = explode('_', $serialized);
+        $len = $split[0];
+        $serialized = $split[1];
         // [Decrypt] => decode => deserialize
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
@@ -220,14 +223,14 @@ class Session implements JsonI {
             $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
-            $decrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
+            $decrypted = substr(openssl_decrypt(substr($serialized, 0, $len), $cipherMeth, $key,0, $iv), 0, $len);
 
             if (strlen($decrypted) > 0) {
-                set_error_handler(function ($errNo, $errStr)
+                set_error_handler(function ($errNo, $errStr, $errFile, $errLine)
                 {
-                    throw  new SessionException($errStr, $errNo);
+                    throw  new SessionException($errStr.' at line '.$errLine, $errNo);
                 });
-                $sessionObj = unserialize(base64_decode($decrypted));
+                $sessionObj = unserialize(base64_decode(trim($decrypted)));
                 restore_error_handler();
 
                 if ($sessionObj instanceof Session) {
@@ -587,6 +590,8 @@ class Session implements JsonI {
     public function serialize() : string {
         // Serialize => Encode => [Encrypt]
         $serializedSession = base64_encode(trim(serialize($this)));
+        $len = strlen($serializedSession);
+        
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
@@ -598,11 +603,11 @@ class Session implements JsonI {
             $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
-
-            return openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
+            $serializedSession = openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
+            $len = strlen($serializedSession);
         }
 
-        return $serializedSession;
+        return $len.'_'.$serializedSession;
     }
     /**
      * Sets session variable.

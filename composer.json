@@ -26,7 +26,7 @@
         "webfiori/database":"v0.8.9",
         "webfiori/cli":"v1.1.4",
         "webfiori/mailer":"v1.1.3",
-        "webfiori/err":"v1.0.8"
+        "webfiori/err":"v1.0.9"
     },
     "require-dev": {
         

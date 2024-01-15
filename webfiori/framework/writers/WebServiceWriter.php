@@ -14,6 +14,7 @@ use webfiori\framework\EAbstractWebService;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamOption;
 use webfiori\http\ParamType;
+use webfiori\http\RequestMethod;
 use webfiori\http\RequestParameter;
 
 /**
@@ -53,6 +54,7 @@ class WebServiceWriter extends ClassWriter {
         $this->addUseStatement(EAbstractWebService::class);
         $this->addUseStatement(ParamType::class);
         $this->addUseStatement(ParamOption::class);
+        $this->addUseStatement(RequestMethod::class);
         $this->servicesObj = new ServiceHolder();
 
         if ($webServicesObj instanceof AbstractWebService) {
@@ -284,9 +286,45 @@ class WebServiceWriter extends ClassWriter {
             $this->f('__construct'),
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
-        $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
+        $this->append('$this->setDescription(\''. str_replace("'", "\\'", $this->servicesObj->getDescription()).'\');', 2);
+        $this->append('$this->setRequestMethods([', 2);
+        foreach ($this->servicesObj->getRequestMethods() as $method) {
+            $this->append($this->getMethod($method).',', 3);
+        }
+        $this->append(']);', 2);
         $this->appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
+    }
+    private function getMethod($method) {
+        switch ($method) {
+            case RequestMethod::CONNECT:{
+                return "RequestMethod::CONNECT";
+            }
+            case RequestMethod::DELETE:{
+                return "RequestMethod::DELETE";
+            }
+            case RequestMethod::GET:{
+                return "RequestMethod::GET";
+            }
+            case RequestMethod::HEAD:{
+                return "RequestMethod::HEAD";
+            }
+            case RequestMethod::OPTIONS:{
+                return "RequestMethod::OPTIONS";
+            }
+            case RequestMethod::PATCH:{
+                return "RequestMethod::PATCH";
+            }
+            case RequestMethod::POST:{
+                return "RequestMethod::POST";
+            }
+            case RequestMethod::PUT:{
+                return "RequestMethod::PUT";
+            }
+            case RequestMethod::TRACE:{
+                return "RequestMethod::TRACE";
+            }
+        }
     }
     private function writeServiceDoc($service) {
         $docArr = [];

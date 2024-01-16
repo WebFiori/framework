@@ -219,10 +219,14 @@ class WebServiceWriter extends ClassWriter {
         }
         
         if ($param->getType() == ParamType::INT || $param->getType() == ParamType::DOUBLE) {
-            if ($param->getMinValue() !== null && ($param->getMinValue() != PHP_INT_MIN && $param->getMinValue() != PHP_FLOAT_MIN)) {
+            $minFloat = defined('PHP_FLOAT_MIN') ? PHP_FLOAT_MIN : 2.2250738585072E-308;
+            $maxFloat = defined('PHP_FLOAT_MAX') ? PHP_FLOAT_MAX : 1.7976931348623E+308;
+            if ($param->getMinValue() !== null && ($param->getMinValue() != $minFloat && $param->getMinValue() != $maxFloat)) {
                 $this->append("ParamOption::MIN => ".$param->getMinValue().",", 4);
             }
-            if ($param->getMaxValue() !== null && ($param->getMaxValue() != PHP_INT_MAX && $param->getMaxValue() != PHP_FLOAT_MAX)) {
+            $maxInt = PHP_INT_MAX;
+            $minInt = defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX;
+            if ($param->getMaxValue() !== null && ($param->getMaxValue() != $maxInt && $param->getMinValue() != $minInt)) {
                 $this->append("ParamOption::MAX => ".$param->getMinValue().",", 4);
             }
         }

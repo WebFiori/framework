@@ -207,6 +207,103 @@ class CreateWebServiceTest extends CreateTestCase {
                 ParamOption::OPTIONAL => false,
         ]);
     }
+    /**
+     * @test
+     */
+    public function test02() {
+        $runner = $runner = App::getRunner();
+        $runner->setInputs([
+            'NewWeb3',
+            '',
+            'get-hello-3',
+            'Service\'s Desc',
+            '',
+            'y',
+            '5',
+            'n',
+            'y',
+            'a-number',
+            '4',
+            'Random\'s desc',
+            'n',
+            '',
+            '',
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'web-service'
+        ]);
+        $result = $runner->start();
+        //$this->assertEquals(0, $result);
+        $this->assertEquals([
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'app\apis'\n",
+            "Enter a name for the new web service:\n",
+            "Description:\n",
+            "Request method:\n",
+            "0: CONNECT\n",
+            "1: DELETE\n",
+            "2: GET <--\n",
+            "3: HEAD\n",
+            "4: OPTIONS\n",
+            "5: POST\n",
+            "6: PUT\n",
+            "7: TRACE\n",
+            "Would you like to add another request method?(y/N)\n",
+            "Request method:\n",
+            "0: CONNECT\n",
+            "1: DELETE\n",
+            "2: GET <--\n",
+            "3: HEAD\n",
+            "4: OPTIONS\n",
+            "5: POST\n",
+            "6: PUT\n",
+            "7: TRACE\n",
+            "Would you like to add another request method?(y/N)\n",
+            "Would you like to add request parameters to the service?(y/N)\n",
+            "Enter a name for the request parameter:\n",
+            "Choose parameter type:\n",
+            "0: array <--\n",
+            "1: boolean\n",
+            "2: email\n",
+            "3: double\n",
+            "4: integer\n",
+            "5: json-obj\n",
+            "6: string\n",
+            "7: url\n",
+            "Description:\n",
+            "Is this parameter optional?(Y/n)\n",
+            "Would you like to set minimum and maximum limites?(y/N)\n",
+            "Success: New parameter added.\n",
+            "Would you like to add another parameter?(y/N)\n",
+            "Creating the class...\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."apis\".\n",
+            "Info: Don't forget to add the service to a services manager.\n",
+        ], $runner->getOutput());
+        $clazz = '\\app\\apis\\NewWeb3Service';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+        $instance = new $clazz();
+        $instance instanceof AbstractWebService;
+        $this->assertEquals('get-hello-3', $instance->getName());
+        $this->assertEquals(1, count($instance->getParameters()));
+        $this->assertEquals('Service\'s Desc', $instance->getDescription());
+        $this->assertEquals([RequestMethod::GET, RequestMethod::POST], $instance->getRequestMethods());
+        $param00 = $instance->getParameters()[0];
+        $this->assertRequestParameter($param00, [
+                ParamOption::NAME => 'a-number',
+                ParamOption::TYPE => ParamType::INT,
+                ParamOption::DESCRIPTION => 'Random\'s desc',
+                ParamOption::DEFAULT => null,
+                ParamOption::EMPTY => false,
+                ParamOption::MAX => PHP_INT_MAX,
+                ParamOption::MAX_LENGTH => null,
+                ParamOption::MIN => defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX,
+                ParamOption::MIN_LENGTH => null,
+                ParamOption::OPTIONAL => false,
+        ]);
+    }
     private function assertRequestParameter(RequestParameter $param, array $expected) {
         $this->assertEquals($expected[ParamOption::NAME], $param->getName());
         $this->assertEquals($expected[ParamOption::TYPE], $param->getType());

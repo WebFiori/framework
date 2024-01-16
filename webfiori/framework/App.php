@@ -540,7 +540,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-RC19');
+        define('WF_VERSION', '3.0.0-Beta 1');
         /**
          * A constant that tells the type of framework version.
          *
@@ -548,7 +548,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION_TYPE', 'Release Candidate');
+        define('WF_VERSION_TYPE', 'Beta');
         /**
          * The date at which the framework version was released.
          *
@@ -556,7 +556,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2023-11-07');
+        define('WF_RELEASE_DATE', '2024-01-17');
     }
 
     /**
@@ -569,7 +569,7 @@ class App {
         });
 
         if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
-            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
+            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
         call_user_func(APP_DIR.'\ini\InitMiddleware::init');
     }

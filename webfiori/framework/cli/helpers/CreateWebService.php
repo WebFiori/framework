@@ -73,8 +73,7 @@ class CreateWebService extends CreateClassHelper {
             $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));
             if ($paramObj->getType() == ParamType::STRING || $paramObj->getType() == ParamType::URL || $paramObj->getType() == ParamType::EMAIL) {
                 $paramObj->setIsEmptyStringAllowed($this->confirm('Are empty values allowed?', false));
-                $paramObj->setMinLength($this->getCommand()->readInteger('Minimum length:'));
-                $paramObj->setMaxLength($this->getCommand()->readInteger('Maximum length:'));
+                $this->setMinAndMaxLength($paramObj);
             }
             if ($paramObj->getType() == ParamType::INT || $paramObj->getType() == ParamType::DOUBLE) {
                 $this->setMinAndMax($paramObj);
@@ -87,6 +86,26 @@ class CreateWebService extends CreateClassHelper {
             }
             $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
+    }
+    private function setMinAndMaxLength(RequestParameter $param) {
+        $setMinMax = $this->confirm('Would you like to set minimum and maximum length?', false);
+        
+        if (!$setMinMax) {
+            return;
+        }
+        $isValid = false;
+        
+        while (!$isValid) {
+            $min = $this->getCommand()->readInteger('Minimum length:');
+            $max = $this->getCommand()->readInteger('Maximum length:');
+            if ($min < $max) {
+                $param->setMinLength($min);
+                $param->setMaxLength($max);
+                $isValid = true;
+            } else {
+                $this->error('Minimum and maximum should not overlap.');
+            }
+        }
     }
     private function setMinAndMax(RequestParameter $param) {
         $setMinMax = $this->confirm('Would you like to set minimum and maximum limites?', false);

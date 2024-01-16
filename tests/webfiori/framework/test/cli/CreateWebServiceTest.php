@@ -31,8 +31,7 @@ class CreateWebServiceTest extends CreateTestCase {
             'Random desc',
             'n',
             'n',
-            '',
-            '',
+            'n',
             '',
         ]);
         $runner->setArgsVector([
@@ -81,8 +80,7 @@ class CreateWebServiceTest extends CreateTestCase {
             "Description:\n",
             "Is this parameter optional?(Y/n)\n",
             "Are empty values allowed?(y/N)\n",
-            "Minimum length: Enter = '0'\n",
-            "Maximum length: Enter = '0'\n",
+            "Would you like to set minimum and maximum length?(y/N)\n",
             "Success: New parameter added.\n",
             "Would you like to add another parameter?(y/N)\n",
             "Creating the class...\n",

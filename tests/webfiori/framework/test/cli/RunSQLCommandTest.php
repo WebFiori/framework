@@ -88,7 +88,6 @@ class RunSQLCommandTest extends TestCase {
      * @test
      */
     public function testCLIQuery02() {
-        
         JsonDriver::setConfigFileName('run-sql-test');
         App::setConfigDriver(JsonDriver::class);
 
@@ -97,11 +96,11 @@ class RunSQLCommandTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $driver = new JsonDriver();
         $driver->setConfigFileName('run-sql-test');
-        
+
         Controller::setDriver($driver);
-        
+
         $this->assertTrue(get_class(App::getConfig()) == JsonDriver::class);
-        
+
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

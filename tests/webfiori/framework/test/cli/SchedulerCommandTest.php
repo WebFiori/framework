@@ -184,6 +184,7 @@ class SchedulerCommandTest extends TestCase {
             "Skip"];
         $actual = $runner->getOutput();
         $idx = 0;
+
         foreach ($expected as $item) {
             if ($item == 'Skip') {
                 break;

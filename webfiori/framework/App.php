@@ -46,31 +46,6 @@ define('MICRO_START', microtime(true));
  */
 class App {
     /**
-     * Sets the class that will be used as configuration driver.
-     *
-     * This method must be used before calling the method 'App::start()' in order
-     * to set proper configuration driver.
-     * 
-     * @param string $clazz The full name of the class including namespace. 
-     */
-    public static function setConfigDriver(string $clazz) {
-        self::$ConfigDriver = $clazz;
-    }
-    /**
-     * Returns the class that represents configuration driver.
-     * 
-     * @return string  The full name of the class including namespace.
-     */
-    public static function getConfigDriver() : string {
-        return self::$ConfigDriver;
-    }
-    /**
-     * A string which points to the class that represents configuration driver.
-     * 
-     * @var string
-     */
-    private static $ConfigDriver = 'webfiori\\framework\\config\\ClassDriver';
-    /**
      * A constant that indicates that the status of the class is 'initialized'.
      *
      */
@@ -106,6 +81,12 @@ class App {
      * @var Runner
      */
     private static $CliRunner;
+    /**
+     * A string which points to the class that represents configuration driver.
+     *
+     * @var string
+     */
+    private static $ConfigDriver = 'webfiori\\framework\\config\\ClassDriver';
     /**
      * A single instance of the class.
      *
@@ -295,13 +276,22 @@ class App {
      */
     public static function getConfig(): ConfigurationDriver {
         $driver = Controller::getDriver();
-        
+
         if (get_class($driver) != self::$ConfigDriver) {
             Controller::setDriver(new self::$ConfigDriver());
             Controller::get()->updateEnv();
             $driver = Controller::getDriver();
         }
+
         return $driver;
+    }
+    /**
+     * Returns the class that represents configuration driver.
+     *
+     * @return string  The full name of the class including namespace.
+     */
+    public static function getConfigDriver() : string {
+        return self::$ConfigDriver;
     }
 
     /**
@@ -368,6 +358,17 @@ class App {
 
         return self::$CliRunner;
     }
+    /**
+     * Sets the class that will be used as configuration driver.
+     *
+     * This method must be used before calling the method 'App::start()' in order
+     * to set proper configuration driver.
+     *
+     * @param string $clazz The full name of the class including namespace.
+     */
+    public static function setConfigDriver(string $clazz) {
+        self::$ConfigDriver = $clazz;
+    }
 
     /**
      * Start your WebFiori application.
@@ -420,7 +421,7 @@ class App {
             /**
              * Directory separator.
              */
-           define('DS', DIRECTORY_SEPARATOR);
+            define('DS', DIRECTORY_SEPARATOR);
         }
 
         if (!defined('APP_DIR')) {
@@ -437,13 +438,14 @@ class App {
             http_response_code(500);
             die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR.'".');
         }
+
         if (!defined('APP_PATH')) {
             /**
              * The absolute path to application directory.
              *
              * @var string
              */
-           define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
+            define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
         }
     }
 

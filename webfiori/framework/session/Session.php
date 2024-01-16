@@ -591,7 +591,7 @@ class Session implements JsonI {
         // Serialize => Encode => [Encrypt]
         $serializedSession = base64_encode(trim(serialize($this)));
         $len = strlen($serializedSession);
-        
+
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {

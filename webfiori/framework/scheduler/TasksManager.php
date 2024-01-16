@@ -282,6 +282,20 @@ class TasksManager {
         return self::$tasksManager;
     }
     /**
+     * Returns the number of current hour in the day as integer.
+     *
+     * This method is used by the class 'AbstractTask' to validate task
+     * execution time. The method will always return a value between 0 and 23
+     * inclusive.
+     *
+     * @return int An integer that represents current hour number in
+     * the day.
+     * @since 1.0.2
+     */
+    public static function getHour() : int {
+        return self::get()->timestamp['hour'];
+    }
+    /**
      * Returns the array that contains logged messages.
      *
      * The array will contain the messages which where logged using the method
@@ -293,6 +307,48 @@ class TasksManager {
      */
     public static function getLogArray() : array {
         return self::get()->logsArray;
+    }
+    /**
+     * Returns the number of current minute in the current hour as integer.
+     *
+     * This method is used by the class 'AbstractTask' to validate task
+     * execution time. The method will always return a value between 0 and 59
+     * inclusive.
+     *
+     * @return int An integer that represents current minute number in
+     * the current hour.
+     *
+     * @since 1.0.2
+     */
+    public static function getMinute() : int {
+        return self::get()->timestamp['minute'];
+    }
+    /**
+     * Returns the number of current month as integer.
+     *
+     * This method is used by the class 'AbstracTask' to validate task
+     * execution time. The method will always return a value between 1 and 12
+     * inclusive.
+     *
+     * @return int An integer that represents current month's number.
+     * @since 1.0.2
+     */
+    public static function getMonth() : int {
+        return self::get()->timestamp['month'];
+    }
+    /**
+     * Gets the password that is used to protect tasks execution.
+     *
+     * The password is used to prevent unauthorized access to execute tasks.
+     * The provided password must be 'sha256' hashed string. It is recommended
+     * to hash the password externally then use the hash inside your code.
+     *
+     * @return string If the password is set, the method will return it.
+     * If not set, the method will return the string 'NO_PASSWORD'.
+     *
+     */
+    public static function getPassword() : string {
+        return self::get()->getPasswordHelper();
     }
     /**
      * Returns a task given its name.
@@ -338,18 +394,42 @@ class TasksManager {
         return self::get()->tasksNamesArr;
     }
     /**
-     * Returns the number of current hour in the day as integer.
+     * Returns the time at which tasks check was initialized.
      *
-     * This method is used by the class 'AbstractTask' to validate task
-     * execution time. The method will always return a value between 0 and 23
-     * inclusive.
+     * @return string The method will return a time string in the format
+     * 'YY-DD HH:MM' where:
+     * <ul>
+     * <li>'YY' is month number.</li>
+     * <li>'MM' is day number in the current month.</li>
+     * <li>'HH' is the hour.</li>
+     * <li>'MM' is the minute.</li>
+     * </ul>
      *
-     * @return int An integer that represents current hour number in
-     * the day.
-     * @since 1.0.2
+     * @since 1.0.7
      */
-    public static function getHour() : int {
-        return self::get()->timestamp['hour'];
+    public static function getTimestamp() : string {
+        $month = self::getMonth();
+
+        if ($month < 10) {
+            $month = '0'.$month;
+        }
+        $day = self::dayOfMonth();
+
+        if ($day < 10) {
+            $day = '0'.$day;
+        }
+        $hour = self::getHour();
+
+        if ($hour < 10) {
+            $hour = '0'.$hour;
+        }
+        $minute = self::getMinute();
+
+        if ($minute < 10) {
+            $minute = '0'.$minute;
+        }
+
+        return $month.'-'.$day.' '.$hour.':'.$minute;
     }
     /**
      * Creates routes to tasks web interface pages.
@@ -410,34 +490,6 @@ class TasksManager {
         }
     }
     /**
-     * Returns the number of current minute in the current hour as integer.
-     *
-     * This method is used by the class 'AbstractTask' to validate task
-     * execution time. The method will always return a value between 0 and 59
-     * inclusive.
-     *
-     * @return int An integer that represents current minute number in
-     * the current hour.
-     *
-     * @since 1.0.2
-     */
-    public static function getMinute() : int {
-        return self::get()->timestamp['minute'];
-    }
-    /**
-     * Returns the number of current month as integer.
-     *
-     * This method is used by the class 'AbstracTask' to validate task
-     * execution time. The method will always return a value between 1 and 12
-     * inclusive.
-     *
-     * @return int An integer that represents current month's number.
-     * @since 1.0.2
-     */
-    public static function getMonth() : int {
-        return self::get()->timestamp['month'];
-    }
-    /**
      * Create a task that will be executed once every month.
      *
      * @param int $dayNumber The day of the month at which the task will be
@@ -478,33 +530,6 @@ class TasksManager {
         }
 
         return false;
-    }
-    /**
-     * Gets the password that is used to protect tasks execution.
-     *
-     * The password is used to prevent unauthorized access to execute tasks.
-     * The provided password must be 'sha256' hashed string. It is recommended
-     * to hash the password externally then use the hash inside your code.
-     *
-     * @return string If the password is set, the method will return it.
-     * If not set, the method will return the string 'NO_PASSWORD'.
-     *
-     */
-    public static function getPassword() : string {
-        
-        return self::get()->getPasswordHelper();
-    }
-    /**
-     * Sets the password that is used to protect tasks execution.
-     * 
-     * The password is used to prevent unauthorized access to execute tasks.
-     * The provided password must be 'sha256' hashed string. It is recommended
-     * to hash the password externally then use the hash inside your code.
-     * 
-     * @param string $pass The password that will be used.
-     */
-    public static function setPassword(string $pass) {
-        self::get()->setPasswordHelper($pass);
     }
     /**
      * Register any task which exist in the folder 'tasks' of the application.
@@ -719,6 +744,18 @@ class TasksManager {
         }
     }
     /**
+     * Sets the password that is used to protect tasks execution.
+     *
+     * The password is used to prevent unauthorized access to execute tasks.
+     * The provided password must be 'sha256' hashed string. It is recommended
+     * to hash the password externally then use the hash inside your code.
+     *
+     * @param string $pass The password that will be used.
+     */
+    public static function setPassword(string $pass) {
+        self::get()->setPasswordHelper($pass);
+    }
+    /**
      * Returns a queue of all queued tasks.
      *
      * @return Queue An object of type 'Queue' which contains all queued tasks.
@@ -727,44 +764,6 @@ class TasksManager {
      */
     public static function tasksQueue() : Queue {
         return self::get()->getQueueHelper();
-    }
-    /**
-     * Returns the time at which tasks check was initialized.
-     *
-     * @return string The method will return a time string in the format
-     * 'YY-DD HH:MM' where:
-     * <ul>
-     * <li>'YY' is month number.</li>
-     * <li>'MM' is day number in the current month.</li>
-     * <li>'HH' is the hour.</li>
-     * <li>'MM' is the minute.</li>
-     * </ul>
-     *
-     * @since 1.0.7
-     */
-    public static function getTimestamp() : string {
-        $month = self::getMonth();
-
-        if ($month < 10) {
-            $month = '0'.$month;
-        }
-        $day = self::dayOfMonth();
-
-        if ($day < 10) {
-            $day = '0'.$day;
-        }
-        $hour = self::getHour();
-
-        if ($hour < 10) {
-            $hour = '0'.$hour;
-        }
-        $minute = self::getMinute();
-
-        if ($minute < 10) {
-            $minute = '0'.$minute;
-        }
-
-        return $month.'-'.$day.' '.$hour.':'.$minute;
     }
     /**
      * Creates a task that will be executed on specific time weekly.

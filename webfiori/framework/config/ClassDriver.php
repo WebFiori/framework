@@ -33,6 +33,26 @@ class ClassDriver implements ConfigurationDriver {
         $this->docEmptyLine = " * ";
         $this->initDefaultConfig();
     }
+    public static function a($file, $str, $tabSize = 0) {
+        $isResource = is_resource($file);
+        $tabStr = $tabSize > 0 ? '    ' : '';
+
+        if (gettype($str) == 'array') {
+            foreach ($str as $subStr) {
+                if ($isResource) {
+                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                } else {
+                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                }
+            }
+        } else {
+            if ($isResource) {
+                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
+            } else {
+                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
+            }
+        }
+    }
     /**
      * Adds application environment variable to the configuration.
      *
@@ -52,15 +72,6 @@ class ClassDriver implements ConfigurationDriver {
             'value' => $value,
             'description' => $description
         ];
-        $this->writeAppConfig();
-    }
-    /**
-     * Removes specific application environment variable given its name.
-     * 
-     * @param string $name The name of the variable.
-     */
-    public function removeEnvVar(string $name) {
-        unset($this->configVars['env-vars'][$name]);
         $this->writeAppConfig();
     }
     /**
@@ -360,6 +371,15 @@ class ClassDriver implements ConfigurationDriver {
             }
         }
         $this->configVars['database-connections'] = $updated;
+        $this->writeAppConfig();
+    }
+    /**
+     * Removes specific application environment variable given its name.
+     *
+     * @param string $name The name of the variable.
+     */
+    public function removeEnvVar(string $name) {
+        unset($this->configVars['env-vars'][$name]);
         $this->writeAppConfig();
     }
 
@@ -860,26 +880,6 @@ class ClassDriver implements ConfigurationDriver {
 
         self::a($cFile, "}");
         $cFile->write(false, true);
-    }
-    public static function a($file, $str, $tabSize = 0) {
-        $isResource = is_resource($file);
-        $tabStr = $tabSize > 0 ? '    ' : '';
-
-        if (gettype($str) == 'array') {
-            foreach ($str as $subStr) {
-                if ($isResource) {
-                    fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                } else {
-                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
-                }
-            }
-        } else {
-            if ($isResource) {
-                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
-            } else {
-                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
-            }
-        }
     }
     private function initDefaultConfig() {
         $this->configVars = [

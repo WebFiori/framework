@@ -6,13 +6,14 @@ use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return function (ECSConfig $ecsConfig): void {
+return function (ECSConfig $ecsConfig): void
+{
     $ecsConfig->paths([
-        __DIR__ . '/app',
-        __DIR__ . '/public',
-        __DIR__ . '/tests',
-        __DIR__ . '/themes',
-        __DIR__ . '/webfiori',
+        __DIR__.'/app',
+        __DIR__.'/public',
+        __DIR__.'/tests',
+        __DIR__.'/themes',
+        __DIR__.'/webfiori',
     ]);
 
     // this way you add a single rule

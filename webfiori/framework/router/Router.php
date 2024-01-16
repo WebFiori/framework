@@ -1103,6 +1103,16 @@ class Router {
 
         return $path;
     }
+    private function getFileDirAndName($absDir): array {
+        $explode = explode(DS, $absDir);
+        $fileName = $explode[count($explode) - 1];
+        $dir = substr($absDir, 0, strlen($absDir) - strlen($fileName));
+
+        return [
+            'name' => $fileName,
+            'dir' => $dir
+        ];
+    }
     /**
      * Creates and Returns a single instance of the router.
      *
@@ -1117,16 +1127,6 @@ class Router {
         self::$router = new Router();
 
         return self::$router;
-    }
-    private function getFileDirAndName($absDir): array {
-        $explode = explode(DS, $absDir);
-        $fileName = $explode[count($explode) - 1];
-        $dir = substr($absDir, 0, strlen($absDir) - strlen($fileName));
-
-        return [
-            'name' => $fileName,
-            'dir' => $dir
-        ];
     }
     /**
      * Returns an array that holds allowed request methods for fetching the

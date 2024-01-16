@@ -55,7 +55,7 @@ class ThemeLoader {
      *
      * This method will return an associative array. The key is the theme
      * name and the value is an object of type Theme that contains theme info.
-     * 
+     *
      * @param bool $updateCache If set to true, cached data of descovered themes
      * will reset and search will be performed again.
      *
@@ -251,7 +251,7 @@ class ThemeLoader {
                 $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
-                
+
                 if (!class_exists($aCName)) {
                     $aCName = '\\'.self::THEMES_DIR.'\\'.$dirName.'\\'.$cName;
                 }

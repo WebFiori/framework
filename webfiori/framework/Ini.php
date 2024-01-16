@@ -34,10 +34,32 @@ class Ini {
      */
     private static $singleton;
     private function __construct() {
-        
     }
 
-    
+
+    /**
+     * Creates all directories at which the application needs to run.
+     */
+    public static function createAppDirs() {
+        $DS = DIRECTORY_SEPARATOR;
+        self::mkdir(ROOT_PATH.$DS.APP_DIR);
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
+        self::mkdir(ROOT_PATH.$DS.'public');
+    }
+
+
 
     /**
      * Creates initialization class.
@@ -125,29 +147,6 @@ class Ini {
         }
 
         return self::$singleton;
-    }
-
-    
-    /**
-     * Creates all directories at which the application needs to run.
-     */
-    public static function createAppDirs() {
-        $DS = DIRECTORY_SEPARATOR;
-        self::mkdir(ROOT_PATH.$DS.APP_DIR);
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
-        self::mkdir(ROOT_PATH.$DS.'public');
     }
     public static function mkdir($dir) {
         if (!is_dir($dir)) {

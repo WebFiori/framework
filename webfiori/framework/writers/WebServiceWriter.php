@@ -148,6 +148,105 @@ class WebServiceWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends EAbstractWebService {');
     }
+    /**
+     *
+     * @param RequestParameter $param
+     */
+    private function appendParam($param) {
+        $this->append("'".$param->getName()."' => [", 3);
+
+        $this->append("ParamOption::TYPE => ".$this->getType($param->getType()).",", 4);
+
+        if ($param->isOptional()) {
+            $this->append("ParamOption::OPTIONAL => true,", 4);
+        }
+
+        if ($param->getDefault() !== null) {
+            $toAppend = "ParamOption::DEFAULT => ".$param->getDefault().",";
+
+            if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL) && strlen($param->getDefault()) > 0) {
+                $toAppend = "ParamOption::DEFAULT => '".$param->getDefault()."',";
+            } else if ($param->getType() == ParamType::BOOL) {
+                $toAppend = $param->getDefault() === true ? "ParamOption::DEFAULT => true," : "ParamOption::DEFAULT => false,";
+            }
+            $this->append($toAppend, 4);
+        }
+
+        if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL)) {
+            if ($param->isEmptyStringAllowed()) {
+                $this->append("ParamOption::EMPTY => true,", 4);
+            }
+
+            if ($param->getMinLength() !== null) {
+                $this->append("ParamOption::MIN_LENGTH => ".$param->getMinLength().",", 4);
+            }
+
+            if ($param->getMaxLength() !== null) {
+                $this->append("ParamOption::MAX_LENGTH => ".$param->getMaxLength().",", 4);
+            }
+        }
+
+        if ($param->getType() == ParamType::INT || $param->getType() == ParamType::DOUBLE) {
+            $minFloat = defined('PHP_FLOAT_MIN') ? PHP_FLOAT_MIN : 2.2250738585072E-308;
+            $maxFloat = defined('PHP_FLOAT_MAX') ? PHP_FLOAT_MAX : 1.7976931348623E+308;
+
+            if ($param->getMinValue() !== null && ($param->getMinValue() != $minFloat && $param->getMinValue() != $maxFloat)) {
+                $this->append("ParamOption::MIN => ".$param->getMinValue().",", 4);
+            }
+            $maxInt = PHP_INT_MAX;
+            $minInt = defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX;
+
+            if ($param->getMaxValue() !== null && ($param->getMaxValue() != $maxInt && $param->getMinValue() != $minInt)) {
+                $this->append("ParamOption::MAX => ".$param->getMinValue().",", 4);
+            }
+        }
+
+        if ($param->getDescription() !== null) {
+            $this->append("ParamOption::DESCRIPTION => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
+        }
+        $this->append('],', 3);
+    }
+    private function appendParams($paramsArray) {
+        if (count($paramsArray) !== 0) {
+            $this->append('$this->addParameters([', 2);
+
+            foreach ($paramsArray as $paramObj) {
+                $this->appendParam($paramObj);
+            }
+            $this->append(']);', 2);
+        }
+    }
+    private function getMethod($method) {
+        switch ($method) {
+            case RequestMethod::CONNECT:{
+                return "RequestMethod::CONNECT";
+            }
+            case RequestMethod::DELETE:{
+                return "RequestMethod::DELETE";
+            }
+            case RequestMethod::GET:{
+                return "RequestMethod::GET";
+            }
+            case RequestMethod::HEAD:{
+                return "RequestMethod::HEAD";
+            }
+            case RequestMethod::OPTIONS:{
+                return "RequestMethod::OPTIONS";
+            }
+            case RequestMethod::PATCH:{
+                return "RequestMethod::PATCH";
+            }
+            case RequestMethod::POST:{
+                return "RequestMethod::POST";
+            }
+            case RequestMethod::PUT:{
+                return "RequestMethod::PUT";
+            }
+            case RequestMethod::TRACE:{
+                return "RequestMethod::TRACE";
+            }
+        }
+    }
     private function getType(string $type) {
         switch ($type) {
             case 'int': {
@@ -180,70 +279,6 @@ class WebServiceWriter extends ClassWriter {
             case 'url': {
                 return 'ParamType::URL';
             }
-        }
-    }
-    /**
-     *
-     * @param RequestParameter $param
-     */
-    private function appendParam($param) {
-        $this->append("'".$param->getName()."' => [", 3);
-        
-        $this->append("ParamOption::TYPE => ".$this->getType($param->getType()).",", 4);
-
-        if ($param->isOptional()) {
-            $this->append("ParamOption::OPTIONAL => true,", 4);
-        }
-        
-        if ($param->getDefault() !== null) {
-            $toAppend = "ParamOption::DEFAULT => ".$param->getDefault().",";
-
-            if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL) && strlen($param->getDefault()) > 0) {
-                $toAppend = "ParamOption::DEFAULT => '".$param->getDefault()."',";
-            } else if ($param->getType() == ParamType::BOOL) {
-                $toAppend = $param->getDefault() === true ? "ParamOption::DEFAULT => true," : "ParamOption::DEFAULT => false,";
-            }
-            $this->append($toAppend, 4);
-        }
-
-        if (($param->getType() == ParamType::STRING || $param->getType() == ParamType::URL || $param->getType() == ParamType::EMAIL)) {
-            if ($param->isEmptyStringAllowed()) {
-                $this->append("ParamOption::EMPTY => true,", 4);
-            }
-            if ($param->getMinLength() !== null) {
-                $this->append("ParamOption::MIN_LENGTH => ".$param->getMinLength().",", 4);
-            }
-            if ($param->getMaxLength() !== null) {
-                $this->append("ParamOption::MAX_LENGTH => ".$param->getMaxLength().",", 4);
-            }
-        }
-        
-        if ($param->getType() == ParamType::INT || $param->getType() == ParamType::DOUBLE) {
-            $minFloat = defined('PHP_FLOAT_MIN') ? PHP_FLOAT_MIN : 2.2250738585072E-308;
-            $maxFloat = defined('PHP_FLOAT_MAX') ? PHP_FLOAT_MAX : 1.7976931348623E+308;
-            if ($param->getMinValue() !== null && ($param->getMinValue() != $minFloat && $param->getMinValue() != $maxFloat)) {
-                $this->append("ParamOption::MIN => ".$param->getMinValue().",", 4);
-            }
-            $maxInt = PHP_INT_MAX;
-            $minInt = defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX;
-            if ($param->getMaxValue() !== null && ($param->getMaxValue() != $maxInt && $param->getMinValue() != $minInt)) {
-                $this->append("ParamOption::MAX => ".$param->getMinValue().",", 4);
-            }
-        }
-
-        if ($param->getDescription() !== null) {
-            $this->append("ParamOption::DESCRIPTION => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
-        }
-        $this->append('],', 3);
-    }
-    private function appendParams($paramsArray) {
-        if (count($paramsArray) !== 0) {
-            $this->append('$this->addParameters([', 2);
-
-            foreach ($paramsArray as $paramObj) {
-                $this->appendParam($paramObj);
-            }
-            $this->append(']);', 2);
         }
     }
     private function implementMethods() {
@@ -290,45 +325,15 @@ class WebServiceWriter extends ClassWriter {
             $this->f('__construct'),
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
-        $this->append('$this->setDescription(\''. str_replace("'", "\\'", $this->servicesObj->getDescription()).'\');', 2);
+        $this->append('$this->setDescription(\''.str_replace("'", "\\'", $this->servicesObj->getDescription()).'\');', 2);
         $this->append('$this->setRequestMethods([', 2);
+
         foreach ($this->servicesObj->getRequestMethods() as $method) {
             $this->append($this->getMethod($method).',', 3);
         }
         $this->append(']);', 2);
         $this->appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
-    }
-    private function getMethod($method) {
-        switch ($method) {
-            case RequestMethod::CONNECT:{
-                return "RequestMethod::CONNECT";
-            }
-            case RequestMethod::DELETE:{
-                return "RequestMethod::DELETE";
-            }
-            case RequestMethod::GET:{
-                return "RequestMethod::GET";
-            }
-            case RequestMethod::HEAD:{
-                return "RequestMethod::HEAD";
-            }
-            case RequestMethod::OPTIONS:{
-                return "RequestMethod::OPTIONS";
-            }
-            case RequestMethod::PATCH:{
-                return "RequestMethod::PATCH";
-            }
-            case RequestMethod::POST:{
-                return "RequestMethod::POST";
-            }
-            case RequestMethod::PUT:{
-                return "RequestMethod::PUT";
-            }
-            case RequestMethod::TRACE:{
-                return "RequestMethod::TRACE";
-            }
-        }
     }
     private function writeServiceDoc($service) {
         $docArr = [];

@@ -254,7 +254,7 @@ class TableClassWriter extends ClassWriter {
         $fks = $this->getTable()->getForeignKeys();
 
         foreach ($fks as $fk) {
-            $fk instanceof FK;
+            
             $sourceCols = array_values($fk->getOwnerCols());
 
             if (count($sourceCols) == 1 && $sourceCols[0]->getNormalName() == $colObj->getNormalName()) {

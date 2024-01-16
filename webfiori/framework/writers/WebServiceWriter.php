@@ -49,12 +49,7 @@ class WebServiceWriter extends ClassWriter {
      */
     public function __construct($webServicesObj = null) {
         parent::__construct('NewWebService', APP_PATH.'apis', APP_DIR.'\\apis');
-        if (!defined('PHP_FLOAT_MAX')) {
-            define('PHP_FLOAT_MAX', 1.7976931348623E+308);
-        }
-        if (!defined('PHP_FLOAT_MIN')) {
-            define('PHP_FLOAT_MIN', 2.2250738585072E-308);
-        }
+
         $this->setSuffix('Service');
         $this->addUseStatement(EAbstractWebService::class);
         $this->addUseStatement(ParamType::class);

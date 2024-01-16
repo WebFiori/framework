@@ -200,9 +200,9 @@ class CreateWebServiceTest extends CreateTestCase {
                 ParamOption::DESCRIPTION => 'Random\'s desc',
                 ParamOption::DEFAULT => null,
                 ParamOption::EMPTY => false,
-                ParamOption::MAX => PHP_FLOAT_MAX,
+                ParamOption::MAX => defined('PHP_FLOAT_MAX') ? PHP_FLOAT_MAX : 1.7976931348623E+308,
                 ParamOption::MAX_LENGTH => null,
-                ParamOption::MIN => PHP_FLOAT_MIN,
+                ParamOption::MIN => defined('PHP_FLOAT_MIN') ? PHP_FLOAT_MIN : 2.2250738585072E-308,
                 ParamOption::MIN_LENGTH => null,
                 ParamOption::OPTIONAL => false,
         ]);

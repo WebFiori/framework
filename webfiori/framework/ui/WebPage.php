@@ -767,21 +767,6 @@ class WebPage {
 
         return $this->getDocument();
     }
-    private function invokeBeforeRender(int $current = 0) {
-        $currentCount = count($this->beforeRenderCallbacks);
-        
-        if ($currentCount == 0 || $currentCount == $current) {
-            return;
-        }
-        $this->beforeRenderCallbacks->get($current)->call($this);
-        $newCount = count($this->beforeRenderCallbacks);
-        if ($newCount != $currentCount) {
-            $this->beforeRenderCallbacks->insertionSort(false);
-            $this->invokeBeforeRender();
-        } else {
-            $this->invokeBeforeRender($current + 1);
-        }
-    }
     /**
      * Resets page attributes to default values.
      *
@@ -1222,6 +1207,22 @@ class WebPage {
         }
 
         return $headNode;
+    }
+    private function invokeBeforeRender(int $current = 0) {
+        $currentCount = count($this->beforeRenderCallbacks);
+
+        if ($currentCount == 0 || $currentCount == $current) {
+            return;
+        }
+        $this->beforeRenderCallbacks->get($current)->call($this);
+        $newCount = count($this->beforeRenderCallbacks);
+
+        if ($newCount != $currentCount) {
+            $this->beforeRenderCallbacks->insertionSort(false);
+            $this->invokeBeforeRender();
+        } else {
+            $this->invokeBeforeRender($current + 1);
+        }
     }
     private function resetBeforeLoaded() {
         $this->beforeRenderCallbacks = new LinkedList();

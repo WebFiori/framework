@@ -10,10 +10,10 @@
  */
 namespace webfiori\framework;
 
+use webfiori\email\Email;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\email\SMTPAccount;
 use webfiori\framework\exceptions\MissingLangException;
-use webfiori\email\Email;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
@@ -82,13 +82,12 @@ class EmailMessage extends Email {
      *
      * @return Email The method will return same instance at which the method is
      * called on.
-     * 
+     *
      * @throws MissingLangException
      */
     public function setLang(string $lang = 'EN') : Email {
         if (parent::setLang($lang)) {
             $this->usingLanguage();
-
         }
 
         return $this;

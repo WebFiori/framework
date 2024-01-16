@@ -28,12 +28,6 @@ interface ConfigurationDriver {
      */
     public function addEnvVar(string $name, $value, string $description = null);
     /**
-     * Removes specific application environment variable given its name.
-     * 
-     * @param string $name The name of the variable.
-     */
-    public function removeEnvVar(string $name);
-    /**
      * Adds new database connections information or update existing connections.
      *
      *
@@ -257,6 +251,12 @@ interface ConfigurationDriver {
      *
      */
     public function removeDBConnection(string $connectionName);
+    /**
+     * Removes specific application environment variable given its name.
+     *
+     * @param string $name The name of the variable.
+     */
+    public function removeEnvVar(string $name);
     /**
      * Removes SMTP account if it exists.
      *

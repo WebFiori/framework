@@ -496,6 +496,7 @@ class CreateTableTest extends TestCase {
         $this->assertEquals(DataType::INT, $idCol->getDatatype());
         $this->assertTrue($idCol->isPrimary());
         $this->assertTrue($idCol->isUnique());
+
         return $clazz;
     }
     /**
@@ -546,7 +547,7 @@ class CreateTableTest extends TestCase {
         $output = $runner->getOutput();
         $clazz = '\\app\\database\\Cool06Table';
         $this->assertTrue(class_exists($clazz));
-        
+
         $this->removeClass($clazz);
         $this->assertEquals(array_merge([
             "Database type:\n",
@@ -597,7 +598,7 @@ class CreateTableTest extends TestCase {
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
         ]), $output);
-        
+
         $instance = new $clazz();
         $instance instanceof Table;
         $this->assertEquals(1, $instance->getForeignKeysCount());

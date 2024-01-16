@@ -33,13 +33,27 @@ class CreateWebService extends CreateClassHelper {
         $this->serviceObj = new ServiceHolder();
         parent::__construct($command, new WebServiceWriter($this->serviceObj));
     }
+    public function addRequestMethods() {
+        $toSelect = RequestMethod::getAll();
+        $addOne = true;
+
+        while ($addOne) {
+            array_multisort($toSelect);
+            $this->serviceObj->addRequestMethod($this->select('Request method:', $toSelect, 2));
+
+            if (count($toSelect) > 1) {
+                $addOne = $this->confirm('Would you like to add another request method?', false);
+            } else {
+                $addOne = false;
+            }
+        }
+    }
     public function readClassInfo() {
         $this->setClassInfo(APP_DIR.'\\apis', 'Service');
 
         $this->setServiceName();
-        $methods = RequestMethod::getAll();
-        array_multisort($methods);
-        $this->serviceObj->addRequestMethod($this->select('Request method:', $methods, 2));
+        $this->serviceObj->setDescription($this->getInput('Description:'));
+        $this->addRequestMethods();
 
         if ($this->confirm('Would you like to add request parameters to the service?', false)) {
             $this->addParamsToService();
@@ -52,18 +66,71 @@ class CreateWebService extends CreateClassHelper {
     private function addParamsToService() {
         do {
             $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->select('Choose parameter type:', ParamType::getTypes(), 0));
             $this->setParamName($paramObj);
+            $paramObj->setType($this->select('Choose parameter type:', ParamType::getTypes(), 0));
+            $paramObj->setDescription($this->getInput('Description:'));
             $added = $this->serviceObj->addParameter($paramObj);
             $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));
 
+            if ($paramObj->getType() == ParamType::STRING || $paramObj->getType() == ParamType::URL || $paramObj->getType() == ParamType::EMAIL) {
+                $paramObj->setIsEmptyStringAllowed($this->confirm('Are empty values allowed?', false));
+                $this->setMinAndMaxLength($paramObj);
+            }
+
+            if ($paramObj->getType() == ParamType::INT || $paramObj->getType() == ParamType::DOUBLE) {
+                $this->setMinAndMax($paramObj);
+            }
+
             if ($added) {
-                $this->success('New parameter added to the service \''.$this->serviceObj->getName().'\'.');
+                $this->success('New parameter added.');
             } else {
                 $this->warning('The parameter was not added.');
             }
             $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
+    }
+    private function setMinAndMax(RequestParameter $param) {
+        $setMinMax = $this->confirm('Would you like to set minimum and maximum limites?', false);
+
+        if (!$setMinMax) {
+            return;
+        }
+        $isValid = false;
+        $method = $param->getType() == ParamType::INT ? 'readInteger' : 'readFloat';
+
+        while (!$isValid) {
+            $min = $this->getCommand()->$method('Minimum value:');
+            $max = $this->getCommand()->$method('Maximum value:');
+
+            if ($min < $max) {
+                $param->setMinValue($min);
+                $param->setMaxValue($max);
+                $isValid = true;
+            } else {
+                $this->error('Minimum and maximum should not overlap.');
+            }
+        }
+    }
+    private function setMinAndMaxLength(RequestParameter $param) {
+        $setMinMax = $this->confirm('Would you like to set minimum and maximum length?', false);
+
+        if (!$setMinMax) {
+            return;
+        }
+        $isValid = false;
+
+        while (!$isValid) {
+            $min = $this->getCommand()->readInteger('Minimum length:');
+            $max = $this->getCommand()->readInteger('Maximum length:');
+
+            if ($min < $max) {
+                $param->setMinLength($min);
+                $param->setMaxLength($max);
+                $isValid = true;
+            } else {
+                $this->error('Minimum and maximum should not overlap.');
+            }
+        }
     }
     /**
      *

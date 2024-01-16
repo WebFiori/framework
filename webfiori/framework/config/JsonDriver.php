@@ -20,39 +20,15 @@ use webfiori\json\Json;
  */
 class JsonDriver implements ConfigurationDriver {
     /**
-     * The name of JSON configuration file.
-     */
-    private static $configFileName = 'app-config';
-    /**
      * The location at which the configuration file will be kept at.
      *
      * @var string The file will be stored at [APP_PATH]/config/';
      */
     const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR;
     /**
-     * Sets the name of the file that configuration values will be taken from.
-     * 
-     * The file must exist on the directory [APP_PATH]/config/ .
-     * 
-     * @param string $name
+     * The name of JSON configuration file.
      */
-    public static function setConfigFileName(string $name) {
-        $split = explode('.', trim($name));
-        if (count($split) == 2) {
-            self::$configFileName = $split[0];
-        } else if (count($split) == 1) {
-            self::$configFileName = trim($name); 
-        }
-    }
-    /**
-     * Returns the name of the file at which the application is using to
-     * read configuration.
-     * 
-     * @return string
-     */
-    public static function getConfigFileName() : string {
-        return self::$configFileName;
-    }
+    private static $configFileName = 'app-config';
     private $json;
     /**
      * Creates new instance of the class.
@@ -118,15 +94,6 @@ class JsonDriver implements ConfigurationDriver {
         ]));
         $this->writeJson();
     }
-    /**
-     * Removes specific application environment variable given its name.
-     * 
-     * @param string $name The name of the variable.
-     */
-    public function removeEnvVar(string $name) {
-        $this->json->get('env-vars')->remove($name);
-        $this->writeJson();
-    }
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $connectionJAsJson = new Json([
             'type' => $dbConnectionsInfo->getDatabaseType(),
@@ -190,18 +157,29 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns the base URL of the application.
-     * 
+     *
      * Note that if the base is set so 'DYNAMIC' in the configuration, it will
      * be auto-generated at run time.
-     * 
+     *
      * @return string A string such as 'http://example.com:8989'.
      */
     public function getBaseURL(): string {
         $val = $this->json->get('base-url');
+
         if ($val == '' || $val == 'DYNAMIC') {
             return Uri::getBaseURL();
         }
+
         return $val;
+    }
+    /**
+     * Returns the name of the file at which the application is using to
+     * read configuration.
+     *
+     * @return string
+     */
+    public static function getConfigFileName() : string {
+        return self::$configFileName;
     }
 
     public function getDBConnection(string $conName) {
@@ -210,11 +188,13 @@ class JsonDriver implements ConfigurationDriver {
         if ($jsonObj !== null) {
             $extras = $jsonObj->get('extras');
             $extrasArr = [];
+
             if ($extras instanceof Json) {
                 foreach ($extras->getProperties() as $prop) {
                     $extrasArr[$prop->getName()] = $prop->getValue();
                 }
             }
+
             return new ConnectionInfo(
                 $jsonObj->get('type'),
                 $jsonObj->get('username'),
@@ -239,15 +219,15 @@ class JsonDriver implements ConfigurationDriver {
             $name = $propObj->getName();
             $jsonObj = $propObj->getValue();
             $acc = new ConnectionInfo(
-                    $this->getProp($jsonObj, 'type', $name), 
-                    $this->getProp($jsonObj, 'username', $name), 
-                    $this->getProp($jsonObj, 'password', $name), 
-                    $this->getProp($jsonObj, 'database', $name));
+                $this->getProp($jsonObj, 'type', $name),
+                $this->getProp($jsonObj, 'username', $name),
+                $this->getProp($jsonObj, 'password', $name),
+                $this->getProp($jsonObj, 'database', $name));
             $extrasObj = $jsonObj->get('extras');
-            
+
             if ($extrasObj !== null && $extrasObj instanceof Json) {
                 $extrasArr = [];
-                
+
                 foreach ($extrasObj->getProperties() as $prop) {
                     $extrasArr[$prop->getName()] = $prop->getValue();
                 }
@@ -260,13 +240,6 @@ class JsonDriver implements ConfigurationDriver {
         }
 
         return $retVal;
-    }
-    private function getProp(Json $j, $name, string $connName) {
-        $val = $j->get($name);
-        if ($val === null) {
-            throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
-        }
-        return $val;
     }
 
     public function getDescription(string $langCode) {
@@ -305,17 +278,19 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns a string that represent the home page of the application.
-     * 
+     *
      * Note that if home page is set to 'BASE_URL' in configuration, the
      * method will use the base URL as the home page.
-     * 
+     *
      * @return string
      */
     public function getHomePage() : string {
         $home = $this->json->get('home-page') ?? '';
+
         if ($home == 'BASE_URL') {
             return $this->getBaseURL();
         }
+
         return $home;
     }
 
@@ -367,7 +342,7 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns an array that contains all added SMTP accounts.
-     * 
+     *
      * @return array An array that contains all added SMTP accounts.
      */
     public function getSMTPConnections(): array {
@@ -406,11 +381,11 @@ class JsonDriver implements ConfigurationDriver {
     public function getTitle(string $lang) : string {
         $titles = $this->json->get('titles');
         $langU = strtoupper(trim($lang));
-        
+
         if (strlen($langU) == 0) {
             return '';
         }
-        
+
         foreach ($titles->getProperties() as $prob) {
             if ($prob->getName() == $langU) {
                 return $prob->getValue();
@@ -465,6 +440,15 @@ class JsonDriver implements ConfigurationDriver {
 
     public function removeDBConnection(string $connectionName) {
     }
+    /**
+     * Removes specific application environment variable given its name.
+     *
+     * @param string $name The name of the variable.
+     */
+    public function removeEnvVar(string $name) {
+        $this->json->get('env-vars')->remove($name);
+        $this->writeJson();
+    }
 
     public function removeSMTPAccount(string $accountName) {
         $this->json->add('smtp-connections', new Json());
@@ -508,6 +492,22 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function setBaseURL(string $url) {
+    }
+    /**
+     * Sets the name of the file that configuration values will be taken from.
+     *
+     * The file must exist on the directory [APP_PATH]/config/ .
+     *
+     * @param string $name
+     */
+    public static function setConfigFileName(string $name) {
+        $split = explode('.', trim($name));
+
+        if (count($split) == 2) {
+            self::$configFileName = $split[0];
+        } else if (count($split) == 1) {
+            self::$configFileName = trim($name);
+        }
     }
     /**
      * Sets or update default description of the application that will be used
@@ -595,7 +595,7 @@ class JsonDriver implements ConfigurationDriver {
             return;
         }
         $trimmedTitle = trim($title);
-        
+
         if (strlen($trimmedTitle) == 0) {
             return;
         }
@@ -612,7 +612,7 @@ class JsonDriver implements ConfigurationDriver {
      */
     public function setTitleSeparator(string $separator) {
         $trimmed = trim($separator);
-        
+
         if (strlen($trimmed) != 0) {
             $this->json->add('name-separator', $separator);
             $this->writeJson();
@@ -620,6 +620,15 @@ class JsonDriver implements ConfigurationDriver {
     }
     public function toJSON() : Json {
         return $this->json;
+    }
+    private function getProp(Json $j, $name, string $connName) {
+        $val = $j->get($name);
+
+        if ($val === null) {
+            throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
+        }
+
+        return $val;
     }
     private function isValidLangCode($langCode) {
         $code = strtoupper(trim($langCode));
@@ -638,6 +647,4 @@ class JsonDriver implements ConfigurationDriver {
         $file->setRawData($json.'');
         $file->write(false, true);
     }
-
-    
 }

@@ -10,6 +10,8 @@
  */
 namespace webfiori\framework\writers;
 
+use const APP_DIR;
+use const APP_PATH;
 use webfiori\database\ColOption;
 use webfiori\database\Column;
 use webfiori\database\DataType;
@@ -20,8 +22,6 @@ use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
-use const APP_DIR;
-use const APP_PATH;
 
 /**
  * A class which is used to write database table classes.
@@ -250,11 +250,41 @@ class TableClassWriter extends ClassWriter {
         }
         $this->append(']);', 2);
     }
+    private function addFKOption(Column $colObj) {
+        $fks = $this->getTable()->getForeignKeys();
+
+        foreach ($fks as $fk) {
+            $fk instanceof FK;
+            $sourceCols = array_values($fk->getOwnerCols());
+
+            if (count($sourceCols) == 1 && $sourceCols[0]->getNormalName() == $colObj->getNormalName()) {
+                $this->addFKOptionHelper($colObj, $fk);
+            }
+        }
+    }
+    private function addFKOptionHelper(Column $col, FK $fk) {
+        $refTableNs = get_class($fk->getSource());
+        $cName = $this->getNamespace().'\\'.$this->getName();
+        $refTableClassName = '$this';
+
+        if ($cName != $refTableNs) {
+            $nsSplit = explode('\\', $refTableNs);
+            $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
+        }
+        $keyName = $fk->getKeyName();
+        $sourceCol = array_keys($fk->getSourceCols())[0];
+        $this->append("ColOption::FK => [", 4);
+        $this->append("ColOption::FK_NAME => '".$keyName."',", 5);
+        $this->append("ColOption::FK_TABLE => ".$refTableClassName.",", 5);
+        $this->append("ColOption::FK_COL => '".$sourceCol."',", 5);
+        $this->append("ColOption::FK_ON_UPDATE => ".$this->getFkCond($fk->getOnUpdate()).",", 5);
+        $this->append("ColOption::FK_ON_DELETE => ".$this->getFkCond($fk->getOnDelete()).",", 5);
+        $this->append("],", 4);
+    }
     private function addFksHelper() {
         $fks = $this->tableObj->getForeignKeys();
 
         foreach ($fks as $fkObj) {
-
             if (count($fkObj->getSourceCols()) == 1) {
                 continue;
             }
@@ -280,6 +310,7 @@ class TableClassWriter extends ClassWriter {
     private function addFksUseTables() {
         if ($this->tableObj !== null) {
             $fks = $this->tableObj->getForeignKeys();
+
             if (count($fks) != 0) {
                 $this->addUseStatement(FK::class);
             }
@@ -292,91 +323,6 @@ class TableClassWriter extends ClassWriter {
                     $this->addUseStatement($refTableNs);
                     $addedRefs[] = $refTableNs;
                 }
-            }
-        }
-    }
-    private function getType(string $dataType) {
-        switch ($dataType) {
-            case 'bigint' : { 
-                return 'DataType::BIGINT';
-            }
-            case 'binary' : { 
-                return 'DataType::BINARY';
-            }
-            case 'bit' : { 
-                return 'DataType::BIT';
-            }
-            case 'blob' : { 
-                return 'DataType::BLOB';
-            }
-            case 'longblob' : { 
-                return 'DataType::BLOB_LONG';
-            }
-            case 'mediumblob' : { 
-                return 'DataType::BLOB_MEDIUM';
-            }
-            case 'tinyblob' : { 
-                return 'DataType::BLOB_TINY';
-            }
-            case 'bool' : { 
-                return 'DataType::BOOL';
-            }
-            case 'boolean' : { 
-                return 'DataType::BOOL';
-            }
-            case 'char' : { 
-                return 'DataType::CHAR';
-            }
-            case 'date' : { 
-                return 'DataType::DATE';
-            }
-            case 'datetime' : { 
-                return 'DataType::DATETIME';
-            }
-            case 'datetime2' : { 
-                return 'DataType::DATETIME2';
-            }
-            case 'decimal' : { 
-                return 'DataType::DECIMAL';
-            }
-            case 'double' : { 
-                return 'DataType::DOUBLE';
-            }
-            case 'float' : { 
-                return 'DataType::FLOAT';
-            }
-            case 'int' : { 
-                return 'DataType::INT';
-            }
-            case 'money' : { 
-                return 'DataType::MONEY';
-            }
-            case 'nchar' : { 
-                return 'DataType::NCHAR';
-            }
-            case 'nvarchar' : { 
-                return 'DataType::NVARCHAR';
-            }
-            case 'text' : { 
-                return 'DataType::TEXT';
-            }
-            case 'medumtext' : { 
-                return 'DataType::TEXT_MEDIUM';
-            }
-            case 'time' : { 
-                return 'DataType::TIME';
-            }
-            case 'timestamp' : { 
-                return 'DataType::TIMESTAMP';
-            }
-            case 'varbinary' : { 
-                return 'DataType::VARBINARY';
-            }
-            case 'varchar' : { 
-                return 'DataType::VARCHAR';
-            } 
-            default : {
-                return "'mixed'";
             }
         }
     }
@@ -399,7 +345,6 @@ class TableClassWriter extends ClassWriter {
                 || $dataType == 'char'
                 || $dataType == 'nchar'
                 || $dataType == 'nvarchar') {
-            
             $this->append("ColOption::SIZE => '".$colObj->getSize()."',", 4);
 
             if ($dataType == 'decimal') {
@@ -444,34 +389,23 @@ class TableClassWriter extends ClassWriter {
         $this->addFKOption($colObj);
         $this->append("],", 3);
     }
-    private function addFKOption(Column $colObj) {
-        $fks = $this->getTable()->getForeignKeys();
-        foreach ($fks as $fk) {
-            $fk instanceof FK;
-            $sourceCols = array_values($fk->getOwnerCols());
-            if (count($sourceCols) == 1 && $sourceCols[0]->getNormalName() == $colObj->getNormalName()) {
-                $this->addFKOptionHelper($colObj, $fk);
-            }
-        }
-    }
-    private function addFKOptionHelper(Column $col, FK $fk) {
-        $refTableNs = get_class($fk->getSource());
-        $cName = $this->getNamespace().'\\'.$this->getName();
-        $refTableClassName = '$this';
+    /**
+     * Extract and return the name of table class based on associated table object.
+     *
+     */
+    private function extractAndSetTableClassName() {
+        $clazz = get_class($this->getTable());
 
-        if ($cName != $refTableNs) {
-            $nsSplit = explode('\\', $refTableNs);
-            $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
+        $split = explode('\\', $clazz);
+        $count = count($split);
+
+        if ($count > 1) {
+            $this->setClassName($split[$count - 1]);
+            array_pop($split);
+            $this->setNamespace(implode('\\', $split));
+        } else {
+            $this->setClassName($split[0]);
         }
-        $keyName = $fk->getKeyName();
-        $sourceCol  = array_keys($fk->getSourceCols())[0];
-        $this->append("ColOption::FK => [", 4);
-        $this->append("ColOption::FK_NAME => '".$keyName."',", 5);
-        $this->append("ColOption::FK_TABLE => ".$refTableClassName.",", 5);
-        $this->append("ColOption::FK_COL => '".$sourceCol."',", 5);
-        $this->append("ColOption::FK_ON_UPDATE => ".$this->getFkCond($fk->getOnUpdate()).",", 5);
-        $this->append("ColOption::FK_ON_DELETE => ".$this->getFkCond($fk->getOnDelete()).",", 5);
-        $this->append("],", 4);
     }
     private function getFkCond(string $txt) {
         switch ($txt) {
@@ -492,22 +426,89 @@ class TableClassWriter extends ClassWriter {
             }
         }
     }
-    /**
-     * Extract and return the name of table class based on associated table object.
-     *
-     */
-    private function extractAndSetTableClassName() {
-        $clazz = get_class($this->getTable());
-
-        $split = explode('\\', $clazz);
-        $count = count($split);
-
-        if ($count > 1) {
-            $this->setClassName($split[$count - 1]);
-            array_pop($split);
-            $this->setNamespace(implode('\\', $split));
-        } else {
-            $this->setClassName($split[0]);
+    private function getType(string $dataType) {
+        switch ($dataType) {
+            case 'bigint' : {
+                return 'DataType::BIGINT';
+            }
+            case 'binary' : {
+                return 'DataType::BINARY';
+            }
+            case 'bit' : {
+                return 'DataType::BIT';
+            }
+            case 'blob' : {
+                return 'DataType::BLOB';
+            }
+            case 'longblob' : {
+                return 'DataType::BLOB_LONG';
+            }
+            case 'mediumblob' : {
+                return 'DataType::BLOB_MEDIUM';
+            }
+            case 'tinyblob' : {
+                return 'DataType::BLOB_TINY';
+            }
+            case 'bool' : {
+                return 'DataType::BOOL';
+            }
+            case 'boolean' : {
+                return 'DataType::BOOL';
+            }
+            case 'char' : {
+                return 'DataType::CHAR';
+            }
+            case 'date' : {
+                return 'DataType::DATE';
+            }
+            case 'datetime' : {
+                return 'DataType::DATETIME';
+            }
+            case 'datetime2' : {
+                return 'DataType::DATETIME2';
+            }
+            case 'decimal' : {
+                return 'DataType::DECIMAL';
+            }
+            case 'double' : {
+                return 'DataType::DOUBLE';
+            }
+            case 'float' : {
+                return 'DataType::FLOAT';
+            }
+            case 'int' : {
+                return 'DataType::INT';
+            }
+            case 'money' : {
+                return 'DataType::MONEY';
+            }
+            case 'nchar' : {
+                return 'DataType::NCHAR';
+            }
+            case 'nvarchar' : {
+                return 'DataType::NVARCHAR';
+            }
+            case 'text' : {
+                return 'DataType::TEXT';
+            }
+            case 'medumtext' : {
+                return 'DataType::TEXT_MEDIUM';
+            }
+            case 'time' : {
+                return 'DataType::TIME';
+            }
+            case 'timestamp' : {
+                return 'DataType::TIMESTAMP';
+            }
+            case 'varbinary' : {
+                return 'DataType::VARBINARY';
+            }
+            case 'varchar' : {
+                return 'DataType::VARCHAR';
+            }
+            default : {
+                return "'mixed'";
+            }
         }
     }
     private function writeConstructor() {

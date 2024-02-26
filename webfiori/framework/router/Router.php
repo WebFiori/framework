@@ -56,8 +56,8 @@ use webfiori\ui\HTMLNode;
  * to it as follows:
  * <pre>
  * Router::addRoute([<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=>'/my-files/my-view.html'<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;RouteOption::PATH => '/custom-route',<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;RouteOption::TO => '/my-files/my-view.html'<br/>
  * ]);
  * </pre>
  * </p>
@@ -66,13 +66,12 @@ use webfiori\ui\HTMLNode;
  * points to classes as follows:
  * <pre>
  * Router::addRoute([<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
- * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=> MyClass::class<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;RouteOption::PATH => '/custom-route',<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;RouteOption::TO => MyClass::class<br/>
  * ]);
  * </pre>
  * </p>
  * @author Ibrahim
- * @version 1.4.0
  */
 class Router {
     /**
@@ -175,7 +174,8 @@ class Router {
     /**
      * Adds new route to a file inside the root folder.
      *
-     * @param array $options An associative array of options. Available options
+     * @param array $options An associative array of options.
+     * The class 'RouteOption' can be used to access options. Available options
      * are:
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the
@@ -226,7 +226,7 @@ class Router {
      * @since 1.2
      */
     public static function addRoute(array $options) : bool {
-        $options['type'] = Router::CUSTOMIZED;
+        $options[RouteOption::TYPE] = Router::CUSTOMIZED;
 
         return Router::getInstance()->addRouteHelper1($options);
     }
@@ -280,7 +280,7 @@ class Router {
      * @since 1.2
      */
     public static function api(array $options) : bool {
-        $options['type'] = Router::API_ROUTE;
+        $options[RouteOption::TYPE] = Router::API_ROUTE;
         self::addToMiddlewareGroup($options, 'api');
 
         return Router::getInstance()->addRouteHelper1($options);
@@ -355,7 +355,7 @@ class Router {
      * @since 1.2
      */
     public static function closure(array $options) : bool {
-        $options['type'] = Router::CLOSURE_ROUTE;
+        $options[RouteOption::TYPE] = Router::CLOSURE_ROUTE;
         self::addToMiddlewareGroup($options, 'closure');
 
         return Router::getInstance()->addRouteHelper1($options);
@@ -745,19 +745,19 @@ class Router {
         return false;
     }
     private function addRouteHelper0($options): bool {
-        $routeTo = $options['route-to'];
-        $caseSensitive = $options['case-sensitive'];
-        $routeType = $options['type'];
-        $incInSiteMap = $options['in-sitemap'];
-        $asApi = $options['as-api'];
-        $closureParams = $options['closure-params'] ;
-        $path = $options['path'];
+        $routeTo = $options[RouteOption::TO];
+        $caseSensitive = $options[RouteOption::CASE_SENSITIVE];
+        $routeType = $options[RouteOption::TYPE];
+        $incInSiteMap = $options[RouteOption::SITEMAP];
+        $asApi = $options[RouteOption::API];
+        $closureParams = $options[RouteOption::CLOSURE_PARAMS] ;
+        $path = $options[RouteOption::PATH];
 
         if ($routeType == self::CLOSURE_ROUTE && !is_callable($routeTo)) {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-        $routeUri->setAction($options['action']);
+        $routeUri->setAction($options[RouteOption::ACTION]);
 
         if (!$this->hasRouteHelper($routeUri)) {
             if ($asApi === true) {
@@ -767,18 +767,18 @@ class Router {
             }
             $routeUri->setIsInSiteMap($incInSiteMap);
 
-            $routeUri->setRequestMethods($options['methods']);
+            $routeUri->setRequestMethods($options[RouteOption::REQUEST_METHODS]);
 
-            foreach ($options['languages'] as $langCode) {
+            foreach ($options[RouteOption::LANGS] as $langCode) {
                 $routeUri->addLanguage($langCode);
             }
 
-            foreach ($options['vars-values'] as $varName => $varValues) {
+            foreach ($options[RouteOption::VALUES] as $varName => $varValues) {
                 $routeUri->addVarValues($varName, $varValues);
             }
             $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
 
-            foreach ($options['middleware'] as $mwName) {
+            foreach ($options[RouteOption::MIDDLEWARE] as $mwName) {
                 $routeUri->addMiddleware($mwName);
             }
 
@@ -844,7 +844,7 @@ class Router {
      * @since 1.0
      */
     private function addRouteHelper1(array $options): bool {
-        if (isset($options['routes'])) {
+        if (isset($options[RouteOption::SUB_ROUTES])) {
             $routesArr = $this->addRoutesGroupHelper($options);
             $added = true;
 
@@ -855,11 +855,11 @@ class Router {
             return $added;
         }
 
-        if (!isset($options['route-to'])) {
+        if (!isset($options[RouteOption::TO])) {
             return false;
         } else {
             $options = $this->checkOptionsArr($options);
-            $routeType = $options['type'];
+            $routeType = $options[RouteOption::TYPE];
         }
 
         if (strlen($this->getBase()) != 0 && ($routeType == self::API_ROUTE ||
@@ -872,14 +872,14 @@ class Router {
         return false;
     }
     private function addRoutesGroupHelper($options, &$routesToAddArr = []) {
-        $subRoutes = isset($options['routes']) && gettype($options['routes']) == 'array' ? $options['routes'] : [];
+        $subRoutes = isset($options[RouteOption::SUB_ROUTES]) && gettype($options[RouteOption::SUB_ROUTES]) == 'array' ? $options[RouteOption::SUB_ROUTES] : [];
 
         foreach ($subRoutes as $subRoute) {
-            if (isset($subRoute['path'])) {
+            if (isset($subRoute[RouteOption::PATH])) {
                 $this->copyOptionsToSub($options, $subRoute);
-                $subRoute['path'] = $options['path'].'/'.$subRoute['path'];
+                $subRoute[RouteOption::PATH] = $options[RouteOption::PATH].'/'.$subRoute[RouteOption::PATH];
 
-                if (isset($subRoute['routes']) && gettype($subRoute['routes']) == 'array') {
+                if (isset($subRoute[RouteOption::SUB_ROUTES]) && gettype($subRoute[RouteOption::SUB_ROUTES]) == 'array') {
                     $this->addRoutesGroupHelper($subRoute, $routesToAddArr);
                 } else {
                     $routesToAddArr[] = $subRoute;
@@ -887,10 +887,10 @@ class Router {
             }
         }
 
-        if (isset($options['route-to'])) {
+        if (isset($options[RouteOption::TO])) {
             $sub = [
-                'path' => $options['path'],
-                'route-to' => $options['route-to']
+                RouteOption::PATH => $options[RouteOption::PATH],
+                RouteOption::TO => $options[RouteOption::TO]
             ];
             $this->copyOptionsToSub($options, $sub);
             $routesToAddArr[] = $sub;
@@ -899,14 +899,14 @@ class Router {
         return $routesToAddArr;
     }
     private static function addToMiddlewareGroup(&$options, $groupName) {
-        if (isset($options['middleware'])) {
-            if (gettype($options['middleware']) == 'array') {
-                $options['middleware'][] = $groupName;
+        if (isset($options[RouteOption::MIDDLEWARE])) {
+            if (gettype($options[RouteOption::MIDDLEWARE]) == 'array') {
+                $options[RouteOption::MIDDLEWARE][] = $groupName;
             } else {
-                $options['middleware'] = [$options['middleware'], $groupName];
+                $options[RouteOption::MIDDLEWARE] = [$options[RouteOption::MIDDLEWARE], $groupName];
             }
         } else {
-            $options['middleware'] = $groupName;
+            $options[RouteOption::MIDDLEWARE] = $groupName;
         }
     }
     /**
@@ -918,23 +918,23 @@ class Router {
      * @return array
      */
     private function checkOptionsArr(array $options): array {
-        $routeTo = $options['route-to'];
+        $routeTo = $options[RouteOption::TO];
 
-        if (isset($options['case-sensitive'])) {
-            $caseSensitive = $options['case-sensitive'] === true;
+        if (isset($options[RouteOption::CASE_SENSITIVE])) {
+            $caseSensitive = $options[RouteOption::CASE_SENSITIVE] === true;
         } else {
             $caseSensitive = true;
         }
 
-        $routeType = $options['type'] ?? Router::CUSTOMIZED;
+        $routeType = $options[RouteOption::TYPE] ?? Router::CUSTOMIZED;
 
-        $incInSiteMap = $options['in-sitemap'] ?? false;
+        $incInSiteMap = $options[RouteOption::SITEMAP] ?? false;
 
-        if (isset($options['middleware'])) {
-            if (gettype($options['middleware']) == 'array') {
-                $mdArr = $options['middleware'];
-            } else if (gettype($options['middleware']) == 'string') {
-                $mdArr = [$options['middleware']];
+        if (isset($options[RouteOption::MIDDLEWARE])) {
+            if (gettype($options[RouteOption::MIDDLEWARE]) == 'array') {
+                $mdArr = $options[RouteOption::MIDDLEWARE];
+            } else if (gettype($options[RouteOption::MIDDLEWARE]) == 'string') {
+                $mdArr = [$options[RouteOption::MIDDLEWARE]];
             } else {
                 $mdArr = [];
             }
@@ -942,21 +942,21 @@ class Router {
             $mdArr = [];
         }
 
-        if (isset($options['as-api'])) {
-            $asApi = $options['as-api'] === true;
+        if (isset($options[RouteOption::API])) {
+            $asApi = $options[RouteOption::API] === true;
         } else {
             $asApi = false;
         }
-        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ?
-                $options['closure-params'] : [];
-        $path = isset($options['path']) ? $this->fixUriPath($options['path']) : '';
-        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
-        $varValues = isset($options['vars-values']) && gettype($options['vars-values']) == 'array' ? $options['vars-values'] : [];
+        $closureParams = isset($options[RouteOption::CLOSURE_PARAMS]) && gettype($options[RouteOption::CLOSURE_PARAMS]) == 'array' ?
+                $options[RouteOption::CLOSURE_PARAMS] : [];
+        $path = isset($options[RouteOption::PATH]) ? $this->fixUriPath($options[RouteOption::PATH]) : '';
+        $languages = isset($options[RouteOption::LANGS]) && gettype($options[RouteOption::LANGS]) == 'array' ? $options[RouteOption::LANGS] : [];
+        $varValues = isset($options[RouteOption::VALUES]) && gettype($options[RouteOption::VALUES]) == 'array' ? $options[RouteOption::VALUES] : [];
 
         $action = '';
 
-        if (isset($options['action'])) {
-            $trimmed = trim($options['action']);
+        if (isset($options[RouteOption::ACTION])) {
+            $trimmed = trim($options[RouteOption::ACTION]);
 
             if (strlen($trimmed) > 0) {
                 $action = $trimmed;
@@ -964,43 +964,43 @@ class Router {
         }
 
         return [
-            'case-sensitive' => $caseSensitive,
-            'type' => $routeType,
-            'in-sitemap' => $incInSiteMap,
-            'as-api' => $asApi,
-            'path' => $path,
-            'route-to' => $routeTo,
-            'closure-params' => $closureParams,
-            'languages' => $languages,
-            'vars-values' => $varValues,
-            'middleware' => $mdArr,
-            'methods' => $this->getRequestMethodsHelper($options),
-            'action' => $action
+            RouteOption::CASE_SENSITIVE => $caseSensitive,
+            RouteOption::TYPE => $routeType,
+            RouteOption::SITEMAP => $incInSiteMap,
+            RouteOption::API => $asApi,
+            RouteOption::PATH => $path,
+            RouteOption::TO => $routeTo,
+            RouteOption::CLOSURE_PARAMS => $closureParams,
+            RouteOption::LANGS => $languages,
+            RouteOption::VALUES => $varValues,
+            RouteOption::MIDDLEWARE => $mdArr,
+            RouteOption::REQUEST_METHODS => $this->getRequestMethodsHelper($options),
+            RouteOption::ACTION => $action
         ];
     }
     private function copyOptionsToSub($options, &$subRoute) {
-        if (!isset($subRoute['case-sensitive'])) {
-            if (isset($options['case-sensitive'])) {
-                $caseSensitive = $options['case-sensitive'] === true;
+        if (!isset($subRoute[RouteOption::CASE_SENSITIVE])) {
+            if (isset($options[RouteOption::CASE_SENSITIVE])) {
+                $caseSensitive = $options[RouteOption::CASE_SENSITIVE] === true;
             } else {
                 $caseSensitive = true;
             }
-            $subRoute['case-sensitive'] = $caseSensitive;
+            $subRoute[RouteOption::CASE_SENSITIVE] = $caseSensitive;
         }
 
-        $subRoute['type'] = $options['type'] ?? Router::CUSTOMIZED;
+        $subRoute[RouteOption::TYPE] = $options[RouteOption::TYPE] ?? Router::CUSTOMIZED;
 
-        if (!isset($subRoute['in-sitemap'])) {
-            $incInSiteMap = $options['in-sitemap'] ?? false;
-            $subRoute['in-sitemap'] = $incInSiteMap;
+        if (!isset($subRoute[RouteOption::SITEMAP])) {
+            $incInSiteMap = $options[RouteOption::SITEMAP] ?? false;
+            $subRoute[RouteOption::SITEMAP] = $incInSiteMap;
         }
 
-        if (isset($options['middleware'])) {
-            if (gettype($options['middleware']) == 'array') {
-                $mdArr = $options['middleware'];
+        if (isset($options[RouteOption::MIDDLEWARE])) {
+            if (gettype($options[RouteOption::MIDDLEWARE]) == 'array') {
+                $mdArr = $options[RouteOption::MIDDLEWARE];
             } else {
-                if (gettype($options['middleware']) == 'string') {
-                    $mdArr = [$options['middleware']];
+                if (gettype($options[RouteOption::MIDDLEWARE]) == 'string') {
+                    $mdArr = [$options[RouteOption::MIDDLEWARE]];
                 } else {
                     $mdArr = [];
                 }
@@ -1009,49 +1009,49 @@ class Router {
             $mdArr = [];
         }
 
-        if (!isset($subRoute['middleware'])) {
-            $subRoute['middleware'] = $mdArr;
+        if (!isset($subRoute[RouteOption::MIDDLEWARE])) {
+            $subRoute[RouteOption::MIDDLEWARE] = $mdArr;
         } else {
-            if (gettype($subRoute['middleware']) == 'array') {
+            if (gettype($subRoute[RouteOption::MIDDLEWARE]) == 'array') {
                 foreach ($mdArr as $md) {
-                    $subRoute['middleware'][] = $md;
+                    $subRoute[RouteOption::MIDDLEWARE][] = $md;
                 }
             } else {
-                if (gettype($subRoute['middleware']) == 'string') {
-                    $newMd = [$subRoute['middleware']];
+                if (gettype($subRoute[RouteOption::MIDDLEWARE]) == 'string') {
+                    $newMd = [$subRoute[RouteOption::MIDDLEWARE]];
 
                     foreach ($mdArr as $md) {
                         $newMd[] = $md;
                     }
-                    $subRoute['middleware'] = $newMd;
+                    $subRoute[RouteOption::MIDDLEWARE] = $newMd;
                 }
             }
         }
-        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
+        $languages = isset($options[RouteOption::LANGS]) && gettype($options[RouteOption::LANGS]) == 'array' ? $options[RouteOption::LANGS] : [];
 
-        if (isset($subRoute['languages']) && gettype($subRoute['languages']) == 'array') {
+        if (isset($subRoute[RouteOption::LANGS]) && gettype($subRoute[RouteOption::LANGS]) == 'array') {
             foreach ($languages as $langCode) {
-                if (!in_array($langCode, $subRoute['languages'])) {
-                    $subRoute['languages'][] = $langCode;
+                if (!in_array($langCode, $subRoute[RouteOption::LANGS])) {
+                    $subRoute[RouteOption::LANGS][] = $langCode;
                 }
             }
         } else {
-            $subRoute['languages'] = $languages;
+            $subRoute[RouteOption::LANGS] = $languages;
         }
 
         $reqMethArr = $this->getRequestMethodsHelper($options);
 
-        if (isset($subRoute['methods'])) {
-            if (gettype($subRoute['methods']) != 'array') {
-                $reqMethArr[] = $subRoute['methods'];
-                $subRoute['methods'] = $reqMethArr;
+        if (isset($subRoute[RouteOption::REQUEST_METHODS])) {
+            if (gettype($subRoute[RouteOption::REQUEST_METHODS]) != 'array') {
+                $reqMethArr[] = $subRoute[RouteOption::REQUEST_METHODS];
+                $subRoute[RouteOption::REQUEST_METHODS] = $reqMethArr;
             } else {
                 foreach ($reqMethArr as $meth) {
-                    $subRoute['methods'][] = $meth;
+                    $subRoute[RouteOption::REQUEST_METHODS][] = $meth;
                 }
             }
         } else {
-            $subRoute['methods'] = $reqMethArr;
+            $subRoute[RouteOption::REQUEST_METHODS] = $reqMethArr;
         }
     }
     private function fixFilePath($path) {
@@ -1141,11 +1141,11 @@ class Router {
     private function getRequestMethodsHelper(array $options): array {
         $requestMethodsArr = [];
 
-        if (isset($options['methods'])) {
-            $methTypes = gettype($options['methods']);
+        if (isset($options[RouteOption::REQUEST_METHODS])) {
+            $methTypes = gettype($options[RouteOption::REQUEST_METHODS]);
 
             if ($methTypes == 'array') {
-                foreach ($options['methods'] as $reqMethod) {
+                foreach ($options[RouteOption::REQUEST_METHODS] as $reqMethod) {
                     $upper = strtoupper(trim($reqMethod));
 
                     if (in_array($upper, Request::METHODS)) {
@@ -1154,7 +1154,7 @@ class Router {
                 }
             } else {
                 if ($methTypes == 'string') {
-                    $upper = strtoupper(trim($options['methods']));
+                    $upper = strtoupper(trim($options[RouteOption::REQUEST_METHODS]));
 
                     if (in_array($upper, Request::METHODS)) {
                         $requestMethodsArr[] = $upper;
@@ -1595,7 +1595,7 @@ class Router {
      */
     private static function view(array $options): bool {
         if (gettype($options) == 'array') {
-            $options['type'] = Router::VIEW_ROUTE;
+            $options[RouteOption::TYPE] = Router::VIEW_ROUTE;
             self::addToMiddlewareGroup($options, 'web');
 
             return Router::getInstance()->addRouteHelper1($options);

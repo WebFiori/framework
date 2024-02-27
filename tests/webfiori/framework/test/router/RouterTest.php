@@ -283,10 +283,214 @@ class RouterTest extends TestCase {
      */
     public function testRedirect03() {
         Response::removeHeader('location');
-        Router::redirect('home', 'https://google.com', 3099);
+        Router::redirect('home/{id}', 'https://google.com', 3099);
+        Router::route('https://127.0.0.1/home/55');
+        $this->assertEquals(301, Response::getCode());
+        $locHeader = Response::getHeader('location');
+        $this->assertEquals(['https://google.com'], $locHeader);
+        $this->assertEquals(55, Router::getParameterValue('id'));
+        $this->assertTrue(Router::removeRoute('home/{id}'));
+    }
+    /**
+     * @test
+     */
+    public function testRedirect04() {
+        Response::setCode(404);
+        Response::removeHeader('location');
+        Router::removeAll();
+        Router::redirect('home/{id?}', 'https://google.com', 400);
         Router::route('https://127.0.0.1/home');
         $this->assertEquals(301, Response::getCode());
         $locHeader = Response::getHeader('location');
         $this->assertEquals(['https://google.com'], $locHeader);
+        $this->assertNull(Router::getParameterValue('id'));
+        $this->assertTrue(Router::removeRoute('home/{id?}'));
+    }
+    /**
+     * @test
+     */
+    public function testSitemap00() {
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Response::clear();
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSitemap01() {
+        Response::clear();
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Router::closure([
+            RouteOption::PATH => 'home',
+            RouteOption::TO => function () {
+
+            },
+            RouteOption::SITEMAP => true
+        ]);
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home</loc>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSitemap02() {
+        Response::clear();
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Router::closure([
+            RouteOption::PATH => 'home/{id}',
+            RouteOption::TO => function () {
+
+            },
+            RouteOption::SITEMAP => true
+        ]);
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSitemap03() {
+        Response::clear();
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Router::closure([
+            RouteOption::PATH => 'home/{id}',
+            RouteOption::TO => function () {
+
+            },
+            RouteOption::SITEMAP => true,
+            RouteOption::VALUES => [
+                'id' => [1,2]
+            ]
+        ]);
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/1</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/2</loc>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSitemap04() {
+        Response::clear();
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Router::closure([
+            RouteOption::PATH => 'home/{id}',
+            RouteOption::TO => function () {
+
+            },
+            RouteOption::SITEMAP => true,
+            RouteOption::VALUES => [
+                'id' => [1,2]
+            ],
+            RouteOption::LANGS => ['en']
+        ]);
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/1</loc>'
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/1?lang=en"/>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/2</loc>'
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/2?lang=en"/>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSitemap05() {
+        Response::clear();
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        Router::closure([
+            RouteOption::PATH => 'home/{id}',
+            RouteOption::TO => function () {
+
+            },
+            RouteOption::SITEMAP => true,
+            RouteOption::VALUES => [
+                'id' => [1,2]
+            ],
+            RouteOption::LANGS => ['en', 'ar']
+        ]);
+        Router::route('https://127.0.0.1/sitemap');
+        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
+                . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap.xml</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/sitemap</loc>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/1</loc>'
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/1?lang=en"/>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://127.0.0.1/home/1?lang=ar"/>'
+                . '</url>'
+                . '<url>'
+                . '<loc>https://127.0.0.1/home/2</loc>'
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/2?lang=en"/>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://127.0.0.1/home/2?lang=ar"/>'
+                . '</url>'
+                . '</urlset>', Response::getBody());
     }
 }

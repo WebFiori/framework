@@ -493,4 +493,33 @@ class RouterTest extends TestCase {
                 . '</url>'
                 . '</urlset>', Response::getBody());
     }
+    /**
+     * @test
+     */
+    public function testClassRoute00() {
+        Response::clear();
+        Router::addRoute([
+                RouteOption::PATH => 'home',
+                RouteOption::TO => \app\apis\RoutingTestClass::class
+        ]);
+        Router::route('https://127.0.0.1/home');
+        
+        $this->assertEquals("I'm inside the class.", Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testClassRoute02() {
+        Response::clear();
+        Router::removeAll();
+        Router::addRoute([
+                RouteOption::PATH => 'home',
+                RouteOption::TO => \app\apis\RoutingTestClass::class,
+                RouteOption::ACTION => 'doSomething'
+        ]);
+        Router::route('https://127.0.0.1/home');
+        
+        $this->assertEquals("I'm doing something.", Response::getBody());
+    }
+ 
 }

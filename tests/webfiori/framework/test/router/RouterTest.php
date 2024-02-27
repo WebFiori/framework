@@ -7,6 +7,7 @@ use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\Util;
 use webfiori\http\RequestMethod;
+use webfiori\http\Response;
 /**
  * Description of RouterTest
  *
@@ -94,13 +95,14 @@ class RouterTest extends TestCase {
                 ]
             ]
         ]);
+        $this->assertNull(Router::getParameterValue('var-1'));
         $obj = Router::getUriObj('/{var-1}/{var-2?}');
         $this->assertNotNull($obj);
 
         $this->assertEquals(2, count($obj->getParameters()));
         Router::route(Util::getBaseURL().'/hello/world');
 
-        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('hello', Router::getParameterValue('var-1'));
         $this->assertEquals('world',$obj->getParameterValue('var-2'));
     }
     /**
@@ -228,5 +230,63 @@ class RouterTest extends TestCase {
 
         $this->assertEquals(['fr','ar','en'], $route3->getLanguages());
         $this->assertFalse($route3->isCaseSensitive());
+    }
+    /**
+     * @test
+     */
+    public function testGetUriObjByURL() {
+        $this->assertNull(Router::getUriObjByURL('https://127.0.0.1/home'));
+        Router::closure([
+                RouteOption::PATH => 'home',
+                RouteOption::TO => function () {
+            
+                }
+        ]);
+        $this->assertNotNull(Router::getUriObjByURL('https://127.0.0.1/home'));
+        $this->assertTrue(Router::removeRoute('/home'));
+        $this->assertNull(Router::getUriObjByURL('https://127.0.0.1/home'));
+        
+    }
+    /**
+     * @test
+     */
+    public function testRedirect() {
+        $myVar = 'Hello';
+        $test = $this;
+        Router::closure([
+                RouteOption::PATH => 'home',
+                RouteOption::TO => function () {
+            
+                }
+        ]);
+
+        Router::redirect('home', 'home2');
+        Router::route('https://127.0.0.1/home');
+        $this->assertEquals(301, Response::getCode());
+        $locHeader = Response::getHeader('location');
+        $this->assertEquals(['home2'], $locHeader);
+        
+    }
+    /**
+     * @test
+     */
+    public function testRedirect01() {
+        Response::removeHeader('location');
+        Router::redirect('home', 'home2', 308);
+        Router::route('https://127.0.0.1/home');
+        $this->assertEquals(308, Response::getCode());
+        $locHeader = Response::getHeader('location');
+        $this->assertEquals(['home2'], $locHeader);
+    }
+    /**
+     * @test
+     */
+    public function testRedirect03() {
+        Response::removeHeader('location');
+        Router::redirect('home', 'https://google.com', 3099);
+        Router::route('https://127.0.0.1/home');
+        $this->assertEquals(301, Response::getCode());
+        $locHeader = Response::getHeader('location');
+        $this->assertEquals(['https://google.com'], $locHeader);
     }
 }

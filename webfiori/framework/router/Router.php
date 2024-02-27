@@ -592,6 +592,7 @@ class Router {
      * @since 1.3.11
      */
     public static function redirect(string $path, string $to, int $code = 301) {
+        self::removeRoute($path);
         Router::closure([
             'path' => $path,
             'route-to' => function ($to, $httpCode)
@@ -603,7 +604,9 @@ class Router {
                 }
                 Response::addHeader('location', $to);
                 Response::setCode($httpCode);
-                Response::send();
+                if (!Runner::isCLI()) {
+                    Response::send();
+                }
             },
             'closure-params' => [
                 $to, $code
@@ -633,19 +636,17 @@ class Router {
      * @since 1.3.7
      */
     public static function removeRoute(string $path) : bool {
-        $pathFix = self::base().self::getInstance()->fixUriPath($path);
+        $pathFix = self::getInstance()->fixUriPath($path);
         $retVal = false;
-
-        if (isset(self::getInstance()->routes['static'][$pathFix])) {
-            unset(self::getInstance()->routes['static'][$pathFix]);
+        $routes = &self::getInstance()->routes;
+        if (isset($routes['static'][$pathFix])) {
+            unset($routes['static'][$pathFix]);
 
             $retVal = true;
-        } else {
-            if (self::getInstance()->routes['variable'][$pathFix]) {
-                unset(self::getInstance()->routes['variable'][$pathFix]);
+        } else if (isset($routes['variable'][$pathFix])) {
+            unset($routes['variable'][$pathFix]);
 
-                $retVal = true;
-            }
+            $retVal = true;
         }
 
         return $retVal;

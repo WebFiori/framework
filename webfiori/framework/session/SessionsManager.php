@@ -413,7 +413,7 @@ class SessionsManager {
         self::getInstance()->pauseSessions();
 
         if (!self::hasSession($sessionName)) {
-            $options['name'] = $sessionName;
+            $options[SessionOption::NAME] = $sessionName;
             $s = new Session($options);
             $s->start();
             self::getInstance()->sessionsArr[] = $s;

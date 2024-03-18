@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateBackgroundTask;
@@ -33,8 +33,8 @@ use webfiori\framework\cli\helpers\CreateWebService;
 class CreateCommand extends CLICommand {
     public function __construct() {
         parent::__construct('create', [
-            new CommandArgument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
-            new CommandArgument('--table', '', true),
+            new Argument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
+            new Argument('--table', '', true),
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     public function createEntityFromQuery(): int {

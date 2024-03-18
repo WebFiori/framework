@@ -144,20 +144,20 @@ class Session implements JsonI {
             $this->setIsRefresh(false);
         }
 
-        if (!(isset($options['duration']) && $this->setDuration($options['duration']))) {
+        if (!(isset($options[SessionOption::DURATION]) && $this->setDuration($options[SessionOption::DURATION]))) {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
 
         if ($this->getDuration() == 0) {
             $this->setIsRefresh(false);
         }
-        $tempSName = isset($options['name']) ? trim($options['name']) : '';
+        $tempSName = isset($options[SessionOption::NAME]) ? trim($options[SessionOption::NAME]) : '';
 
         if (!$this->setNameHelper($tempSName)) {
             throw new SessionException('Invalid session name: \''.$tempSName.'\'.');
         }
 
-        $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : self::generateSessionID($tempSName));
+        $this->getCookie()->setValue(isset($options[SessionOption::SESSION_ID]) ? trim($options[SessionOption::SESSION_ID]) : self::generateSessionID($tempSName));
         $this->resumedAt = 0;
         $this->startedAt = 0;
         $this->sessionVariables = [];

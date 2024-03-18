@@ -4,10 +4,13 @@ namespace webfiori\framework\test;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
+use webfiori\framework\Access;
 use webfiori\framework\App;
 use webfiori\framework\Lang;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
+use webfiori\framework\User;
 use webfiori\ui\HTMLNode;
 /**
  * Description of PageTest
@@ -212,6 +215,97 @@ class PageTest extends TestCase {
     /**
      * @test
      */
+    public function testCreateHtmlNode03() {
+        $page = new WebPage();
+        $node = $page->createHTMLNode();
+        $node->setID('new-node');
+        $this->assertEquals('div', $node->getNodeName());
+        $this->assertEquals(0,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
+        $this->assertNull($el);
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $page = new WebPage();
+        $this->assertFalse($page->hasPrivilege('A_TEST'));
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege01() {
+        $page = new WebPage();
+        SessionsManager::start('new');
+        $this->assertFalse($page->hasPrivilege('A_TEST'));
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege02() {
+        $page = new WebPage();
+        SessionsManager::start('new');
+        $user = new User();
+        $user->addPrivilege('A_TEST');
+        SessionsManager::getActiveSession()->setUser($user);
+        $this->assertFalse($page->hasPrivilege('A_TEST'));
+        Access::newGroup('Test');
+        Access::newPrivilege('Test', 'A_TEST');
+        $user->addPrivilege('A_TEST');
+        $this->assertTrue($page->hasPrivilege('A_TEST'));
+    }
+    /**
+     * @test
+     */
+    public function testGetSession00() {
+        $page = new WebPage();
+        $this->assertNull($page->getActiveSession());
+    }
+    /**
+     * @test
+     */
+    public function testGetSession01() {
+        SessionsManager::start('test-session-1');
+        $page = new WebPage();
+        $session = $page->getActiveSession();
+        $this->assertNotNull($session);
+        $this->assertEquals('test-session-1', $session->getName());
+        SessionsManager::destroy();
+        $this->assertNull($page->getActiveSession());
+    }
+    /**
+     * @test
+     */
+    public function testGetSession02() {
+        SessionsManager::start('test-session-1');
+        SessionsManager::start('test-session-2');
+        $page = new WebPage();
+        $session = $page->getActiveSession();
+        $this->assertNotNull($session);
+        $this->assertEquals('test-session-2', $session->getName());
+        SessionsManager::destroy();
+        $this->assertNull($page->getActiveSession());
+    }
+    /**
+     * @test
+     */
+    public function testGetLabel00() {
+        $page = new WebPage();
+        $this->assertEquals('a/b/c', $page->get('a/b/c'));
+    }
+    /**
+     * @test
+     */
+    public function testGetLabel01() {
+        $page = new WebPage();
+        $this->assertEquals('2', $page->get('hello/two'));
+        $this->assertEquals([
+            'cool' => 'Cool'
+        ], $page->get('hello/one'));
+    }
+    /**
+     * @test
+     */
     public function testDefaults00() {
         $page = new WebPage();
         $this->assertEquals('EN',$page->getLangCode());
@@ -225,6 +319,7 @@ class PageTest extends TestCase {
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
         $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
+        $this->assertEquals('http://127.0.0.1',$page->getBase());
     }
     /**
      * @test

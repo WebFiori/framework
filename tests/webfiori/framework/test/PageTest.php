@@ -258,6 +258,7 @@ class PageTest extends TestCase {
      * @test
      */
     public function testGetSession00() {
+        SessionsManager::destroy();
         $page = new WebPage();
         $this->assertNull($page->getActiveSession());
     }

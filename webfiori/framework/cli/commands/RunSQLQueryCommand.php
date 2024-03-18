@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
@@ -30,13 +30,13 @@ use webfiori\framework\DB;
 class RunSQLQueryCommand extends CLICommand {
     public function __construct() {
         parent::__construct('run-query', [
-            new CommandArgument('--connection', 'Database connection that the query will be executed on.', true),
-            new CommandArgument('--schema', 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents database schema.', true),
-            new CommandArgument('--create', 'This option is used alongside the option --table and --schema. If it is provided, this means initiate the process of creating the database or the Table.', true),
-            new CommandArgument('--table', 'Table class to run query on.', true),
-            new CommandArgument('--file', 'The path to SQL file that holds SQL query.', true),
-            new CommandArgument('--no-confirm', 'If this argument is provided, the query will be executed without confirmation step.', true),
-            new CommandArgument('--show-sql', 'If this argument is provided, SQL statement will be shown in the console. This option is ignored if option --no-confirm is not provided.', true),
+            new Argument('--connection', 'Database connection that the query will be executed on.', true),
+            new Argument('--schema', 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents database schema.', true),
+            new Argument('--create', 'This option is used alongside the option --table and --schema. If it is provided, this means initiate the process of creating the database or the Table.', true),
+            new Argument('--table', 'Table class to run query on.', true),
+            new Argument('--file', 'The path to SQL file that holds SQL query.', true),
+            new Argument('--no-confirm', 'If this argument is provided, the query will be executed without confirmation step.', true),
+            new Argument('--show-sql', 'If this argument is provided, SQL statement will be shown in the console. This option is ignored if option --no-confirm is not provided.', true),
         ], 'Execute SQL query on specific database.');
     }
     /**

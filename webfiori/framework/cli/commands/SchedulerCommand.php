@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
 /**
@@ -39,13 +39,13 @@ class SchedulerCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('scheduler', [
-            new CommandArgument('p', 'Scheduler password. If it is set, then it must be provided here.', true),
-            new CommandArgument('--list', 'List all scheduled tasks.', true),
-            new CommandArgument('--check', 'Run a check against all tasks to check if it is time to execute them or not.', true),
-            new CommandArgument('--force', 'Force a specific task to execute.', true),
-            new CommandArgument('--task-name', 'The name of the task that will be forced to execute or to show its arguments.', true),
-            new CommandArgument('--show-task-args', 'If this one is provided with task name and a task has custom execution args, they will be shown.', true),
-            new CommandArgument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
+            new Argument('p', 'Scheduler password. If it is set, then it must be provided here.', true),
+            new Argument('--list', 'List all scheduled tasks.', true),
+            new Argument('--check', 'Run a check against all tasks to check if it is time to execute them or not.', true),
+            new Argument('--force', 'Force a specific task to execute.', true),
+            new Argument('--task-name', 'The name of the task that will be forced to execute or to show its arguments.', true),
+            new Argument('--show-task-args', 'If this one is provided with task name and a task has custom execution args, they will be shown.', true),
+            new Argument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
         ], 'Run tasks scheduler.');
 
         if (TasksManager::getPassword() != 'NO_PASSWORD') {

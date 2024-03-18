@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
-use webfiori\cli\CommandArgument;
+use webfiori\cli\Argument;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;
@@ -26,7 +26,7 @@ class UpdateTableCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('update-table', [
-            new CommandArgument('--table', 'The namespace of the table class (including namespace).', true),
+            new Argument('--table', 'The namespace of the table class (including namespace).', true),
         ], 'Update a database table.');
     }
     /**

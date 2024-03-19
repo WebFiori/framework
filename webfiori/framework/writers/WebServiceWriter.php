@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\framework\EAbstractWebService;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamOption;
 use webfiori\http\ParamType;
@@ -51,7 +50,7 @@ class WebServiceWriter extends ClassWriter {
         parent::__construct('NewWebService', APP_PATH.'apis', APP_DIR.'\\apis');
 
         $this->setSuffix('Service');
-        $this->addUseStatement(EAbstractWebService::class);
+        $this->addUseStatement(AbstractWebService::class);
         $this->addUseStatement(ParamType::class);
         $this->addUseStatement(ParamOption::class);
         $this->addUseStatement(RequestMethod::class);

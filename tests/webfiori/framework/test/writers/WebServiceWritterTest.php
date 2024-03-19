@@ -17,7 +17,7 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\AbstractWebService",
             "webfiori\http\ParamType",
             "webfiori\http\ParamOption",
             "webfiori\\http\\RequestMethod"
@@ -33,7 +33,7 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\AbstractWebService",
             "webfiori\http\ParamType",
             "webfiori\http\ParamOption",
             "webfiori\\http\\RequestMethod"
@@ -61,7 +61,7 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\EAbstractWebService",
+            "webfiori\http\AbstractWebService",
             "webfiori\http\ParamType",
             "webfiori\http\ParamOption",
             "webfiori\\http\\RequestMethod"

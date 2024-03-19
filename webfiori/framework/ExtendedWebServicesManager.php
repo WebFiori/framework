@@ -24,16 +24,8 @@ use webfiori\json\JsonI;
  * parameter 'lang'.
  *
  * @author Ibrahim
- *
- * @version 1.0.2
  */
 abstract class ExtendedWebServicesManager extends WebServicesManager {
-    /**
-     * A constant that represents error message type.
-     *
-     * @since 1.0.2
-     */
-    private static $E = 'error';
     private $translation;
     /**
      * Creates new instance of 'API'.
@@ -68,74 +60,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
                 'db-error' => 'Database Error.'
             ]);
         }
-    }
-    /**
-     * Sends a response message to indicate that an action is not implemented.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"Action not implemented.",<br/>
-     * &nbsp;&nbsp;"type":"error",<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 404 - Not Found.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.0
-     */
-    public function actionNotImpl() {
-        $message = $this->get('general/action-not-impl');
-        $this->sendResponse($message, self::$E, 404);
-    }
-    /**
-     * Sends a response message to indicate that an action is not supported by the API.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"Action not supported",<br/>
-     * &nbsp;&nbsp;"type":"error"<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 404 - Not Found.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.0
-     */
-    public function actionNotSupported() {
-        $message = $this->get('general/action-not-supported');
-        $this->sendResponse($message, self::$E, 404);
-    }
-    /**
-     * Sends a response message to indicate that request content type is
-     * not supported by the API.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"Content type not supported.",<br/>
-     * &nbsp;&nbsp;"type":"error",<br/>
-     * &nbsp;&nbsp;"request-content-type":"content_type"<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 404 - Not Found.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.1
-     */
-    public function contentTypeNotSupported(string $cType = '') {
-        $message = $this->get('general/content-not-supported');
-        $this->sendResponse($message, self::$E, 404,'"request-content-type":"'.$cType.'"');
     }
     /**
      * Creates a sub array to define language variables.
@@ -191,9 +115,9 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
             if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
                 $json->add('query', $info->getLastQuery());
             }
-            $this->sendResponse($message, self::$E, 404, $json);
+            $this->sendResponse($message, self::E, 404, $json);
         } else {
-            $this->sendResponse($message, self::$E, 404, $info);
+            $this->sendResponse($message, self::E, 404, $info);
         }
     }
     /**
@@ -256,111 +180,9 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         return $this->translation;
     }
     /**
-     * Sends a response message to indicate that a request parameter(s) have invalid values.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"The following parameter(s) has invalid values: 'param_1', 'param_2', 'param_n'",<br/>
-     * &nbsp;&nbsp;"type":"error"<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 404 - Not Found.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.3
-     */
-    public function invParams() {
-        $val = '';
-        $paramsNamesArr = $this->getInvalidParameters();
-
-        if (gettype($paramsNamesArr) == 'array') {
-            $i = 0;
-            $count = count($paramsNamesArr);
-
-            foreach ($paramsNamesArr as $paramName) {
-                if ($i + 1 == $count) {
-                    $val .= '\''.$paramName.'\'';
-                } else {
-                    $val .= '\''.$paramName.'\', ';
-                }
-                $i++;
-            }
-        }
-        $message = $this->get('general/inv-params');
-        $this->sendResponse($message.$val.'.', self::$E, 404);
-    }
-    /**
-     * Sends a response message to indicate that a request parameter or parameters are missing.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"The following required parameter(s) where missing from the request body: 'param_1', 'param_2', 'param_n'",<br/>
-     * &nbsp;&nbsp;"type":"error",<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 404 - Not Found.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.3
-     */
-    public function missingParams() {
-        $val = '';
-        $paramsNamesArr = $this->getMissingParameters();
-
-        if (gettype($paramsNamesArr) == 'array') {
-            $i = 0;
-            $count = count($paramsNamesArr);
-
-            foreach ($paramsNamesArr as $paramName) {
-                if ($i + 1 == $count) {
-                    $val .= '\''.$paramName.'\'';
-                } else {
-                    $val .= '\''.$paramName.'\', ';
-                }
-                $i++;
-            }
-        }
-        $message = $this->get('general/missing-params');
-        $this->sendResponse($message.$val.'.', self::$E, 404);
-    }
-    /**
-     * Sends a response message to indicate that a user is not authorized to
-     * do an API call.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"Not authorized",<br/>
-     * &nbsp;&nbsp;"type":"error"<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 401 - Not Authorized.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.0
-     */
-    public function notAuth() {
-        $message = $this->get('general/http-codes/401/message');
-        $this->sendResponse($message, self::$E, 401);
-    }
-    /**
      * Auto-register services tables which exist on a specific directory.
      *
-     * Note that the statement 'return __NAMESPACE__' should be included at the
-     * end of service class for auto-register to work. If the statement
-     * does not exist, the method will assume that the path is the namespace of
-     * each class. Also, the classes which represents web services must be suffixed
+     * The classes which represents web services must be suffixed
      * with the word 'Service' in order to register them (e.g. RegisterUserService).
      *
      * @param string $pathToScan A path which is relative to application source
@@ -375,28 +197,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         {
             $m->addService($ws);
         }, 'Service', [$this], [$this]);
-    }
-    /**
-     * Sends a response message to indicate that request method is not supported.
-     *
-     * This method will send back a JSON string in the following format:
-     * <p>
-     * {<br/>
-     * &nbsp;&nbsp;"message":"Method Not Allowed.",<br/>
-     * &nbsp;&nbsp;"type":"error",<br/>
-     * }
-     * </p>
-     * In addition to the message, The response will sent HTTP code 405 - Method Not Allowed.
-     * Note that the content of the field "message" might differ. It depends on
-     * the language. If no language is selected or language is not supported,
-     * The language that will be used is the language that was set as default
-     * language in the class 'SiteConfig'.
-     *
-     * @since 1.0
-     */
-    public function requestMethodNotAllowed() {
-        $message = $this->get('general/http-codes/405/message');
-        $this->sendResponse($message, self::$E, 405);
     }
     /**
      * Sets multiple language variables.

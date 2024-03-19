@@ -145,7 +145,7 @@ class WebServiceWriter extends ClassWriter {
     }
 
     public function writeClassDeclaration() {
-        $this->append('class '.$this->getName().' extends EAbstractWebService {');
+        $this->append('class '.$this->getName().' extends AbstractWebService {');
     }
     /**
      *

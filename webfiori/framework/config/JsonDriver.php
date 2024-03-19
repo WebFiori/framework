@@ -68,8 +68,8 @@ class JsonDriver implements ConfigurationDriver {
                     "description" => "Host name that will be used when runing the application as command line utility."
                 ], 'none', 'same')
             ], 'none', 'same'),
-            'smtp-connections' => new Json(),
-            'database-connections' => new Json(),
+            'smtp-connections' => new Json([], 'none', 'same'),
+            'database-connections' => new Json([], 'none', 'same'),
         ], 'none', 'same');
         $this->json->setIsFormatted(true);
     }
@@ -91,7 +91,7 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->get('env-vars')->add($name, new Json([
             'value' => $value,
             'description' => $description
-        ]));
+        ], 'none', 'same'));
         $this->writeJson();
     }
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
@@ -102,7 +102,7 @@ class JsonDriver implements ConfigurationDriver {
             'username' => $dbConnectionsInfo->getUsername(),
             'database' => $dbConnectionsInfo->getDBName(),
             'password' => $dbConnectionsInfo->getPassword(),
-        ]);
+        ], 'none', 'same');
         $connectionJAsJson->addArray('extras', $dbConnectionsInfo->getExtars(), true);
         $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $connectionJAsJson);
         $this->writeJson();
@@ -117,7 +117,7 @@ class JsonDriver implements ConfigurationDriver {
             'address' => $emailAccount->getAddress(),
             'sender-name' => $emailAccount->getSenderName(),
 
-        ]);
+        ], 'none', 'same');
         $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $connectionAsJson);
         $this->writeJson();
     }
@@ -434,7 +434,7 @@ class JsonDriver implements ConfigurationDriver {
         $f->remove();
     }
     public function removeAllDBConnections() {
-        $this->json->add('database-connections', new Json());
+        $this->json->add('database-connections', new Json([], 'none', 'same'));
         $this->writeJson();
     }
 
@@ -451,7 +451,7 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     public function removeSMTPAccount(string $accountName) {
-        $this->json->add('smtp-connections', new Json());
+        $this->json->add('smtp-connections', new Json([], 'none', 'same'));
         $this->writeJson();
     }
     /**
@@ -487,7 +487,7 @@ class JsonDriver implements ConfigurationDriver {
             'version' => $vNum,
             'version-type' => $vType,
             'release-date' => $releaseDate
-        ]));
+        ], 'none', 'same'));
         $this->writeJson();
     }
 

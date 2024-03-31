@@ -573,6 +573,11 @@ class WebPage {
      *
      */
     public function getTranslation() : Lang {
+        
+        if (!$this->skipLangCheck && $this->tr === null) {
+            $this->usingLanguage();
+        }
+        
         return $this->tr;
     }
     /**

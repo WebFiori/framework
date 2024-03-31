@@ -10,11 +10,16 @@
  */
 namespace webfiori\framework;
 
+use Error;
 use Exception;
+use webfiori\file\File;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
 use webfiori\http\Response;
+use const DS;
+use const ROOT_PATH;
+use const THEMES_PATH;
 
 
 /**
@@ -257,7 +262,13 @@ class ThemeLoader {
                 }
 
                 if (class_exists($aCName)) {
-                    $instance = new $aCName();
+                    try {
+                        $instance = new $aCName();
+                    } catch (Error $ex) {
+                        $instance = null;
+                    } catch (Exception $ex) {
+                        $instance = null;
+                    }
 
                     if ($instance instanceof Theme) {
                         self::$AvailableThemes[$instance->getName()] = $instance;

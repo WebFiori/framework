@@ -12,6 +12,7 @@ namespace webfiori\framework\ui;
 
 use Error;
 use Exception;
+use TypeError;
 use webfiori\collections\LinkedList;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\MissingLangException;
@@ -572,6 +573,11 @@ class WebPage {
      *
      */
     public function getTranslation() : Lang {
+        
+        if (!$this->skipLangCheck && $this->tr === null) {
+            $this->usingLanguage();
+        }
+        
         return $this->tr;
     }
     /**
@@ -790,9 +796,14 @@ class WebPage {
 
         $this->setTitleSep(App::getConfig()->getTitleSeparator());
 
-        $langObj = $this->getTranslation();
+        try {
+            $langObj = $this->getTranslation();
+            $this->contentDir = $langObj->getWritingDir();
+        } catch (TypeError $ex) {
+             $this->contentDir = 'ltr';
+        }
 
-        $this->contentDir = $langObj === null ? 'ltr' : $langObj->getWritingDir();
+        
 
         $this->incFooter = true;
         $this->incHeader = true;
@@ -1313,6 +1324,7 @@ class WebPage {
                 if (!$this->skipLangCheck) {
                     throw new MissingLangException($ex->getMessage());
                 }
+                return;
             }
             $pageLang = $this->getTranslation();
 

@@ -18,14 +18,14 @@
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
         "ext-openssl": "*",
-        "webfiori/http":"v3.3.9",
+        "webfiori/http":"v3.3.10",
         "webfiori/file":"v1.3.4",
         "webfiori/jsonx":"v3.3.0",
         "webfiori/ui":"v2.6.1",
         "webfiori/collections":"v1.1.4",
         "webfiori/database":"v0.8.9",
         "webfiori/cli":"v1.2.0",
-        "webfiori/mailer":"v1.1.4",
+        "webfiori/mailer":"v1.2.0",
         "webfiori/err":"v1.0.9"
     },
     "require-dev": {

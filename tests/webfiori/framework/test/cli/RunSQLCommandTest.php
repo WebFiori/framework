@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
 use tables\Schema;
 use tables\Schema2;
+use webfiori\cli\CommandTestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
 use webfiori\framework\config\JsonDriver;
 
-class RunSQLCommandTest extends TestCase {
+class RunSQLCommandTest extends CommandTestCase {
     /**
      * @test
      */
@@ -18,22 +18,8 @@ class RunSQLCommandTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
-
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'run-query',
-        ]);
-        $runner->setInputs([
-            '0',
-            '0',
-            'select * from hello;',
-            'y'
-        ]);
-
-
-        $this->assertEquals(1146, $runner->start());
-
+        $this->setRunner(App::getRunner());
+        
         $this->assertEquals([
             "Select database connection:\n",
             "0: testing-connection <--\n",
@@ -47,7 +33,13 @@ class RunSQLCommandTest extends TestCase {
             "Continue?(Y/n)\n",
             "Info: Executing query on database testing_db...\n",
             "Error: 1146 - Table 'testing_db.hello' doesn't exist\n"
-        ], $runner->getOutput());
+        ], $this->executeMultiCommand(['run-query'], [
+            '0',
+            '0',
+            'select * from hello;',
+            'y'
+        ]));
+        $this->assertEquals(1146, $this->getExitCode());
     }
     /**
      * @test
@@ -56,20 +48,7 @@ class RunSQLCommandTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
-
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'run-query',
-            '--connection' => 'testing-connection',
-        ]);
-        $runner->setInputs([
-            '0',
-            'drop table test2_x;',
-            'y'
-        ]);
-
-        $this->assertEquals(1051, $runner->start());
+        $this->setRunner(App::getRunner());
 
         $this->assertEquals([
             "What type of query you would like to run?\n",
@@ -82,7 +61,15 @@ class RunSQLCommandTest extends TestCase {
             "Continue?(Y/n)\n",
             "Info: Executing query on database testing_db...\n",
             "Error: 1051 - Unknown table 'testing_db.test2_x'\n"
-        ], $runner->getOutput());
+        ], $this->executeMultiCommand([
+            'run-query',
+            '--connection' => 'testing-connection',
+        ], [
+            '0',
+            'drop table test2_x;',
+            'y'
+        ]));
+        $this->assertEquals(1051, $this->getExitCode());
     }
     /**
      * @test
@@ -188,23 +175,17 @@ class RunSQLCommandTest extends TestCase {
         $conn->setName('testing-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
 
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
+        $this->setRunner(App::getRunner());
+
+        $this->assertEquals([
+            "Error: Provided file is not SQL file!\n"
+        ], $this->executeMultiCommand([
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
             '--file' => 'app\\database\\Test2Table.php'
-        ]);
-        $runner->setInputs([
-
-        ]);
-
-
-        $this->assertEquals(-1, $runner->start());
-        $this->assertEquals([
-            "Error: Provided file is not SQL file!\n"
-        ], $runner->getOutput());
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
@@ -213,25 +194,19 @@ class RunSQLCommandTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('testing-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->setRunner(App::getRunner());
 
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
+        $this->assertEquals([
+            "Info: Executing query on database testing_db...\n",
+            "Success: Query executed without errors.\n"
+        ], $this->executeMultiCommand([
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
             '--file' => 'app\\database\\sql-file.sql'
-        ]);
-        $runner->setInputs([
-
-        ]);
-
-
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Info: Executing query on database testing_db...\n",
-            "Success: Query executed without errors.\n"
-        ], $runner->getOutput());
+        ]));
+        
+        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test

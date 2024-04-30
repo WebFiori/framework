@@ -8,4 +8,7 @@
 /.gitignore export-ignore
 /.travis.yml export-ignore
 /phpunit.xml export-ignore
+/ecs.php export-ignore
+/php_cs.php.dist export-ignore
+/phpbench.json export-ignore
 /sonar-project.properties export-ignore

@@ -121,12 +121,13 @@ class RunSQLQueryCommand extends CLICommand {
         $schema = new DB($connName);
 
         if ($file !== null) {
-            $fileObj = new File($file);
+            $fileObj = new File(ROOT_PATH.DS.$file);
 
             if ($fileObj->isExist()) {
                 $fileObj->read();
-
-                if ($fileObj->getMIME() == 'application/sql') {
+                $mime = $fileObj->getMIME();
+                
+                if ($mime == 'application/sql' || $mime == 'application/x-sql') {
                     return $this->runFileQuery($schema, $fileObj);
                 } else {
                     $this->error('Provided file is not SQL file!');

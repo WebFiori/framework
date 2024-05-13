@@ -122,7 +122,11 @@ class RunSQLQueryCommand extends CLICommand {
 
         if ($file !== null) {
             $fileObj = new File(ROOT_PATH.DS.$file);
-
+            
+            if (!$fileObj->isExist()) {
+                $fileObj = new File($file);
+            }
+            
             if ($fileObj->isExist()) {
                 $fileObj->read();
                 $mime = $fileObj->getMIME();
@@ -135,7 +139,12 @@ class RunSQLQueryCommand extends CLICommand {
                     return -1;
                 }
             } else {
-                $this->error('No such file: '.$file);
+                $path = $fileObj->getAbsolutePath();
+                
+                if (strlen($path) == 0) {
+                    $path = $file;
+                }
+                $this->error('No such file: '.$path);
 
                 return -1;
             }
@@ -201,24 +210,30 @@ class RunSQLQueryCommand extends CLICommand {
 
         while (!File::isFileExist($filePath)) {
             $filePath = $this->getInput('File path:');
-
+            $modified = ROOT_PATH.DS.$filePath;
+            
+            if (File::isFileExist($modified)) {
+                $filePath = $modified;
+            } 
+            
             if (File::isFileExist($filePath)) {
                 $file = new File($filePath);
                 $file->read();
-
-                if ($file->getMIME() == 'application/sql') {
+                $mime = $file->getMIME();
+                
+                if ($mime == 'application/sql' || $mime == 'application/x-sql') {
                     break;
                 } else {
                     $this->error('Provided file is not SQL file!');
                 }
             } else {
-                $this->error('No such file!');
+                $this->error('No such file: '.$filePath);
             }
         }
 
         return $this->runFileQuery($schema, $file);
     }
-
+    
     private function queryOnSchema(DB $schema) {
         if ($this->isArgProvided('--create')) {
             $schema->createTables();

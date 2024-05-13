@@ -139,7 +139,12 @@ class RunSQLQueryCommand extends CLICommand {
                     return -1;
                 }
             } else {
-                $this->error('No such file: '.$fileObj->getAbsolutePath());
+                $path = $fileObj->getAbsolutePath();
+                
+                if (strlen($path) == 0) {
+                    $path = $file;
+                }
+                $this->error('No such file: '.$path);
 
                 return -1;
             }

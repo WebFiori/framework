@@ -219,7 +219,8 @@ class RunSQLQueryCommand extends CLICommand {
             if (File::isFileExist($filePath)) {
                 $file = new File($filePath);
                 $file->read();
-
+                $mime = $file->getMIME();
+                
                 if ($mime == 'application/sql' || $mime == 'application/x-sql') {
                     break;
                 } else {

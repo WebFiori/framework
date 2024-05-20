@@ -25,7 +25,6 @@ class Ini {
     private $docEmptyLine;
     private $docEnd;
     private $docStart;
-    private $since10;
     /**
      * An instance of the class.
      *
@@ -34,6 +33,10 @@ class Ini {
      */
     private static $singleton;
     private function __construct() {
+        $this->docStart = '/**';
+        $this->docEnd = ' **/';
+        $this->docEmptyLine = " *";
+        $this->blockEnd = '}';
     }
 
 
@@ -89,7 +92,6 @@ class Ini {
             $this->docStart,
             " * $comment",
             $this->docEmptyLine,
-            $this->since10,
             $this->docEnd,
             'public static function init() {'
         ], 1);
@@ -125,7 +127,6 @@ class Ini {
         ClassDriver::a($cFile, $this->docStart, 1);
         ClassDriver::a($cFile, "     * Initialize system routes.");
         ClassDriver::a($cFile, $this->docEmptyLine, 1);
-        ClassDriver::a($cFile, $this->since10, 1);
         ClassDriver::a($cFile, $this->docEnd, 1);
         ClassDriver::a($cFile, "    public static function create() {");
         ClassDriver::a($cFile, "        //TODO: Add your own routes here.");

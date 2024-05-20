@@ -532,6 +532,7 @@ class App {
         self::$AU = AutoLoader::get();
 
         if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
+            Ini::createAppDirs();
             Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
@@ -542,7 +543,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-Beta.7');
+        define('WF_VERSION', '3.0.0-Beta.8');
         /**
          * A constant that tells the type of framework version.
          *
@@ -558,7 +559,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2024-05-13');
+        define('WF_RELEASE_DATE', '2024-05-20');
     }
 
     /**

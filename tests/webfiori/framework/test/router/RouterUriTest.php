@@ -18,6 +18,8 @@ class RouterUriTest extends TestCase {
         \webfiori\framework\middleware\MiddlewareManager::register(new \TestMiddleware());
         $uri->addMiddleware('global');
         $this->assertEquals(1, $uri->getMiddleware()->size());
+        $uri->addMiddleware('Super Cool Middleware');
+        $this->assertEquals(2, $uri->getMiddleware()->size());
         $this->assertFalse($uri->isDynamic());
     }
     /**

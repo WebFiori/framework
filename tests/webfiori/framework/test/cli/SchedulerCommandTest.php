@@ -446,4 +446,50 @@ class SchedulerCommandTest extends TestCase {
             "Check finished.",
         ], TasksManager::getLogArray());
     }
+    /**
+     * @test
+     */
+    public function test14() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            '5'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'scheduler',
+            '--force',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select one of the scheduled tasks to force:\n",
+            "0: Fail 1\n",
+            "1: Fail 2\n",
+            "2: Fail 3\n",
+            "3: Success Every Minute\n",
+            "4: Success 1\n",
+            "5: Cancel <--\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test15() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'Hell',
+            '5'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'scheduler',
+            '--force',
+            '--task-name="Rand"',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(-1, $runner->start());
+        $this->assertEquals([
+            "Error: No task was found which has the name 'Rand'\n",
+        ], $runner->getOutput());
+    }
 }

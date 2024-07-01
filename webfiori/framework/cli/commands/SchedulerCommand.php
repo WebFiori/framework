@@ -111,6 +111,10 @@ class SchedulerCommand extends CLICommand {
     }
     private function checkTaskArgs($taskName) {
         $task = TasksManager::getTask($taskName);
+        
+        if ($task === null) {
+            return;
+        }
         $args = $task->getExecArgsNames();
 
         if (count($args) != 0 && $this->confirm('Would you like to customize execution arguments?', false)) {

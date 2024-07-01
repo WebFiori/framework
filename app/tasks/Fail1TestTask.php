@@ -2,6 +2,7 @@
 namespace app\tasks;
 
 use webfiori\framework\scheduler\AbstractTask;
+use webfiori\framework\scheduler\TasksManager;
 /**
  * A background process which was created using the command "create".
  *
@@ -40,12 +41,14 @@ class Fail1TestTask extends AbstractTask {
      * Execute the process.
      */
     public function execute() {
+        TasksManager::logInfo('Task '.$this->getTaskName().' Is executing...');
         return false;
     }
     /**
      * Execute a set of instructions when the job failed to complete without errors.
      */
     public function onFail() {
+        TasksManager::logErr('Task '.$this->getTaskName().' Failed.');
     }
     /**
      * Execute a set of instructions when the job completed without errors.

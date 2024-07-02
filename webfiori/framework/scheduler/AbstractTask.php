@@ -1430,11 +1430,6 @@ abstract class AbstractTask implements JsonI {
                 }
                 return self::STEP_VAL;
             }
-            $retVal = self::INV_VAL;
-
-            if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
-                $retVal = self::STEP_VAL;
-            }
         }
 
         return $retVal;

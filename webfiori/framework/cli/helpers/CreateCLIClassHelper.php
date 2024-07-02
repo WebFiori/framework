@@ -55,18 +55,21 @@ class CreateCLIClassHelper extends CreateClassHelper {
         $addToMore = true;
 
         while ($addToMore) {
-            $argArr = [];
-            $groupName = $this->getInput('Enter argument name:');
+            $argObj = new \webfiori\cli\Argument();
+            $argName = $this->getInput('Enter argument name:');
 
-            if (strlen($groupName) > 0) {
-                $argArr['name'] = $groupName;
+            if (!$argObj->setName($argName)) {
+                $this->error('Invalid name provided.');
+                continue;
             }
-            $argArr['description'] = $this->getInput('Describe this argument and how to use it:', '');
-            $argArr['values'] = $this->getFixedValues();
-            $argArr['optional'] = $this->confirm('Is this argument optional or not?', true);
-            $argArr['default'] = $this->getInput('Enter default value:');
+            $argObj->setDescription($this->getInput('Describe this argument and how to use it:', ''));
+            foreach ($this->getFixedValues() as $v) {
+                $argObj->addAllowedValue($v);
+            }
+            $argObj->setIsOptional($this->confirm('Is this argument optional or not?', true));
+            $argObj->setDefault($this->getInput('Enter default value:').'');
 
-            $argsArr[] = $argArr;
+            $argsArr[] = $argObj;
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
 

@@ -182,6 +182,7 @@ abstract class AbstractTask implements JsonI {
         $this->taskDetails['days-of-month'] = [];
         $this->taskDetails['months'] = [];
         $this->taskDetails['days-of-week'] = [];
+        
 
 
         if (!$this->cron($when)) {
@@ -376,6 +377,17 @@ abstract class AbstractTask implements JsonI {
         }
 
         return false;
+    }
+    /**
+     * Schedule a task to run every specific number of minutes.
+     * 
+     * Assuming that 5 is supplied as a value, this means that the job will be
+     * executed every 5 minutes within an hour.
+     * 
+     * @param int $step The number of minutes that a job will be executed after.
+     */
+    public function everyXMinuts(int $step) {
+        $this->cron('*/'.$step.' * * * *');
     }
     /**
      * Execute the event which should run when it is time to execute the task.
@@ -1388,12 +1400,12 @@ abstract class AbstractTask implements JsonI {
         $retVal = self::ANY_VAL;
 
         if ($expr != '*') {
-            $split = explode('/', $expr);
-            $count = count($split);
+            $split0 = explode('/', $expr);
+            $count = count($split0);
 
             if (!($count == 2)) {
-                $split = explode('-', $expr);
-                $count = count($split);
+                $split0 = explode('-', $expr);
+                $count = count($split0);
 
                 if (!($count == 2)) {
                     $retVal = self::SPECIFIC_VAL;
@@ -1406,16 +1418,17 @@ abstract class AbstractTask implements JsonI {
                 }
                 $retVal = self::RANGE_VAL;
 
-                if (!(strlen($split[0]) != 0 && strlen($split[1]) != 0)) {
+                if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
                     $retVal = self::INV_VAL;
                 }
 
                 return $retVal;
-            }
-            $retVal = self::INV_VAL;
-
-            if (!(strlen($split[0]) != 0 && strlen($split[1]) != 0)) {
-                $retVal = self::STEP_VAL;
+            } else {
+                //Step val
+                if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
+                    return self::INV_VAL;
+                }
+                return self::STEP_VAL;
             }
         }
 
@@ -1507,8 +1520,14 @@ abstract class AbstractTask implements JsonI {
         TasksManager::log('Line: '.$ex->getLine());
         TasksManager::log('Stack Trace:');
         $index = 0;
-
-        foreach ($ex->getTrace() as $traceEntry) {
+        $trace = debug_backtrace();
+        $firstEntry = $ex->getTrace()[0];
+        $firstEntry['line'] = $ex->getLine();
+        $e = new TraceEntry($firstEntry);
+        TasksManager::log('#'.$index.' '.$e);
+        $index++;
+        
+        foreach ($trace as $traceEntry) {
             $e = new TraceEntry($traceEntry);
             TasksManager::log('#'.$index.' '.$e);
             $index++;

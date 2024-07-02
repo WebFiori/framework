@@ -182,6 +182,8 @@ class CreateTaskTest extends CreateTestCase {
             'end',
             'End date of the report.',
             '2021-07-07',
+            'y',
+            '',
             'n'
         ]);
 
@@ -202,6 +204,9 @@ class CreateTaskTest extends CreateTestCase {
             "Enter argument name:\n",
             "Describe the use of the argument: Enter = ''\n",
             "Default value: Enter = ''\n",
+            "Would you like to add more arguments?(y/N)\n",
+            "Enter argument name:\n",
+            "Error: Invalid argument name: <empty string>\n",
             "Would you like to add more arguments?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $runner->getOutput());

@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
+use webfiori\cli\CLICommand;
 use webfiori\framework\writers\CLICommandClassWriter;
 
 class CLICommandClassWriterTest extends TestCase {
@@ -34,18 +35,36 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('Lets-Do-It', $writer->getCommandName());
         $this->assertFalse($writer->setClassName('Invalid Name'));
         $this->assertFalse($writer->setClassName('   '));
-        $this->assertTrue($writer->setClassName('DoItCommand'));
-        $this->assertEquals('DoItCommand', $writer->getName());
-        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'DoItCommand.php', $writer->getAbsolutePath());
+        $this->assertTrue($writer->setClassName('DoItXCommand'));
+        $this->assertEquals('DoItXCommand', $writer->getName());
+        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'DoItXCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
         $this->assertEquals('Lets-Do-It', $writer->getCommandName());
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
+        $writer->setArgs([
+            new \webfiori\cli\Argument('--do', 'A do arg', true)
+        ]);
+        $this->assertEquals('', $writer->getDescription());
+        $writer->setCommandDescription('Random desc');
+        $this->assertEquals('Random desc', $writer->getDescription());
         $this->assertEquals([
             'webfiori\cli\CLICommand'
         ], $writer->getUseStatements());
         $writer->writeClass();
-        $this->assertTrue(class_exists($writer->getNamespace().'\\'.$writer->getName()));
+        $clazz = $writer->getNamespace().'\\'.$writer->getName();
+        $this->assertTrue(class_exists($clazz));
         $writer->removeClass();
+        $clazzObj = new $clazz();
+        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertEquals('Lets-Do-It', $clazzObj->getName());
+        $this->assertEquals('Random desc', $clazzObj->getDescription());
+        $this->assertEquals([
+            '--do'
+        ], $clazzObj->getArgsNames());
+        $arg = $clazzObj->getArg('--do');
+        $this->assertTrue($arg instanceof \webfiori\cli\Argument);
+        $this->assertEquals('A do arg', $arg->getDescription());
+        $this->assertTrue($arg->isOptional());
     }
 }

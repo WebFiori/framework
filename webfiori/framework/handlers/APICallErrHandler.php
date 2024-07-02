@@ -19,7 +19,8 @@ use webfiori\json\Json;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
  *
- * This handler is also used to handle startup exceptions.
+ * This handler is also used to handle startup exceptions. The priority of the handler
+ * is set to 0 which indicates that it will be executed last.
  *
  * @author Ibrahim
  */
@@ -32,6 +33,7 @@ class APICallErrHandler extends AbstractHandler {
     public function __construct() {
         parent::__construct();
         $this->setName('API Call Errors Handler');
+        
     }
     /**
      * Handles the exception

@@ -125,7 +125,9 @@ class SchedulerCommandTest extends TestCase {
             "Forcing task 'Fail 1' to execute...\n",
             "Active task: \"Fail 1\" ...\n",
             "Calling the method app\\tasks\Fail1TestTask::execute()\n",
+            "Info: Task Fail 1 Is executing...\n",
             "Calling the method app\\tasks\Fail1TestTask::onFail()\n",
+            "Error: Task Fail 1 Failed.\n",
             "Calling the method app\\tasks\Fail1TestTask::afterExec()\n",
             "Check finished.\n",
             "Total number of tasks: 5\n",
@@ -170,21 +172,22 @@ class SchedulerCommandTest extends TestCase {
             "Thrown in: Fail2TestTask\n",
             "Line: 44\n",
             "Stack Trace:\n",
-            "#0 At class app\\tasks\Fail2TestTask line 1083\n",
-            "#1 At class webfiori\\framework\scheduler\AbstractTask line 406\n",
-            "#2 At class webfiori\\framework\scheduler\AbstractTask line 903\n",
-            "#3 At class webfiori\\framework\scheduler\TasksManager line 625\n",
-            "#4 At class webfiori\\framework\scheduler\TasksManager line 135\n",
-            "#5 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
-            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
-            "#7 At class webfiori\\cli\CLICommand line 409\n",
-            "#8 At class webfiori\\cli\Runner line 684\n",
-            "#9 At class webfiori\\cli\Runner line 615\n",
-            "#10 At class webfiori\cli\Runner line 154\n",
+            "#0 At class app\\tasks\Fail2TestTask line 44\n",
+            "#1 At class webfiori\\framework\scheduler\AbstractTask line 1097\n",
+            "#2 At class webfiori\\framework\scheduler\AbstractTask line 418\n",
+            "#3 At class webfiori\\framework\scheduler\AbstractTask line 951\n",
+            "#4 At class webfiori\\framework\scheduler\TasksManager line 673\n",
+            "#5 At class webfiori\\framework\scheduler\TasksManager line 139\n",
+            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
+            "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
+            "#8 At class webfiori\\cli\CLICommand line 409\n",
+            "#9 At class webfiori\\cli\Runner line 684\n",
+            "#10 At class webfiori\\cli\Runner line 615\n",
+            "#11 At class webfiori\cli\Runner line 156\n",
             "Skip"];
         $actual = $runner->getOutput();
         $idx = 0;
-
+        
         foreach ($expected as $item) {
             if ($item == 'Skip') {
                 break;
@@ -443,5 +446,51 @@ class SchedulerCommandTest extends TestCase {
             "Calling the method app\\tasks\SuccessTestTask::afterExec()",
             "Check finished.",
         ], TasksManager::getLogArray());
+    }
+    /**
+     * @test
+     */
+    public function test14() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            '5'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'scheduler',
+            '--force',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Select one of the scheduled tasks to force:\n",
+            "0: Fail 1\n",
+            "1: Fail 2\n",
+            "2: Fail 3\n",
+            "3: Success Every Minute\n",
+            "4: Success 1\n",
+            "5: Cancel <--\n",
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test15() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'Hell',
+            '5'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'scheduler',
+            '--force',
+            '--task-name="Rand"',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(-1, $runner->start());
+        $this->assertEquals([
+            "Error: No task was found which has the name 'Rand'\n",
+        ], $runner->getOutput());
     }
 }

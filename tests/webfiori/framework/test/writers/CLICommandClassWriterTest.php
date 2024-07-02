@@ -35,9 +35,9 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('Lets-Do-It', $writer->getCommandName());
         $this->assertFalse($writer->setClassName('Invalid Name'));
         $this->assertFalse($writer->setClassName('   '));
-        $this->assertTrue($writer->setClassName('DoItCommand'));
-        $this->assertEquals('DoItCommand', $writer->getName());
-        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'DoItCommand.php', $writer->getAbsolutePath());
+        $this->assertTrue($writer->setClassName('DoItXCommand'));
+        $this->assertEquals('DoItXCommand', $writer->getName());
+        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'DoItXCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
         $this->assertEquals('Lets-Do-It', $writer->getCommandName());
         $this->assertEquals('', $writer->getDescription());

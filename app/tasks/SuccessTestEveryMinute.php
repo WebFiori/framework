@@ -2,6 +2,7 @@
 namespace app\tasks;
 
 use webfiori\framework\scheduler\AbstractTask;
+use webfiori\framework\scheduler\TasksManager;
 /**
  * A background process which was created using the command "create".
  *
@@ -49,6 +50,7 @@ class SuccessTestEveryMinute extends AbstractTask {
      * Execute the process.
      */
     public function execute() {
+        TasksManager::logErr('Task '.$this->getTaskName().' Successfully completed.');
         //TODO: Write the code that represents the process.
     }
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\test\scheduler;
 
+use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\scheduler\BaseTask;
@@ -140,7 +141,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'\'.');
         $task = new BaseTask('');
     }
@@ -155,7 +156,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor05() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'0-5,7,15,60 0-4,8 * * *\'.');
         $task = new BaseTask('0-5,7,15,60 0-4,8 * * *');
     }
@@ -163,7 +164,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor06() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'0-5,7,15 0-4,24,8 * * *\'.');
         $task = new BaseTask('0-5,7,15 0-4,24,8 * * *');
     }
@@ -202,7 +203,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor08() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'*/15,*/20,30-35 */2 */3,6,9 jan-mar 0,mon,3-6\'.');
         $task = new BaseTask('*/15,*/20,30-35 */2 */3,6,9 jan-mar 0,mon,3-6');
     }
@@ -210,7 +211,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor09() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'*/15,*/20,30-35 */2 * */3 0,mon,3-6\'.');
         $task = new BaseTask('*/15,*/20,30-35 */2 * */3 0,mon,3-6');
     }
@@ -218,7 +219,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor10() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'*/15,*/20,30-35 */2 * * */3\'.');
         $task = new BaseTask('*/15,*/20,30-35 */2 * * */3');
     }
@@ -226,7 +227,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor11() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5,a * * * *\'');
         $task = new BaseTask('5,a * * * *');
     }
@@ -234,7 +235,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor12() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5, * * * *\'.');
         $task = new BaseTask('5, * * * *');
     }
@@ -242,7 +243,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor13() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5-0 * * * *\'.');
         $task = new BaseTask('5-0 * * * *');
     }
@@ -250,7 +251,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor14() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'60-60 * * * *\'.');
         $task = new BaseTask('60-60 * * * *');
     }
@@ -258,7 +259,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor15() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5-60 * * * *\'.');
         $task = new BaseTask('5-60 * * * *');
     }
@@ -266,7 +267,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor16() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 15,a * * *\'');
         $task = new BaseTask('* 15,a * * *');
     }
@@ -274,7 +275,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor17() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 7, * * *\'.');
         $task = new BaseTask('* 7, * * *');
     }
@@ -282,7 +283,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor18() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 23-9 * * *\'.');
         $task = new BaseTask('* 23-9 * * *');
     }
@@ -290,7 +291,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor19() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'24-24 * * * *\'.');
         $task = new BaseTask('24-24 * * * *');
     }
@@ -298,7 +299,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor20() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 5-24 * * *\'.');
         $task = new BaseTask('* 5-24 * * *');
     }
@@ -306,7 +307,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor21() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 1-32 * *\'.');
         $task = new BaseTask('* * 1-32 * *');
     }
@@ -314,7 +315,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor22() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 0-30 * *\'.');
         $task = new BaseTask('* * 0-30 * *');
     }
@@ -322,7 +323,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor23() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 30-30 * *\'.');
         $task = new BaseTask('* * 30-30 * *');
     }
@@ -330,7 +331,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor24() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 20-10 * *\'.');
         $task = new BaseTask('* * 20-10 * *');
     }
@@ -338,7 +339,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor25() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 20, * *\'.');
         $task = new BaseTask('* * 20, * *');
     }
@@ -346,7 +347,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor26() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 20,a * *\'.');
         $task = new BaseTask('* * 20,a * *');
     }
@@ -354,7 +355,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor27() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 5-c * * *\'.');
         $task = new BaseTask('* 5-c * * *');
     }
@@ -362,7 +363,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testConstructor28() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5-a * * * *\'.');
         $task = new BaseTask('5-a * * * *');
     }
@@ -540,7 +541,7 @@ class SchedulerTaskTest extends TestCase {
         $job = new BaseTask();
         $job->setOnExecution(function()
         {
-            throw new \Exception();
+            throw new Exception();
         });
         $job->exec();
         $this->assertFalse($job->isSuccess());
@@ -573,7 +574,7 @@ class SchedulerTaskTest extends TestCase {
         });
         $job->setOnFailure(function()
         {
-            throw new \Exception();
+            throw new Exception();
         });
         $r = $job->exec();
         $this->assertFalse($r);
@@ -999,7 +1000,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager00() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'\'.');
         $task = new BaseTask('');
     }
@@ -1007,7 +1008,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager01() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'11-100 * * * *\'.');
         $task = new BaseTask('11-100 * * * *');
     }
@@ -1015,7 +1016,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager02() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'*/60 * * * *\'.');
         $task = new BaseTask('*/60 * * * *');
     }
@@ -1023,7 +1024,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager03() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 15-24 * * *\'.');
         $task = new BaseTask('* 15-24 * * *');
     }
@@ -1031,7 +1032,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager04() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* */24 * * *\'.');
         $task = new BaseTask('* */24 * * *');
     }
@@ -1039,7 +1040,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager05() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * 25-37 * *\'.');
         $task = new BaseTask('* * 25-37 * *');
     }
@@ -1047,7 +1048,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager06() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-13 *\'.');
         $task = new BaseTask('* * * 12-13 *');
     }
@@ -1055,7 +1056,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager07() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * 13 *\'.');
         $task = new BaseTask('* * * 13 *');
     }
@@ -1063,7 +1064,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager08() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * 12-1 *\'.');
         $task = new BaseTask('* * * 12-1 *');
     }
@@ -1071,7 +1072,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager09() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * 5-16 *\'.');
         $task = new BaseTask('* * * 5-16 *');
     }
@@ -1079,7 +1080,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager10() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
         $task = new BaseTask('* * * * 0-7');
     }
@@ -1087,7 +1088,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager11() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * * 0-7\'.');
         $task = new BaseTask('* * * * 0-7');
     }
@@ -1102,7 +1103,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager13() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * * 7\'.');
         $task = new BaseTask('* * * * 7');
     }
@@ -1110,7 +1111,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager14() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
         $task = new BaseTask('40-30 * * * *');
     }
@@ -1118,7 +1119,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager15() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'40-30 * * * *\'.');
         $task = new BaseTask('40-30 * * * *');
     }
@@ -1126,7 +1127,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager16() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* * * * 1,2,7,8\'.');
         $task = new BaseTask('* * * * 1,2,7,8');
     }
@@ -1134,7 +1135,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager17() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 23-8 * * *\'.');
         $task = new BaseTask('* 23-8 * * *');
     }
@@ -1142,7 +1143,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager18() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 0-13,14,24 * * *\'.');
         $task = new BaseTask('* 0-13,14,24 * * *');
     }
@@ -1150,7 +1151,7 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testTasksManager19() {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'* 0-13 * 5,6,13 *\'.');
         $task = new BaseTask('* 0-13 * 5,6,13 *');
     }
@@ -1224,5 +1225,25 @@ class SchedulerTaskTest extends TestCase {
         $this->assertFalse($job->weeklyOn('0','23:60'));
         $this->assertFalse($job->weeklyOn('0','24:00'));
         $this->assertTrue($job->weeklyOn('0','00:00'));
+    }
+    /**
+     * @test
+     */
+    public function testEveryXMinute00() {
+        $task = new BaseTask();
+        $task->everyXMinuts(5);
+        $this->assertEquals('*/5 * * * *', $task->getExpression());
+ 
+        TasksManager::setDayOfMonth(15);
+        TasksManager::setHour(23);
+        TasksManager::setMonth(5);
+        TasksManager::setMinute(33);
+        $this->assertEquals('05-15 23:33', TasksManager::getTimestamp());
+        $this->assertTrue($task->isDayOfWeek());
+        $this->assertFalse($task->isMinute());
+        $this->assertTrue($task->isHour());
+        $this->assertTrue($task->isMonth());
+        $this->assertTrue($task->isDayOfMonth());
+        
     }
 }

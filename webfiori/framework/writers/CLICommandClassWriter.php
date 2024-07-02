@@ -157,8 +157,8 @@ class CLICommandClassWriter extends ClassWriter {
             $topArr[] = ' * In addition, the command have the following args:';
             $topArr[] = ' * <ul>';
 
-            foreach ($this->args as $argArr) {
-                $topArr[] = " * <li>".$argArr['name']."</li>";
+            foreach ($this->args as $argObj) {
+                $topArr[] = " * <li>".$argObj->getName()."</li>";
             }
             $topArr[] = ' * </ul>';
         }
@@ -180,18 +180,19 @@ class CLICommandClassWriter extends ClassWriter {
         if (count($this->args) > 0) {
             $this->append(["parent::__construct('$this->name', ["], 2);
 
-            foreach ($this->args as $argArr) {
-                $this->append("'".$argArr['name']."' => [", 3);
-
-                if (strlen($argArr['description']) != 0) {
-                    $this->append("'description' => '".str_replace("'", "\'", $argArr['description'])."',", 4);
+            foreach ($this->args as $argObj) {
+                
+                $this->append("'".$argObj->getName()."' => [", 3);
+                
+                if (strlen($argObj->getDescription()) != 0) {
+                    $this->append("'description' => '".str_replace("'", "\'", $argObj->getDescription())."',", 4);
                 }
-                $this->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
+                $this->append("'optional' => ".($argObj->isOptional() ? 'true' : 'false').",", 4);
 
-                if (count($argArr['values']) != 0) {
+                if (count($argObj->getAllowedValues()) != 0) {
                     $this->append("'values' => [", 4);
 
-                    foreach ($argArr['values'] as $val) {
+                    foreach ($argObj->getAllowedValues() as $val) {
                         $this->append("'".str_replace("'", "\'", $val)."',", 5);
                     }
                     $this->append("]", 4);
@@ -200,7 +201,7 @@ class CLICommandClassWriter extends ClassWriter {
             }
             $this->append("], '".str_replace("'", "\'", $this->desc)."');", 2);
         } else {
-            $this->append("parent::__construct('$this->name', '".str_replace("'", "\'", $this->desc)."');", 2);
+            $this->append("parent::__construct('$this->name', [], '".str_replace("'", "\'", $this->desc)."');", 2);
         }
 
         $this->append('}', 1);

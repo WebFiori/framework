@@ -479,15 +479,63 @@ class TasksManager {
      *
      * @param string $message A string that act as a log message. It will be
      * appended as passed without any changes.
-     *
+     * 
+     * @param string $type The type of the message that will be logged. It can
+     * be one of the following values:
+     * <ul>
+     * <li>none</li>
+     * <li>error</li>
+     * <li>success</li>
+     * <li>info</li>
+     * </ul>
+     * Default is 'none'.
+     * 
      * @since 1.0.8
      */
-    public static function log(string $message) {
+    public static function log(string $message, string $type = 'none') {
         self::get()->logsArray[] = $message;
 
         if (self::get()->command !== null && self::get()->command->isArgProvided('--show-log')) {
-            self::get()->command->println("%s", $message);
+            if ($type == 'success') {
+                self::get()->command->success($message);
+            } else if ($type == 'error') {
+                self::get()->command->error($message);
+            } else if ($type == 'info') {
+                self::get()->command->info($message);
+            } else {
+                self::get()->command->println("%s", $message);
+            }
         }
+    }
+    /**
+     * Appends a message to the array that contains logged messages.
+     * 
+     * @param string $msg A string that act as a log message. It will be
+     * appended as passed without any changes. Note that if running in CLI,
+     * this will appear as a success message
+     */
+    public static function logSuccess(string $msg) {
+        self::log($msg, 'success');
+    }
+    /**
+     * Appends a message to the array that contains logged messages.
+     * 
+     * @param string $msg A string that act as a log message. It will be
+     * appended as passed without any changes. Note that if running in CLI,
+     * this will appear as a info message
+     */
+    public static function logInfo(string $msg) {
+        self::log($msg, 'info');
+    }
+    /**
+     * Appends a message to the array that contains logged messages.
+     * 
+     * @param string $msg A string that act as a log message. It will be
+     * appended as passed without any changes. Note that if running in CLI,
+     * this will appear as a error message
+     */
+    public static function logErr(string $msg) {
+        self::log($msg, 'error');
     }
     /**
      * Create a task that will be executed once every month.

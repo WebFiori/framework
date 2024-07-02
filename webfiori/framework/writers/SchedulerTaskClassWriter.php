@@ -25,6 +25,9 @@ class SchedulerTaskClassWriter extends ClassWriter {
     /**
      * Creates new instance of the class.
      *
+     * @param string $className The name of the class that will represent the
+     * task.
+     * 
      * @param string $taskName The name of the task.
      *
      * @param string $taskDesc A short description that description what does the
@@ -33,8 +36,8 @@ class SchedulerTaskClassWriter extends ClassWriter {
      * @param array $argsArr An associative array that holds any arguments that
      * the task needs.
      */
-    public function __construct($taskName = '', $taskDesc = '', array $argsArr = []) {
-        parent::__construct('NewTask', APP_PATH.'tasks', APP_DIR.'\\tasks');
+    public function __construct(string $className = 'NewTask', $taskName = '', $taskDesc = '', array $argsArr = []) {
+        parent::__construct($className, APP_PATH.'tasks', APP_DIR.'\\tasks');
         $this->task = new BaseTask();
 
         if (!$this->setTaskName($taskName)) {
@@ -44,6 +47,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
         if (!$this->setTaskDescription($taskDesc)) {
             $this->setTaskDescription('No Description');
         }
+        $this->getTask()->setDescription($this->getTaskDescription());
 
         foreach ($argsArr as $taskArg) {
             $this->addArgument($taskArg);

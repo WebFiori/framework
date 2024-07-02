@@ -172,21 +172,22 @@ class SchedulerCommandTest extends TestCase {
             "Thrown in: Fail2TestTask\n",
             "Line: 44\n",
             "Stack Trace:\n",
-            "#0 At class app\\tasks\Fail2TestTask line 1083\n",
-            "#1 At class webfiori\\framework\scheduler\AbstractTask line 406\n",
-            "#2 At class webfiori\\framework\scheduler\AbstractTask line 903\n",
-            "#3 At class webfiori\\framework\scheduler\TasksManager line 625\n",
-            "#4 At class webfiori\\framework\scheduler\TasksManager line 135\n",
-            "#5 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
-            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
-            "#7 At class webfiori\\cli\CLICommand line 409\n",
-            "#8 At class webfiori\\cli\Runner line 684\n",
-            "#9 At class webfiori\\cli\Runner line 615\n",
-            "#10 At class webfiori\cli\Runner line 154\n",
+            "#0 At class app\\tasks\Fail2TestTask line 44\n",
+            "#1 At class webfiori\\framework\scheduler\AbstractTask line 1097\n",
+            "#2 At class webfiori\\framework\scheduler\AbstractTask line 418\n",
+            "#3 At class webfiori\\framework\scheduler\AbstractTask line 951\n",
+            "#4 At class webfiori\\framework\scheduler\TasksManager line 673\n",
+            "#5 At class webfiori\\framework\scheduler\TasksManager line 139\n",
+            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
+            "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
+            "#8 At class webfiori\\cli\CLICommand line 409\n",
+            "#9 At class webfiori\\cli\Runner line 684\n",
+            "#10 At class webfiori\\cli\Runner line 615\n",
+            "#11 At class webfiori\cli\Runner line 156\n",
             "Skip"];
         $actual = $runner->getOutput();
         $idx = 0;
-
+        var_dump($actual);
         foreach ($expected as $item) {
             if ($item == 'Skip') {
                 break;

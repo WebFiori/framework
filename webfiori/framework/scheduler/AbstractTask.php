@@ -1525,8 +1525,14 @@ abstract class AbstractTask implements JsonI {
         TasksManager::log('Line: '.$ex->getLine());
         TasksManager::log('Stack Trace:');
         $index = 0;
-
-        foreach ($ex->getTrace() as $traceEntry) {
+        $trace = debug_backtrace();
+        $firstEntry = $ex->getTrace()[0];
+        $firstEntry['line'] = $ex->getLine();
+        $e = new TraceEntry($firstEntry);
+        TasksManager::log('#'.$index.' '.$e);
+        $index++;
+        
+        foreach ($trace as $traceEntry) {
             $e = new TraceEntry($traceEntry);
             TasksManager::log('#'.$index.' '.$e);
             $index++;

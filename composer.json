@@ -21,7 +21,7 @@
         "webfiori/http":"v3.3.11",
         "webfiori/file":"v1.3.6",
         "webfiori/jsonx":"v3.3.0",
-        "webfiori/ui":"v2.6.1",
+        "webfiori/ui":"v2.6.3",
         "webfiori/collections":"v1.1.4",
         "webfiori/database":"v0.8.10",
         "webfiori/cli":"v1.2.2",

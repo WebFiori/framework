@@ -643,6 +643,50 @@ class AutoLoader {
 
         return $loaded;
     }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     *
+     * @param string $ns A string to be validated.
+     *
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) {
+        if ($ns == '\\') {
+            return true;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    private function createNSFromPath(string $filePath, string $className) {
+        $split = explode(DIRECTORY_SEPARATOR, $filePath);
+        $nsArr = [];
+        $currentNs = '';
+        foreach ($split as $str) {
+            if (self::isValidNamespace($str)) {
+                $currentNs .= '\\'.$str;
+            }
+            $nsArr[] = $currentNs;
+        }
+        return $nsArr;
+    }
     private function loadFromCache($classNS, $className): bool {
         $loaded = false;
 

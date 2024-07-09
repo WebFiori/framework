@@ -17,6 +17,7 @@ use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
+use webfiori\framework\autoload\AutoLoader;
 use webfiori\framework\config\ConfigurationDriver;
 use webfiori\framework\config\Controller;
 use webfiori\framework\exceptions\InitializationException;
@@ -526,8 +527,8 @@ class App {
         /**
          * Initialize autoloader.
          */
-        if (!class_exists('webfiori\framework\AutoLoader',false)) {
-            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'AutoLoader.php';
+        if (!class_exists('webfiori\framework\autoload\AutoLoader',false)) {
+            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
 

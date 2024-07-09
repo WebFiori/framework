@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace webfiori\framework\autoload;
 
 use Exception;
 use webfiori\framework\autoload\ClassInfo;
@@ -115,8 +115,8 @@ class AutoLoader {
         $this->searchFolders = [];
         $this->cacheArr = [];
         $this->loadedClasses = [];
-        require_once 'exceptions'.DIRECTORY_SEPARATOR.'ClassLoaderException.php';
-
+        require_once 'ClassLoaderException.php';
+        require_once 'ClassInfo.php';
         if (defined('ROOT_PATH')) {
             $this->rootDir = ROOT_PATH;
         } else if (strlen($root) != 0 && is_dir($root)) {

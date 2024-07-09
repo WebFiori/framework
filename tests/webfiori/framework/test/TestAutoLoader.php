@@ -2,7 +2,7 @@
 namespace webfiori\framework\test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\AutoLoader;
+use webfiori\framework\autoload\AutoLoader;
 /**
  * Description of TestAutoLoader
  *

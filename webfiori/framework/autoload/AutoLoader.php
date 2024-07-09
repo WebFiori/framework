@@ -154,7 +154,19 @@ class AutoLoader {
         }
         $this->loadedClasses[] = [
             ClassInfo::NAME => 'AutoLoader',
-            ClassInfo::NS => 'webfiori\\framework',
+            ClassInfo::NS => substr(self::class, 0, strlen(self::class) - strlen('AutoLoader') - 1),
+            ClassInfo::PATH => __DIR__,
+            ClassInfo::CACHED => false
+        ];
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => 'ClassInfo',
+            ClassInfo::NS => substr(ClassInfo::class, 0, strlen(ClassInfo::class) - strlen('ClassInfo') - 1),
+            ClassInfo::PATH => __DIR__,
+            ClassInfo::CACHED => false
+        ];
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => 'ClassLoaderException',
+            ClassInfo::NS => substr(ClassLoaderException::class, 0, strlen(ClassLoaderException::class) - strlen('ClassLoaderException') - 1),
             ClassInfo::PATH => __DIR__,
             ClassInfo::CACHED => false
         ];

@@ -19,7 +19,7 @@ class TestAutoLoader extends TestCase {
      * @test
      */
     public function test01() {
-        $cArr = explode('\\', 'webfiori\\entity\\AutoLoader');
+        $cArr = explode('\\', 'webfiori\\framework\\autoload\\AutoLoader');
         $className = $cArr[count($cArr) - 1];
         $classNs = implode('\\', array_slice($cArr, 0, count($cArr) - 1));
 

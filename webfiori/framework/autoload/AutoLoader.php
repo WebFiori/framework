@@ -633,10 +633,10 @@ class AutoLoader {
         if (!$isFileLoaded && file_exists($f)) {
             $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
             $this->loadedClasses[] = [
-                self::$CLASS_INDICES[0] => $className,
-                self::$CLASS_INDICES[1] => $ns,
-                self::$CLASS_INDICES[2] => $f,
-                self::$CLASS_INDICES[3] => false
+                ClassInfo::NAME => $className,
+                ClassInfo::NS => $ns,
+                ClassInfo::PATH => $f,
+                ClassInfo::CACHED => false
             ];
             $loaded = true;
         }

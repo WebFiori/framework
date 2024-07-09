@@ -643,14 +643,19 @@ class AutoLoader {
         $isFileLoaded = in_array($f, $allPaths);
 
         if (!$isFileLoaded && file_exists($f)) {
-            $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
-            $this->loadedClasses[] = [
-                ClassInfo::NAME => $className,
-                ClassInfo::NS => $ns,
-                ClassInfo::PATH => $f,
-                ClassInfo::CACHED => false
-            ];
-            $loaded = true;
+            $nsFromPath = $this->createNSFromPath($f, $className);
+            
+            if (in_array('\\'.$classWithNs, $nsFromPath)) {
+                require_once $f;
+                $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
+                $this->loadedClasses[] = [
+                    ClassInfo::NAME => $className,
+                    ClassInfo::NS => $ns,
+                    ClassInfo::PATH => $f,
+                    ClassInfo::CACHED => false
+                ];
+                $loaded = true;
+            }
         }
 
         return $loaded;
@@ -693,9 +698,27 @@ class AutoLoader {
         $currentNs = '';
         foreach ($split as $str) {
             if (self::isValidNamespace($str)) {
-                $currentNs .= '\\'.$str;
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = $currentNs.'\\'.$str;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
             }
-            $nsArr[] = $currentNs;
+            
+        }
+        $currentNs = '';
+        for ($x = count($split) - 1 ; $x > -1 ; $x--) {
+            $str = $split[$x];
+            if (self::isValidNamespace($str)) {
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = '\\'.$str.$currentNs;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
+            }
+            
         }
         return $nsArr;
     }

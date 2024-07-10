@@ -694,7 +694,7 @@ class AutoLoader {
     }
     private function createNSFromPath(string $filePath, string $className) {
         $split = explode(DIRECTORY_SEPARATOR, $filePath);
-        $nsArr = [];
+        $nsArr = ['\\'.$className];
         $currentNs = '';
         foreach ($split as $str) {
             if (self::isValidNamespace($str)) {

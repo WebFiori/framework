@@ -17,6 +17,7 @@ use webfiori\cli\Runner;
 use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
+use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\ConfigurationDriver;
 use webfiori\framework\config\Controller;
 use webfiori\framework\exceptions\InitializationException;
@@ -63,7 +64,7 @@ class App {
     /**
      * An instance of autoloader class.
      *
-     * @var AutoLoader
+     * @var ClassLoader
      *
      * @since 1.0
      */
@@ -247,13 +248,13 @@ class App {
         }
     }
     /**
-     * Returns a reference to an instance of 'AutoLoader'.
+     * Returns a reference to an instance of 'ClassLoader'.
      *
-     * @return AutoLoader A reference to an instance of 'AutoLoader'.
+     * @return ClassLoader A reference to an instance of 'ClassLoader'.
      *
      * @since 1.2.1
      */
-    public static function getAutoloader(): AutoLoader {
+    public static function getClassLoader(): ClassLoader {
         return self::$AU;
     }
     /**
@@ -526,10 +527,10 @@ class App {
         /**
          * Initialize autoloader.
          */
-        if (!class_exists('webfiori\framework\AutoLoader',false)) {
-            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'AutoLoader.php';
+        if (!class_exists('webfiori\framework\autoload\ClassLoader',false)) {
+            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
         }
-        self::$AU = AutoLoader::get();
+        self::$AU = ClassLoader::get();
 
         if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
             Ini::createAppDirs();
@@ -543,7 +544,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-Beta.9');
+        define('WF_VERSION', '3.0.0-Beta.10');
         /**
          * A constant that tells the type of framework version.
          *
@@ -559,7 +560,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2024-07-09');
+        define('WF_RELEASE_DATE', '2024-07-11');
     }
 
     /**

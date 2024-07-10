@@ -2,6 +2,8 @@
 namespace webfiori\framework\test\router;
 
 use PHPUnit\Framework\TestCase;
+use TestMiddleware;
+use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 /**
@@ -15,7 +17,7 @@ class RouterUriTest extends TestCase {
      */
     public function testAddToMiddleware00() {
         $uri = new RouterUri('https://www3.programmingacademia.com:80/test', '');
-        \webfiori\framework\middleware\MiddlewareManager::register(new \TestMiddleware());
+        MiddlewareManager::register(new TestMiddleware());
         $uri->addMiddleware('global');
         $this->assertEquals(1, $uri->getMiddleware()->size());
         $uri->addMiddleware('Super Cool Middleware');

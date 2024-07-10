@@ -2,10 +2,10 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
-use SessionStatus;
 use webfiori\file\File;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\Session;
+use webfiori\framework\session\SessionStatus;
 /**
  * Description of SessionTest
  *

@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework\session;
 
-use SessionStatus;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\http\HttpCookie;

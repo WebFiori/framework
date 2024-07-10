@@ -8,10 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace webfiori\framework\autoload;
 
 use Exception;
-use webfiori\framework\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
  *
@@ -27,7 +26,7 @@ use webfiori\framework\exceptions\ClassLoaderException;
  *
  * @version 1.1.7
  */
-class AutoLoader {
+class ClassLoader {
     /**
      * The name of the file that represents autoloader's cache.
      * @var string
@@ -59,26 +58,6 @@ class AutoLoader {
      */
     private $cacheArr;
     /**
-     * An array that contains the names of indices that are used by loaded class
-     * info array.
-     *
-     * The array have the following indices:
-     * <ul>
-     * <li>class-name</li>
-     * <li>namespace</li>
-     * <li>path</li>
-     * <li>loaded-from-cache</li>
-     * </ul>
-     *
-     * @var array
-     */
-    private static $CLASS_INDICES = [
-        'class-name',
-        'namespace',
-        'path',
-        'loaded-from-cache'
-    ];
-    /**
      * An array that contains the names of all loaded class.
      *
      * @var array
@@ -87,9 +66,9 @@ class AutoLoader {
      */
     private $loadedClasses;
     /**
-     * A single instance of the class 'AutoLoader'.
+     * A single instance of the class 'ClassLoader'.
      *
-     * @var AutoLoader
+     * @var ClassLoader
      *
      * @since 1.0
      */
@@ -134,8 +113,8 @@ class AutoLoader {
         $this->searchFolders = [];
         $this->cacheArr = [];
         $this->loadedClasses = [];
-        require_once 'exceptions'.DIRECTORY_SEPARATOR.'ClassLoaderException.php';
-
+        require_once 'ClassLoaderException.php';
+        require_once 'ClassInfo.php';
         if (defined('ROOT_PATH')) {
             $this->rootDir = ROOT_PATH;
         } else if (strlen($root) != 0 && is_dir($root)) {
@@ -157,7 +136,7 @@ class AutoLoader {
         }
         spl_autoload_register(function($className)
         {
-            AutoLoader::get()->loadClass($className);
+            ClassLoader::get()->loadClass($className);
         });
 
         if (gettype($onFail) == 'string') {
@@ -172,14 +151,26 @@ class AutoLoader {
             $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
-            self::$CLASS_INDICES[0] => 'AutoLoader',
-            self::$CLASS_INDICES[1] => 'webfiori\\framework',
-            self::$CLASS_INDICES[2] => __DIR__,
-            self::$CLASS_INDICES[3] => false
+            ClassInfo::NAME => 'ClassLoader',
+            ClassInfo::NS => substr(self::class, 0, strlen(self::class) - strlen('ClassLoader') - 1),
+            ClassInfo::PATH => __DIR__,
+            ClassInfo::CACHED => false
+        ];
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => 'ClassInfo',
+            ClassInfo::NS => substr(ClassInfo::class, 0, strlen(ClassInfo::class) - strlen('ClassInfo') - 1),
+            ClassInfo::PATH => __DIR__,
+            ClassInfo::CACHED => false
+        ];
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => 'ClassLoaderException',
+            ClassInfo::NS => substr(ClassLoaderException::class, 0, strlen(ClassLoaderException::class) - strlen('ClassLoaderException') - 1),
+            ClassInfo::PATH => __DIR__,
+            ClassInfo::CACHED => false
         ];
     }
     /**
-     * Returns a single instance of the class 'AutoLoader'.
+     * Returns a single instance of the class 'ClassLoader'.
      *
      * @param $options array An associative array of options that is used to initialize
      * the autoloader. The available options are:
@@ -203,7 +194,7 @@ class AutoLoader {
      * </li>
      * </ul>
      *
-     * @return AutoLoader
+     * @return ClassLoader
      *
      * @throws Exception
      */
@@ -212,7 +203,7 @@ class AutoLoader {
         'search-folders' => [],
         'root' => '',
         'on-load-failure' => self::ON_FAIL_ACTIONS[1]
-    ]): AutoLoader {
+    ]): ClassLoader {
         $DS = DIRECTORY_SEPARATOR;
 
         if (self::$loader === null) {
@@ -250,7 +241,7 @@ class AutoLoader {
                 $root = $DS.$root;
             }
             $onFail = $options['on-load-failure'] ?? self::ON_FAIL_ACTIONS[0];
-            self::$loader = new AutoLoader($root, $frameworkSearchFolders, $defineRoot,$onFail);
+            self::$loader = new ClassLoader($root, $frameworkSearchFolders, $defineRoot,$onFail);
             self::checkComposer();
         }
 
@@ -320,11 +311,11 @@ class AutoLoader {
 
         foreach ($loadedClasses as $classArr) {
             if ($namespace !== null) {
-                if ($classArr[self::$CLASS_INDICES[1]] == $namespace && $classArr[self::$CLASS_INDICES[0]] == $className) {
-                    $retVal[] = $classArr[self::$CLASS_INDICES[2]];
+                if ($classArr[ClassInfo::NS] == $namespace && $classArr[ClassInfo::NAME] == $className) {
+                    $retVal[] = $classArr[ClassInfo::PATH];
                 }
-            } else if ($classArr[self::$CLASS_INDICES[0]] == $className) {
-                $retVal[] = $classArr[self::$CLASS_INDICES[2]];
+            } else if ($classArr[ClassInfo::NAME] == $className) {
+                $retVal[] = $classArr[ClassInfo::PATH];
             }
         }
 
@@ -391,11 +382,11 @@ class AutoLoader {
     public  static function isLoaded(string $class, string $ns = null): bool {
         foreach (self::getLoadedClasses() as $classArr) {
             if ($ns !== null) {
-                if ($class == $classArr[self::$CLASS_INDICES[0]]
-                        && $ns == $classArr[self::$CLASS_INDICES[1]]) {
+                if ($class == $classArr[ClassInfo::NAME]
+                        && $ns == $classArr[ClassInfo::NS]) {
                     return true;
                 }
-            } else if ($class == $classArr[self::$CLASS_INDICES[0]]) {
+            } else if ($class == $classArr[ClassInfo::NAME]) {
                 return true;
             }
         }
@@ -650,18 +641,84 @@ class AutoLoader {
         $isFileLoaded = in_array($f, $allPaths);
 
         if (!$isFileLoaded && file_exists($f)) {
-            require_once $f;
-            $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
-            $this->loadedClasses[] = [
-                self::$CLASS_INDICES[0] => $className,
-                self::$CLASS_INDICES[1] => $ns,
-                self::$CLASS_INDICES[2] => $f,
-                self::$CLASS_INDICES[3] => false
-            ];
-            $loaded = true;
+            $nsFromPath = $this->createNSFromPath($f, $className);
+            
+            if (in_array('\\'.$classWithNs, $nsFromPath)) {
+                require_once $f;
+                $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
+                $this->loadedClasses[] = [
+                    ClassInfo::NAME => $className,
+                    ClassInfo::NS => $ns,
+                    ClassInfo::PATH => $f,
+                    ClassInfo::CACHED => false
+                ];
+                $loaded = true;
+            }
         }
 
         return $loaded;
+    }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     *
+     * @param string $ns A string to be validated.
+     *
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) {
+        if ($ns == '\\') {
+            return true;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    private function createNSFromPath(string $filePath, string $className) {
+        $split = explode(DIRECTORY_SEPARATOR, $filePath);
+        $nsArr = ['\\'.$className];
+        $currentNs = '';
+        foreach ($split as $str) {
+            if (self::isValidNamespace($str)) {
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = $currentNs.'\\'.$str;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
+            }
+            
+        }
+        $currentNs = '';
+        for ($x = count($split) - 1 ; $x > -1 ; $x--) {
+            $str = $split[$x];
+            if (self::isValidNamespace($str)) {
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = '\\'.$str.$currentNs;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
+            }
+            
+        }
+        return $nsArr;
     }
     private function loadFromCache($classNS, $className): bool {
         $loaded = false;
@@ -672,10 +729,10 @@ class AutoLoader {
                     require_once $location;
                     $ns = count(explode('\\', $classNS)) == 1 ? '\\' : substr($classNS, 0, strlen($classNS) - strlen($className) - 1);
                     $this->loadedClasses[] = [
-                        self::$CLASS_INDICES[0] => $className,
-                        self::$CLASS_INDICES[1] => $ns,
-                        self::$CLASS_INDICES[2] => $location,
-                        self::$CLASS_INDICES[3] => true
+                        ClassInfo::NAME => $className,
+                        ClassInfo::NS => $ns,
+                        ClassInfo::PATH => $location,
+                        ClassInfo::CACHED => true
                     ];
                     $loaded = true;
                 }
@@ -740,13 +797,13 @@ class AutoLoader {
 
             if (is_resource($h)) {
                 foreach ($this->loadedClasses as $classArr) {
-                    $path = substr($classArr[self::$CLASS_INDICES[2]], strlen($root)).'=>';
+                    $path = substr($classArr[ClassInfo::PATH], strlen($root)).'=>';
 
-                    if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
+                    if ($classArr[ClassInfo::NS] == '\\') {
                         //A class without a namespace
-                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[ClassInfo::NAME]."\n");
                     } else {
-                        fwrite($h, $path.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                        fwrite($h, $path.$classArr[ClassInfo::NS].'\\'.$classArr[ClassInfo::NAME]."\n");
                     }
                 }
                 fclose($h);

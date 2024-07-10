@@ -4,7 +4,7 @@
 
 
 use webfiori\framework\App;
-use webfiori\framework\AutoLoader;
+use webfiori\framework\autoload\ClassLoader;
 
 $DS = DIRECTORY_SEPARATOR;
 
@@ -23,7 +23,7 @@ fprintf(STDOUT, "Version ID: '".PHP_VERSION_ID."'\n");
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
 fprintf(STDOUT,'Include Path: \''.get_include_path().'\''."\n");
-fprintf(STDOUT,"Tryning to load the class 'AutoLoader'...\n");
+fprintf(STDOUT,"Tryning to load the class 'ClassLoader'...\n");
 $isAutoloaderLoaded = false;
 
 if (explode($DS, __DIR__)[0] == 'home') {
@@ -31,7 +31,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //linux
-        $file = $DS.$dir.'framework'.$DS.'AutoLoader.php';
+        $file = $DS.$dir.'framework'.$DS.'autoload'.$DS.'ClassLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {
@@ -45,7 +45,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //other
-        $file = $dir.$DS.'framework'.$DS.'AutoLoader.php';
+        $file = $dir.$DS.'framework'.$DS.'autoload'.$DS.'ClassLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {
@@ -57,13 +57,13 @@ if (explode($DS, __DIR__)[0] == 'home') {
 }
 
 if ($isAutoloaderLoaded === false) {
-    fprintf(STDERR, "Error: Unable to find the class 'AutoLoader'.\n");
+    fprintf(STDERR, "Error: Unable to find the class 'ClassLoader'.\n");
     exit(-1);
 } else {
-    fprintf(STDOUT,"Class 'AutoLoader' successfully loaded.\n");
+    fprintf(STDOUT,"Class 'ClassLoader' successfully loaded.\n");
 }
 fprintf(STDOUT,"Initializing autoload directories...\n");
-AutoLoader::get([
+ClassLoader::get([
     'search-folders' => [
         'tests',
         'webfiori',
@@ -79,8 +79,8 @@ fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
 App::start();
 fprintf(STDOUT,'Done.'."\n");
-fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
-define('TESTS_PATH', AutoLoader::get()->root().$DS.TESTS_DIRECTORY);
+fprintf(STDOUT,'Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");
+define('TESTS_PATH', ClassLoader::get()->root().$DS.TESTS_DIRECTORY);
 fprintf(STDOUT,'Tests Path: '.TESTS_PATH."\n");
 fprintf(STDOUT,'App Path: '.APP_PATH."\n");
 fprintf(STDOUT,"---------------------------------\n");

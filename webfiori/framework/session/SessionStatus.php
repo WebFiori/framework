@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-
+namespace webfiori\framework\session;
 /**
  * A class which is used to hold constants which represents different statuses
  * of a session.

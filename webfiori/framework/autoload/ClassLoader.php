@@ -11,8 +11,6 @@
 namespace webfiori\framework\autoload;
 
 use Exception;
-use webfiori\framework\autoload\ClassInfo;
-use webfiori\framework\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
  *
@@ -28,7 +26,7 @@ use webfiori\framework\exceptions\ClassLoaderException;
  *
  * @version 1.1.7
  */
-class AutoLoader {
+class ClassLoader {
     /**
      * The name of the file that represents autoloader's cache.
      * @var string
@@ -68,9 +66,9 @@ class AutoLoader {
      */
     private $loadedClasses;
     /**
-     * A single instance of the class 'AutoLoader'.
+     * A single instance of the class 'ClassLoader'.
      *
-     * @var AutoLoader
+     * @var ClassLoader
      *
      * @since 1.0
      */
@@ -138,7 +136,7 @@ class AutoLoader {
         }
         spl_autoload_register(function($className)
         {
-            AutoLoader::get()->loadClass($className);
+            ClassLoader::get()->loadClass($className);
         });
 
         if (gettype($onFail) == 'string') {
@@ -153,8 +151,8 @@ class AutoLoader {
             $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
-            ClassInfo::NAME => 'AutoLoader',
-            ClassInfo::NS => substr(self::class, 0, strlen(self::class) - strlen('AutoLoader') - 1),
+            ClassInfo::NAME => 'ClassLoader',
+            ClassInfo::NS => substr(self::class, 0, strlen(self::class) - strlen('ClassLoader') - 1),
             ClassInfo::PATH => __DIR__,
             ClassInfo::CACHED => false
         ];
@@ -172,7 +170,7 @@ class AutoLoader {
         ];
     }
     /**
-     * Returns a single instance of the class 'AutoLoader'.
+     * Returns a single instance of the class 'ClassLoader'.
      *
      * @param $options array An associative array of options that is used to initialize
      * the autoloader. The available options are:
@@ -196,7 +194,7 @@ class AutoLoader {
      * </li>
      * </ul>
      *
-     * @return AutoLoader
+     * @return ClassLoader
      *
      * @throws Exception
      */
@@ -205,7 +203,7 @@ class AutoLoader {
         'search-folders' => [],
         'root' => '',
         'on-load-failure' => self::ON_FAIL_ACTIONS[1]
-    ]): AutoLoader {
+    ]): ClassLoader {
         $DS = DIRECTORY_SEPARATOR;
 
         if (self::$loader === null) {
@@ -243,7 +241,7 @@ class AutoLoader {
                 $root = $DS.$root;
             }
             $onFail = $options['on-load-failure'] ?? self::ON_FAIL_ACTIONS[0];
-            self::$loader = new AutoLoader($root, $frameworkSearchFolders, $defineRoot,$onFail);
+            self::$loader = new ClassLoader($root, $frameworkSearchFolders, $defineRoot,$onFail);
             self::checkComposer();
         }
 

@@ -315,7 +315,56 @@ class UpdateSettingsCommandTest extends TestCase {
 
         $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
     }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryTheme02() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'webfiori\\framework\\Privilege',
+            'themes\\fioriTheme2\\NewTestTheme2'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'theme'
+        ]);
+        $runner->start();
+        //$this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Theme successfully updated.\n"
+        ], $runner->getOutput());
 
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryTheme03() {
+        $runner = App::getRunner();
+        $runner->setInputs([
+            'webfiori\\framework\\App',
+            'themes\\fioriTheme2\\NewTestTheme2'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'update-settings',
+            '--w' => 'theme'
+        ]);
+        $runner->start();
+        //$this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Theme successfully updated.\n"
+        ], $runner->getOutput());
+
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+    }
     /**
      * @test
      */

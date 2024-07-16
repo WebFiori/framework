@@ -11,6 +11,7 @@
 namespace webfiori\framework\scheduler;
 
 use Exception;
+use InvalidArgumentException;
 use Throwable;
 use webfiori\collections\Queue;
 use webfiori\error\TraceEntry;
@@ -205,6 +206,9 @@ abstract class AbstractTask implements JsonI {
      *
      * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an
      * object of type TaskArgument.
+     * 
+     * @throws InvalidArgumentException If provided argument is not a string or an object of type
+     * 'TaskArgument'.
      *
      * @since 1.0
      */
@@ -214,7 +218,7 @@ abstract class AbstractTask implements JsonI {
         } else if ($nameOrObj instanceof TaskArgument) {
             $arg = $nameOrObj;
         } else {
-            return;
+            throw new InvalidArgumentException('Invalid argument type. Expected \'string\' or \''.TaskArgument::class.'\'');;
         }
 
         if (!$this->hasArg($arg->getName())) {

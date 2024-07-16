@@ -104,6 +104,7 @@ class UpdateSettingsCommand extends CLICommand {
                 if ($instance instanceof Theme) {
                     return true;
                 }
+                return false;
             } catch (Throwable $exc) {
                 return false;
             }

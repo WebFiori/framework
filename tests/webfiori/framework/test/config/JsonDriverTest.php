@@ -142,6 +142,7 @@ class JsonDriverTest extends TestCase {
         $driver->addEnvVar('COOL_OR_NOT', 'cool');
         $driver->addEnvVar('DO_IT', false);
         $driver->addEnvVar('MULTIPLY_BY', 4, 'A number to multiply by.');
+        $driver->addEnvVar('NUL');
     }
     /**
      * @test
@@ -171,6 +172,10 @@ class JsonDriverTest extends TestCase {
                 "value" => 4,
                 "description" => "A number to multiply by."
             ],
+            'NUL' => [
+                "value" => null,
+                "description" => null
+            ]
         ], $driver->getEnvVars());
         $driver->removeEnvVar('COOL_OR_NOT');
     }
@@ -198,6 +203,10 @@ class JsonDriverTest extends TestCase {
                 "value" => 4,
                 "description" => "A number to multiply by."
             ],
+            'NUL' => [
+                "value" => null,
+                "description" => null
+            ]
         ], $driver->getEnvVars());
     }
     /**
@@ -409,6 +418,7 @@ class JsonDriverTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', 'test@222', 'my_db', 'localhost', 3306);
         $driver->addOrUpdateDBConnection($conn);
         $this->assertEquals(1, count($driver->getDBConnections()));
+        
     }
     /**
      * @test
@@ -417,14 +427,42 @@ class JsonDriverTest extends TestCase {
     public function testDatabaseConnections01() {
         $driver = new JsonDriver();
         $driver->initialize();
-        $account =$driver->getDBConnection('New_Connection');
+        $account = $driver->getDBConnection('New_Connection');
         $this->assertEquals(3306, $account->getPort());
         $this->assertEquals('my_db', $account->getDBName());
         $this->assertEquals('mysql', $account->getDatabaseType());
         $this->assertEquals('localhost', $account->getHost());
         $this->assertEquals('test@222', $account->getPassword());
         $this->assertEquals('root', $account->getUsername());
-
+        $driver->removeAllDBConnections();
+        $this->assertEquals(0, count($driver->getDBConnections()));
+        $this->assertNull($driver->getDBConnection('New_Connection'));
+    }
+    /**
+     * @test
+     * @depends testDatabaseConnections01
+     */
+    public function testDatabaseConnections02() {
+        $driver = new JsonDriver();
+        $this->assertEquals(0, count($driver->getDBConnections()));
+        $this->assertNull($driver->getDBConnection('olf'));
+        $conn = new ConnectionInfo('mysql', 'root', 'test@222', 'my_db', 'localhost', 3306, [
+            'KG' => 9,
+            'OP' => 'hello'
+        ]);
+        $driver->addOrUpdateDBConnection($conn);
+        $this->assertEquals(1, count($driver->getDBConnections()));
+        $account = $driver->getDBConnection('New_Connection');
+        $this->assertEquals(3306, $account->getPort());
+        $this->assertEquals('my_db', $account->getDBName());
+        $this->assertEquals('mysql', $account->getDatabaseType());
+        $this->assertEquals('localhost', $account->getHost());
+        $this->assertEquals('test@222', $account->getPassword());
+        $this->assertEquals('root', $account->getUsername());
+        $this->assertEquals([
+            'KG' => 9,
+            'OP' => 'hello'
+        ], $account->getExtars());
     }
     /**
      * @test

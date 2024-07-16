@@ -76,6 +76,15 @@ class SchedulerTaskTest extends TestCase {
      * @test
      */
     public function testAttributes06() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid argument type. Expected 'string' or 'webfiori\\framework\\scheduler\\TaskArgument'");
+        $job = new BaseTask();
+        $job->addExecutionArg(new \webfiori\framework\Privilege());
+    }
+    /**
+     * @test
+     */
+    public function testAttributes07() {
         $job = new BaseTask();
         $job->addExecutionArgs([
             'one' => [

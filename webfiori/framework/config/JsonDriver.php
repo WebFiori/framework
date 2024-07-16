@@ -225,11 +225,16 @@ class JsonDriver implements ConfigurationDriver {
                 $this->getProp($jsonObj, 'database', $name));
             $extrasObj = $jsonObj->get('extras');
 
-            if ($extrasObj !== null && $extrasObj instanceof Json) {
+            if ($extrasObj !== null) {
                 $extrasArr = [];
+                if ($extrasObj instanceof Json) {
+                    
 
-                foreach ($extrasObj->getProperties() as $prop) {
-                    $extrasArr[$prop->getName()] = $prop->getValue();
+                    foreach ($extrasObj->getProperties() as $prop) {
+                        $extrasArr[$prop->getName()] = $prop->getValue();
+                    }
+                } else if (gettype($extrasObj) == 'array') {
+                    $extrasArr = $extrasObj;
                 }
                 $acc->setExtras($extrasArr);
             }

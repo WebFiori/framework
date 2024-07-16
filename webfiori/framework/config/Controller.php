@@ -22,6 +22,15 @@ class Controller {
         $this->driver = new $driverClazz();
         $this->driver->initialize();
     }
+    /**
+     * Adds new environment variable to the configuration of the app.
+     * 
+     * @param string $name The name of the variable such as 'MY_VAR'.
+     * 
+     * @param mixed $value The value of the variable.
+     * 
+     * @param string|null $description An optional text that describes the variable.
+     */
     public function addEnvVar(string $name, $value, string $description = null) {
         $this->getDriver()->addEnvVar($name, $value, $description);
     }
@@ -56,6 +65,7 @@ class Controller {
         }
 
         foreach ($current->getEnvVars() as $name => $probs) {
+            
             $new->addEnvVar($name, $probs['value'], $probs['description']);
         }
         $new->setPrimaryLanguage($current->getPrimaryLanguage());

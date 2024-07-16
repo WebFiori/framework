@@ -262,7 +262,15 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns an array that holds the information of defined application environment
+     * variables.
+     * 
+     * @return array The returned array will be associative. The key will represent
+     * the name of the variable and its value is a sub-associative array with
+     * two indices, 'description' and 'value'. The description index is a text that describes
+     * the variable and the value index will hold its value.
+     */
     public function getEnvVars(): array {
         $retVal = [];
         $vars = $this->json->get('env-vars');
@@ -364,7 +372,12 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns the name or the namespace of default theme that the application
+     * will use in case a page does not have specific theme.
+     * 
+     * @return string
+     */
     public function getTheme(): string {
         return $this->json->get('theme') ?? '';
     }

@@ -104,7 +104,13 @@ class Controller {
     public static function updateEnv() {
         foreach (self::getDriver()->getEnvVars() as $name => $envVar) {
             if (!defined($name)) {
-                define($name, $envVar['value']);
+                if (isset($envVar['value'])) {
+                    define($name, $envVar['value']);
+                    putenv($name.'='.$envVar['value']);
+                } else {
+                    define($name, null);
+                    putenv($name.'=');
+                }
             }
         }
     }

@@ -18,15 +18,16 @@ interface ConfigurationDriver {
      * The variables which are added using this method will be defined as
      * a named constant at run time using the function 'define'. This means
      * the constant will be accesaable anywhere within the application's environment.
+     * Additionally, it will be added as environment variable using 'putenv()'.
      *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
      *
-     * @param mixed $value The value of the constant.
+     * @param mixed|null $value The value of the constant.
      *
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value, string $description = null);
+    public function addEnvVar(string $name, $value = null, string $description = null);
     /**
      * Adds new database connections information or update existing connections.
      *

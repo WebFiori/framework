@@ -87,7 +87,7 @@ class JsonDriver implements ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value, string $description = null) {
+    public function addEnvVar(string $name, $value = null, string $description = null) {
         $this->json->get('env-vars')->add($name, new Json([
             'value' => $value,
             'description' => $description
@@ -193,6 +193,8 @@ class JsonDriver implements ConfigurationDriver {
                 foreach ($extras->getProperties() as $prop) {
                     $extrasArr[$prop->getName()] = $prop->getValue();
                 }
+            } else if (gettype($extras) == 'array') {
+                $extrasArr = $extras;
             }
 
             return new ConnectionInfo(
@@ -225,11 +227,16 @@ class JsonDriver implements ConfigurationDriver {
                 $this->getProp($jsonObj, 'database', $name));
             $extrasObj = $jsonObj->get('extras');
 
-            if ($extrasObj !== null && $extrasObj instanceof Json) {
+            if ($extrasObj !== null) {
                 $extrasArr = [];
+                if ($extrasObj instanceof Json) {
+                    
 
-                foreach ($extrasObj->getProperties() as $prop) {
-                    $extrasArr[$prop->getName()] = $prop->getValue();
+                    foreach ($extrasObj->getProperties() as $prop) {
+                        $extrasArr[$prop->getName()] = $prop->getValue();
+                    }
+                } else if (gettype($extrasObj) == 'array') {
+                    $extrasArr = $extrasObj;
                 }
                 $acc->setExtras($extrasArr);
             }
@@ -262,7 +269,15 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns an array that holds the information of defined application environment
+     * variables.
+     * 
+     * @return array The returned array will be associative. The key will represent
+     * the name of the variable and its value is a sub-associative array with
+     * two indices, 'description' and 'value'. The description index is a text that describes
+     * the variable and the value index will hold its value.
+     */
     public function getEnvVars(): array {
         $retVal = [];
         $vars = $this->json->get('env-vars');
@@ -364,7 +379,12 @@ class JsonDriver implements ConfigurationDriver {
 
         return $retVal;
     }
-
+    /**
+     * Returns the name or the namespace of default theme that the application
+     * will use in case a page does not have specific theme.
+     * 
+     * @return string
+     */
     public function getTheme(): string {
         return $this->json->get('theme') ?? '';
     }

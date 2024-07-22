@@ -94,7 +94,7 @@ class CLICommandClassWriter extends ClassWriter {
     public function setCommandDescription(string $desc) {
         $trimmed = trim($desc);
 
-        if (strlen($desc) == 0) {
+        if (strlen($trimmed) == 0) {
             return;
         }
         $this->desc = $trimmed;

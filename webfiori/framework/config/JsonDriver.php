@@ -193,6 +193,8 @@ class JsonDriver implements ConfigurationDriver {
                 foreach ($extras->getProperties() as $prop) {
                     $extrasArr[$prop->getName()] = $prop->getValue();
                 }
+            } else if (gettype($extras) == 'array') {
+                $extrasArr = $extras;
             }
 
             return new ConnectionInfo(

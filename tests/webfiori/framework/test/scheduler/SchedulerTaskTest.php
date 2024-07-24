@@ -4,6 +4,8 @@ namespace webfiori\framework\test\scheduler;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\exceptions\InvalidCRONExprException;
+use webfiori\framework\Privilege;
 use webfiori\framework\scheduler\BaseTask;
 use webfiori\framework\scheduler\TaskArgument;
 use webfiori\framework\scheduler\TasksManager;
@@ -79,7 +81,7 @@ class SchedulerTaskTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Invalid argument type. Expected 'string' or 'webfiori\\framework\\scheduler\\TaskArgument'");
         $job = new BaseTask();
-        $job->addExecutionArg(new \webfiori\framework\Privilege());
+        $job->addExecutionArg(new Privilege());
     }
     /**
      * @test
@@ -375,6 +377,30 @@ class SchedulerTaskTest extends TestCase {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'5-a * * * *\'.');
         $task = new BaseTask('5-a * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor29() {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5-7,8- * * * *\'.');
+        $task = new BaseTask('5-7,8- * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor30() {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5/,8- * * * *\'.');
+        $task = new BaseTask('5/,8- * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor31() {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5/b,8- * * * *\'.');
+        $task = new BaseTask('5/b,8- * * * *');
     }
     /**
      * @test
@@ -711,6 +737,37 @@ class SchedulerTaskTest extends TestCase {
     /**
      * @test
      */
+    public function testIsDayOfWeek03() {
+        $job = new BaseTask();
+        $job->everyWeek();
+                
+        TasksManager::setDayOfWeek(0);
+        TasksManager::setHour(0);
+        $this->assertTrue($job->isDayOfWeek());
+        $this->assertTrue($job->isHour());
+        
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek04() {
+        $this->expectException(InvalidCRONExprException::class);
+        $this->expectExceptionMessage("Invalid cron expression: '5 4 * * 0-a,5-6'");
+        $job = new BaseTask('5 4 * * 0-a,5-6');
+
+    }
+    /**
+     * @test
+     */
+    public function testIsDayOfWeek05() {
+        $this->expectException(InvalidCRONExprException::class);
+        $this->expectExceptionMessage("Invalid cron expression: '5 4 * * 0-,5-6'");
+        $job = new BaseTask('5 4 * * 0-,5-6');
+
+    }
+    /**
+     * @test
+     */
     public function testIsHour00() {
         $job = new BaseTask();
         $job->everyHour(1);
@@ -774,7 +831,40 @@ class SchedulerTaskTest extends TestCase {
         $this->assertFalse($job->isHour());
     }
 
+    /**
+     * @test
+     */
+    public function testIsHour03() {
+        $job = new BaseTask();
+        $job->everyXHour(2);
 
+        for ($x = 0 ; $x < 24 ; $x++) {
+            TasksManager::setHour($x);
+            
+            if ($x % 2 == 0) {
+                $this->assertTrue($job->isHour());
+            } else {
+                $this->assertFalse($job->isHour());
+            }
+        }
+    }
+    /**
+     * @test
+     */
+    public function testIsHour04() {
+        $job = new BaseTask();
+        $job->everyXHour(3);
+
+        for ($x = 0 ; $x < 24 ; $x++) {
+            TasksManager::setHour($x);
+            
+            if ($x % 3 == 0) {
+                $this->assertTrue($job->isHour());
+            } else {
+                $this->assertFalse($job->isHour());
+            }
+        }
+    }
     /**
      * @test
      */
@@ -913,6 +1003,24 @@ class SchedulerTaskTest extends TestCase {
 
         TasksManager::setMinute(1);
         $this->assertFalse($job->isMinute());
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth03() {
+        $this->expectException(InvalidCRONExprException::class);
+        $this->expectExceptionMessage("Invalid cron expression: '* 4 * 1-3,9-b *");
+        $job = new BaseTask('* 4 * 1-3,9-b *');
+
+    }
+    /**
+     * @test
+     */
+    public function testIsMonth04() {
+        $this->expectException(InvalidCRONExprException::class);
+        $this->expectExceptionMessage("Invalid cron expression: '* 4 * 1-3,9- *");
+        $job = new BaseTask('* 4 * 1-3,9- *');
+
     }
     /**
      * @test
@@ -1253,6 +1361,27 @@ class SchedulerTaskTest extends TestCase {
         $this->assertTrue($task->isHour());
         $this->assertTrue($task->isMonth());
         $this->assertTrue($task->isDayOfMonth());
+        
+    }
+    /**
+     * @test
+     */
+    public function testEveryXMinute01() {
+        $task = new BaseTask();
+        $task->everyXMinuts(17);
+        TasksManager::setDayOfMonth(15);
+        TasksManager::setHour(23);
+        TasksManager::setMonth(5);
+        TasksManager::setMinute(33);
+        
+        for ($x = 1 ; $x < 60 ; $x++) {
+            TasksManager::setMinute($x);
+            if ($x % 17 == 0) {
+                $this->assertTrue($task->isMinute());
+            } else {
+                $this->assertFalse($task->isMinute());
+            }
+        }
         
     }
 }

@@ -105,6 +105,7 @@ class PrivilegesGroupTest extends TestCase {
     public function testRemoveParentGroup01() {
         $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
         $this->assertFalse($child->setParentGroup());
+        
     }
     /**
      * @test
@@ -141,6 +142,7 @@ class PrivilegesGroupTest extends TestCase {
     public function testSetParentGroup00() {
         $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
         $parentGroup = new PrivilegesGroup('PARENT_1', 'Parent Group #1');
+        $this->assertTrue($parentGroup->setParentGroup(null));
         $this->assertFalse($child->setParentGroup($child));
         $this->assertTrue($child->setParentGroup($parentGroup));
         $this->assertSame($parentGroup,$child->getParentGroup());

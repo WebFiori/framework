@@ -105,6 +105,30 @@ class SessionsManager {
         }
     }
     /**
+     * Returns a date string that represents the time at which all sessions
+     * that was created before it will be cleared.
+     * 
+     * This method will try to use the environment variable 'SESSION_GC' to
+     * decide on the time. If this environment variable does not exist,
+     * it will use the value 30 days to create the date time string which
+     * indicates that any session created 30 days ago will be cleared.
+     * 
+     * @return string A date string in the format 'YYYY-MM-DD HH:MM:SS'.
+     */
+    public static function getGCTime() : string {
+        $olderThan = time() - 60 * 60 * 24 * 30;
+        $fromEnv = getenv('SESSION_GC') !== false ? intval(getenv('SESSION_GC')) : 0;
+        $fromConst = defined('SESSION_GC') && intval(SESSION_GC) > 0 ? intval(SESSION_GC) : 0;
+        
+        if ($fromEnv != 0) {
+            $olderThan = $fromEnv;
+        } else if ($fromConst != 0) {
+            $olderThan = $fromConst;
+        }  
+
+        return date('Y-m-d H:i:s', $olderThan);
+    }
+    /**
      * Returns the value of a session variable.
      *
      * The value will be taken from the active session.
@@ -193,8 +217,7 @@ class SessionsManager {
      * @return string|bool If session ID is found, the method will
      * return it. Note that if it is in a cookie, the name of the cookie must
      * be the name of the session in order to take the ID from it. If it is
-     * in GET or POST request, it must be in a parameter with the name
-     * 'session-id'.
+     * in GET or POST request, it must be in a parameter with the name of the session.
      *
      * @since 1.0
      */
@@ -233,11 +256,12 @@ class SessionsManager {
         return self::getInstance()->sessionStorage;
     }
     /**
-     * Checks if the given session name has a cookie or not.
+     * Checks if the active session has a cookie or not.
      *
-     * @return bool true if a cookie with the name of the session is found. false otherwise.
-     *
-     * @since 1.0
+     * Note that in command line, the method will always return false.
+     * 
+     * @return bool true if The active session has a cookie. False if not. If no
+     * session is active, false is returned.
      */
     public static function hasCookie() : bool {
         $active = self::getActiveSession();

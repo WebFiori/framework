@@ -354,6 +354,33 @@ abstract class AbstractTask implements JsonI {
         $this->cron('0 * * * *');
     }
     /**
+     * Schedules a task to run weekly at specific week day and time.
+     *
+     * @param int $dayNameOrNum A 3 letter day name (such as 'sun' or 'tue') or a day number from 0 to 6.
+     * 0 for sunday. Default is 0.
+     *
+     * @param string $time A time in the form 'HH:MM'. HH can have any value
+     * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
+     * default is '00:00'.
+     *
+     * @return bool If the time for the task is set, the method will
+     * return true. If not, it will return false.
+     */
+    public function everyWeek($dayNameOrNum = 0, string $time = '00:00') : bool {
+        return $this->weeklyOn($dayNameOrNum, $time);
+    }
+    /**
+     * Schedule a task to run every specific number of hours.
+     * 
+     * The expression that will be used is "At minute 0 past every X hour" where
+     * x is the number of hours.
+     * 
+     * @param int $xHour The number of hours at which the job will be executed.
+     */
+    public function everyXHour(int $xHour) {
+        $this->cron('0 */'.$xHour.' * * *');
+    }
+    /**
      * Schedules a task to run every month on specific day and time.
      *
      * @param int $dayNum The number of the day. It can be any value between
@@ -1190,7 +1217,7 @@ abstract class AbstractTask implements JsonI {
                 }
                 $hoursAttrs['every-x-hour'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if (!$this->isNumberHelper($subExpr)) {
+                if (!is_numeric($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1231,6 +1258,10 @@ abstract class AbstractTask implements JsonI {
                 break;
             } else if ($exprType == self::RANGE_VAL) {
                 $range = explode('-', $subExpr);
+                if (!(is_numeric($range[0]) && is_numeric($range[1]))) {
+                    $isValidExpr = false;
+                    break;
+                }
                 $start = intval($range[0]);
                 $end = intval($range[1]);
 
@@ -1248,7 +1279,7 @@ abstract class AbstractTask implements JsonI {
                 }
                 $minuteAttrs['every-x-minute'][] = $stepVal;
             } else if ($exprType == self::SPECIFIC_VAL) {
-                if (!$this->isNumberHelper($subExpr)) {
+                if (!is_numeric($subExpr)) {
                     $isValidExpr = false;
                     break;
                 }
@@ -1402,7 +1433,7 @@ abstract class AbstractTask implements JsonI {
      */
     private function getSubExprType(string $expr): string {
         $retVal = self::ANY_VAL;
-
+        
         if ($expr != '*') {
             $split0 = explode('/', $expr);
             $count = count($split0);
@@ -1471,26 +1502,6 @@ abstract class AbstractTask implements JsonI {
         }
 
         return $retVal;
-    }
-    /**
-     * Checks if a given string represents a number or not.
-     * @param string $str
-     * @return bool
-     */
-    private function isNumberHelper(string $str): bool {
-        $len = strlen($str);
-
-        if ($len != 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $ch = $str[$x];
-
-                if (!($ch >= '0' && $ch <= '9')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
     private function isValidRange(int $start, int $end, int $min, int $max): bool {
         $isValidExpr = true;

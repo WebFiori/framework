@@ -65,7 +65,9 @@ class CreateMiddlewareTest extends CreateTestCase {
         $runner->setInputs([
             'NewCool',
             'app\middleware',
+            '  ',
             'Check is cool',
+            
             '22',
             'y',
             'global',
@@ -76,6 +78,8 @@ class CreateMiddlewareTest extends CreateTestCase {
         $this->assertEquals([
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
+            "Enter a name for the middleware:\n",
+            "Error: Invalid input is given. Try again.\n",
             "Enter a name for the middleware:\n",
             "Enter middleware priority: Enter = '0'\n",
             "Would you like to add the middleware to a group?(y/N)\n",

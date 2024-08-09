@@ -63,7 +63,7 @@ class CreateMiddleware extends CreateClassHelper {
     private function getMiddlewareName() : string {
         return $this->getInput('Enter a name for the middleware:', null, new InputValidator(function ($val)
         {
-            if (strlen($val) > 0) {
+            if (strlen(trim($val)) > 0) {
                 return true;
             }
 

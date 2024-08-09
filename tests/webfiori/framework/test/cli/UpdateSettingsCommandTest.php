@@ -4,6 +4,7 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
+use webfiori\framework\config\JsonDriver;
 use webfiori\framework\router\Router;
 
 /**
@@ -16,6 +17,7 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function test00() {
+        JsonDriver::setConfigFileName('app-config.json');
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

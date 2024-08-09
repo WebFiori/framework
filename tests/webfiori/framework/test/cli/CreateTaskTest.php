@@ -123,7 +123,8 @@ class CreateTaskTest extends CreateTestCase {
             '',
             'Invalid#',
             'Create Round task',
-            'The task will do nothing.',
+            ' ',
+            ' The task will do nothing. ',
             'N',
             '',
         ]);
@@ -148,6 +149,8 @@ class CreateTaskTest extends CreateTestCase {
             "Enter a name for the task:\n",
             "Error: Provided name is invalid!\n",
             "Enter a name for the task:\n",
+            "Provide short description of what does the task will do:\n",
+            "Error: Invalid input is given. Try again.\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",

@@ -62,8 +62,6 @@ class UpdateTableCommand extends CLICommand {
             $tableHelper->updateColumn();
         } else if ($whatToDo == 'Drop foreign key.') {
             $tableHelper->removeForeignKey();
-        } else {
-            $this->error('Option not implemented.');
         }
 
         return 0;

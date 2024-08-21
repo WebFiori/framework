@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\config;
 
+use Exception;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\InitializationException;
 
@@ -12,6 +13,10 @@ use webfiori\framework\exceptions\InitializationException;
  */
 class Controller {
     const NL = "\n";
+    /**
+     * 
+     * @var ConfigurationDriver
+     */
     private $driver;
     private static $singleton;
     /**
@@ -20,7 +25,14 @@ class Controller {
     public function __construct() {
         $driverClazz = App::getConfigDriver();
         $this->driver = new $driverClazz();
-        $this->driver->initialize();
+        $this->init($this->driver);
+    }
+    private static function init(ConfigurationDriver $driver, bool $reCreate = false) {
+        try {
+            $driver->initialize($reCreate);
+        } catch (Exception $ex) {
+            throw new InitializationException('Unable to initialize configuration driver due to an error: '.$ex->getMessage(), $ex->getCode(), $ex);
+        }
     }
     /**
      * Adds new environment variable to the configuration of the app.
@@ -73,7 +85,7 @@ class Controller {
         $new->setSchedulerPassword($current->getSchedulerPassword());
         $new->setHomePage($current->getHomePage());
         $new->setTitleSeparator($current->getTitleSeparator());
-        $new->initialize(true);
+        $this->init($new, true);
     }
     /**
      * Returns a single instance of the class.
@@ -103,7 +115,7 @@ class Controller {
      */
     public static function setDriver(ConfigurationDriver $driver) {
         self::get()->driver = $driver;
-        $driver->initialize();
+        self::init($driver);
     }
     /**
      * Reads application environment variables and updates the class which holds

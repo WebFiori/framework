@@ -52,18 +52,9 @@ class DB extends Database {
         }
         $conn = App::getConfig()->getDBConnection($connName);
 
+
         if (!($conn instanceof ConnectionInfo)) {
-            $connectionsArr = App::getConfig()->getDBConnections();
-
-            foreach ($connectionsArr as $xCon) {
-                if ($xCon->getName() == $connName) {
-                    $conn = $xCon;
-                }
-            }
-
-            if (!($conn instanceof ConnectionInfo)) {
-                throw new DatabaseException("No connection was found which has the name '$connName'. Driver: ".get_class(App::getConfig()).'.');
-            }
+            throw new DatabaseException("No connection was found which has the name '$connName'. Driver: ".get_class(App::getConfig()).'.');
         }
         parent::__construct($conn);
     }

@@ -118,6 +118,7 @@ class App {
             mb_regex_encoding($encoding);
         }
         $this->initAutoLoader();
+        $this->setHandlers();
         Controller::get()->updateEnv();
         /**
          * Set memory limit.
@@ -130,7 +131,6 @@ class App {
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
 
-        $this->setHandlers();
         //Initialize CLI
         self::getRunner();
 
@@ -142,7 +142,7 @@ class App {
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
-        call_user_func(APP_DIR.'\ini\InitPrivileges::init');
+        self::call(APP_DIR.'\ini\InitPrivileges::init');
 
 
 
@@ -353,7 +353,7 @@ class App {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
-                call_user_func(APP_DIR.'\ini\InitCommands::init');
+                self::call(APP_DIR.'\ini\InitCommands::init');
             });
         }
 
@@ -536,7 +536,7 @@ class App {
             Ini::createAppDirs();
             Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
-        call_user_func(APP_DIR.'\ini\InitAutoLoad::init');
+        self::call(APP_DIR.'\ini\InitAutoLoad::init');
     }
     private function initFrameworkVersionInfo() {
         /**
@@ -575,9 +575,17 @@ class App {
         if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
             Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
-        call_user_func(APP_DIR.'\ini\InitMiddleware::init');
+        self::call(APP_DIR.'\ini\InitMiddleware::init');
     }
-
+    private static function call($func) {
+        try {
+            call_user_func($func);
+        } catch (Exception $ex) {
+            if (self::getRunner()->isCLI()) {
+                printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
+            }
+        }
+    }
     /**
      * @throws FileException
      */
@@ -588,7 +596,7 @@ class App {
             if (!class_exists(APP_DIR.'\\ini\\routes\\'.$className)) {
                 Ini::get()->createRoutesClass($className);
             }
-            call_user_func(APP_DIR.'\ini\routes\\'.$className.'::create');
+            self::call(APP_DIR.'\ini\routes\\'.$className.'::create');
         }
 
         if (Router::routesCount() != 0) {
@@ -617,7 +625,7 @@ class App {
             }
             TasksManager::getPassword(self::getConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
-            call_user_func(APP_DIR.'\ini\InitTasks::init');
+            self::call(APP_DIR.'\ini\InitTasks::init');
             TasksManager::registerTasks();
         }
     }

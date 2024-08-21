@@ -66,12 +66,7 @@ class DefaultSessionStorage implements SessionStorage {
         }
         $sessionsFiles = array_diff(scandir($this->storeLoc), ['.','..']);
 
-        if (defined('SESSION_GC') && SESSION_GC > 0) {
-            $olderThan = time() - SESSION_GC;
-        } else {
-            //Clear any session which is older than 30 days
-            $olderThan = time() - 60 * 60 * 24 * 30;
-        }
+        $olderThan = SessionsManager::getGCTime();
 
         foreach ($sessionsFiles as $file) {
             $fileObj = new File($this->storeLoc.DS.$file);

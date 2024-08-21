@@ -36,7 +36,20 @@ class SessionDB extends DB {
         $this->addTable(new MSSQLSessionDataTable());
         $this->addTable(new MySQLSessionDataTable());
     }
-
+    /**
+     * Removes database tables which are used to store session information.
+     */
+    public function removeTables() {
+        
+        $this->transaction(function (DB $db) {
+            try {
+                $db->table('session_data')->drop()->execute();
+                $db->table('sessions')->drop()->execute();
+            } catch (DatabaseException $ex) {
+                return;
+            }
+        });
+    }
     /**
      * Clears the sessions which are older than the constant 'SESSION_GC' or
      * older than 30 days if the constant is not defined.
@@ -45,13 +58,7 @@ class SessionDB extends DB {
      * @since 1.0
      */
     public function gc() {
-        if (defined('SESSION_GC') && SESSION_GC > 0) {
-            $olderThan = time() - SESSION_GC;
-        } else {
-            //Clear any session which is older than 30 days
-            $olderThan = time() - 60 * 60 * 24 * 30;
-        }
-        $date = date('Y-m-d H:i:s', $olderThan);
+        $date = SessionsManager::getGCTime();
         $ids = $this->getSessionsIDs($date);
 
         foreach ($ids as $id) {

@@ -115,7 +115,7 @@ class Controller {
      */
     public static function setDriver(ConfigurationDriver $driver) {
         self::get()->driver = $driver;
-        $this->init($driver);
+        self::init($driver);
     }
     /**
      * Reads application environment variables and updates the class which holds

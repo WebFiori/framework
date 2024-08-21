@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\config;
 
+use Exception;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\InitializationException;
 
@@ -26,7 +27,7 @@ class Controller {
         $this->driver = new $driverClazz();
         $this->init($this->driver);
     }
-    private function init(ConfigurationDriver $driver, bool $reCreate = false) {
+    private static function init(ConfigurationDriver $driver, bool $reCreate = false) {
         try {
             $this->driver->initialize($reCreate);
         } catch (Exception $ex) {

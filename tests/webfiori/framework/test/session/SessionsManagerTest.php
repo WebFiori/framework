@@ -27,8 +27,10 @@ class SessionsManagerTest extends TestCase {
         $this->assertFalse(SessionsManager::remove('xyz'));
         $this->assertFalse(SessionsManager::set('xyz','hello'));
         $this->assertNull(SessionsManager::pull('xyz'));
-
+        
+        $this->assertFalse(SessionsManager::hasCookie());
         SessionsManager::start('hello');
+        $this->assertFalse(SessionsManager::hasCookie());
         $this->assertEquals(1, count(SessionsManager::getSessions()));
         $activeSesstion = SessionsManager::getActiveSession();
         $this->assertFalse($activeSesstion->isRefresh());
@@ -39,7 +41,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals(7200, $activeSesstion->getDuration());
         $this->assertEquals(SessionStatus::NEW, $activeSesstion->getStatus());
 
-        $activeSesstion->set('var-1', 'Good');
+        SessionsManager::set('var-1', 'Good');
         $activeSesstion->set('var-2', 'Bad');
         $activeSesstion->set('var-3', 'Average');
         $activeSesstion->set('var-4', 'Almost Good');
@@ -107,6 +109,7 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::destroy();
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertEquals(SessionStatus::KILLED, $active2->getStatus());
+        SessionsManager::validateStorage();
         $active2->start();
         $this->assertEquals(SessionStatus::NEW, $active2->getStatus());
         $this->assertNotNull(SessionsManager::getActiveSession());
@@ -162,8 +165,8 @@ class SessionsManagerTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
-        SessionsManager::reset();
         SessionsManager::setStorage(new DatabaseSessionStorage());
+        SessionsManager::getStorage()->getController()->removeTables();
         SessionsManager::start('hello');
     }
     /**

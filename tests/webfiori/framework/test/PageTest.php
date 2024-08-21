@@ -650,7 +650,10 @@ class PageTest extends TestCase {
 
         $page->setTheme($secondThemeName);
         $fTheme = $page->getTheme();
-
+        
+        $this->assertEquals($firstThemeName, $theme3->getName());
+        $this->assertEquals($secondThemeName, $fTheme->getName());
+        
         $this->assertFalse($theme3 === $fTheme);
         $this->assertNotEquals($firstThemeName,$fTheme->getName());
         $page->setTheme($secondThemeName);

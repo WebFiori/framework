@@ -774,7 +774,7 @@ class WebPage {
 
         return $this->getDocument();
     }
-    private function getConfigVar(string $meth, string $default, array $params = []) {
+    private function getConfigVar(string $meth, string $default = null, array $params = []) {
         try{
             return call_user_func_array([App::getConfig(), $meth], $params);
         } catch (InitializationException $ex) {
@@ -1014,10 +1014,14 @@ class WebPage {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
             return;
         }
-        $xthemeName = $this->getConfigVar('getTheme', '');;
+        $xthemeName = $themeNameOrClass;
+        
+        if (strlen(trim($themeNameOrClass.'')) == 0) {
+            $xthemeName = $this->getConfigVar('getTheme', $themeNameOrClass);
+        }
 
-        if (strlen($xthemeName) === 0) {
-            return;
+        if (strlen($xthemeName) == 0) {
+            $xthemeName = $themeNameOrClass;
         }
         $tmpTheme = ThemeLoader::usingTheme($xthemeName);
 

@@ -60,6 +60,7 @@ class APICallErrHandler extends AbstractHandler {
         } else {
             $j = new Json([
                 'message' => '500 - General Server Error.',
+                'details' => $this->getMessage(),
                 'type' => 'error',
             ]);
         }

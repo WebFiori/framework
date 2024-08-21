@@ -5,7 +5,7 @@ namespace webfiori\framework\ui\serverErrPage;
 <v-col cols=12>
     <v-alert prominent type=error>
         <v-row align=center>
-            <v-col>
+            <v-col cols="12">
                 <?php
                 if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
                     echo '500 - Server Error: Uncaught Exception.';
@@ -13,6 +13,9 @@ namespace webfiori\framework\ui\serverErrPage;
                     echo 'General Server Error';
                 }
 ?>
+            </v-col>
+            <v-col cols="12">
+                Error Details: <?= $throwableOrErr->getMessage()?>
             </v-col>
         </v-row>
     </v-alert>

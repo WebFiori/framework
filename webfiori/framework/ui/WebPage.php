@@ -15,6 +15,7 @@ use Exception;
 use TypeError;
 use webfiori\collections\LinkedList;
 use webfiori\framework\App;
+use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\exceptions\UIException;
@@ -258,7 +259,7 @@ class WebPage {
      */
     public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getConfig()->getAppVersion();
+            $attrs['revision'] = $this->getConfigVar('getAppVersion', '1.0');
         }
         $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
     }
@@ -278,7 +279,7 @@ class WebPage {
      */
     public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
-            $attrs['revision'] = App::getConfig()->getAppVersion();
+            $attrs['revision'] = $this->getConfigVar('getAppVersion', '1.0');
         }
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }
@@ -773,6 +774,13 @@ class WebPage {
 
         return $this->getDocument();
     }
+    private function getConfigVar(string $meth, string $default, array $params = []) {
+        try{
+            return call_user_func_array([App::getConfig(), $meth], $params);
+        } catch (InitializationException $ex) {
+            return $default;
+        }
+    }
     /**
      * Resets page attributes to default values.
      *
@@ -784,17 +792,11 @@ class WebPage {
         $this->checkLang();
         $this->usingLanguage();
 
-        $appName = App::getConfig()->getAppName($this->getLangCode());
-        $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
-
-        $websiteDesc = App::getConfig()->getDescription($this->getLangCode());
-        $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
-
-        $pageTitle = App::getConfig()->getTitle($this->getLangCode());
-        $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
-
-
-        $this->setTitleSep(App::getConfig()->getTitleSeparator());
+        
+        $this->setWebsiteName($this->getConfigVar('getAppName', 'WebFiori App', [$this->getLangCode()]));
+        $this->setDescription($this->getConfigVar('getDescription', '', [$this->getLangCode()]));
+        $this->setTitle($this->getConfigVar('getTitle', 'Hello World', [$this->getLangCode()]));
+        $this->setTitleSep($this->getConfigVar('getTitleSeparator', '|'));
 
         try {
             $langObj = $this->getTranslation();
@@ -1012,7 +1014,7 @@ class WebPage {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
             return;
         }
-        $xthemeName = $themeNameOrClass === null ? App::getConfig()->getTheme() : $themeNameOrClass;
+        $xthemeName = $this->getConfigVar('getTheme', '');;
 
         if (strlen($xthemeName) === 0) {
             return;
@@ -1180,7 +1182,7 @@ class WebPage {
             $langCodeFromRequest = Request::getParam('lang');
 
             if ($langCodeFromRequest === null) {
-                $this->setLang(App::getConfig()->getPrimaryLanguage());
+                $this->setLang($this->getConfigVar('getPrimaryLanguage', 'EN'));
 
                 return;
             }
@@ -1194,10 +1196,13 @@ class WebPage {
 
     private function getHead() {
         $loadedTheme = $this->getTheme();
+        $defaultBase = Util::getBaseURL();
+        $base = $this->getConfigVar('getBaseURL', $defaultBase);
+        
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
-            App::getConfig()->getBaseURL()
+            $base
         );
 
         if ($loadedTheme !== null) {
@@ -1210,7 +1215,7 @@ class WebPage {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setPageTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(App::getConfig()->getBaseURL());
+        $headNode->setBase($base);
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {

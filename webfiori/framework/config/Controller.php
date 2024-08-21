@@ -29,7 +29,7 @@ class Controller {
     }
     private static function init(ConfigurationDriver $driver, bool $reCreate = false) {
         try {
-            $this->driver->initialize($reCreate);
+            $driver->initialize($reCreate);
         } catch (Exception $ex) {
             throw new InitializationException('Unable to initialize configuration driver due to an error: '.$ex->getMessage(), $ex->getCode(), $ex);
         }

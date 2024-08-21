@@ -179,7 +179,7 @@ class SchedulerCommandTest extends TestCase {
             "#4 At class webfiori\\framework\scheduler\TasksManager line 673\n",
             "#5 At class webfiori\\framework\scheduler\TasksManager line 139\n",
             "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
-            "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 328\n",
+            "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 331\n",
             "#8 At class webfiori\\cli\CLICommand line 409\n",
             "#9 At class webfiori\\cli\Runner line 684\n",
             "#10 At class webfiori\\cli\Runner line 615\n",

@@ -181,8 +181,8 @@ class SchedulerCommandTest extends TestCase {
             "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
             "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 331\n",
             "#8 At class webfiori\\cli\CLICommand line 409\n",
-            "#9 At class webfiori\\cli\Runner line 684\n",
-            "#10 At class webfiori\\cli\Runner line 615\n",
+            "#9 At class webfiori\\cli\Runner line 725\n",
+            "#10 At class webfiori\\cli\Runner line 656\n",
             "#11 At class webfiori\cli\Runner line 156\n",
             "Skip"];
         $actual = $runner->getOutput();

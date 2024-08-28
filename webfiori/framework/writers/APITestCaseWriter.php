@@ -27,7 +27,7 @@ class APITestCaseWriter extends ClassWriter {
      *
      */
     public function __construct(WebServicesManager $m, $service = null) {
-        parent::__construct('WebService', ROOT_PATH.'tests\\apis',  ROOT_PATH.'tests\\apis');
+        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis',  ROOT_PATH.'tests\\apis');
         $this->setSuffix('Test');
         $this->setServicesManager($m);
         
@@ -88,6 +88,7 @@ class APITestCaseWriter extends ClassWriter {
     }
     public function writeClassBody() {
         $this->writeNotAllowedRequestMethodTestCases();
+        $this->writeRequiredParametersTestCases();
         $this->append('}');
     }
 
@@ -95,11 +96,45 @@ class APITestCaseWriter extends ClassWriter {
         $this->append("/**\n"
                 ." * A unit test class which is used to test the API '".$this->getService()->getName()."'.\n"
         );
-        $this->append(" * </ul>\n */");
+        $this->append(" * \n */");
     }
 
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends APITestCase {');
+    }
+    private function writeRequiredParametersTestCases() {
+        $params = $this->getService()->getParameters();
+        $responseMessage = \webfiori\http\ResponseMessage::get('404-2');
+        $missingArr = [];
+        foreach ($params as $param) {
+            $param instanceof \webfiori\http\RequestParameter;
+            if (!$param->isOptional()) {
+                $missingArr[] = $param->getName();
+            }
+        }
+        if (count($missingArr) !== 0) {
+            $requestMethod = $this->getService()->getRequestMethods()[0];
+            $this->append('public function testRequiredParameters() {', 1);
+            $this->append('$output = $this->callEntpoint(new '.$this->getServicesManagerName().'(), RequestMethod::'. strtoupper($requestMethod).', '.$this->getServiceName().'::class, []);', 2);
+            $this->append("\$this->assertEquals('{'.self::NL", 2);
+                $this->append(". '    \"message\":\"$responseMessage\'". implode("\',", $missingArr)."\','.self::NL", 2);
+                $this->append(". '    \"type\":\"error\",'.self::NL", 2);
+                $this->append(". '    \"http_code\":404,'.self::NL", 2);
+                $this->append(". '    \"more_info\":{'.self::NL", 2);
+                $this->append(". '        \"missing\":['.self::NL", 2);
+                for ($x = 0 ; $x < count($missingArr) ; $x++) {
+                    $item = $missingArr[$x];
+                    if ($x + 1 == count($missingArr)) {
+                        $this->append(". '            \"$item\"'.self::NL", 2);
+                    } else {
+                        $this->append(". '            \"$item\"',.self::NL", 2);
+                    }
+                }
+                $this->append(". '        ]'.self::NL", 2);
+                $this->append(". '    }'.self::NL", 2);
+                $this->append(". '}', \$output);", 2);
+            $this->append('}', 1);
+        }
     }
     private function writeNotAllowedRequestMethodTestCases() {
         $methods = $this->getService()->getRequestMethods();
@@ -107,7 +142,7 @@ class APITestCaseWriter extends ClassWriter {
         
         foreach (RequestMethod::getAll() as $method) {
             if (!in_array($method, $methods)) {
-                $this->append('public function requestMethodNotAllowedTest'.($testCasesCount < 10 ? '0'.$testCasesCount : $testCasesCount).'(){', 1);
+                $this->append('public function testRequestMethodNotAllowed'.($testCasesCount < 10 ? '0'.$testCasesCount : $testCasesCount).'() {', 1);
                 $methodName = $this->getMethName($method);
                 
                 if ($methodName == 'callEndpoint') {
@@ -121,6 +156,7 @@ class APITestCaseWriter extends ClassWriter {
                 $this->append(". '    \"http_code\":405,'.self::NL", 2);
                 $this->append(". '}', \$output);", 2);
                 $this->append('}', 1);
+                $testCasesCount++;
             }
         }
     }

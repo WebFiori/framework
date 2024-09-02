@@ -62,7 +62,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             'Name: \\tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
             "Path: ".ROOT_PATH."\\tests\webfiori\\framework\scheduler\webServices\n",
             "Would you like to use default parameters?(Y/n)\n",
-            "Info: New class was created at \"".ROOT_PATH."\\tests\webfiori\\framework\scheduler\webServices\".\n"
+            "Info: New class was created at \"".ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices\".\n"
         ], $runner->getOutput());
         $clazz = '\tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest';
         $this->assertTrue(class_exists($clazz));
@@ -86,7 +86,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
         $exitCode = $runner->start();
         $this->assertEquals(0, $exitCode);
         $this->assertEquals([
-            "Info: New class was created at \"".ROOT_PATH."\\tests\webfiori\\framework\scheduler\webServices\".\n"
+            "Info: New class was created at \"".ROOT_PATH.DS."\tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices".DS."\n"
         ], $runner->getOutput());
         $clazz = '\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
         $this->assertTrue(class_exists($clazz));
@@ -123,7 +123,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'tests\webfiori\\framework\scheduler\webServices'\n",
-            "Info: New class was created at \"".ROOT_PATH."\\tests\webfiori\\framework\scheduler\webServices\".\n"
+            "Info: New class was created at \"".ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices".DS.".\n"
         ], $runner->getOutput());
         $clazz = '\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
         $this->assertTrue(class_exists($clazz));

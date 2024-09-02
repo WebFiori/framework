@@ -35,6 +35,9 @@ class CreateCommand extends CLICommand {
         parent::__construct('create', [
             new Argument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
             new Argument('--table', '', true),
+            new Argument('--manager', 'Web services manager class.', true),
+            new Argument('--service', 'The name of web service that is registered by web services manager.', true),
+            new Argument('--defaults', 'An option which is used to indicate that default values should be used for non-provided options.', true)
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     public function createEntityFromQuery(): int {
@@ -106,6 +109,11 @@ class CreateCommand extends CLICommand {
         } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
             $create = new CreateFullRESTHelper($this);
             $create->readInfo();
+        } else if ($answer == 'Web service test case.') {
+            $create = new \webfiori\framework\cli\helpers\CreateAPITestCase($this);
+            if (!$create->readClassInfo()) {
+                return -1;
+            }
         }
 
         return 0;
@@ -121,6 +129,7 @@ class CreateCommand extends CLICommand {
         $options['theme'] = 'Theme.';
         $options['db'] = 'Database access class based on table.';
         $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
+        $options['api-test'] = 'Web service test case.';
         $options['q'] = 'Quit.';
         $what = $this->getArgValue('--c');
         $answer = null;

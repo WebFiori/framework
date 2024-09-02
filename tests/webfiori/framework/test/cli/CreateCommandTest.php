@@ -14,7 +14,7 @@ class CreateCommandTest extends CreateTestCase {
     public function testCreate00() {
         $runner = App::getRunner();
         $runner->setInputs([
-            '9',
+            '10',
         ]);
         $runner->setArgsVector([
             'webfiori',
@@ -32,7 +32,8 @@ class CreateCommandTest extends CreateTestCase {
             "6: Theme.\n",
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
-            "9: Quit. <--\n",
+            "9: Web service test case.\n",
+            "10: Quit. <--\n",
         ], $runner->getOutput());
     }
     /**
@@ -59,7 +60,8 @@ class CreateCommandTest extends CreateTestCase {
             "6: Theme.\n",
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
-            "9: Quit. <--\n",
+            "9: Web service test case.\n",
+            "10: Quit. <--\n",
         ], $runner->getOutput());
     }
 }

@@ -204,7 +204,10 @@ class CreateClassHelper {
     public function setClassInfo(string $ns, string $suffix) {
         $classInfo = $this->getClassInfo($ns, $suffix);
         $this->setNamespace($classInfo['namespace']);
-        $this->setClassName($classInfo['name']);
+        
+        if ($suffix != $classInfo['name']) {
+            $this->setClassName($classInfo['name']);
+        }
         $this->setPath($classInfo['path']);
     }
     /**

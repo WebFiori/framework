@@ -10,7 +10,6 @@ $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
-define('JSON_STYLE', 'snake');
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.

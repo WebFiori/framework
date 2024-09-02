@@ -6,7 +6,7 @@ use webfiori\framework\App;
 /**
  * @author Ibrahim
  */
-class CreateCLICommandTest extends CreateTestCase {
+class CreateAPITestCaseTest extends CreateTestCase {
     /**
      * @test
      */

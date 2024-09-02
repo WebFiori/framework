@@ -114,7 +114,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             
         ]);
         $exitCode = $runner->start();
-        //$this->assertEquals(0, $exitCode);
+        $this->assertEquals(0, $exitCode);
         $path = ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices";
         $this->assertEquals([
             "Please enter services manager information:\n",

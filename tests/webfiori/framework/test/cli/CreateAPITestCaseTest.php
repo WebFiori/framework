@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\cli\CLICommand;
 use webfiori\framework\App;
+use webfiori\framework\scheduler\webServices\TasksServicesManager;
 /**
  * @author Ibrahim
  */
@@ -40,7 +40,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             'webfiori',
             'create',
             '--c' => 'api-test',
-            '--manager' => \webfiori\framework\scheduler\webServices\TasksServicesManager::class,
+            '--manager' => TasksServicesManager::class,
             '--service' => 'c'
         ]);
         $runner->setInputs([
@@ -78,7 +78,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             'webfiori',
             'create',
             '--c' => 'api-test',
-            '--manager' => \webfiori\framework\scheduler\webServices\TasksServicesManager::class,
+            '--manager' => TasksServicesManager::class,
             '--service' => 'get-tasks',
             '--defaults'
         ]);

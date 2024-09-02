@@ -2,7 +2,6 @@
 
 namespace webfiori\framework\writers;
 
-use webfiori\framework\writers\ClassWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\APITestCase;
 use webfiori\http\RequestMethod;

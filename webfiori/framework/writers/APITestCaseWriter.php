@@ -62,7 +62,7 @@ class APITestCaseWriter extends ClassWriter {
         }
         $this->setPhpUnitVersion(9);
         if (!($service instanceof AbstractWebService)) {
-            if (class_exists($service)) {
+            if ($service !== null && class_exists($service)) {
                 $s = new $service();
                 
                 if ($s instanceof AbstractWebService) {

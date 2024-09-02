@@ -6,6 +6,7 @@ use webfiori\framework\writers\ClassWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\APITestCase;
 use webfiori\http\RequestMethod;
+use webfiori\http\ResponseMessage;
 use webfiori\http\WebServicesManager;
 
 /**
@@ -23,17 +24,42 @@ class APITestCaseWriter extends ClassWriter {
     private $servicesManager;
     private $servicesManagerName;
     private $phpunitV;
+    /**
+     * Sets PHPUnit version number.
+     * 
+     * This is used to check if annotations or attributes should be used in test case
+     * method declaration. Starting with PHPUnit 10, attributes are used.
+     * 
+     * @param int $num
+     */
     public function setPhpUnitVersion(int $num) {
         $this->phpunitV = $num;
     }
     /**
-     * Creates new instance of the class.
-     *
+     * Returns PHPUnit version number.
+     * 
+     * This is used to check if annotations or attributes should be used in test case
+     * method declaration. Starting with PHPUnit 10, attributes are used.
+     * 
+     * @return int
      */
-    public function __construct(WebServicesManager $m, $service = null) {
+    public function getPhpUnitVersion() : int {
+        return $this->phpunitV;
+    }
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param WebServicesManager|null $manager Web services manager instance.
+     * 
+     * @param AbstractWebService $service The web service at which the test case
+     * will be based on.
+     */
+    public function __construct(WebServicesManager $manager = null, $service = null) {
         parent::__construct('WebService', ROOT_PATH.'\\tests\\apis',  ROOT_PATH.'tests\\apis');
         $this->setSuffix('Test');
-        $this->setServicesManager($m);
+        if ($manager !== null) {
+            $this->setServicesManager($manager);
+        }
         $this->setPhpUnitVersion(9);
         if (!($service instanceof AbstractWebService)) {
             if (class_exists($service)) {
@@ -48,9 +74,19 @@ class APITestCaseWriter extends ClassWriter {
         }
  
     }
-    public function getServicesManager() {
+    /**
+     * Returns the associated web services manager that will be used by the test case.
+     * 
+     * @return WebServicesManager
+     */
+    public function getServicesManager() : WebServicesManager {
         return $this->servicesManager;
     }
+    /**
+     * Sets the associated web services manager that will be used by the test case.
+     * 
+     * @param WebServicesManager $m
+     */
     public function setServicesManager(WebServicesManager $m) {
         $this->servicesManager = $m;
         $clazzExp = explode('\\', get_class($m));
@@ -66,7 +102,7 @@ class APITestCaseWriter extends ClassWriter {
     }
 
     /**
-     * Sets the table that the writer will use in writing the table class.
+     * Sets the web service that the writer will use in writing the test case.
      *
      * @param AbstractWebService $service
      */
@@ -84,10 +120,20 @@ class APITestCaseWriter extends ClassWriter {
         $this->addAllUse();
         parent::writeClass();
     }
-    public function getServiceName() {
+    /**
+     * Returns the name of the class of the web service.
+     * 
+     * @return string
+     */
+    public function getServiceName() : string {
         return $this->serviceObjName;
     }
-    public function getServicesManagerName() {
+    /**
+     * Returns the name of web services manager class.
+     * 
+     * @return string
+     */
+    public function getServicesManagerName() : string {
         return $this->servicesManagerName;
     }
     public function writeClassBody() {
@@ -109,10 +155,10 @@ class APITestCaseWriter extends ClassWriter {
     }
     private function writeRequiredParametersTestCases() {
         $params = $this->getService()->getParameters();
-        $responseMessage = \webfiori\http\ResponseMessage::get('404-2');
+        $responseMessage = ResponseMessage::get('404-2');
         $missingArr = [];
         foreach ($params as $param) {
-            $param instanceof \webfiori\http\RequestParameter;
+            
             if (!$param->isOptional()) {
                 $missingArr[] = $param->getName();
             }
@@ -142,7 +188,7 @@ class APITestCaseWriter extends ClassWriter {
             $this->append('}', 1);
         }
     }
-    public function writeTestCases() {
+    private function writeTestCases() {
         $methods = $this->getService()->getRequestMethods();
         $testCasesCount = 0;
         

@@ -4,7 +4,9 @@ namespace webfiori\framework\test\config;
 use PHPUnit\Framework\TestCase;
 use webfiori\database\ConnectionInfo;
 use webfiori\email\SMTPAccount;
+use webfiori\file\File;
 use webfiori\framework\config\JsonDriver;
+use const DS;
 /**
  *
  * @author Ibrahim
@@ -52,6 +54,9 @@ class JsonDriverTest extends TestCase {
             'AR' => 'افتراضي',
             'EN' => 'Default'
         ],$driver->getTitles());
+        $this->assertEquals('Application', $driver->getAppName('EN'));
+        $this->assertEquals('تطبيق', $driver->getAppName('AR'));
+        $this->assertNull($driver->getAppName('BK'));
     }
     /**
      * @test
@@ -78,6 +83,11 @@ class JsonDriverTest extends TestCase {
             'AR' => 'تطبيق',
             'EN' => 'Cool App'
         ],$driver->getAppNames());
+        $driver->setAppName('Cool App', 'Enx');
+        $this->assertEquals([
+            'AR' => 'تطبيق',
+            'EN' => 'Cool App'
+        ],$driver->getAppNames());
         $driver->initialize();
     }
     /**
@@ -95,7 +105,9 @@ class JsonDriverTest extends TestCase {
             'AR' => 'تطبيق',
             'EN' => 'Cool App'
         ],$driver->getAppNames());
+        $this->assertTrue(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
         $driver->remove();
+        $this->assertFalse(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
     }
     /**
      * @test
@@ -410,6 +422,60 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
+     * @depends testSMTPConnections02
+     */
+    public function testSMTPConnections03() {
+        $driver = new JsonDriver();
+        $driver->initialize();
+        $this->assertEquals(1, count($driver->getSMTPConnections()));
+        $driver->removeSMTPAccount('Cool');
+        $this->assertEquals(0, count($driver->getSMTPConnections()));
+    }
+    /**
+     * @test
+     */
+    public function testSMTPConnections04() {
+        $driver = new JsonDriver();
+        $this->assertEquals(0, count($driver->getSMTPConnections()));
+        $this->assertNull($driver->getSMTPConnection('olf'));
+        $conn = new SMTPAccount([
+            'port' => 6,
+            'server-address' => 'smtp@example.com',
+            'user' => 'me@example.com',
+            'pass' => 'some_pass',
+            'sender-name' => 'WebFiori',
+            'sender-address' => 'addr@example.com',
+            'account-name' => 'Cool'
+        ]);
+        $driver->addOrUpdateSMTPAccount($conn);
+        $this->assertEquals(1, count($driver->getSMTPConnections()));
+        $conn = new SMTPAccount([
+            'port' => 6,
+            'server-address' => 'smtp@example.com',
+            'user' => 'me@example.com',
+            'pass' => 'some_pass',
+            'sender-name' => 'WebFiori',
+            'sender-address' => 'addr@example.com',
+            'account-name' => 'Cool2'
+        ]);
+        $driver->addOrUpdateSMTPAccount($conn);
+        $this->assertEquals(2, count($driver->getSMTPConnections()));
+        $account =$driver->getSMTPConnection('Cool');
+        $this->assertEquals(6, $account->getPort());
+        $this->assertEquals('Cool', $account->getAccountName());
+        $this->assertEquals('addr@example.com', $account->getAddress());
+        $this->assertEquals('WebFiori', $account->getSenderName());
+        $this->assertEquals('smtp@example.com', $account->getServerAddress());
+        $this->assertEquals('me@example.com', $account->getUsername());
+        $driver->removeSMTPAccount('Cool');
+        $this->assertEquals(1, count($driver->getSMTPConnections()));
+        $account = $driver->getSMTPConnection('Cool');
+        $this->assertNull($account);
+        $account = $driver->getSMTPConnection('Cool2');
+        $this->assertNotNull($account);
+    }
+    /**
+     * @test
      */
     public function testDatabaseConnections00() {
         $driver = new JsonDriver();
@@ -463,6 +529,42 @@ class JsonDriverTest extends TestCase {
             'KG' => 9,
             'OP' => 'hello'
         ], $account->getExtars());
+        $driver->removeAllDBConnections();
+        $this->assertEquals(0, count($driver->getDBConnections()));
+    }
+    /**
+     * @test
+     */
+    public function testDatabaseConnections03() {
+        $driver = new JsonDriver();
+        $this->assertEquals(0, count($driver->getDBConnections()));
+        $this->assertNull($driver->getDBConnection('olf'));
+        $conn = new ConnectionInfo('mysql', 'root', 'test@222', 'my_db', 'localhost', 3306);
+        $conn->setName('ok');
+        $driver->addOrUpdateDBConnection($conn);
+        $this->assertEquals(1, count($driver->getDBConnections()));
+        $conn = new ConnectionInfo('mysql', 'root', 'test@222', 'my_db', 'localhost', 3306);
+        $conn->setName('not_ok');
+        $conn->setExtras([
+            'A' => 'B',
+            'C' => 'D'
+        ]);
+        $driver->addOrUpdateDBConnection($conn);
+        $this->assertEquals(2, count($driver->getDBConnections()));
+        $driver->removeDBConnection('ok');
+        $this->assertEquals(1, count($driver->getDBConnections()));
+        
+        $account = $driver->getDBConnection('not_ok');
+        $this->assertEquals(3306, $account->getPort());
+        $this->assertEquals('my_db', $account->getDBName());
+        $this->assertEquals('mysql', $account->getDatabaseType());
+        $this->assertEquals('localhost', $account->getHost());
+        $this->assertEquals('test@222', $account->getPassword());
+        $this->assertEquals('root', $account->getUsername());
+        $this->assertEquals([
+            'A' => 'B',
+            'C' => 'D'
+        ], $account->getExtars());
     }
     /**
      * @test
@@ -473,6 +575,58 @@ class JsonDriverTest extends TestCase {
         $driver = new JsonDriver();
         $driver->initialize();
         $driver->getDBConnections();
+        JsonDriver::setConfigFileName('app-config');
     }
-    
+    /**
+     * @test
+     */
+    public function testSchedulerPass00() {
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('app-config.json');
+        $driver->initialize(true);
+        $this->assertEquals('NO_PASSWORD', $driver->getSchedulerPassword());
+        $driver->setSchedulerPassword(hash('sha256', '123'));
+        $this->assertEquals(hash('sha256', '123'), $driver->getSchedulerPassword());
+        $driver->setSchedulerPassword('');
+        $this->assertEquals('NO_PASSWORD', $driver->getSchedulerPassword());
+    }
+    /**
+     * @test
+     */
+    public function testHomePage00() {
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('app-config.json');
+        $driver->initialize(true);
+        $this->assertEquals('https://127.0.0.1', $driver->getHomePage());
+        $driver->setHomePage('https://home.com/my-page');
+        $this->assertEquals('https://home.com/my-page', $driver->getHomePage());
+        $driver->setHomePage('');
+        $this->assertEquals('https://127.0.0.1', $driver->getHomePage());
+    }
+    /**
+     * @test
+     */
+    public function testBase00() {
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('app-config.json');
+        $driver->initialize(true);
+        $this->assertEquals('https://127.0.0.1', $driver->getBaseURL());
+        $driver->setBaseURL('https://home.com');
+        $this->assertEquals('https://home.com', $driver->getBaseURL());
+        $driver->setBaseURL('');
+        $this->assertEquals('https://127.0.0.1', $driver->getBaseURL());
+    }
+    /**
+     * @test
+     */
+    public function testSetTheme00() {
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('app-config.json');
+        $driver->initialize(true);
+        $this->assertEquals('', $driver->getTheme());
+        $driver->setTheme('Test Theme');
+        $this->assertEquals('Test Theme', $driver->getTheme());
+        $driver->setTheme('');
+        $this->assertEquals('', $driver->getTheme());
+    }
 }

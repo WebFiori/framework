@@ -178,7 +178,7 @@ class APITestCaseWriter extends ClassWriter {
                     if ($x + 1 == count($missingArr)) {
                         $this->append(". '            \"$item\"'.self::NL", 2);
                     } else {
-                        $this->append(". '            \"$item\"',.self::NL", 2);
+                        $this->append(". '            \"$item\",'.self::NL", 2);
                     }
                 }
                 $this->append(". '        ]'.self::NL", 2);

@@ -3,6 +3,10 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
 use webfiori\framework\scheduler\webServices\TasksServicesManager;
+use webfiori\framework\writers\ServiceHolder;
+use webfiori\framework\writers\WebServiceWriter;
+use webfiori\http\ParamOption;
+use webfiori\http\ParamType;
 /**
  * @author Ibrahim
  */
@@ -60,7 +64,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             "4: set-password\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: \\tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
+            'Name: tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "Info: New class was created at \"".$path."\".\n"
@@ -120,7 +124,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: \\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest'."\n",
+            'Name: tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
@@ -129,6 +133,65 @@ class CreateAPITestCaseTest extends CreateTestCase {
             "Info: New class was created at \"".$path."\".\n"
         ], $runner->getOutput());
         $clazz = '\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+    }
+    /**
+     * @test
+     */
+    public function testCreateAPITestCase04() {
+        $runner = $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'api-test',
+            '--service' => 'get-tasks',
+        ]);
+        $service = new ServiceHolder('say-hi-service');
+        $service->addParameters([
+            'first-name' => [
+                ParamOption::TYPE => ParamType::STRING
+            ],
+            'last-name' => [
+                ParamOption::TYPE => ParamType::STRING,
+                ParamOption::OPTIONAL => true,
+            ],
+            'age' => [
+                ParamOption::TYPE => ParamType::INT,
+                ParamOption::OPTIONAL => true,
+            ],
+        ]);
+
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'api-test',
+            '--service' => 'say-hi-service',
+        ]);
+        $runner->setInputs([
+            '\\tests\\apis\\multiple\\ServicesManager00',
+            'n',
+            '10',
+            '',
+            '',
+            
+        ]);
+        $exitCode = $runner->start();
+        //$this->assertEquals(0, $exitCode);
+        $path = ROOT_PATH.DS."tests".DS."tests".DS."apis".DS."multiple";
+        $this->assertEquals([
+            "Please enter services manager information:\n",
+            "Test case will be created with following parameters:\n",
+            "PHPUnit Version: 9\n",
+            'Name: tests\tests\apis\multiple\WebService00Test'."\n",
+            "Path: ".$path."\n",
+            "Would you like to use default parameters?(Y/n)\n",
+            "PHPUnit Version: Enter = '11'\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'tests\\tests\apis\multiple'\n",
+            "Info: New class was created at \"".$path."\".\n"
+        ], $runner->getOutput());
+        $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

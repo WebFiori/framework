@@ -15,7 +15,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
      * @test
      */
     public function testCreateAPITestCase00() {
-        $runner = $runner = App::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -39,7 +39,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
      * @test
      */
     public function testCreateAPITestCase01() {
-        $runner = $runner = App::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -77,7 +77,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
      * @test
      */
     public function testCreateAPITestCase02() {
-        $runner = $runner = App::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -102,7 +102,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
      * @test
      */
     public function testCreateAPITestCase03() {
-        $runner = $runner = App::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
@@ -140,27 +140,14 @@ class CreateAPITestCaseTest extends CreateTestCase {
      * @test
      */
     public function testCreateAPITestCase04() {
-        $runner = $runner = App::getRunner();
+        $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',
             'create',
             '--c' => 'api-test',
             '--service' => 'get-tasks',
         ]);
-        $service = new ServiceHolder('say-hi-service');
-        $service->addParameters([
-            'first-name' => [
-                ParamOption::TYPE => ParamType::STRING
-            ],
-            'last-name' => [
-                ParamOption::TYPE => ParamType::STRING,
-                ParamOption::OPTIONAL => true,
-            ],
-            'age' => [
-                ParamOption::TYPE => ParamType::INT,
-                ParamOption::OPTIONAL => true,
-            ],
-        ]);
+        
 
         $runner->setArgsVector([
             'webfiori',
@@ -177,7 +164,7 @@ class CreateAPITestCaseTest extends CreateTestCase {
             
         ]);
         $exitCode = $runner->start();
-        //$this->assertEquals(0, $exitCode);
+        $this->assertEquals(0, $exitCode);
         $path = ROOT_PATH.DS."tests".DS."tests".DS."apis".DS."multiple";
         $this->assertEquals([
             "Please enter services manager information:\n",
@@ -194,5 +181,26 @@ class CreateAPITestCaseTest extends CreateTestCase {
         $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateAPITestCase05() {
+        $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'api-test',
+            '--manager' => '\\tests\\apis\\emptyService\\EmptyServicesManager',
+        ]);
+        $runner->setInputs();
+
+        $exitCode = $runner->start();
+        $this->assertEquals(-1, $exitCode);
+
+        $this->assertEquals([
+            "Info: Provided services manager has 0 registered services.\n",
+        ], $runner->getOutput());
     }
 }

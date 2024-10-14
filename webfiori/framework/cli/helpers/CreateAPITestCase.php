@@ -37,7 +37,9 @@ class CreateAPITestCase extends CreateClassHelper {
         if (!$this->readManagerInfo()) {
             return false;
         }
-        $this->readServiceInfo();
+        if (!$this->readServiceInfo()) {
+            return false;
+        }
         $nsArr = explode('\\', get_class($this->writer->getService()));
         array_pop($nsArr);
         $ns = implode('\\', $nsArr);
@@ -77,15 +79,16 @@ class CreateAPITestCase extends CreateClassHelper {
                 $this->info('Selected services manager has no service with name \''.$selected.'\'.');
             } else {
                 $this->writer->setService($services[$selected]);
-                return;
+                return false;
             }
         }
         if (count($services) == 0) {
             $this->info('Provided services manager has 0 registered services.');
-            return;
+            return false;
         }
         $selected = $this->select('Which service you would like to have a test case for?', array_keys($services));
         $this->writer->setService($services[$selected]);
+        return true;
     }
     private function readManagerInfo() {
         $m = $this->getCommand()->getArgValue('--manager');

@@ -79,7 +79,7 @@ class CreateAPITestCase extends CreateClassHelper {
                 $this->info('Selected services manager has no service with name \''.$selected.'\'.');
             } else {
                 $this->writer->setService($services[$selected]);
-                return false;
+                return true;
             }
         }
         if (count($services) == 0) {

@@ -138,12 +138,6 @@ class CreateAPITestCaseTest extends CreateTestCase {
      */
     public function testCreateAPITestCase04() {
         $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'create',
-            '--c' => 'api-test',
-            '--service' => 'get-tasks',
-        ]);
         
 
         $runner->setArgsVector([
@@ -205,12 +199,6 @@ class CreateAPITestCaseTest extends CreateTestCase {
      */
     public function testCreateAPITestCase06() {
         $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'create',
-            '--c' => 'api-test',
-            '--service' => 'get-tasks',
-        ]);
         
 
         $runner->setArgsVector([
@@ -268,5 +256,29 @@ class CreateAPITestCaseTest extends CreateTestCase {
         $this->assertEquals([
             "Error: The argument --manager has invalid value.\n",
         ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testCreateAPITestCase08() {
+        $runner = App::getRunner();
+        $runner->setArgsVector([
+            'webfiori',
+            'create',
+            '--c' => 'api-test',
+            '--service' => 'say-hi-service-2',
+            '--manager' => '\\tests\\apis\\multiple\\ServicesManager00',
+            '--defaults'
+        ]);
+        $runner->setInputs();
+        $exitCode = $runner->start();
+        $this->assertEquals(0, $exitCode);
+        $path = ROOT_PATH.DS."tests".DS."tests".DS."apis".DS."multiple";
+        $this->assertEquals([
+            "Info: New class was created at \"".$path."\".\n"
+        ], $runner->getOutput());
+        $clazz = '\\tests\\tests\\apis\\multiple\\WebService01Test';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
     }
 }

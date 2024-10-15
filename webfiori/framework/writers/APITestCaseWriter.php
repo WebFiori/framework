@@ -224,7 +224,7 @@ class APITestCaseWriter extends ClassWriter {
         }
     }
     private function addTestAnnotation() {
-        if ($this->phpunitV >= 10) {
+        if ($this->getPhpUnitVersion() >= 10) {
             $this->append('#[Test]', 1);
         } else {
             $this->append('/**', 1);

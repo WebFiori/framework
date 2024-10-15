@@ -16,6 +16,7 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
     public function test00() {
         $w = new APITestCaseWriter(new TasksServicesManager(), ForceTaskExecutionService::class);
         $this->assertEquals('tests\\apis\\WebServiceTest', $w->getName(true));
+        $this->assertEquals(9, $w->getPhpUnitVersion());
         $w->writeClass();
         $this->assertTrue(class_exists($w->getName(true)));
         $this->removeClass($w->getAbsolutePath());
@@ -24,7 +25,7 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
      * @test
      */
     public function test01() {
-        $w = new APITestCaseWriter(new TasksServicesManager(), ForceTaskExecutionService::class);
+        $w = new APITestCaseWriter(new TasksServicesManager(), new ForceTaskExecutionService());
         $w->setClassName('Cool');
         $w->setNamespace('\\tests\\cool');
         $w->setPath(ROOT_PATH.DS.'tests'.DS.'cool');

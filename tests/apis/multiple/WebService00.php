@@ -25,7 +25,8 @@ class WebService00 extends AbstractWebService {
         $this->setDescription('');
         $this->setRequestMethods([
                 RequestMethod::GET,
-                RequestMethod::POST
+                RequestMethod::POST,
+                RequestMethod::PATCH
         ]);
         $this->addParameters([
             'first-name' => [

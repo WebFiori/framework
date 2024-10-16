@@ -54,7 +54,7 @@ class APITestCaseWriter extends ClassWriter {
      * will be based on.
      */
     public function __construct(WebServicesManager $manager = null, $service = null) {
-        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis',  ROOT_PATH.'tests\\apis');
+        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis', 'tests\\apis');
         $this->setSuffix('Test');
         if ($manager !== null) {
             $this->setServicesManager($manager);
@@ -178,7 +178,7 @@ class APITestCaseWriter extends ClassWriter {
                     if ($x + 1 == count($missingArr)) {
                         $this->append(". '            \"$item\"'.self::NL", 2);
                     } else {
-                        $this->append(". '            \"$item\"',.self::NL", 2);
+                        $this->append(". '            \"$item\",'.self::NL", 2);
                     }
                 }
                 $this->append(". '        ]'.self::NL", 2);
@@ -224,7 +224,7 @@ class APITestCaseWriter extends ClassWriter {
         }
     }
     private function addTestAnnotation() {
-        if ($this->phpunitV >= 10) {
+        if ($this->getPhpUnitVersion() >= 10) {
             $this->append('#[Test]', 1);
         } else {
             $this->append('/**', 1);

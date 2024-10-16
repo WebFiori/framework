@@ -182,7 +182,14 @@ abstract class ClassWriter {
         $retVal = $this->className.$this->getSuffix();
 
         if ($withNs) {
-            return '\\'.$this->getNamespace().'\\'.$retVal;
+            $ns = $this->getNamespace();
+            
+            if ($ns == '\\') {
+                
+                return '\\'.$retVal;
+            }
+            
+            return $ns.'\\'.$retVal;
         }
 
         return $retVal;
@@ -340,12 +347,12 @@ abstract class ClassWriter {
      * Other than that, false is returned.
      */
     public function setNamespace(string $namespace) {
-        $trimmed = trim($namespace);
+        $trimmed = trim($namespace, ' ');
 
         if (!self::isValidNamespace($trimmed)) {
             return false;
         }
-        $this->ns = $trimmed;
+        $this->ns = $trimmed[0] == '\\' ? substr($trimmed, 1) : $trimmed;
 
         return true;
     }

@@ -5,6 +5,7 @@
 
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
+use webfiori\framework\config\JsonDriver;
 
 $DS = DIRECTORY_SEPARATOR;
 
@@ -88,6 +89,11 @@ fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.
 register_shutdown_function(function()
 {
+    JsonDriver::setConfigFileName('app-config.json');
+    App::getConfig()->remove();
+    JsonDriver::setConfigFileName('run-sql-test.json');
+    App::getConfig()->remove();
+    JsonDriver::setConfigFileName('super-confx.json');
     App::getConfig()->remove();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");

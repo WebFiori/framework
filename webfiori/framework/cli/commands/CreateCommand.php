@@ -10,10 +10,11 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
 use webfiori\cli\Argument;
+use webfiori\cli\CLICommand;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
+use webfiori\framework\cli\helpers\CreateAPITestCase;
 use webfiori\framework\cli\helpers\CreateBackgroundTask;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
@@ -110,7 +111,7 @@ class CreateCommand extends CLICommand {
             $create = new CreateFullRESTHelper($this);
             $create->readInfo();
         } else if ($answer == 'Web service test case.') {
-            $create = new \webfiori\framework\cli\helpers\CreateAPITestCase($this);
+            $create = new CreateAPITestCase($this);
             if (!$create->readClassInfo()) {
                 return -1;
             }

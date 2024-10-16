@@ -229,8 +229,14 @@ class Session implements JsonI {
                 {
                     throw  new SessionException($errStr.' at line '.$errLine, $errNo);
                 });
-                $sessionObj = unserialize(base64_decode(trim($decrypted)));
-                restore_error_handler();
+                try {
+                    $sessionObj = unserialize(base64_decode(trim($decrypted)));
+                    restore_error_handler();
+                } catch (SessionException $ex) {
+                    restore_error_handler();
+                    return false;
+                }
+                
 
                 if ($sessionObj instanceof Session) {
                     $this->sessionStatus = SessionStatus::RESUMED;
@@ -244,8 +250,13 @@ class Session implements JsonI {
             {
                 throw  new SessionException($errStr, $errNo);
             });
-            $sessionObj = unserialize(base64_decode($serialized));
-            restore_error_handler();
+            try {
+                $sessionObj = unserialize(base64_decode($serialized));
+                restore_error_handler();
+            } catch (SessionException $ex) {
+                restore_error_handler();
+                return false;
+            }
 
             if ($sessionObj instanceof Session) {
                 $this->sessionStatus = SessionStatus::RESUMED;

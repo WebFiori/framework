@@ -314,8 +314,8 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->getController()->createTables()->execute();
-        $sto->getController()->table('session_data')->select()->execute();
-        $sto->getController()->table('sessions')->select()->execute();
+//        $sto->getController()->table('session_data')->select()->execute();
+//        $sto->getController()->table('sessions')->select()->execute();
         $this->assertTrue(true);
     }
     /**

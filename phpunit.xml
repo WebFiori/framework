@@ -45,6 +45,8 @@
             <file>./webfiori/framework/cli/commands/UpdateTableCommand.php</file>
             <file>./webfiori/framework/cli/commands/VersionCommand.php</file>
             <file>./webfiori/framework/cli/commands/WHelpCommand.php</file>
+            <file>./webfiori/framework/cli/CLITestCase.php</file>
+            <file>./webfiori/framework/cli/CLIUtils.php</file>
             
             <file>./webfiori/framework/cli/helpers/ClassInfoReader.php</file>
             <file>./webfiori/framework/cli/helpers/CreateBackgroundTask.php</file>

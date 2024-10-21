@@ -9,11 +9,16 @@
  *
  */
 namespace webfiori\framework\autoload;
+
 /**
  * A class that contains the names of indices that are used by loaded class info array.
  *
  */
 class ClassInfo {
+    /**
+     * A constant that represents the value 'cached' of class.
+     */
+    const CACHED = 'loaded-from-cache';
     /**
      * A constant that represents the value 'name' of class.
      */
@@ -26,8 +31,4 @@ class ClassInfo {
      * A constant that represents the value 'path' of class.
      */
     const PATH = 'path';
-    /**
-     * A constant that represents the value 'cached' of class.
-     */
-    const CACHED = 'loaded-from-cache';
 }

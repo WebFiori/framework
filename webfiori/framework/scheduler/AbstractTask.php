@@ -183,7 +183,7 @@ abstract class AbstractTask implements JsonI {
         $this->taskDetails['days-of-month'] = [];
         $this->taskDetails['months'] = [];
         $this->taskDetails['days-of-week'] = [];
-        
+
 
 
         if (!$this->cron($when)) {
@@ -206,7 +206,7 @@ abstract class AbstractTask implements JsonI {
      *
      * @param string|TaskArgument $nameOrObj The name of the argument. This also can be an
      * object of type TaskArgument.
-     * 
+     *
      * @throws InvalidArgumentException If provided argument is not a string or an object of type
      * 'TaskArgument'.
      *
@@ -354,33 +354,6 @@ abstract class AbstractTask implements JsonI {
         $this->cron('0 * * * *');
     }
     /**
-     * Schedules a task to run weekly at specific week day and time.
-     *
-     * @param int $dayNameOrNum A 3 letter day name (such as 'sun' or 'tue') or a day number from 0 to 6.
-     * 0 for sunday. Default is 0.
-     *
-     * @param string $time A time in the form 'HH:MM'. HH can have any value
-     * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
-     * default is '00:00'.
-     *
-     * @return bool If the time for the task is set, the method will
-     * return true. If not, it will return false.
-     */
-    public function everyWeek($dayNameOrNum = 0, string $time = '00:00') : bool {
-        return $this->weeklyOn($dayNameOrNum, $time);
-    }
-    /**
-     * Schedule a task to run every specific number of hours.
-     * 
-     * The expression that will be used is "At minute 0 past every X hour" where
-     * x is the number of hours.
-     * 
-     * @param int $xHour The number of hours at which the job will be executed.
-     */
-    public function everyXHour(int $xHour) {
-        $this->cron('0 */'.$xHour.' * * *');
-    }
-    /**
      * Schedules a task to run every month on specific day and time.
      *
      * @param int $dayNum The number of the day. It can be any value between
@@ -410,11 +383,38 @@ abstract class AbstractTask implements JsonI {
         return false;
     }
     /**
+     * Schedules a task to run weekly at specific week day and time.
+     *
+     * @param int $dayNameOrNum A 3 letter day name (such as 'sun' or 'tue') or a day number from 0 to 6.
+     * 0 for sunday. Default is 0.
+     *
+     * @param string $time A time in the form 'HH:MM'. HH can have any value
+     * between 0 and 23 inclusive. MM can have any value between 0 and 59 inclusive.
+     * default is '00:00'.
+     *
+     * @return bool If the time for the task is set, the method will
+     * return true. If not, it will return false.
+     */
+    public function everyWeek($dayNameOrNum = 0, string $time = '00:00') : bool {
+        return $this->weeklyOn($dayNameOrNum, $time);
+    }
+    /**
+     * Schedule a task to run every specific number of hours.
+     *
+     * The expression that will be used is "At minute 0 past every X hour" where
+     * x is the number of hours.
+     *
+     * @param int $xHour The number of hours at which the job will be executed.
+     */
+    public function everyXHour(int $xHour) {
+        $this->cron('0 */'.$xHour.' * * *');
+    }
+    /**
      * Schedule a task to run every specific number of minutes.
-     * 
+     *
      * Assuming that 5 is supplied as a value, this means that the job will be
      * executed every 5 minutes within an hour.
-     * 
+     *
      * @param int $step The number of minutes that a job will be executed after.
      */
     public function everyXMinuts(int $step) {
@@ -1433,7 +1433,7 @@ abstract class AbstractTask implements JsonI {
      */
     private function getSubExprType(string $expr): string {
         $retVal = self::ANY_VAL;
-        
+
         if ($expr != '*') {
             $split0 = explode('/', $expr);
             $count = count($split0);
@@ -1463,6 +1463,7 @@ abstract class AbstractTask implements JsonI {
                 if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
                     return self::INV_VAL;
                 }
+
                 return self::STEP_VAL;
             }
         }
@@ -1541,7 +1542,7 @@ abstract class AbstractTask implements JsonI {
         $e = new TraceEntry($firstEntry);
         TasksManager::log('#'.$index.' '.$e);
         $index++;
-        
+
         foreach ($trace as $traceEntry) {
             $e = new TraceEntry($traceEntry);
             TasksManager::log('#'.$index.' '.$e);

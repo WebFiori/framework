@@ -417,6 +417,15 @@ class App {
         } catch (Error $ex) {
         }
     }
+    private static function call($func) {
+        try {
+            call_user_func($func);
+        } catch (Exception $ex) {
+            if (self::getRunner()->isCLI()) {
+                printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
+            }
+        }
+    }
     private function checkAppDir() {
         if (!defined('DS')) {
             /**
@@ -576,15 +585,6 @@ class App {
             Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
         self::call(APP_DIR.'\ini\InitMiddleware::init');
-    }
-    private static function call($func) {
-        try {
-            call_user_func($func);
-        } catch (Exception $ex) {
-            if (self::getRunner()->isCLI()) {
-                printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
-            }
-        }
     }
     /**
      * @throws FileException

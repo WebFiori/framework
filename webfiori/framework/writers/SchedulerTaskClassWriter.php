@@ -27,7 +27,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
      *
      * @param string $className The name of the class that will represent the
      * task.
-     * 
+     *
      * @param string $taskName The name of the task.
      *
      * @param string $taskDesc A short description that description what does the

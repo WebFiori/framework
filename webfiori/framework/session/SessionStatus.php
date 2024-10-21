@@ -9,6 +9,7 @@
  *
  */
 namespace webfiori\framework\session;
+
 /**
  * A class which is used to hold constants which represents different statuses
  * of a session.

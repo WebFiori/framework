@@ -18,8 +18,8 @@ use webfiori\http\Request;
 use webfiori\http\Response;
 /**
  * Errors and exceptions handler which is used to handle errors in case of
- * HTTP request. 
- * 
+ * HTTP request.
+ *
  * The priority of the handler
  * is set to 0 which indicates that it will be executed last.
  *

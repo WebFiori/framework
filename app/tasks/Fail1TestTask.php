@@ -42,6 +42,7 @@ class Fail1TestTask extends AbstractTask {
      */
     public function execute() {
         TasksManager::logInfo('Task '.$this->getTaskName().' Is executing...');
+
         return false;
     }
     /**

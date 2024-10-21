@@ -7,7 +7,7 @@ use webfiori\http\Response;
 /**
  * A middleware which is created using the command "create".
  *
- * The middleware will have the name 'Super Middleware' and 
+ * The middleware will have the name 'Super Middleware' and
  * Priority 100.
  * In addition, the middleware is added to the following groups:
  * <ul>
@@ -29,12 +29,6 @@ class CoolMiddleware extends AbstractMiddleware {
         ]);
     }
     /**
-     * Execute a set of instructions before accessing the application.
-     */
-    public function before(Request $request, Response $response) {
-        //TODO: Implement the action to perform before processing the request.
-    }
-    /**
      * Execute a set of instructions after processing the request and before sending back the response.
      */
     public function after(Request $request, Response $response) {
@@ -45,5 +39,11 @@ class CoolMiddleware extends AbstractMiddleware {
      */
     public function afterSend(Request $request, Response $response) {
         //TODO: Implement the action to perform after sending the request.
+    }
+    /**
+     * Execute a set of instructions before accessing the application.
+     */
+    public function before(Request $request, Response $response) {
+        //TODO: Implement the action to perform before processing the request.
     }
 }

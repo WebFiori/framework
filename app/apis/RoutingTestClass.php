@@ -1,5 +1,4 @@
 <?php
-
 namespace app\apis;
 
 use webfiori\http\Response;

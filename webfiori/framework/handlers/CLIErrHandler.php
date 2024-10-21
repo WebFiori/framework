@@ -17,8 +17,8 @@ use webfiori\framework\App;
 use webfiori\framework\scheduler\TasksManager;
 /**
  * Exceptions handler which is used to handle exceptions in case of running
- * CLI applications. 
- * 
+ * CLI applications.
+ *
  * The priority of the handler
  * is set to 0 which indicates that it will be executed last.
  *

@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
 use webfiori\cli\Argument;
+use webfiori\cli\CLICommand;
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
 /**
@@ -111,7 +111,7 @@ class SchedulerCommand extends CLICommand {
     }
     private function checkTaskArgs($taskName) {
         $task = TasksManager::getTask($taskName);
-        
+
         if ($task === null) {
             return;
         }

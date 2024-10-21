@@ -10,16 +10,16 @@
  */
 namespace webfiori\framework;
 
+use const DS;
 use Error;
 use Exception;
+use const ROOT_PATH;
+use const THEMES_PATH;
 use webfiori\file\File;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
 use webfiori\http\Response;
-use const DS;
-use const ROOT_PATH;
-use const THEMES_PATH;
 
 
 /**

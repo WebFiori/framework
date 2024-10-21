@@ -33,7 +33,6 @@ class APICallErrHandler extends AbstractHandler {
     public function __construct() {
         parent::__construct();
         $this->setName('API Call Errors Handler');
-        
     }
     /**
      * Handles the exception

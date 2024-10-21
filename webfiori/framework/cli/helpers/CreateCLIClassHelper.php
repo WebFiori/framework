@@ -63,6 +63,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
                 continue;
             }
             $argObj->setDescription($this->getInput('Describe this argument and how to use it:', ''));
+
             foreach ($this->getFixedValues() as $v) {
                 $argObj->addAllowedValue($v);
             }

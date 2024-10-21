@@ -11,8 +11,8 @@
 namespace webfiori\framework\cli\commands;
 
 use Throwable;
-use webfiori\cli\CLICommand;
 use webfiori\cli\Argument;
+use webfiori\cli\CLICommand;
 use webfiori\cli\InputValidator;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
@@ -104,6 +104,7 @@ class UpdateSettingsCommand extends CLICommand {
                 if ($instance instanceof Theme) {
                     return true;
                 }
+
                 return false;
             } catch (Throwable $exc) {
                 return false;

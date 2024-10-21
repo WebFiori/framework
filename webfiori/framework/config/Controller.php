@@ -14,7 +14,7 @@ use webfiori\framework\exceptions\InitializationException;
 class Controller {
     const NL = "\n";
     /**
-     * 
+     *
      * @var ConfigurationDriver
      */
     private $driver;
@@ -27,20 +27,13 @@ class Controller {
         $this->driver = new $driverClazz();
         $this->init($this->driver);
     }
-    private static function init(ConfigurationDriver $driver, bool $reCreate = false) {
-        try {
-            $driver->initialize($reCreate);
-        } catch (Exception $ex) {
-            throw new InitializationException('Unable to initialize configuration driver due to an error: '.$ex->getMessage(), $ex->getCode(), $ex);
-        }
-    }
     /**
      * Adds new environment variable to the configuration of the app.
-     * 
+     *
      * @param string $name The name of the variable such as 'MY_VAR'.
-     * 
+     *
      * @param mixed $value The value of the variable.
-     * 
+     *
      * @param string|null $description An optional text that describes the variable.
      */
     public function addEnvVar(string $name, $value, string $description = null) {
@@ -77,7 +70,6 @@ class Controller {
         }
 
         foreach ($current->getEnvVars() as $name => $probs) {
-            
             $new->addEnvVar($name, $probs['value'], $probs['description']);
         }
         $new->setPrimaryLanguage($current->getPrimaryLanguage());
@@ -134,6 +126,13 @@ class Controller {
                     putenv($name.'=');
                 }
             }
+        }
+    }
+    private static function init(ConfigurationDriver $driver, bool $reCreate = false) {
+        try {
+            $driver->initialize($reCreate);
+        } catch (Exception $ex) {
+            throw new InitializationException('Unable to initialize configuration driver due to an error: '.$ex->getMessage(), $ex->getCode(), $ex);
         }
     }
 }

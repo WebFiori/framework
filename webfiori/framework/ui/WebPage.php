@@ -574,11 +574,10 @@ class WebPage {
      *
      */
     public function getTranslation() : Lang {
-        
         if (!$this->skipLangCheck && $this->tr === null) {
             $this->usingLanguage();
         }
-        
+
         return $this->tr;
     }
     /**
@@ -774,13 +773,6 @@ class WebPage {
 
         return $this->getDocument();
     }
-    private function getConfigVar(string $meth, string $default = null, array $params = []) {
-        try{
-            return call_user_func_array([App::getConfig(), $meth], $params);
-        } catch (InitializationException $ex) {
-            return $default;
-        }
-    }
     /**
      * Resets page attributes to default values.
      *
@@ -792,7 +784,7 @@ class WebPage {
         $this->checkLang();
         $this->usingLanguage();
 
-        
+
         $this->setWebsiteName($this->getConfigVar('getAppName', 'WebFiori App', [$this->getLangCode()]));
         $this->setDescription($this->getConfigVar('getDescription', '', [$this->getLangCode()]));
         $this->setTitle($this->getConfigVar('getTitle', 'Hello World', [$this->getLangCode()]));
@@ -802,10 +794,10 @@ class WebPage {
             $langObj = $this->getTranslation();
             $this->contentDir = $langObj->getWritingDir();
         } catch (TypeError $ex) {
-             $this->contentDir = 'ltr';
+            $this->contentDir = 'ltr';
         }
 
-        
+
 
         $this->incFooter = true;
         $this->incHeader = true;
@@ -1015,7 +1007,7 @@ class WebPage {
             return;
         }
         $xthemeName = $themeNameOrClass;
-        
+
         if (strlen(trim($themeNameOrClass.'')) == 0) {
             $xthemeName = $this->getConfigVar('getTheme', $themeNameOrClass);
         }
@@ -1196,13 +1188,20 @@ class WebPage {
         }
         $this->setLang($langCodeFromSession);
     }
+    private function getConfigVar(string $meth, string $default = null, array $params = []) {
+        try {
+            return call_user_func_array([App::getConfig(), $meth], $params);
+        } catch (InitializationException $ex) {
+            return $default;
+        }
+    }
 
 
     private function getHead() {
         $loadedTheme = $this->getTheme();
         $defaultBase = Util::getBaseURL();
         $base = $this->getConfigVar('getBaseURL', $defaultBase);
-        
+
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
@@ -1333,6 +1332,7 @@ class WebPage {
                 if (!$this->skipLangCheck) {
                     throw new MissingLangException($ex->getMessage());
                 }
+
                 return;
             }
             $pageLang = $this->getTranslation();

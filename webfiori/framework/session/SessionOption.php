@@ -8,7 +8,6 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-
 namespace webfiori\framework\session;
 
 /**
@@ -23,15 +22,15 @@ class SessionOption {
      */
     const DURATION = 'duration';
     /**
-     * An option which is used to set if session timeout will be refreshed on
-     * each request or not (bool)
-     */
-    const REFRESH = 'refresh';
-    /**
      * An option which is used to set the name of the session. The name will be
      * same as session cookie.
      */
     const NAME = 'name';
+    /**
+     * An option which is used to set if session timeout will be refreshed on
+     * each request or not (bool)
+     */
+    const REFRESH = 'refresh';
     /**
      * An option which is used to set the ID of the session.
      */

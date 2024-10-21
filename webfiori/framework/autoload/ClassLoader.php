@@ -263,15 +263,31 @@ class ClassLoader {
      * @return bool If file is exist and class is loaded, true is returned. False
      * otherwise.
      */
-    public static function map(string $className, string $classWithNs, string $path) {
-        self::get()->addClassMap($className, $classWithNs, $path);
+    public static function map(string $className, string $classWithNs, string $filePath) {
+        self::get()->addClassMap($className, $classWithNs, $filePath);
+    }
+    /**
+     * Load multiple classes from same path which belongs to same namespace.
+     * 
+     * This helper method can be used to autoload classes which are non-PSR-4 compliant.
+     * 
+     * @param string $ns The namespace at which classes belongs to.
+     * 
+     * @param string $path The location at which all classes stored at.
+     * 
+     * @param array $classes An array that holds the names of the classes.
+     */
+    public static function mapAll(string $ns, string $path, array $classes) {
+        foreach ($classes as $className) {
+            self::map($className, $ns.'\\'.$className, $path.DIRECTORY_SEPARATOR.$className.'.php');
+        }
     }
     /**
      * Load a class using its specified path.
      * 
      * This method can be used in case the class that the user tries to load does
      * not comply with PSR-4 standard for placing classes in correct folder
-     * with correct namespace.
+     * with correct namespace. Once loaded, it will be added to the cache.
      * 
      * @param string $className The name of the class that will be loaded.
      * 

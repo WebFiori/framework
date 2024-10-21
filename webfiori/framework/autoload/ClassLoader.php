@@ -247,7 +247,60 @@ class ClassLoader {
 
         return self::$loader;
     }
-
+    /**
+     * Load a class using its specified path.
+     * 
+     * This method can be used in case the class that the user tries to load does
+     * not comply with PSR-4 standard for placing classes in correct folder
+     * with correct namespace.
+     * 
+     * @param string $className The name of the class that will be loaded.
+     * 
+     * @param string $classWithNs The full name of the class including its namespace.
+     * 
+     * @param string $path The path to PHP file that has class implementation.
+     * 
+     * @return bool If file is exist and class is loaded, true is returned. False
+     * otherwise.
+     */
+    public static function map(string $className, string $classWithNs, string $path) {
+        self::get()->addClassMap($className, $classWithNs, $path);
+    }
+    /**
+     * Load a class using its specified path.
+     * 
+     * This method can be used in case the class that the user tries to load does
+     * not comply with PSR-4 standard for placing classes in correct folder
+     * with correct namespace.
+     * 
+     * @param string $className The name of the class that will be loaded.
+     * 
+     * @param string $classWithNs The full name of the class including its namespace.
+     * 
+     * @param string $path The path to PHP file that has class implementation.
+     * 
+     * @return bool If file is exist and class is loaded, true is returned. False
+     * otherwise.
+     */
+    public function addClassMap(string $className, string $classWithNs, string $path) : bool {
+        $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
+        
+        if ($this->loadFromCache($ns, $className)) {
+            return true;
+        }
+        if (!file_exists($path)) {
+            return false;
+        }
+        require_once $path;
+        
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => $className,
+            ClassInfo::NS => $ns,
+            ClassInfo::PATH => $path,
+            ClassInfo::CACHED => false
+        ];
+        return true;
+    }
     /**
      * Returns an array that contains all cached classes information.
      *

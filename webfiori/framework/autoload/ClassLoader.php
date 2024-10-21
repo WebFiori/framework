@@ -16,21 +16,15 @@ use Exception;
  *
  * The class aims to provide all needed utilities to autoload any classes
  * which are within the scope of the framework. In addition, the developer
- * can add his own custom folders to the autoloader. More to that, the autoloader
- * will load any class which exist in the folder 'vendor' if composer
- * is used to collect the dependencies. To activate this feature, the constant
- * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of
- * any other component to load classes.
+ * can add his own custom folders to the autoloader.
  *
  * @author Ibrahim
  *
- * @version 1.1.7
  */
 class ClassLoader {
     /**
      * The name of the file that represents autoloader's cache.
      * @var string
-     * @since 1.1.6
      */
     const CACHE_NAME = 'class-loader.cache';
     /**
@@ -41,7 +35,6 @@ class ClassLoader {
      * <li>throw-exception</li>,
      * <li>do-nothing</li>
      * </ul>
-     * @since 1.1.6
      */
     const ON_FAIL_ACTIONS = [
         'throw-exception',
@@ -54,7 +47,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.1.6
      */
     private $cacheArr;
     /**
@@ -62,7 +54,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.1.4
      */
     private $loadedClasses;
     /**
@@ -70,7 +61,6 @@ class ClassLoader {
      *
      * @var ClassLoader
      *
-     * @since 1.0
      */
     private static $loader;
     /**
@@ -79,7 +69,6 @@ class ClassLoader {
      *
      * @var string|callable
      *
-     * @since 1.1.3
      */
     private $onFail;
     /**
@@ -87,7 +76,6 @@ class ClassLoader {
      *
      * @var string
      *
-     * @since 1.0
      */
     private $rootDir;
     /**
@@ -95,7 +83,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.0
      */
     private $searchFolders;
 
@@ -107,7 +94,6 @@ class ClassLoader {
      * @param string $onFail
      * @throws ClassLoaderException
      * @throws Exception
-     * @since 1.0
      */
     private function __construct(string $root = '', array $searchFolders = [], bool $defineRoot = false, string $onFail = self::ON_FAIL_ACTIONS[0]) {
         $this->searchFolders = [];
@@ -252,13 +238,13 @@ class ClassLoader {
      * 
      * This method can be used in case the class that the user tries to load does
      * not comply with PSR-4 standard for placing classes in correct folder
-     * with correct namespace.
+     * with correct namespace. Once loaded, it will be added to the cache.
      * 
      * @param string $className The name of the class that will be loaded.
      * 
      * @param string $classWithNs The full name of the class including its namespace.
      * 
-     * @param string $path The path to PHP file that has class implementation.
+     * @param string $filePath The path to PHP file that has class implementation.
      * 
      * @return bool If file is exist and class is loaded, true is returned. False
      * otherwise.
@@ -326,7 +312,6 @@ class ClassLoader {
      *
      * @return array An array that contains all cached classes information.
      * @throws Exception
-     * @since 1.1.7
      */
     public static function getCacheArray(): array {
         return self::get()->cacheArr;
@@ -364,7 +349,6 @@ class ClassLoader {
      * @throws Exception
      * loaded.
      *
-     * @since 1.0
      */
     public static function getClassPath(string $className, string $namespace = null, bool $load = false): array {
         $retVal = [];
@@ -397,7 +381,6 @@ class ClassLoader {
      * @return array An array of all added search folders.
      *
      * @throws Exception
-     * @since 1.1.1
      */
     public static function getFolders(): array {
         $folders = [];
@@ -427,7 +410,6 @@ class ClassLoader {
      * @return array An associative array that contains loaded classes info.
      *
      * @throws Exception
-     * @since 1.1.4
      */
     public static function getLoadedClasses(): array {
         return self::get()->loadedClasses;
@@ -446,7 +428,6 @@ class ClassLoader {
      * Else, it will return false.
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public  static function isLoaded(string $class, string $ns = null): bool {
         foreach (self::getLoadedClasses() as $classArr) {
@@ -474,7 +455,6 @@ class ClassLoader {
      * are inside the given directory will be included in the search.
      *
      * @throws Exception
-     * @since 1.1.2
      */
     public static function newSearchFolder(string $dir, bool $incSubFolders = true) {
         self::get()->addSearchDirectory($dir,$incSubFolders);
@@ -486,7 +466,6 @@ class ClassLoader {
      * @return string The root directory that is used to search inside.
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public static function root(): string {
         return self::get()->getRoot();
@@ -503,7 +482,6 @@ class ClassLoader {
      * </ul>
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public static function setOnFail($onFail) {
         if (is_callable($onFail)) {
@@ -528,7 +506,6 @@ class ClassLoader {
      * @param string $appendRoot If set to true, Root directory of the search will
      * be added as a prefix to the path.
      *
-     * @since 1.0
      *
      * @deprecated since version 1.1.2
      */
@@ -605,7 +582,6 @@ class ClassLoader {
      *
      * @return array
      *
-     * @since 1.1.6
      */
     private static function getComposerVendorDirs(): array {
         $DS = DIRECTORY_SEPARATOR;
@@ -639,7 +615,6 @@ class ClassLoader {
      *
      * @return string The root directory that is used to search inside.
      *
-     * @since 1.0
      */
     private function getRoot(): string {
         return $this->rootDir;
@@ -652,7 +627,6 @@ class ClassLoader {
      *
      * @throws ClassLoaderException
      * @throws Exception
-     * @since 1.0
      */
     private function loadClass(string $classWithNs) {
         $cArr = explode('\\', $classWithNs);
@@ -835,7 +809,6 @@ class ClassLoader {
     /**
      * Read the file which contains autoloader cached content.
      *
-     * @since 1.1.6
      */
     private function readCache() {
         $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto';
@@ -855,7 +828,6 @@ class ClassLoader {
      * This method is called every time a new class is loaded to update the cache.
      *
      * @throws Exception
-     * @since 1.1.6
      */
     private function updateCacheHelper() {
         $autoloadCache = self::getCachePath();

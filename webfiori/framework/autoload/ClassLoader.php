@@ -32,7 +32,7 @@ class ClassLoader {
      * @var string
      * @since 1.1.6
      */
-    const CACHE_NAME = 'autoload.cache';
+    const CACHE_NAME = 'class-loader.cache';
     /**
      * An array that contains the possible things that can be performed
      * if a class has failed to load.

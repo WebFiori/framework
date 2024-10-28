@@ -161,8 +161,8 @@ class SessionsManagerTest extends TestCase {
      */
     public function testDatabaseSession01() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS');
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::setStorage(new DatabaseSessionStorage());
@@ -174,7 +174,7 @@ class SessionsManagerTest extends TestCase {
      * @depends testInitSessionsDb
      */
     public function testDatabaseSession02() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS');
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
@@ -277,11 +277,12 @@ class SessionsManagerTest extends TestCase {
     /**
      * @test
      * @depends testDatabaseSession02
+     * @depends testCloseDb00
      */
     public function testDropDbTables00() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("1146 - Table 'testing_db.session_data' doesn't exist");
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS');
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
@@ -308,14 +309,15 @@ class SessionsManagerTest extends TestCase {
      * @depends testDatabaseSession01
      */
     public function testInitSessionsDb() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS');
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
         $sto->getController()->createTables()->execute();
-//        $sto->getController()->table('session_data')->select()->execute();
-//        $sto->getController()->table('sessions')->select()->execute();
+        $sto->getController()->clear();
+        $sto->getController()->table('session_data')->selectCount()->execute();
+        $sto->getController()->table('sessions')->selectCount()->execute();
         $this->assertTrue(true);
     }
     /**
@@ -323,7 +325,7 @@ class SessionsManagerTest extends TestCase {
      * @depends testInitSessionsDb
      */
     public function testDbSessions00() {
-        SessionsManager::start('hello', [
+        SessionsManager::start('hello-x', [
             
         ]);
         $activeSesstion = SessionsManager::getActiveSession();
@@ -332,7 +334,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertTrue($activeSesstion->isRunning());
 
         $this->assertNotNull($activeSesstion);
-        $this->assertEquals('hello', $activeSesstion->getName());
+        $this->assertEquals('hello-x', $activeSesstion->getName());
         $this->assertEquals(7200, $activeSesstion->getDuration());
         $this->assertEquals(SessionStatus::NEW, $activeSesstion->getStatus());
 

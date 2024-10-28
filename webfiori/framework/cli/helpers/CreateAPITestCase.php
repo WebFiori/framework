@@ -71,7 +71,7 @@ class CreateAPITestCase extends CreateClassHelper {
             $this->writeClass();
         }
     }
-    private function readManagerInfo() {
+    private function readManagerInfo() : bool {
         $m = $this->getCommand()->getArgValue('--manager');
         $instance = null;
 
@@ -109,7 +109,7 @@ class CreateAPITestCase extends CreateClassHelper {
             }
         }
     }
-    private function readServiceInfo() {
+    private function readServiceInfo() : bool {
         $selected = $this->getCommand()->getArgValue('--service');
         $services = $this->writer->getServicesManager()->getServices();
 
@@ -119,16 +119,17 @@ class CreateAPITestCase extends CreateClassHelper {
             } else {
                 $this->writer->setService($services[$selected]);
 
-                return;
+                return true;
             }
         }
 
         if (count($services) == 0) {
             $this->info('Provided services manager has 0 registered services.');
 
-            return;
+            return false;
         }
         $selected = $this->select('Which service you would like to have a test case for?', array_keys($services));
         $this->writer->setService($services[$selected]);
+        return true;
     }
 }

@@ -18,7 +18,7 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
         $this->assertEquals('tests\\apis\\WebServiceTest', $w->getName(true));
         $this->assertEquals(9, $w->getPhpUnitVersion());
         $w->writeClass();
-        $this->assertTrue(class_exists($w->getName(true)));
+        $this->assertTrue(class_exists('\\'.$w->getName(true)));
         $this->removeClass($w->getAbsolutePath());
     }
     /**
@@ -31,7 +31,7 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
         $w->setPath(ROOT_PATH.DS.'tests'.DS.'cool');
         $this->assertEquals('tests\\cool\\CoolTest', $w->getName(true));
         $w->writeClass();
-        $this->assertTrue(class_exists($w->getName(true)));
+        $this->assertTrue(class_exists('\\'.$w->getName(true)));
         $this->removeClass($w->getAbsolutePath());
     }
 }

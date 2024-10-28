@@ -123,9 +123,9 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns the name of the application in specific display language.
-     * 
+     *
      * @param string $langCode Language code such as 'AR'.
-     * 
+     *
      * @return string|null Application name or null if language code does not
      * exist.
      */
@@ -332,12 +332,11 @@ class JsonDriver implements ConfigurationDriver {
      */
     public function getSchedulerPassword(): string {
         $pass = $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
-        
+
         if (strlen($pass.'') == 0 || $pass == 'NO_PASSWORD') {
-            
             return 'NO_PASSWORD';
         }
-        
+
         return $pass;
     }
     /**
@@ -383,7 +382,7 @@ class JsonDriver implements ConfigurationDriver {
             $jsonObj = $prop->getValue();
             $acc = new SMTPAccount();
             $acc->setAccountName($name);
-            
+
             $acc->setAddress($this->getProp($jsonObj, 'address', $name));
             $acc->setPassword($this->getProp($jsonObj, 'password', $name));
             $acc->setPort($this->getProp($jsonObj, 'port', $name));
@@ -398,7 +397,7 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Returns the name or the namespace of default theme that the application
      * will use in case a page does not have specific theme.
-     * 
+     *
      * @return string
      */
     public function getTheme(): string {
@@ -459,10 +458,10 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Creates application configuration file.
-     * 
+     *
      * This method will attempt to create a JSON configuration file in the folder
      * 'config' of the application.
-     * 
+     *
      * @param bool $reCreate If this parameter is set to true and there already a configuration
      * file with same name, it will be overriden.
      */
@@ -476,7 +475,7 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Deletes configuration file.
-     * 
+     *
      * Note that in order to remove specific configuration file, its name must
      * be set using the method JsonDriver::setConfigFileName()
      */
@@ -488,20 +487,26 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->add('database-connections', new Json([], 'none', 'same'));
         $this->writeJson();
     }
+    /**
+     * Removes all added SMTP connections.
+     */
+    public function removeAllSMTPAccounts() {
+        $this->json->add('smtp-connections', new Json([], 'none', 'same'));
+        $this->writeJson();
+    }
 
     public function removeDBConnection(string $connectionName) {
         $connections = $this->getDBConnections();
         $accountNameTrimmed = trim($connectionName);
         $toAdd = [];
-        
+
         foreach ($connections as $connection) {
-            
             if ($connection->getName() != $accountNameTrimmed) {
                 $toAdd[] = $connection;
             }
         }
         $this->removeAllDBConnections();
-        
+
         foreach ($toAdd as $account) {
             $this->addOrUpdateDBConnection($account);
         }
@@ -516,30 +521,22 @@ class JsonDriver implements ConfigurationDriver {
         $this->writeJson();
     }
     /**
-     * Removes all added SMTP connections.
-     */
-    public function removeAllSMTPAccounts() {
-        $this->json->add('smtp-connections', new Json([], 'none', 'same'));
-        $this->writeJson();
-    }
-    /**
      * Removes specific SMTP connection from the configuration given its name.
-     * 
+     *
      * @param string $accountName The name of the connection.
      */
     public function removeSMTPAccount(string $accountName) {
         $connections = $this->getSMTPConnections();
         $accountNameTrimmed = trim($accountName);
         $toAdd = [];
-        
+
         foreach ($connections as $connection) {
-            
             if ($connection->getAccountName() != $accountNameTrimmed) {
                 $toAdd[] = $connection;
             }
         }
         $this->removeAllSMTPAccounts();
-        
+
         foreach ($toAdd as $account) {
             $this->addOrUpdateSMTPAccount($account);
         }
@@ -582,14 +579,14 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Sets the base URL of the application.
-     * 
+     *
      * This is usually used in fetching resources.
-     * 
+     *
      * @param string $url
      */
     public function setBaseURL(string $url) {
         $trim = trim($url);
-        
+
         if (strlen($trim) == 0) {
             $this->json->add('base-url', 'DYNAMIC');
         } else {
@@ -640,9 +637,9 @@ class JsonDriver implements ConfigurationDriver {
      */
     public function setHomePage(string $url) {
         $trim = trim($url);
-        
+
         if (strlen($trim) == 0) {
-            $this->json->add('home-page', 'BASE_URL'); 
+            $this->json->add('home-page', 'BASE_URL');
         } else {
             $this->json->add('home-page', $trim);
         }

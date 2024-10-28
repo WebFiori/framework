@@ -181,9 +181,8 @@ class CLICommandClassWriter extends ClassWriter {
             $this->append(["parent::__construct('$this->name', ["], 2);
 
             foreach ($this->args as $argObj) {
-                
                 $this->append("'".$argObj->getName()."' => [", 3);
-                
+
                 if (strlen($argObj->getDescription()) != 0) {
                     $this->append("'description' => '".str_replace("'", "\'", $argObj->getDescription())."',", 4);
                 }

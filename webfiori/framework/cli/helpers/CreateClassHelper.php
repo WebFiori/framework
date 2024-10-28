@@ -204,7 +204,7 @@ class CreateClassHelper {
     public function setClassInfo(string $ns, string $suffix) {
         $classInfo = $this->getClassInfo($ns, $suffix);
         $this->setNamespace($classInfo['namespace']);
-        
+
         if ($suffix != $classInfo['name']) {
             $this->setClassName($classInfo['name']);
         }
@@ -232,14 +232,14 @@ class CreateClassHelper {
     public function setNamespace($ns) : bool {
         return $this->getWriter()->setNamespace($ns);
     }
-     /**
-      * Sets the location at which the class will be created on.
-      *
-      * @param string $path A string that represents folder path.
-      *
-      * @return boolean If the path is successfully set, the method will return true.
-      * Other than that, false is returned.
-      */
+    /**
+     * Sets the location at which the class will be created on.
+     *
+     * @param string $path A string that represents folder path.
+     *
+     * @return boolean If the path is successfully set, the method will return true.
+     * Other than that, false is returned.
+     */
     public function setPath(string $path): bool {
         return $this->getWriter()->setPath($path);
     }

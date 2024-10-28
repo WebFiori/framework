@@ -105,30 +105,6 @@ class SessionsManager {
         }
     }
     /**
-     * Returns a date string that represents the time at which all sessions
-     * that was created before it will be cleared.
-     * 
-     * This method will try to use the environment variable 'SESSION_GC' to
-     * decide on the time. If this environment variable does not exist,
-     * it will use the value 30 days to create the date time string which
-     * indicates that any session created 30 days ago will be cleared.
-     * 
-     * @return string A date string in the format 'YYYY-MM-DD HH:MM:SS'.
-     */
-    public static function getGCTime() : string {
-        $olderThan = time() - 60 * 60 * 24 * 30;
-        $fromEnv = getenv('SESSION_GC') !== false ? intval(getenv('SESSION_GC')) : 0;
-        $fromConst = defined('SESSION_GC') && intval(SESSION_GC) > 0 ? intval(SESSION_GC) : 0;
-        
-        if ($fromEnv != 0) {
-            $olderThan = $fromEnv;
-        } else if ($fromConst != 0) {
-            $olderThan = $fromConst;
-        }  
-
-        return date('Y-m-d H:i:s', $olderThan);
-    }
-    /**
      * Returns the value of a session variable.
      *
      * The value will be taken from the active session.
@@ -191,6 +167,32 @@ class SessionsManager {
         }
 
         return $retVal;
+    }
+    /**
+     * Returns a date string that represents the time at which all sessions
+     * that was created before it will be cleared.
+     *
+     * This method will try to use the environment variable 'SESSION_GC' to
+     * decide on the time. If this environment variable does not exist,
+     * it will use the value 30 days to create the date time string which
+     * indicates that any session created 30 days ago will be cleared.
+     *
+     * @return string A date string in the format 'YYYY-MM-DD HH:MM:SS'.
+     */
+    public static function getGCTime() : string {
+        $olderThan = time() - 60 * 60 * 24 * 30;
+        $fromEnv = getenv('SESSION_GC') !== false ? intval(getenv('SESSION_GC')) : 0;
+        $fromConst = defined('SESSION_GC') && intval(SESSION_GC) > 0 ? intval(SESSION_GC) : 0;
+
+        if ($fromEnv != 0) {
+            $olderThan = $fromEnv;
+        } else {
+            if ($fromConst != 0) {
+                $olderThan = $fromConst;
+            }
+        }
+
+        return date('Y-m-d H:i:s', $olderThan);
     }
     /**
      * Returns the ID of a session from a cookie given its name.
@@ -259,7 +261,7 @@ class SessionsManager {
      * Checks if the active session has a cookie or not.
      *
      * Note that in command line, the method will always return false.
-     * 
+     *
      * @return bool true if The active session has a cookie. False if not. If no
      * session is active, false is returned.
      */

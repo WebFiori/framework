@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
 use webfiori\cli\Argument;
+use webfiori\cli\CLICommand;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
@@ -122,15 +122,15 @@ class RunSQLQueryCommand extends CLICommand {
 
         if ($file !== null) {
             $fileObj = new File(ROOT_PATH.DS.$file);
-            
+
             if (!$fileObj->isExist()) {
                 $fileObj = new File($file);
             }
-            
+
             if ($fileObj->isExist()) {
                 $fileObj->read();
                 $mime = $fileObj->getMIME();
-                
+
                 if ($mime == 'application/sql' || $mime == 'application/x-sql') {
                     return $this->runFileQuery($schema, $fileObj);
                 } else {
@@ -211,7 +211,7 @@ class RunSQLQueryCommand extends CLICommand {
         while (!File::isFileExist($filePath)) {
             $filePath = $this->getInput('File path:');
             $modified = ROOT_PATH.DS.$filePath;
-            
+
             if (File::isFileExist($modified)) {
                 $filePath = $modified;
             } 
@@ -233,7 +233,7 @@ class RunSQLQueryCommand extends CLICommand {
 
         return $this->runFileQuery($schema, $file);
     }
-    
+
     private function queryOnSchema(DB $schema) {
         if ($this->isArgProvided('--create')) {
             $schema->createTables();

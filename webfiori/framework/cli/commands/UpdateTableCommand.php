@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
 use webfiori\cli\Argument;
+use webfiori\cli\CLICommand;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;

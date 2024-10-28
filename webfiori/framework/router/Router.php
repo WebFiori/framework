@@ -604,6 +604,7 @@ class Router {
                 }
                 Response::addHeader('location', $to);
                 Response::setCode($httpCode);
+
                 if (!Runner::isCLI()) {
                     Response::send();
                 }
@@ -639,6 +640,7 @@ class Router {
         $pathFix = self::getInstance()->fixUriPath($path);
         $retVal = false;
         $routes = &self::getInstance()->routes;
+
         if (isset($routes['static'][$pathFix])) {
             unset($routes['static'][$pathFix]);
 

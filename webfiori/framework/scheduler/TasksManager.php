@@ -479,7 +479,7 @@ class TasksManager {
      *
      * @param string $message A string that act as a log message. It will be
      * appended as passed without any changes.
-     * 
+     *
      * @param string $type The type of the message that will be logged. It can
      * be one of the following values:
      * <ul>
@@ -489,7 +489,7 @@ class TasksManager {
      * <li>info</li>
      * </ul>
      * Default is 'none'.
-     * 
+     *
      * @since 1.0.8
      */
     public static function log(string $message, string $type = 'none') {
@@ -509,17 +509,17 @@ class TasksManager {
     }
     /**
      * Appends a message to the array that contains logged messages.
-     * 
+     *
      * @param string $msg A string that act as a log message. It will be
      * appended as passed without any changes. Note that if running in CLI,
-     * this will appear as a success message
+     * this will appear as a error message
      */
-    public static function logSuccess(string $msg) {
-        self::log($msg, 'success');
+    public static function logErr(string $msg) {
+        self::log($msg, 'error');
     }
     /**
      * Appends a message to the array that contains logged messages.
-     * 
+     *
      * @param string $msg A string that act as a log message. It will be
      * appended as passed without any changes. Note that if running in CLI,
      * this will appear as a info message
@@ -529,13 +529,13 @@ class TasksManager {
     }
     /**
      * Appends a message to the array that contains logged messages.
-     * 
+     *
      * @param string $msg A string that act as a log message. It will be
      * appended as passed without any changes. Note that if running in CLI,
-     * this will appear as a error message
+     * this will appear as a success message
      */
-    public static function logErr(string $msg) {
-        self::log($msg, 'error');
+    public static function logSuccess(string $msg) {
+        self::log($msg, 'success');
     }
     /**
      * Create a task that will be executed once every month.

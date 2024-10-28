@@ -24,7 +24,6 @@ return $config->setRules([
         ],
         'indentation_type' => true,
         'method_chaining_indentation' => true,
-        'statement_indentation' => true,
         'no_trailing_whitespace' => true,
         'no_trailing_whitespace_in_comment' => true,
         'blank_line_after_opening_tag' => true,

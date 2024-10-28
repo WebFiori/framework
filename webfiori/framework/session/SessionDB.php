@@ -37,20 +37,6 @@ class SessionDB extends DB {
         $this->addTable(new MySQLSessionDataTable());
     }
     /**
-     * Removes database tables which are used to store session information.
-     */
-    public function removeTables() {
-        
-        $this->transaction(function (DB $db) {
-            try {
-                $db->table('session_data')->drop()->execute();
-                $db->table('sessions')->drop()->execute();
-            } catch (DatabaseException $ex) {
-                return;
-            }
-        });
-    }
-    /**
      * Clears the sessions which are older than the constant 'SESSION_GC' or
      * older than 30 days if the constant is not defined.
      *
@@ -167,6 +153,20 @@ class SessionDB extends DB {
     public function removeSession(string $sId) {
         $this->table('session_data')->delete()->where('s-id', $sId)->execute();
         $this->table('sessions')->delete()->where('s-id', $sId)->execute();
+    }
+    /**
+     * Removes database tables which are used to store session information.
+     */
+    public function removeTables() {
+        $this->transaction(function (DB $db)
+        {
+            try {
+                $db->table('session_data')->drop()->execute();
+                $db->table('sessions')->drop()->execute();
+            } catch (DatabaseException $ex) {
+                return;
+            }
+        });
     }
 
     /**

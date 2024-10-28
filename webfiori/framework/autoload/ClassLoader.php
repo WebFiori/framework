@@ -16,23 +16,17 @@ use Exception;
  *
  * The class aims to provide all needed utilities to autoload any classes
  * which are within the scope of the framework. In addition, the developer
- * can add his own custom folders to the autoloader. More to that, the autoloader
- * will load any class which exist in the folder 'vendor' if composer
- * is used to collect the dependencies. To activate this feature, the constant
- * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of
- * any other component to load classes.
+ * can add his own custom folders to the autoloader.
  *
  * @author Ibrahim
  *
- * @version 1.1.7
  */
 class ClassLoader {
     /**
      * The name of the file that represents autoloader's cache.
      * @var string
-     * @since 1.1.6
      */
-    const CACHE_NAME = 'autoload.cache';
+    const CACHE_NAME = 'class-loader.cache';
     /**
      * An array that contains the possible things that can be performed
      * if a class has failed to load.
@@ -41,7 +35,6 @@ class ClassLoader {
      * <li>throw-exception</li>,
      * <li>do-nothing</li>
      * </ul>
-     * @since 1.1.6
      */
     const ON_FAIL_ACTIONS = [
         'throw-exception',
@@ -54,7 +47,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.1.6
      */
     private $cacheArr;
     /**
@@ -62,7 +54,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.1.4
      */
     private $loadedClasses;
     /**
@@ -70,7 +61,6 @@ class ClassLoader {
      *
      * @var ClassLoader
      *
-     * @since 1.0
      */
     private static $loader;
     /**
@@ -79,7 +69,6 @@ class ClassLoader {
      *
      * @var string|callable
      *
-     * @since 1.1.3
      */
     private $onFail;
     /**
@@ -87,7 +76,6 @@ class ClassLoader {
      *
      * @var string
      *
-     * @since 1.0
      */
     private $rootDir;
     /**
@@ -95,7 +83,6 @@ class ClassLoader {
      *
      * @var array
      *
-     * @since 1.0
      */
     private $searchFolders;
 
@@ -107,7 +94,6 @@ class ClassLoader {
      * @param string $onFail
      * @throws ClassLoaderException
      * @throws Exception
-     * @since 1.0
      */
     private function __construct(string $root = '', array $searchFolders = [], bool $defineRoot = false, string $onFail = self::ON_FAIL_ACTIONS[0]) {
         $this->searchFolders = [];
@@ -115,6 +101,7 @@ class ClassLoader {
         $this->loadedClasses = [];
         require_once 'ClassLoaderException.php';
         require_once 'ClassInfo.php';
+
         if (defined('ROOT_PATH')) {
             $this->rootDir = ROOT_PATH;
         } else if (strlen($root) != 0 && is_dir($root)) {
@@ -168,6 +155,43 @@ class ClassLoader {
             ClassInfo::PATH => __DIR__,
             ClassInfo::CACHED => false
         ];
+    }
+    /**
+     * Load a class using its specified path.
+     *
+     * This method can be used in case the class that the user tries to load does
+     * not comply with PSR-4 standard for placing classes in correct folder
+     * with correct namespace. Once loaded, it will be added to the cache.
+     *
+     * @param string $className The name of the class that will be loaded.
+     *
+     * @param string $classWithNs The full name of the class including its namespace.
+     *
+     * @param string $path The path to PHP file that has class implementation.
+     *
+     * @return bool If file is exist and class is loaded, true is returned. False
+     * otherwise.
+     */
+    public function addClassMap(string $className, string $classWithNs, string $path) : bool {
+        $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
+
+        if ($this->loadFromCache($ns, $className)) {
+            return true;
+        }
+
+        if (!file_exists($path)) {
+            return false;
+        }
+        require_once $path;
+
+        $this->loadedClasses[] = [
+            ClassInfo::NAME => $className,
+            ClassInfo::NS => $ns,
+            ClassInfo::PATH => $path,
+            ClassInfo::CACHED => false
+        ];
+
+        return true;
     }
     /**
      * Returns a single instance of the class 'ClassLoader'.
@@ -247,7 +271,6 @@ class ClassLoader {
 
         return self::$loader;
     }
-
     /**
      * Returns an array that contains all cached classes information.
      *
@@ -257,7 +280,6 @@ class ClassLoader {
      *
      * @return array An array that contains all cached classes information.
      * @throws Exception
-     * @since 1.1.7
      */
     public static function getCacheArray(): array {
         return self::get()->cacheArr;
@@ -295,7 +317,6 @@ class ClassLoader {
      * @throws Exception
      * loaded.
      *
-     * @since 1.0
      */
     public static function getClassPath(string $className, string $namespace = null, bool $load = false): array {
         $retVal = [];
@@ -328,7 +349,6 @@ class ClassLoader {
      * @return array An array of all added search folders.
      *
      * @throws Exception
-     * @since 1.1.1
      */
     public static function getFolders(): array {
         $folders = [];
@@ -358,7 +378,6 @@ class ClassLoader {
      * @return array An associative array that contains loaded classes info.
      *
      * @throws Exception
-     * @since 1.1.4
      */
     public static function getLoadedClasses(): array {
         return self::get()->loadedClasses;
@@ -377,7 +396,6 @@ class ClassLoader {
      * Else, it will return false.
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public  static function isLoaded(string $class, string $ns = null): bool {
         foreach (self::getLoadedClasses() as $classArr) {
@@ -393,6 +411,73 @@ class ClassLoader {
 
         return false;
     }
+    /**
+     * Checks if provided string represents a valid namespace or not.
+     *
+     * @param string $ns A string to be validated.
+     *
+     * @return bool If the provided string represents a valid namespace, the
+     * method will return true. False if it does not represent a valid namespace.
+     */
+    public static function isValidNamespace(string $ns) {
+        if ($ns == '\\') {
+            return true;
+        }
+        $split = explode('\\', $ns);
+
+        foreach ($split as $subNs) {
+            $len = strlen($subNs);
+
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $subNs[$x];
+
+                if ($x == 0 && $char >= '0' && $char <= '9') {
+                    return false;
+                }
+
+                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    /**
+     * Load a class using its specified path.
+     *
+     * This method can be used in case the class that the user tries to load does
+     * not comply with PSR-4 standard for placing classes in correct folder
+     * with correct namespace. Once loaded, it will be added to the cache.
+     *
+     * @param string $className The name of the class that will be loaded.
+     *
+     * @param string $classWithNs The full name of the class including its namespace.
+     *
+     * @param string $filePath The path to PHP file that has class implementation.
+     *
+     * @return bool If file is exist and class is loaded, true is returned. False
+     * otherwise.
+     */
+    public static function map(string $className, string $classWithNs, string $filePath) {
+        self::get()->addClassMap($className, $classWithNs, $filePath);
+    }
+    /**
+     * Load multiple classes from same path which belongs to same namespace.
+     *
+     * This helper method can be used to autoload classes which are non-PSR-4 compliant.
+     *
+     * @param string $ns The namespace at which classes belongs to.
+     *
+     * @param string $path The location at which all classes stored at.
+     *
+     * @param array $classes An array that holds the names of the classes.
+     */
+    public static function mapAll(string $ns, string $path, array $classes) {
+        foreach ($classes as $className) {
+            self::map($className, $ns.'\\'.$className, $path.DIRECTORY_SEPARATOR.$className.'.php');
+        }
+    }
 
     /**
      * Adds new folder to the set folder at which the autoloader will try to search
@@ -405,7 +490,6 @@ class ClassLoader {
      * are inside the given directory will be included in the search.
      *
      * @throws Exception
-     * @since 1.1.2
      */
     public static function newSearchFolder(string $dir, bool $incSubFolders = true) {
         self::get()->addSearchDirectory($dir,$incSubFolders);
@@ -417,7 +501,6 @@ class ClassLoader {
      * @return string The root directory that is used to search inside.
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public static function root(): string {
         return self::get()->getRoot();
@@ -434,7 +517,6 @@ class ClassLoader {
      * </ul>
      *
      * @throws Exception
-     * @since 1.1.5
      */
     public static function setOnFail($onFail) {
         if (is_callable($onFail)) {
@@ -459,7 +541,6 @@ class ClassLoader {
      * @param string $appendRoot If set to true, Root directory of the search will
      * be added as a prefix to the path.
      *
-     * @since 1.0
      *
      * @deprecated since version 1.1.2
      */
@@ -530,13 +611,44 @@ class ClassLoader {
             self::$loader->addSearchDirectory($vendorFolder, true, false);
         }
     }
+    private function createNSFromPath(string $filePath, string $className) {
+        $split = explode(DIRECTORY_SEPARATOR, $filePath);
+        $nsArr = ['\\'.$className];
+        $currentNs = '';
+
+        foreach ($split as $str) {
+            if (self::isValidNamespace($str)) {
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = $currentNs.'\\'.$str;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
+            }
+        }
+        $currentNs = '';
+
+        for ($x = count($split) - 1 ; $x > -1 ; $x--) {
+            $str = $split[$x];
+
+            if (self::isValidNamespace($str)) {
+                if (strlen($currentNs) == 0) {
+                    $currentNs = '\\'.$str;
+                } else {
+                    $currentNs = '\\'.$str.$currentNs;
+                }
+                $nsArr[] = $currentNs.'\\'.$className;
+            }
+        }
+
+        return $nsArr;
+    }
     /**
      * Returns an array string that contains all possible paths for the folder
      * 'vendor'.
      *
      * @return array
      *
-     * @since 1.1.6
      */
     private static function getComposerVendorDirs(): array {
         $DS = DIRECTORY_SEPARATOR;
@@ -570,7 +682,6 @@ class ClassLoader {
      *
      * @return string The root directory that is used to search inside.
      *
-     * @since 1.0
      */
     private function getRoot(): string {
         return $this->rootDir;
@@ -583,7 +694,6 @@ class ClassLoader {
      *
      * @throws ClassLoaderException
      * @throws Exception
-     * @since 1.0
      */
     private function loadClass(string $classWithNs) {
         $cArr = explode('\\', $classWithNs);
@@ -642,7 +752,7 @@ class ClassLoader {
 
         if (!$isFileLoaded && file_exists($f)) {
             $nsFromPath = $this->createNSFromPath($f, $className);
-            
+
             if (in_array('\\'.$classWithNs, $nsFromPath)) {
                 require_once $f;
                 $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
@@ -657,68 +767,6 @@ class ClassLoader {
         }
 
         return $loaded;
-    }
-    /**
-     * Checks if provided string represents a valid namespace or not.
-     *
-     * @param string $ns A string to be validated.
-     *
-     * @return bool If the provided string represents a valid namespace, the
-     * method will return true. False if it does not represent a valid namespace.
-     */
-    public static function isValidNamespace(string $ns) {
-        if ($ns == '\\') {
-            return true;
-        }
-        $split = explode('\\', $ns);
-
-        foreach ($split as $subNs) {
-            $len = strlen($subNs);
-
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $subNs[$x];
-
-                if ($x == 0 && $char >= '0' && $char <= '9') {
-                    return false;
-                }
-
-                if (!(($char <= 'Z' && $char >= 'A') || ($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char == '_')) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-    private function createNSFromPath(string $filePath, string $className) {
-        $split = explode(DIRECTORY_SEPARATOR, $filePath);
-        $nsArr = ['\\'.$className];
-        $currentNs = '';
-        foreach ($split as $str) {
-            if (self::isValidNamespace($str)) {
-                if (strlen($currentNs) == 0) {
-                    $currentNs = '\\'.$str;
-                } else {
-                    $currentNs = $currentNs.'\\'.$str;
-                }
-                $nsArr[] = $currentNs.'\\'.$className;
-            }
-            
-        }
-        $currentNs = '';
-        for ($x = count($split) - 1 ; $x > -1 ; $x--) {
-            $str = $split[$x];
-            if (self::isValidNamespace($str)) {
-                if (strlen($currentNs) == 0) {
-                    $currentNs = '\\'.$str;
-                } else {
-                    $currentNs = '\\'.$str.$currentNs;
-                }
-                $nsArr[] = $currentNs.'\\'.$className;
-            }
-            
-        }
-        return $nsArr;
     }
     private function loadFromCache($classNS, $className): bool {
         $loaded = false;
@@ -766,7 +814,6 @@ class ClassLoader {
     /**
      * Read the file which contains autoloader cached content.
      *
-     * @since 1.1.6
      */
     private function readCache() {
         $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto';
@@ -786,7 +833,6 @@ class ClassLoader {
      * This method is called every time a new class is loaded to update the cache.
      *
      * @throws Exception
-     * @since 1.1.6
      */
     private function updateCacheHelper() {
         $autoloadCache = self::getCachePath();

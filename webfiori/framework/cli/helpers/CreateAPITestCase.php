@@ -44,16 +44,16 @@ class CreateAPITestCase extends CreateClassHelper {
         array_pop($nsArr);
         $ns = implode('\\', $nsArr);
         $this->setClassName($this->writer->getServiceName().'Test');
-        $this->setNamespace('tests\\'. $ns);
-        $this->setPath(ROOT_PATH.DS.'tests'.DS. implode(DS, $nsArr));
-        
+        $this->setNamespace('tests\\'.$ns);
+        $this->setPath(ROOT_PATH.DS.'tests'.DS.implode(DS, $nsArr));
+
 
         if ($this->getCommand()->isArgProvided('--defaults')) {
             $this->writeClass();
         } else {
-            
             $this->checkPlace($ns);
         }
+
         return true;
     }
     private function checkPlace($ns) {
@@ -62,7 +62,7 @@ class CreateAPITestCase extends CreateClassHelper {
         $this->println("Name: ".$this->getWriter()->getName(true));
         $this->println("Path: ".$this->getWriter()->getPath());
         $confrm = $this->confirm('Would you like to use default parameters?', true);
-        
+
         if ($confrm) {
             $this->writeClass();
         } else {
@@ -93,36 +93,61 @@ class CreateAPITestCase extends CreateClassHelper {
     private function readManagerInfo() {
         $m = $this->getCommand()->getArgValue('--manager');
         $instance = null;
-        
+
         if ($m !== null) {
             if (class_exists($m)) {
                 $instance = new $m();
 
                 if ($instance instanceof WebServicesManager) {
                     $this->writer->setServicesManager($instance);
+
                     return true;
                 } else {
                     $this->error("The argument --manager has invalid value.");
+
                     return false;
                 }
             } else {
                 $this->error("The argument --manager has invalid value.");
+
                 return false;
             }
         }
+
         if ($instance === null) {
             while (!($instance instanceof WebServicesManager)) {
                 $instance = $this->getCommand()->readInstance('Please enter services manager information:');
-                
+
                 if (!($instance instanceof WebServicesManager)) {
                     $this->error('Provided class is not an instance of '.WebServicesManager::class);
                 } else {
                     $this->writer->setServicesManager($instance);
+
                     return true;
                 }
             }
-            
         }
     }
+    private function readServiceInfo() {
+        $selected = $this->getCommand()->getArgValue('--service');
+        $services = $this->writer->getServicesManager()->getServices();
 
+        if ($selected !== null) {
+            if (!isset($services[$selected])) {
+                $this->info('Selected services manager has no service with name \''.$selected.'\'.');
+            } else {
+                $this->writer->setService($services[$selected]);
+
+                return;
+            }
+        }
+
+        if (count($services) == 0) {
+            $this->info('Provided services manager has 0 registered services.');
+
+            return;
+        }
+        $selected = $this->select('Which service you would like to have a test case for?', array_keys($services));
+        $this->writer->setService($services[$selected]);
+    }
 }

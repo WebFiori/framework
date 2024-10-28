@@ -71,25 +71,6 @@ class CreateAPITestCase extends CreateClassHelper {
             $this->writeClass();
         }
     }
-    private function readServiceInfo() {
-        $selected = $this->getCommand()->getArgValue('--service');
-        $services = $this->writer->getServicesManager()->getServices();
-        if ($selected !== null) {
-            if (!isset($services[$selected])) {
-                $this->info('Selected services manager has no service with name \''.$selected.'\'.');
-            } else {
-                $this->writer->setService($services[$selected]);
-                return true;
-            }
-        }
-        if (count($services) == 0) {
-            $this->info('Provided services manager has 0 registered services.');
-            return false;
-        }
-        $selected = $this->select('Which service you would like to have a test case for?', array_keys($services));
-        $this->writer->setService($services[$selected]);
-        return true;
-    }
     private function readManagerInfo() {
         $m = $this->getCommand()->getArgValue('--manager');
         $instance = null;

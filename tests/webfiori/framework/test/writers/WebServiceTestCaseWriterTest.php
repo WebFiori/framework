@@ -31,6 +31,8 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
         $w->setPath(ROOT_PATH.DS.'tests'.DS.'cool');
         $this->assertEquals('tests\\cool\\CoolTest', $w->getName(true));
         $w->writeClass();
+        $this->assertTrue(file_exists($w->getAbsolutePath()));
+        require_once $w->getAbsolutePath();
         $this->assertTrue(class_exists('\\'.$w->getName(true)));
         $this->removeClass($w->getAbsolutePath());
     }

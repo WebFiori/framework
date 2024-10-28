@@ -54,6 +54,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         
         $this->assertEquals(0, $this->getExitCode());
         $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest';
+        $this->assertTrue(file_exists($path.DS.'TasksLoginServiceTest.php'));
+        require_once $path.DS.'TasksLoginServiceTest.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -73,6 +75,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
         $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
+        $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
+        require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -106,6 +110,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
 
         $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
+        $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
+        require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -139,6 +145,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
 
         $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
+        $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
+        require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -188,6 +196,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
         $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
+        $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
+        require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -220,6 +230,8 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
         $clazz = '\\tests\\tests\\apis\\multiple\\WebService01Test';
+        $this->assertTrue(file_exists($path.DS.'WebService01Test.php'));
+        require_once $path.DS.'WebService01Test.php';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

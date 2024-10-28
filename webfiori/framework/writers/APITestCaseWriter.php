@@ -31,7 +31,7 @@ class APITestCaseWriter extends ClassWriter {
      * will be based on.
      */
     public function __construct(WebServicesManager $manager = null, $service = null) {
-        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis',  ROOT_PATH.'tests\\apis');
+        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis', 'tests\\apis');
         $this->setSuffix('Test');
 
         if ($manager !== null) {
@@ -152,6 +152,7 @@ class APITestCaseWriter extends ClassWriter {
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends APITestCase {');
     }
+    
     private function addAllUse() {
         $this->addUseStatement(APITestCase::class);
         $this->addUseStatement(RequestMethod::class);
@@ -160,7 +161,7 @@ class APITestCaseWriter extends ClassWriter {
         $this->addUseStatement('PHPUnit\Framework\Attributes\Test');
     }
     private function addTestAnnotation() {
-        if ($this->phpunitV >= 10) {
+        if ($this->getPhpUnitVersion() >= 10) {
             $this->append('#[Test]', 1);
         } else {
             $this->append('/**', 1);
@@ -241,7 +242,7 @@ class APITestCaseWriter extends ClassWriter {
                 if ($x + 1 == count($missingArr)) {
                     $this->append(". '            \"$item\"'.self::NL", 2);
                 } else {
-                    $this->append(". '            \"$item\"',.self::NL", 2);
+                    $this->append(". '            \"$item\",'.self::NL", 2);
                 }
             }
             $this->append(". '        ]'.self::NL", 2);

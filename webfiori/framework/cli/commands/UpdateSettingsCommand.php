@@ -33,7 +33,7 @@ class UpdateSettingsCommand extends CLICommand {
                 .'Possible values are: version, app-name, scheduler-pass, page-title, '
                 .'page-description, primary-lang, title-sep, home-page, theme,'
                 .'admin-theme.', true),
-        ], 'Update application settings which are stored in the class "AppConfig".');
+        ], 'Update application settings which are stored in specific configuration driver.');
     }
     public function exec() : int {
         $options = [];

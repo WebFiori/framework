@@ -18,6 +18,7 @@ use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\autoload\ClassLoader;
+use webfiori\framework\cache\Cache;
 use webfiori\framework\config\ConfigurationDriver;
 use webfiori\framework\config\Controller;
 use webfiori\framework\exceptions\InitializationException;
@@ -179,6 +180,9 @@ class App {
                 foreach ($uriObj->getMiddleware() as $mw) {
                     $mw->after(Request::get(), Response::get());
                 }
+                Cache::get($uriObj->getUri(true, true), function () {
+                    return Response::getBody();
+                }, $uriObj->getCacheDuration());
             }
         });
         //class is now initialized

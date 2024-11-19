@@ -15,6 +15,7 @@ use Exception;
 use webfiori\cli\Runner;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
+use webfiori\framework\cache\Cache;
 use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\ui\HTTPCodeView;
 use webfiori\framework\ui\StarterPage;
@@ -755,13 +756,14 @@ class Router {
         $asApi = $options[RouteOption::API];
         $closureParams = $options[RouteOption::CLOSURE_PARAMS] ;
         $path = $options[RouteOption::PATH];
+        $cache = $options[RouteOption::CACHE_DURATION];
 
         if ($routeType == self::CLOSURE_ROUTE && !is_callable($routeTo)) {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
         $routeUri->setAction($options[RouteOption::ACTION]);
-
+        $routeUri->setCacheDuration($cache);
         if (!$this->hasRouteHelper($routeUri)) {
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
@@ -928,6 +930,12 @@ class Router {
         } else {
             $caseSensitive = true;
         }
+        
+        if (isset($options[RouteOption::CACHE_DURATION])) {
+            $cacheDuration = $options[RouteOption::CACHE_DURATION];
+        } else {
+            $cacheDuration = 0;
+        }
 
         $routeType = $options[RouteOption::TYPE] ?? Router::CUSTOMIZED;
 
@@ -978,7 +986,8 @@ class Router {
             RouteOption::VALUES => $varValues,
             RouteOption::MIDDLEWARE => $mdArr,
             RouteOption::REQUEST_METHODS => $this->getRequestMethodsHelper($options),
-            RouteOption::ACTION => $action
+            RouteOption::ACTION => $action,
+            RouteOption::CACHE_DURATION => $cacheDuration
         ];
     }
     private function copyOptionsToSub($options, &$subRoute) {
@@ -1376,7 +1385,6 @@ class Router {
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
                 define('API_CALL', true);
             }
-
             if (is_callable($route->getRouteTo())) {
                 if ($loadResource === true) {
                     call_user_func_array($route->getRouteTo(),$route->getClosureParams());
@@ -1453,6 +1461,12 @@ class Router {
      * @throws RoutingException
      */
     private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
+        $data = Cache::get($uri);
+        
+        if ($data !== null) {
+            Response::write($data);
+            return true;
+        }
         $pathArray = $routeUri->getPathArray();
         $requestMethod = Request::getMethod();
         $indexToSearch = 'static';

@@ -46,6 +46,7 @@ class RouterUri extends Uri {
      */
     private $action;
     private $assignedMiddlewareList;
+    private $cacheDuration;
     /**
      *
      * @var array
@@ -137,6 +138,15 @@ class RouterUri extends Uri {
         $this->incInSiteMap = false;
         $this->languages = [];
         $this->addMiddleware('global');
+        $this->setCacheDuration(0);
+    }
+    public function getCacheDuration() : int {
+        return $this->cacheDuration;
+    }
+    public function setCacheDuration(int $val) {
+        if ($val >= 0) {
+            $this->cacheDuration = $val;
+        }
     }
     /**
      * Adds a language to the set of languages at which the resource that the URI

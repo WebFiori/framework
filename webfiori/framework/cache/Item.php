@@ -3,9 +3,8 @@
 namespace webfiori\framework\cache;
 
 /**
- *
  */
-abstract class AbstractCacheStore {
+class Item {
     private $timeToLive;
     private $data;
     private $key;
@@ -24,10 +23,6 @@ abstract class AbstractCacheStore {
     public function setCreatedAt(int $time) {
         $this->createdAt = $time;
     }
-    public abstract function isExist();
-    public abstract function cache();
-    public abstract function delete();
-    public abstract function read();
     public function getTTL() : int {
         return $this->timeToLive;
     }
@@ -71,7 +66,7 @@ abstract class AbstractCacheStore {
 
     
     private function decrypt($data) {
-        // decode > extract iv > decrypt d9xCt
+        // decode > extract iv > decrypt
         $decodedData = base64_decode($data);
         $ivLength = openssl_cipher_iv_length('aes-256-cbc');
         $iv = substr($decodedData, 0, $ivLength);

@@ -8,63 +8,46 @@ namespace webfiori\framework\cache;
 class Cache {
     /**
      * 
-     * @var AbstractCacheStore
+     * @var string
      */
     private $driver;
     private static $inst;
     private static function getInst() : Cache {
         if (self::$inst === null) {
             self::$inst = new Cache();
-            self::setDriver(FileCacheStore::class);
+            self::setDriver(new FileStorage());
         }
         return self::$inst;
     }
-    public static function setDriver(string $clazz) {
-        if (!class_exists($clazz)) {
-            return false;
-        }
-        $class = new $clazz();
-        
-        if (($clazz instanceof AbstractCacheStore)) {
-            return false;
-        }
-        self::getInst()->driver = $class;
+    public static function setDriver(Storage $driver) {
+        self::getInst()->driver = $driver;
     }
-    public static function getDriver() : AbstractCacheStore {
+    public static function getDriver() : Storage {
         return self::getInst()->driver;
     }
     public static function delete(string $key) {
-        $item = self::getDriver();
-        $item->setKey($key);
-        $item->delete();
+        self::getDriver()->delete($key);
     }
     public static function has(string $key) : bool {
-        $item = self::getDriver();
-        $item->setKey($key);
-        return $item->isExist();
+        return self::getDriver()->has($key);
+    }
+    public static function flush() {
+        self::getDriver()->flush();
     }
     public static function set(string $key, $data, int $ttl = 60, bool $override = false) : bool {
         if (!self::has($key) || $override === true) {
-            $item = self::getDriver();
-            $item->setKey($key);
-            $item->setSecret('ok');
-            $item->setData($data);
-            $item->setTTL($ttl);
-            $item->delete();
-            $item->cache();
+            $item = new Item($key, $data, $ttl, defined('CACHE_SECRET') ? CACHE_SECRET : '');
+            self::getDriver()->cache($item);
         }
         return false;
     }
     /**
      * 
      * @param string $key
-     * @return AbstractCacheStore
+     * @return Item|null
      */
     public static function getItem(string $key) {
-        if (self::has($key)) {
-            self::get($key);
-            return self::getDriver();
-        }
+        return self::getDriver()->readItem($key);
     }
     public static function setTTL(string $key, $ttl) {
         $item = self::getItem($key);
@@ -72,26 +55,22 @@ class Cache {
             return false;
         }
         $item->setTTL($ttl);
-        $item->cache();
+        self::getDriver()->cache($item);
         return true;
     }
     public static function get(string $key, callable $generator = null, int $ttl = 60, array $params = []) {
-        $item = self::getDriver();
-        $item->setKey($key);
-        $item->setSecret('ok');
-        $data = $item->read();
+        $data = self::getDriver()->read($key);
         
         if ($data !== null && $data !== false) {
             return $data;
         }
+
         if (!is_callable($generator)) {
             return null;
         }
         $newData = call_user_func_array($generator, $params);
-        $item->setData($newData);
-        $item->setTTL($ttl);
-        
-        $item->cache();
+        $item = new Item($key, $newData, $ttl, defined('CACHE_SECRET') ? CACHE_SECRET : '');
+        self::getDriver()->cache($item);
         return $newData;
     }
 }

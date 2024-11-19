@@ -10,51 +10,78 @@ class CacheTest extends TestCase {
      * @test
      */
     public function test00() {
-        $data = Cache::get('test', function () {
+        $key = 'first';
+        $data = Cache::get($key, function () {
             return 'This is a test.';
         });
         $this->assertEquals('This is a test.', $data);
-        $this->assertEquals('This is a test.', Cache::get('test'));
+        $this->assertEquals('This is a test.', Cache::get($key));
         $this->assertNull(Cache::get('not_cached'));
     }
     /**
      * @test
      */
     public function test01() {
-        $data = Cache::get('test2', function () {
+        $key = 'test_2';
+        $this->assertFalse(Cache::has($key));
+        $data = Cache::get($key, function () {
             return 'This is a test.';
-        }, 1);
+        }, 5);
         $this->assertEquals('This is a test.', $data);
-        sleep(2);
-        $this->assertNull(Cache::get('test2'));
+        $this->assertTrue(Cache::has($key));
+        sleep(6);
+        $this->assertFalse(Cache::has($key));
+        $this->assertNull(Cache::get($key));
     }
     /**
      * @test
      */
     public function test03() {
-        $this->assertFalse(Cache::has('test3'));
-        $data = Cache::get('test3', function () {
+        $key = 'ok_test';
+        $this->assertFalse(Cache::has($key));
+        $data = Cache::get($key, function () {
             return 'This is a test.';
         }, 600);
         $this->assertEquals('This is a test.', $data);
-        $this->assertTrue(Cache::has('test3'));
-        Cache::delete('test3');
-        $this->assertFalse(Cache::has('test3'));
-        $this->assertNull(Cache::get('test3'));
+        $this->assertTrue(Cache::has($key));
+        Cache::delete($key);
+        $this->assertFalse(Cache::has($key));
+        $this->assertNull(Cache::get($key));
     }
     /**
      * @test
      */
     public function test04() {
-        $this->assertFalse(Cache::has('test3'));
-        $data = Cache::get('test4', function () {
+        $key = 'test_3';
+        $this->assertFalse(Cache::has($key));
+        $data = Cache::get($key, function () {
             return 'This is a test.';
         }, 600);
         $this->assertEquals('This is a test.', $data);
-        $item = Cache::getItem('test4');
+        $item = Cache::getItem($key);
+        $this->assertNotNull($item);
         $this->assertEquals(600, $item->getTTL());
-        Cache::setTTL('test4', 1000);
-        $item = Cache::getItem('test4');
+        Cache::setTTL($key, 1000);
+        $item = Cache::getItem($key);
         $this->assertEquals(1000, $item->getTTL());
+        Cache::delete($key);
+        $this->assertNull(Cache::getItem($key));
+    }
+    public function test05() {
+        $keys = [];
+        for ($x = 0 ; $x < 10 ; $x++) {
+            $key = 'item_'.$x;
+            Cache::get($key, function () {
+                return 'This is a test.';
+            }, 600);
+            $keys[] = $key;
+        }
+        foreach ($keys as $key) {
+            $this->assertTrue(Cache::has($key));
+        }
+        Cache::flush();
+        foreach ($keys as $key) {
+            $this->assertFalse(Cache::has($key));
+        }
     }
 }

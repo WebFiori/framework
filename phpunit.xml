@@ -28,6 +28,10 @@
             <file>./webfiori/framework/router/RouterUri.php</file>
             <file>./webfiori/framework/router/Router.php</file>
             
+            <file>./webfiori/framework/cache/AbstractCacheStore.php</file>
+            <file>./webfiori/framework/cache/FileCacheStore.php</file>
+            <file>./webfiori/framework/cache/Cache.php</file>
+            
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>

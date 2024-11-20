@@ -530,7 +530,8 @@ class Router {
      * Adds new route to a web page.
      *
      * Note that the route which created using this method will be added to
-     * 'global' and 'web' middleware groups.
+     * 'global' and 'web' middleware groups. Additionally, the route will
+     * be cached for 1 hour by default.
      *
      * @param array $options An associative array that contains route
      * options. Available options are:
@@ -1614,7 +1615,10 @@ class Router {
         if (gettype($options) == 'array') {
             $options[RouteOption::TYPE] = Router::VIEW_ROUTE;
             self::addToMiddlewareGroup($options, 'web');
-
+            if (!isset($options[RouteOption::CACHE_DURATION])) {
+                //Cache pages for one hour by default.
+                $options[RouteOption::CACHE_DURATION] = 3600;
+            }
             return Router::getInstance()->addRouteHelper1($options);
         }
 

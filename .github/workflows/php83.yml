@@ -118,5 +118,29 @@ jobs:
         
       - name: Benchmarking
         run: phpbench run tests/webfiori/benchmark --report=default
+  release_staging:
+    needs:
+      - "test"
+      - "coding_standards_check"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: pre-release
+          token: ${{ secrets.GITHUB_TOKEN }}
+  release_prod:
+    needs:
+      - "test"
+      - "coding_standards_check"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: php
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       

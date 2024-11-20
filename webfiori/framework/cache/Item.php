@@ -70,10 +70,10 @@ class Item {
     /**
      * Returns cache item data after performing decryption on it.
      *
-     * @return string
+     * @return mixed
      */
-    public function getDataDecrypted() : string {
-        return $this->decrypt($this->getData());
+    public function getDataDecrypted() {
+        return unserialize($this->decrypt($this->getData()));
     }
     /**
      * Returns cache data after performing encryption on it.
@@ -83,7 +83,7 @@ class Item {
      * @return string
      */
     public function getDataEncrypted() : string {
-        return $this->encrypt($this->getData());
+        return $this->encrypt(serialize($this->getData()));
     }
     /**
      * Returns the time at which cache item will expire as Unix timestamp.
@@ -169,7 +169,7 @@ class Item {
      * @param int $ttl Time-to-live of the item in cache.
      */
     public function setTTL(int $ttl) {
-        if ($ttl > 0) {
+        if ($ttl >= 0) {
             $this->timeToLive = $ttl;
         }
     }

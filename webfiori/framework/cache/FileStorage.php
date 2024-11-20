@@ -33,19 +33,21 @@ class FileStorage implements Storage {
      * @param Item $item An item that will be added to the cache.
      */
     public function cache(Item $item) {
-        $filePath = $this->getPath().DS.md5($item->getKey()).'.cache';
-        $encryptedData = $item->getDataEncrypted();
+        if ($item->getTTL() > 0) {
+            $filePath = $this->getPath().DS.md5($item->getKey()).'.cache';
+            $encryptedData = $item->getDataEncrypted();
 
-        if (!is_dir($this->getPath())) {
-            mkdir($this->getPath(), 0755, true);
+            if (!is_dir($this->getPath())) {
+                mkdir($this->getPath(), 0755, true);
+            }
+            file_put_contents($filePath, serialize([
+                'data' => $encryptedData,
+                'created_at' => time(),
+                'ttl' => $item->getTTL(),
+                'expires' => $item->getExpiryTime(),
+                'key' => $item->getKey()
+            ]));
         }
-        file_put_contents($filePath, serialize([
-            'data' => $encryptedData,
-            'created_at' => time(),
-            'ttl' => $item->getTTL(),
-            'expires' => $item->getExpiryTime(),
-            'key' => $item->getKey()
-        ]));
     }
     /**
      * Removes an item from the cache.

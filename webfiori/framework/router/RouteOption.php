@@ -29,6 +29,10 @@ class RouteOption {
      */
     const CASE_SENSITIVE = 'case-sensitive';
     /**
+     * An option which is used to set the duration of route cache in seconds.
+     */
+    const CACHE_DURATION = 'cache-ttl';
+    /**
      * An option which is used to set an array as closure parameters (applies to routes of type closure only)
      */
     const CLOSURE_PARAMS = 'closure-params';

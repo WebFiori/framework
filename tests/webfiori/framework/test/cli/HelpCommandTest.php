@@ -2,9 +2,6 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\http\WebServicesManager;
 /**
  * @author Ibrahim
  */

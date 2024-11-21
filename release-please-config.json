@@ -1,6 +1,6 @@
 {
     "include-v-in-tag":true,
-    
+    "tag-separator": "-",
     "packages":{
         ".":{
             "changelog-path": "CHANGELOG.md",
@@ -14,7 +14,7 @@
               { "type": "style", "section": "Styles" },
               { "type": "chore", "section": "Miscellaneous Chores" },
               { "type": "refactor", "section": "Code Refactoring" },
-              { "type": "test", "section": "Tests" },
+              { "type": "test", "section": "Testing" },
               { "type": "build", "section": "Build System" },
               { "type": "ci", "section": "Continuous Integration" }
             ]

@@ -31,6 +31,7 @@
     "require-dev": {
         
     },
+    "require-dev": {},
     "autoload": {
         "psr-4": {
             "webfiori\\framework\\": "webfiori/framework/"

@@ -131,7 +131,7 @@ jobs:
           release-type: php
           target-branch: dev
           config-file: release-please-config.json
-          manifest-file: release-please-manifest.json
+          manifest-file: .release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
   release_prod:
     needs:

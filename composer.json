@@ -2,6 +2,8 @@
     "name": "webfiori/framework",
     "description": "WebFiori framework. Made to make the web bloom.",
     "homepage": "https://webfiori.com",
+    "version":"3.0.0-Beta.13",
+    "type":"library",
     "support": {
         "issues": "https://github.com/webfiori/framework/issues",
         "source": "https://github.com/webfior/framework"
@@ -9,7 +11,9 @@
     "authors": [
         {
             "name": "Ibrahim BinAlshikh",
-            "email": "ibrahim@webfiori.com"
+            "email": "ibrahim@webfiori.com",
+            "homepage": "https://ibrahim-binalshikh.me",
+            "role":"Maintainer"
         }
     ],
     "require": {

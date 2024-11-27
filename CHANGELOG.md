@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.1.0-Beta.14](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.14...v3.1.0-Beta.14) (2024-11-27)
+
+
+### Features
+
+* Added Ability to Enable or Disable Cache ([434fd72](https://github.com/WebFiori/framework/commit/434fd726657d7e4967681933bd718d60f68f2a76))
+
+
+### Miscellaneous Chores
+
+* Updated Dependencies Versions ([07252d0](https://github.com/WebFiori/framework/commit/07252d09f40af27cc04494ea7081a41fe0fe2ede))
+* Updated Framework Version ([d44cedc](https://github.com/WebFiori/framework/commit/d44cedc29ce9097403bdb263c279812f78d7581b))
+
 ## [3.0.0-Beta.14](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.14...v3.0.0-Beta.14) (2024-11-21)
 
 

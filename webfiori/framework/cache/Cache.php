@@ -19,6 +19,7 @@ class Cache {
      * @var Storage
      */
     private $driver;
+    private $isEnabled;
     private static $inst;
     /**
      * Removes an item from the cache given its unique identifier.
@@ -27,6 +28,15 @@ class Cache {
      */
     public static function delete(string $key) {
         self::getDriver()->delete($key);
+    }
+    /**
+     * Enable or disable caching.
+     * 
+     * @param bool $enable If set to true, caching will be enabled. Other than
+     * that, caching will be disabled.
+     */
+    public static function setEnabled(bool $enable) {
+        self::getInst()->isEnabled = $enable;
     }
     /**
      * Removes all items from the cache.
@@ -61,8 +71,11 @@ class Cache {
             return null;
         }
         $newData = call_user_func_array($generator, $params);
-        $item = new Item($key, $newData, $ttl, defined('CACHE_SECRET') ? CACHE_SECRET : '');
-        self::getDriver()->cache($item);
+        
+        if (self::isEnabled()) {
+            $item = new Item($key, $newData, $ttl, defined('CACHE_SECRET') ? CACHE_SECRET : '');
+            self::getDriver()->cache($item);
+        }
 
         return $newData;
     }
@@ -122,9 +135,19 @@ class Cache {
         if (!self::has($key) || $override === true) {
             $item = new Item($key, $data, $ttl, defined('CACHE_SECRET') ? CACHE_SECRET : '');
             self::getDriver()->cache($item);
+            
+            return true;
         }
 
         return false;
+    }
+    /**
+     * Checks if caching is enabled or not.
+     * 
+     * @return bool True if enabled. False otherwise.
+     */
+    public static function isEnabled() : bool {
+        return self::getInst()->isEnabled;
     }
     /**
      * Sets storage engine which is used to store, read, update and delete items
@@ -165,6 +188,7 @@ class Cache {
         if (self::$inst === null) {
             self::$inst = new Cache();
             self::setDriver(new FileStorage());
+            self::setEnabled(true);
         }
 
         return self::$inst;

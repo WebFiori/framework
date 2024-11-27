@@ -1,10 +1,10 @@
-name: Build PHP 8.3
+name: Build PHP 8.4
 
 on:
   push:
     branches: [ master, dev ]
   pull_request:
-    branches: [ master, dev ]
+    branches: [ master ]
 
 jobs:
   
@@ -23,13 +23,13 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [8.3]
+        php: [8.4]
             
     name: PHP${{matrix.php}} - ${{matrix.os}}
     
     steps: 
       - name: Clone Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -80,7 +80,7 @@ jobs:
       - name: "Set up PHP"
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "8.3"
+          php-version: "8.1"
           extensions: "mbstring"
           tools: composer, symplify/easy-coding-standard:12.0.6
           
@@ -101,10 +101,10 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [8.0,8.1,8.2,8.3]
+        php: [8.0,8.1,8.2,8.3,8.4]
     steps:
       - name: Clone Repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -118,35 +118,5 @@ jobs:
         
       - name: Benchmarking
         run: phpbench run tests/webfiori/benchmark --report=default
-  release_staging:
-    name: Publish Beta
-    needs:
-      - "test"
-      - "coding_standards_check"
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/release-please-action@v3
-        with:
-          release-type: php
-          default-branch: dev
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-          token: ${{ secrets.GITHUB_TOKEN }}
-  release_prod:
-    name: Publish Production
-    needs:
-      - "test"
-      - "coding_standards_check"
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/release-please-action@v3
-        with:
-          release-type: php
-          config-file: release-please-config.json
-          token: ${{ secrets.GITHUB_TOKEN }}
         
       

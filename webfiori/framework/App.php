@@ -118,7 +118,7 @@ class App {
             mb_http_output($encoding);
             mb_regex_encoding($encoding);
         }
-        $this->initAutoLoader();
+        self::initAutoLoader();
         $this->setHandlers();
         Controller::get()->updateEnv();
         /**
@@ -543,7 +543,7 @@ class App {
      * @throws FileException
      * @throws Exception
      */
-    private function initAutoLoader() {
+    private static function initAutoLoader() {
         /**
          * Initialize autoloader.
          */

@@ -2,7 +2,7 @@
     "name": "webfiori/framework",
     "description": "WebFiori framework. Made to make the web bloom.",
     "homepage": "https://webfiori.com",
-    "version": "3.0.0-Beta.15",
+    "version": "3.0.0-Beta.16",
     "type": "library",
     "support": {
         "issues": "https://github.com/webfiori/framework/issues",
@@ -29,7 +29,7 @@
         "webfiori/collections": "v1.1.4",
         "webfiori/database": "v0.8.11",
         "webfiori/cli": "v1.3.0",
-        "webfiori/mailer": "v1.2.0",
+        "webfiori/mailer": "v1.2.1",
         "webfiori/err": "v1.1.0"
     },
     "require-dev": {},

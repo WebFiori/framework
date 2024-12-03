@@ -592,7 +592,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-Beta.16');
+        define('WF_VERSION', '3.0.0-Beta.17');
         /**
          * A constant that tells the type of framework version.
          *
@@ -608,7 +608,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2024-12-01');
+        define('WF_RELEASE_DATE', '2024-12-03');
     }
 
     /**

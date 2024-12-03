@@ -305,7 +305,35 @@ class App {
     public static function getConfigDriver() : string {
         return self::$ConfigDriver;
     }
-
+    /**
+     * Initiate main environment variables which are used by the framework.
+     * 
+     * This method is intended to be called in the index file of the project.
+     * 
+     * @param string $appFolder The name of the folder at which the application
+     * is created at.
+     * 
+     * @param string $publicFolder A string that represent the name of the public
+     * folder such as 'public'.
+     * 
+     * @param string $indexDir The directory at which index file exist at.
+     * Usually, its the value of the constant __DIR__.
+     */
+    public static function initiate(string $appFolder, string $publicFolder = 'public', string $indexDir = __DIR__) {
+        if (!defined('ROOT_PATH')) {
+            define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
+        }
+        if (!defined('APP_DIR')) {
+            define('APP_DIR', $appFolder);
+        }
+        if (!defined('APP_PATH')) {
+            define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
+        }
+        if (!defined('WF_CORE_PATH')) {
+            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor\webfiori\framework\webfiori\framework');
+        }
+        self::initAutoLoader();
+    }
     /**
      * Returns an instance which represents the class that is used to run the
      * terminal.

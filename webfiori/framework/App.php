@@ -306,6 +306,24 @@ class App {
         return self::$ConfigDriver;
     }
     /**
+     * Handel the request.
+     * 
+     * This method should only be called after the application has been initialized.
+     * Its used to handle HTTP requests or start CLI processing.
+     */
+    public static function handle() {
+        if (self::$ClassStatus == self::STATUS_INITIALIZED) {
+            if (App::getRunner()->isCLI() === true) {
+                App::getRunner()->start();
+            } else {
+               //route user request.
+               SessionsManager::start('wf-session');
+               Router::route(Request::getRequestedURI());
+               Response::send();
+            }
+        }
+    }
+    /**
      * Initiate main environment variables which are used by the framework.
      * 
      * This method is intended to be called in the index file of the project.

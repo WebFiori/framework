@@ -1,26 +1,23 @@
 {
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
     "include-v-in-tag":true,
     "tag-separator": "-",
-    "packages":{
-        ".":{
-            "changelog-path": "CHANGELOG.md",
-            "changelog-sections": [
-              { "type": "feat", "section": "Features" },
-              { "type": "feature", "section": "Features" },
-              { "type": "fix", "section": "Bug Fixes" },
-              { "type": "perf", "section": "Performance Improvements" },
-              { "type": "revert", "section": "Reverts" },
-              { "type": "docs", "section": "Documentation" },
-              { "type": "style", "section": "Styles" },
-              { "type": "chore", "section": "Miscellaneous Chores" },
-              { "type": "refactor", "section": "Code Refactoring" },
-              { "type": "test", "section": "Testing" },
-              { "type": "build", "section": "Build System" },
-              { "type": "ci", "section": "Continuous Integration" },
-              { "type": "ui", "section": "User Interface" },
-              { "type": "database", "section": "Database Changes" },
-              { "type": "email", "section": "Email Notifications Changes" }
-            ]
-        }
-    }
+    "changelog-path": "CHANGELOG.md",
+    "changelog-sections": [
+      { "type": "feat", "section": "Features" },
+      { "type": "feature", "section": "Features" },
+      { "type": "fix", "section": "Bug Fixes" },
+      { "type": "perf", "section": "Performance Improvements" },
+      { "type": "revert", "section": "Reverts" },
+      { "type": "docs", "section": "Documentation" },
+      { "type": "style", "section": "Styles" },
+      { "type": "chore", "section": "Miscellaneous Chores" },
+      { "type": "refactor", "section": "Code Refactoring" },
+      { "type": "test", "section": "Testing" },
+      { "type": "build", "section": "Build System" },
+      { "type": "ci", "section": "Continuous Integration" },
+      { "type": "ui", "section": "User Interface" },
+      { "type": "database", "section": "Database Changes" },
+      { "type": "email", "section": "Email Notifications Changes" }
+    ]
 }

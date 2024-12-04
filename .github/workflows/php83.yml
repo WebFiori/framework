@@ -119,7 +119,7 @@ jobs:
       - name: Benchmarking
         run: phpbench run tests/webfiori/benchmark --report=default
   release_staging:
-    name: Publish Beta
+    name: Prepare Beta Release Branch
     needs:
       - "test"
       - "coding_standards_check"
@@ -135,7 +135,7 @@ jobs:
           manifest-file: .release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
   release_prod:
-    name: Publish Production
+    name: Prepare Production Release Branch
     needs:
       - "test"
       - "coding_standards_check"

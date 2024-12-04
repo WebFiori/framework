@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.0.0-Beta.18](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.17...v3.0.0-Beta.18) (2024-12-04)
+
+
+### Bug Fixes
+
+* Correction to File Path ([df3eacf](https://github.com/WebFiori/framework/commit/df3eacfb150a43020794545f51ee1379256a46fc))
+* Fix to Undefined Constant ([d605a5b](https://github.com/WebFiori/framework/commit/d605a5be85cd8623a2114b8c0756372c82bd7c9b))
+
+
+### Miscellaneous Chores
+
+* release v3.0.0-Beta.18 ([5a588eb](https://github.com/WebFiori/framework/commit/5a588eb52815889a8409a07a30c4e6f0defe3269))
+* Updated Framework Version ([783f4be](https://github.com/WebFiori/framework/commit/783f4be57869ae93eab8c0b49fe2ede5cc7fbba8))
+* Updated Release Please Config ([1a8b4e5](https://github.com/WebFiori/framework/commit/1a8b4e55f9a5496aac47e30228613d8a24068914))
+
 ## [3.0.0-Beta.17](https://github.com/WebFiori/framework/compare/v3.1.0-Beta.14...v3.0.0-Beta.17) (2024-12-03)
 
 

@@ -29,6 +29,10 @@ class StarterPage extends WebPage {
         $this->getDocument()->getDocumentRoot()->setStyle([
             'background-color' => '#e0f2b4'
         ]);
+        $this->getChildByID(self::MAIN_ELEMENTS[2])->setStyle([
+            'background' => 'rgb(213,238,153)',
+            'background' => 'radial-gradient(circle, rgba(213,238,153,0.5550420851934523) 26%, rgba(4,101,37,0.45700286950717783) 68%)'
+        ]);
         $this->setTitle('Welcome to WebFiori');
         $div = $this->insert('div');
         $div->addChild('img', [
@@ -80,7 +84,10 @@ class StarterPage extends WebPage {
     private function createCard($link, $icon, $cardTitle, $paragraph, \webfiori\ui\HTMLNode $el) {
         $card = $el->addChild('v-card', [
             'hover',
-            'height' => '220px'
+            'height' => '220px',
+            'style' => [
+                'background' => 'rgba(255,255,255,.6)'
+            ]
         ]);
         $card->addChild('v-card-title')->addChild('v-icon',[
             'style' => 'margin:10px'

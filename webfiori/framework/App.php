@@ -320,6 +320,9 @@ class App {
      * Usually, its the value of the constant __DIR__.
      */
     public static function initiate(string $appFolder, string $publicFolder = 'public', string $indexDir = __DIR__) {
+        if (!defined('DS')) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
         if (!defined('ROOT_PATH')) {
             define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
         }

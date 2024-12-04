@@ -64,7 +64,7 @@ class JsonDriver implements ConfigurationDriver {
                     'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
                 ], 'none', 'same'),
                 "CLI_HTTP_HOST" => new Json([
-                    "value" => "example.com",
+                    "value" => "127.0.0.1",
                     "description" => "Host name that will be used when runing the application as command line utility."
                 ], 'none', 'same')
             ], 'none', 'same'),

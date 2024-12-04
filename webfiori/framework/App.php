@@ -88,7 +88,7 @@ class App {
      *
      * @var string
      */
-    private static $ConfigDriver = 'webfiori\\framework\\config\\ClassDriver';
+    private static $ConfigDriver = 'webfiori\\framework\\config\\JsonDriver';
     /**
      * A single instance of the class.
      *

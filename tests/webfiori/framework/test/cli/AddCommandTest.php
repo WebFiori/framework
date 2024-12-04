@@ -191,7 +191,7 @@ class AddCommandTest extends TestCase {
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
         ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
-        $this->removeClass('\\app\\langs\\LanguageFK');
+        $this->removeClass('\\app\\langs\\LangFK');
         Controller::getDriver()->initialize();
     }
     /**

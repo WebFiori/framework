@@ -19,7 +19,7 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
         $this->assertEquals(9, $w->getPhpUnitVersion());
         $w->writeClass();
         $this->assertTrue(class_exists('\\'.$w->getName(true)));
-        $this->removeClass($w->getAbsolutePath());
+        unlink($w->getAbsolutePath());
     }
     /**
      * @test
@@ -34,6 +34,6 @@ class WebServiceTestCaseWriterTest extends CreateTestCase {
         $this->assertTrue(file_exists($w->getAbsolutePath()));
         require_once $w->getAbsolutePath();
         $this->assertTrue(class_exists('\\'.$w->getName(true)));
-        $this->removeClass($w->getAbsolutePath());
+        unlink($w->getAbsolutePath());
     }
 }

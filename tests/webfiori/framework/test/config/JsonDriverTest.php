@@ -38,7 +38,7 @@ class JsonDriverTest extends TestCase {
                 'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
             ],
             'CLI_HTTP_HOST' => [
-                'value' => 'example.com',
+                "value" => "127.0.0.1",
                 'description' => 'Host name that will be used when runing the application as command line utility.'
             ],
         ],$driver->getEnvVars());
@@ -147,7 +147,7 @@ class JsonDriverTest extends TestCase {
                 'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
             ],
             "CLI_HTTP_HOST" => [
-                "value" => "example.com",
+                "value" => "127.0.0.1",
                 "description" => "Host name that will be used when runing the application as command line utility."
             ]
         ], $driver->getEnvVars());

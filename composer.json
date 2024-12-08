@@ -30,7 +30,8 @@
         "webfiori/database": "v0.8.12",
         "webfiori/cli": "v1.3.0",
         "webfiori/mailer": "v1.2.1",
-        "webfiori/err": "v1.1.0"
+        "webfiori/err": "v1.1.0",
+        "webfiori/cache": "v1.0.0"
     },
     "require-dev": {},
     "autoload": {

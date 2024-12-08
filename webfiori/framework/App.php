@@ -18,7 +18,6 @@ use webfiori\error\Handler;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\autoload\ClassLoader;
-use webfiori\framework\cache\Cache;
 use webfiori\framework\config\ConfigurationDriver;
 use webfiori\framework\config\Controller;
 use webfiori\framework\exceptions\InitializationException;
@@ -26,11 +25,12 @@ use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
 use webfiori\framework\middleware\AbstractMiddleware;
+use webfiori\framework\middleware\CacheMiddleware;
 use webfiori\framework\middleware\MiddlewareManager;
+use webfiori\framework\middleware\StartSessionMiddleware;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
@@ -154,7 +154,6 @@ class App {
         {
             register_shutdown_function(function()
             {
-                SessionsManager::validateStorage();
                 $uriObj = Router::getRouteUri();
 
                 if ($uriObj !== null) {
@@ -163,14 +162,6 @@ class App {
                     }
                 }
             });
-            try {
-                $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
-
-                foreach ($sessionsCookiesHeaders as $headerVal) {
-                    Response::addHeader('set-cookie', $headerVal);
-                }
-            } catch (Error $exc) {
-            }
 
             $uriObj = Router::getRouteUri();
 
@@ -180,20 +171,10 @@ class App {
                 foreach ($uriObj->getMiddleware() as $mw) {
                     $mw->after(Request::get(), Response::get());
                 }
-                App::cacheResponse($uriObj->getUri(true, true), $uriObj->getCacheDuration());
             }
         });
         //class is now initialized
         self::$ClassStatus = self::STATUS_INITIALIZED;
-    }
-    public static function cacheResponse(string $key, int $duration) {
-        Cache::get($key, function () {
-            return [
-                'headers' => Response::getHeaders(),
-                'http-code' => Response::getCode(),
-                'body' => Response::getBody()
-            ];
-        }, $duration);
     }
     /**
      * Register CLI commands or background tasks.
@@ -317,7 +298,8 @@ class App {
                 App::getRunner()->start();
             } else {
                //route user request.
-               SessionsManager::start('wf-session');
+               MiddlewareManager::register(new StartSessionMiddleware());
+               MiddlewareManager::register(new CacheMiddleware());
                Router::route(Request::getRequestedURI());
                Response::send();
             }
@@ -538,7 +520,8 @@ class App {
             'webfiori/file' => 'webfiori\\file\\File',
             'webfiori/mailer' => 'webfiori\\email\\SMTPAccount',
             'webfiori/cli' => 'webfiori\\cli\\CLICommand',
-            'webfiori/err' => 'webfiori\\error\\ErrorHandlerException'
+            'webfiori/err' => 'webfiori\\error\\ErrorHandlerException',
+            'webfiori/cache' => 'webfiori\\cache\\Cache'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {

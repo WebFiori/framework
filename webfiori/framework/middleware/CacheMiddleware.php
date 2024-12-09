@@ -19,7 +19,7 @@ class CacheMiddleware extends AbstractMiddleware {
         $uriObj = Router::getRouteUri();
         
         if ($uriObj !== null) {
-            $request->getRequestedURI();
+            $key = $request->getRequestedURI();
             
             //Following steps are used to make cached response unique per user.
             $session = SessionsManager::getActiveSession();

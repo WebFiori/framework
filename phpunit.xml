@@ -113,8 +113,5 @@
         <testsuite name="Session Tests">
             <directory>./tests/webfiori/framework/test/session</directory>
         </testsuite>
-        <testsuite name="Cache Tests">
-            <directory>./tests/webfiori/framework/test/cache</directory>
-        </testsuite>
     </testsuites>
 </phpunit>

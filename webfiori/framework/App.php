@@ -298,8 +298,6 @@ class App {
                 App::getRunner()->start();
             } else {
                //route user request.
-               MiddlewareManager::register(new StartSessionMiddleware());
-               MiddlewareManager::register(new CacheMiddleware());
                Router::route(Request::getRequestedURI());
                Response::send();
             }
@@ -627,6 +625,8 @@ class App {
         if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
             Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
+        MiddlewareManager::register(new StartSessionMiddleware());
+        MiddlewareManager::register(new CacheMiddleware());
         self::call(APP_DIR.'\ini\InitMiddleware::init');
     }
     /**

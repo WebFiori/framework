@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.0-Beta.19](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.18...v3.0.0-Beta.19) (2024-12-09)
+
+
+### Miscellaneous Chores
+
+* release v3.0.0-Beta.19 ([e8d5314](https://github.com/WebFiori/framework/commit/e8d531433f6afada6684050013b4169b3d8d547b))
+* Updated Dependencies ([8284dc6](https://github.com/WebFiori/framework/commit/8284dc655e8e92aafc3fb6a1bd88861254da0fe1))
+* Updated Version Number ([280f418](https://github.com/WebFiori/framework/commit/280f418df38a2eb019b6f2a5d0c1b8b8d00133d3))
+
 ## [3.0.0-Beta.18](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.17...v3.0.0-Beta.18) (2024-12-04)
 
 

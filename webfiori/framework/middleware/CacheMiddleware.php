@@ -10,27 +10,21 @@ use webfiori\http\Response;
 
 
 class CacheMiddleware extends AbstractMiddleware {
+
     public function __construct() {
         parent::__construct('cache');
         $this->setPriority(50);
         $this->addToGroups(['web', 'api']);
+  
     }
     public function after(Request $request, Response $response) {
+        
         $uriObj = Router::getRouteUri();
         
         if ($uriObj !== null) {
-            $key = $request->getRequestedURI();
+            $key = $this->getKey();
             
-            //Following steps are used to make cached response unique per user.
-            $session = SessionsManager::getActiveSession();
-            if ($session !== null) {
-                $key .= $session->getId();
-            } 
-            $authHeader = $request->getAuthHeader();
-            $key .= $authHeader['scheme'].$authHeader['credentials'];
-            //End
-            
-            Cache::get($key, function (Response $response) {
+            Cache::set($key, function (Response $response) {
                 return [
                     'headers' => $response->getHeaders(),
                     'http-code' => $response->getCode(),
@@ -45,6 +39,30 @@ class CacheMiddleware extends AbstractMiddleware {
     }
 
     public function before(Request $request, Response $response) {
+        $data = Cache::get($this->getKey());
         
+        if ($data !== null) {
+            $response->write($data['body']);
+            $response->setCode($data['http-code']);
+            foreach ($data['headers'] as $headerObj) {
+                $response->addHeader($headerObj->getName(), $headerObj->getValue());
+            }
+            $response->send();
+        }
+    }
+    private function getKey() {
+        $key = Request::getUri()->getUri(true, true);
+            
+        //Following steps are used to make cached response unique per user.
+        $session = SessionsManager::getActiveSession();
+        if ($session !== null) {
+            $key .= $session->getId();
+        } 
+        $authHeader = Request::getAuthHeader();
+        if ($authHeader !== null) {
+            $key .= $authHeader->getScheme().$authHeader->getCredentials();
+        }
+        //End
+        return $key;
     }
 }

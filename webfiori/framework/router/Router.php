@@ -1464,16 +1464,7 @@ class Router {
      * @throws RoutingException
      */
     private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
-        $data = Cache::get($uri);
         
-        if ($data !== null) {
-            Response::write($data['body']);
-            Response::setCode($data['http-code']);
-            foreach ($data['headers'] as $headerObj) {
-                Response::addHeader($headerObj->getName(), $headerObj->getValue());
-            }
-            return true;
-        }
         $pathArray = $routeUri->getPathArray();
         $requestMethod = Request::getMethod();
         $indexToSearch = 'static';

@@ -1379,7 +1379,6 @@ class Router {
     private function routeFound(RouterUri $route, bool $loadResource) {
         if ($route->isRequestMethodAllowed()) {
             $this->uriObj = $route;
-            $route->getMiddleware()->insertionSort(false);
 
             foreach ($route->getMiddleware() as $mw) {
                 $mw->before(Request::get(), Response::get());

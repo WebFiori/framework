@@ -28,26 +28,26 @@ class MiddlewareManager {
      */
     private $middlewareList;
     private function __construct() {
-        $this->middlewareList = new LinkedList();
+        $this->middlewareList = [];
     }
     /**
-     * Returns a set of middlewares that belongs to a specific group.
+     * Returns a set of middleware that belongs to a specific group.
      *
      * @param string $groupName The name of the group.
      *
-     * @return LinkedList The method will return a linked list with all
+     * @return array The method will return a linked list with all
      * middleware in the group. If no group which has the given name exist, the
      * list will be empty.
      *
      * @since 1.0
      */
-    public static function getGroup(string $groupName) {
-        $list = new LinkedList();
+    public static function getGroup(string $groupName) : array {
+        $list = [];
         $mdList = self::get()->middlewareList;
 
         foreach ($mdList as $mw) {
             if (in_array($groupName, $mw->getGroups())) {
-                $list->add($mw);
+                $list[] = $mw;
             }
         }
 
@@ -78,10 +78,9 @@ class MiddlewareManager {
      *
      * @param AbstractMiddleware $middleware The middleware that will be registered.
      *
-     * @since 1.0
      */
     public static function register(AbstractMiddleware $middleware) {
-        self::get()->middlewareList->add($middleware);
+        self::get()->middlewareList[] = $middleware;
     }
     /**
      * Removes a middleware given its name.
@@ -92,11 +91,14 @@ class MiddlewareManager {
      */
     public static function remove(string $name) {
         $manager = self::get();
-        $mw = $manager->getMiddleware($name);
-
-        if ($mw instanceof AbstractMiddleware) {
-            $manager->middlewareList->remove($manager->middlewareList->indexOf($mw));
+        $newList = [];
+        
+        foreach ($manager->middlewareList as $md) {
+            if ($md->getName() != $name) {
+                $newList[] = $md;
+            }
         }
+        $manager->middlewareList = $newList;
     }
     /**
      *

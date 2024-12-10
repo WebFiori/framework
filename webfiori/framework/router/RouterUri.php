@@ -12,7 +12,6 @@ namespace webfiori\framework\router;
 
 use Closure;
 use InvalidArgumentException;
-use webfiori\collections\LinkedList;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\http\Uri;
 use webfiori\ui\HTMLNode;
@@ -46,6 +45,7 @@ class RouterUri extends Uri {
      */
     private $action;
     private $assignedMiddlewareList;
+    private $sortedMiddleeareList;
     private $cacheDuration;
     /**
      *
@@ -132,7 +132,8 @@ class RouterUri extends Uri {
         $this->isCS = $caseSensitive;
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
-        $this->assignedMiddlewareList = new LinkedList();
+        $this->assignedMiddlewareList = [];
+        $this->sortedMiddleeareList = [];
 
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
@@ -190,12 +191,12 @@ class RouterUri extends Uri {
             $group = MiddlewareManager::getGroup($name);
 
             foreach ($group as $mw) {
-                $this->assignedMiddlewareList->add($mw);
+                $this->assignedMiddlewareList[] = $mw;
             }
 
             return;
         }
-        $this->assignedMiddlewareList->add($mw);
+        $this->assignedMiddlewareList[] = $mw;
     }
     /**
      * Returns the name of the action that will be called in the controller.
@@ -260,12 +261,19 @@ class RouterUri extends Uri {
     /**
      * Returns a list that holds objects for the middleware.
      *
-     * @return LinkedList
+     * @return array
      *
-     * @since 1.4.0
      */
-    public function getMiddleware() : LinkedList {
-        return $this->assignedMiddlewareList;
+    public function getMiddleware() : array {
+        if (count($this->assignedMiddlewareList) != count($this->sortedMiddleeareList)) {
+            $compareFunc = function ($a, $b) {
+                return $b->getPriority() - $a->getPriority();
+            };
+            $this->sortedMiddleeareList = $this->assignedMiddlewareList;
+            
+            usort($this->sortedMiddleeareList, $compareFunc);
+        }
+        return $this->sortedMiddleeareList;
     }
 
     /**

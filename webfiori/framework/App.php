@@ -154,11 +154,11 @@ class App {
         {
             register_shutdown_function(function()
             {
-                $uriObj = Router::getRouteUri();
-
                 if ($uriObj !== null) {
-                    foreach ($uriObj->getMiddleware() as $mw) {
-                        $mw->afterSend(Request::get(), Response::get());
+                    $mdArr = $uriObj->getMiddleware();
+
+                    for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
+                        $mdArr[$x]->afterSend(Request::get(), Response::get());
                     }
                 }
             });
@@ -166,10 +166,10 @@ class App {
             $uriObj = Router::getRouteUri();
 
             if ($uriObj !== null) {
-                $uriObj->getMiddleware()->insertionSort();
+                $mdArr = $uriObj->getMiddleware();
 
-                foreach ($uriObj->getMiddleware() as $mw) {
-                    $mw->after(Request::get(), Response::get());
+                for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
+                    $mdArr[$x]->after(Request::get(), Response::get());
                 }
             }
         });

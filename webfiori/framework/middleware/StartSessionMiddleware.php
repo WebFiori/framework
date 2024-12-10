@@ -6,9 +6,16 @@ use Error;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
 use webfiori\http\Response;
-
+/**
+ * A middleware which is used to initialize sessions.
+ */
 class StartSessionMiddleware extends AbstractMiddleware {
-
+    /**
+     * Creates new instance of the class.
+     * 
+     * By default, the middleware is part of the group 'web'.
+     * The priority of the middleware is PHP_INT_MAX.
+     */
     public function __construct() {
         parent::__construct('start-session');
         $this->setPriority(PHP_INT_MAX);

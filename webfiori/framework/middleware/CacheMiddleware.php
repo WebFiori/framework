@@ -10,27 +10,27 @@ use webfiori\http\Response;
 
 
 class CacheMiddleware extends AbstractMiddleware {
-
+    private $fromCache;
     public function __construct() {
         parent::__construct('cache');
         $this->setPriority(50);
         $this->addToGroups(['web', 'api']);
-  
+        $this->fromCache = false;
     }
     public function after(Request $request, Response $response) {
         
-        $uriObj = Router::getRouteUri();
+        if (!$this->fromCache) {
+            $uriObj = Router::getRouteUri();
         
-        if ($uriObj !== null) {
-            $key = $this->getKey();
-            
-            Cache::set($key, function (Response $response) {
-                return [
+            if ($uriObj !== null) {
+                $key = $this->getKey();
+                $data = [
                     'headers' => $response->getHeaders(),
                     'http-code' => $response->getCode(),
                     'body' => $response->getBody()
                 ];
-            }, $uriObj->getCacheDuration(), [$response]);
+                Cache::set($key, $data, $uriObj->getCacheDuration());
+            }
         }
     }
 
@@ -39,9 +39,11 @@ class CacheMiddleware extends AbstractMiddleware {
     }
 
     public function before(Request $request, Response $response) {
-        $data = Cache::get($this->getKey());
+        $key = $this->getKey();
+        $data = Cache::get($key);
         
         if ($data !== null) {
+            $this->fromCache = true;
             $response->write($data['body']);
             $response->setCode($data['http-code']);
             foreach ($data['headers'] as $headerObj) {

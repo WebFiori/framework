@@ -28,9 +28,10 @@
             <file>./webfiori/framework/router/RouterUri.php</file>
             <file>./webfiori/framework/router/Router.php</file>
             
-            <file>./webfiori/framework/cache/AbstractCacheStore.php</file>
-            <file>./webfiori/framework/cache/FileStorage.php</file>
-            <file>./webfiori/framework/cache/Cache.php</file>
+            <file>./webfiori/framework/middleware/AbstractMiddleware.php</file>
+            <file>./webfiori/framework/middleware/MiddlewareManager.php</file>
+            <file>./webfiori/framework/middleware/CacheMiddleware.php</file>
+            <file>./webfiori/framework/middleware/StartSessionMiddleware.php</file>
             
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>

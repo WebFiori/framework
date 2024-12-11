@@ -99,3 +99,4 @@ register_shutdown_function(function()
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Starting to run tests...\n");
+fprintf(STDOUT,"---------------------------------\n");

@@ -106,8 +106,7 @@ class App {
      * @since 1.0
      */
     private function __construct() {
-        $this->checkStdInOut();
-        $this->initFrameworkVersionInfo();
+        
         $this->checkAppDir();
         /**
          * Change encoding of mb_ functions to UTF-8
@@ -118,7 +117,6 @@ class App {
             mb_http_output($encoding);
             mb_regex_encoding($encoding);
         }
-        self::initAutoLoader();
         $this->setHandlers();
         Controller::get()->updateEnv();
         /**
@@ -131,21 +129,17 @@ class App {
          */
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
-
         //Initialize CLI
         self::getRunner();
 
         $this->initThemesPath();
-        $this->checkStandardLibs();
-
+        
         if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
             Ini::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
         self::call(APP_DIR.'\ini\InitPrivileges::init');
-
-
 
         $this->initMiddleware();
         $this->initRoutes();
@@ -319,21 +313,39 @@ class App {
      */
     public static function initiate(string $appFolder, string $publicFolder = 'public', string $indexDir = __DIR__) {
         if (!defined('DS')) {
+            /**
+             * Directory separator.
+             */
             define('DS', DIRECTORY_SEPARATOR);
         }
         if (!defined('ROOT_PATH')) {
+            /**
+             * Path to source folder.
+             */
             define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
         }
         if (!defined('APP_DIR')) {
+            /**
+             * Name of application directory.
+             */
             define('APP_DIR', $appFolder);
         }
         if (!defined('APP_PATH')) {
+            /**
+             * Path to application directory.
+             */
             define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
         }
         if (!defined('WF_CORE_PATH')) {
+            /**
+             * Path to WebFiori's core library.
+             */
             define('WF_CORE_PATH', ROOT_PATH.DS.'vendor\webfiori\framework\webfiori\framework');
         }
         self::initAutoLoader();
+        self::checkStandardLibs();
+        self::checkStdInOut();
+        self::initFrameworkVersionInfo();
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -467,13 +479,7 @@ class App {
         }
     }
     private function checkAppDir() {
-        if (!defined('DS')) {
-            /**
-             * Directory separator.
-             */
-            define('DS', DIRECTORY_SEPARATOR);
-        }
-
+        
         if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application
@@ -508,7 +514,7 @@ class App {
      * @throws InitializationException
      * @since 1.3.5
      */
-    private function checkStandardLibs() {
+    private static function checkStandardLibs() {
         $standardLibsClasses = [
             'webfiori/collections' => 'webfiori\\collections\\Node',
             'webfiori/ui' => 'webfiori\\ui\\HTMLNode',
@@ -532,7 +538,7 @@ class App {
     /**
      * Checks and initialize standard input and output streams.
      */
-    private function checkStdInOut() {
+    private static function checkStdInOut() {
         /*
          * first, check for php streams if they are open or not.
          */
@@ -588,7 +594,7 @@ class App {
         }
         self::call(APP_DIR.'\ini\InitAutoLoad::init');
     }
-    private function initFrameworkVersionInfo() {
+    private static function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
          *

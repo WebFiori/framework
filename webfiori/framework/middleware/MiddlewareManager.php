@@ -10,21 +10,19 @@
  */
 namespace webfiori\framework\middleware;
 
-use webfiori\collections\LinkedList;
+use Exception;
+
 /**
  * This class is used to manage the operations which are related to middleware.
  *
  * @author Ibrahim
  *
- * @since 1.0
- *
- * @since 2.0.0
  */
 class MiddlewareManager {
     private static $inst;
     /**
      *
-     * @var LinkedList
+     * @var array
      */
     private $middlewareList;
     private function __construct() {
@@ -38,8 +36,6 @@ class MiddlewareManager {
      * @return array The method will return a linked list with all
      * middleware in the group. If no group which has the given name exist, the
      * list will be empty.
-     *
-     * @since 1.0
      */
     public static function getGroup(string $groupName) : array {
         $list = [];
@@ -61,8 +57,6 @@ class MiddlewareManager {
      * @return AbstractMiddleware|null If a middleware with the given name is
      * found, the method will return it. Other than that, the method will return
      * null.
-     *
-     * @since 1.0
      */
     public static function getMiddleware(string $name) {
         $mdList = self::get()->middlewareList;
@@ -76,18 +70,26 @@ class MiddlewareManager {
     /**
      * Register a new middleware.
      *
-     * @param AbstractMiddleware $middleware The middleware that will be registered.
-     *
+     * @param AbstractMiddleware|string $middleware The middleware that will be registered.
      */
-    public static function register(AbstractMiddleware $middleware) {
-        self::get()->middlewareList[] = $middleware;
+    public static function register($middleware) : bool {
+        if (gettype($middleware) == 'string') {
+            try {
+                $middleware = new $middleware();
+            } catch (Exception $exc) {
+                return false;
+            }
+        }
+        if ($middleware instanceof AbstractMiddleware) {
+            self::get()->middlewareList[] = $middleware;
+            return true;
+        }
+        return false;
     }
     /**
      * Removes a middleware given its name.
      *
      * @param string $name The name of the middleware.
-     *
-     * @since 1.0
      */
     public static function remove(string $name) {
         $manager = self::get();

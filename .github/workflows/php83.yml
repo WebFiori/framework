@@ -119,7 +119,7 @@ jobs:
       - name: Benchmarking
         run: phpbench run tests/webfiori/benchmark --report=default
   release_staging:
-    name: Prepare Beta Release Branch
+    name: Prepare Beta Release Branch / Publish Release
     needs:
       - "test"
       - "coding_standards_check"
@@ -127,7 +127,7 @@ jobs:
     if: github.ref == 'refs/heads/dev'
     steps:
       - uses: actions/checkout@v4
-      - uses: google-github-actions/release-please-action@v3
+      - uses: google-github-actions/release-please-action@v4
         with:
           release-type: php
           default-branch: dev
@@ -135,7 +135,7 @@ jobs:
           manifest-file: .release-please-manifest.json
           token: ${{ secrets.GITHUB_TOKEN }}
   release_prod:
-    name: Prepare Production Release Branch
+    name: Prepare Production Release Branch / Publish Release
     needs:
       - "test"
       - "coding_standards_check"
@@ -143,7 +143,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
-      - uses: google-github-actions/release-please-action@v3
+      - uses: google-github-actions/release-please-action@v4
         with:
           release-type: php
           config-file: release-please-config.json

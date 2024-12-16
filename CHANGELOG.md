@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.0-Beta.20](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.19...v3.0.0-Beta.20) (2024-12-16)
+
+
+### Miscellaneous Chores
+
+* Fix target Branch ([a419a3e](https://github.com/WebFiori/framework/commit/a419a3e29bb416be328b19f1489788d51ebbcd4e))
+* release 3.0.0-Beta.20 ([ddcf6b0](https://github.com/WebFiori/framework/commit/ddcf6b03010a0f011112bfa789f446b1949daaae))
+* release 3.0.0-Beta.20 ([c4fc053](https://github.com/WebFiori/framework/commit/c4fc053d45a5c8b24e963a625d0954c33af2c884))
+* release 3.0.0-Beta.20 ([6e72830](https://github.com/WebFiori/framework/commit/6e72830f0ec1f6943d84ee3266632d5c62e02832))
+* release v3.0.0-Beta.20 ([630f512](https://github.com/WebFiori/framework/commit/630f512c6a036e111a7b146cacbd7d72dfe0da06))
+* Updated Framework Version ([361e5d5](https://github.com/WebFiori/framework/commit/361e5d545a274043efceab4087d4db7769990d60))
+
 ## [3.0.0-Beta.19](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.19...v3.0.0-Beta.19) (2024-12-09)
 
 

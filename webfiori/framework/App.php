@@ -617,7 +617,7 @@ class App {
         }
         self::call(APP_DIR.'\ini\InitAutoLoad::init');
     }
-    private static function initFrameworkVersionInfo() {
+    public static function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
          *

@@ -63,6 +63,10 @@ class App {
      */
     const STATUS_NONE = 'NONE';
     /**
+     * A constant that indicates that the status of the class is initiated.
+     */
+    const STATUS_INITIATED = 'INITIATED';
+    /**
      * An instance of autoloader class.
      *
      * @var ClassLoader
@@ -148,6 +152,7 @@ class App {
         {
             register_shutdown_function(function()
             {
+                $uriObj = Router::getRouteUri();
                 if ($uriObj !== null) {
                     $mdArr = $uriObj->getMiddleware();
 
@@ -250,10 +255,8 @@ class App {
      * the constructor of the class is not called. 'INITIALIZING' if the execution
      * is happening inside the constructor of the class. 'INITIALIZED' once the
      * code in the constructor is executed.
-     *
-     * @since 1.0
      */
-    public static function getClassStatus() {
+    public static function getClassStatus() : string {
         return self::$ClassStatus;
     }
     /**
@@ -280,6 +283,14 @@ class App {
     public static function getConfigDriver() : string {
         return self::$ConfigDriver;
     }
+    private static function getRoot() {
+        //Following lines of code assumes that the class exist on the folder: 
+        //\vendor\webfiori\framework\webfiori\framework
+        //Its used to construct the folder at which index file will exist at
+        $vendorPath = '\vendor\webfiori\framework\webfiori\framework';
+        $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
+        return $rootPath;
+    }
     /**
      * Handel the request.
      * 
@@ -287,6 +298,14 @@ class App {
      * Its used to handle HTTP requests or start CLI processing.
      */
     public static function handle() {
+        
+        if (self::$ClassStatus == self::STATUS_NONE) {
+            $publicFolderName = 'public';
+            self::initiate('app', $publicFolderName, self::getRoot().DIRECTORY_SEPARATOR.$publicFolderName);
+        }
+        if (self::$ClassStatus == self::STATUS_INITIATED) {
+            self::start();
+        }
         if (self::$ClassStatus == self::STATUS_INITIALIZED) {
             if (App::getRunner()->isCLI() === true) {
                 App::getRunner()->start();
@@ -311,7 +330,7 @@ class App {
      * @param string $indexDir The directory at which index file exist at.
      * Usually, its the value of the constant __DIR__.
      */
-    public static function initiate(string $appFolder, string $publicFolder = 'public', string $indexDir = __DIR__) {
+    public static function initiate(string $appFolder = 'app', string $publicFolder = 'public', string $indexDir = __DIR__) {
         if (!defined('DS')) {
             /**
              * Directory separator.
@@ -319,6 +338,9 @@ class App {
             define('DS', DIRECTORY_SEPARATOR);
         }
         if (!defined('ROOT_PATH')) {
+            if ($indexDir == __DIR__) {
+                $indexDir = self::getRoot().DS.$publicFolder;
+            }
             /**
              * Path to source folder.
              */
@@ -346,6 +368,7 @@ class App {
         self::checkStandardLibs();
         self::checkStdInOut();
         self::initFrameworkVersionInfo();
+        self::$ClassStatus = self::STATUS_INITIATED;
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -432,12 +455,12 @@ class App {
      * @since 1.0
      */
     public static function start(): App {
-        if (self::$ClassStatus == 'NONE') {
+        if (self::$ClassStatus == self::STATUS_NONE || self::$ClassStatus == self::STATUS_INITIATED) {
             if (self::$LC === null) {
-                self::$ClassStatus = 'INITIALIZING';
+                self::$ClassStatus = self::STATUS_INITIALIZING;
                 self::$LC = new App();
             }
-        } else if (self::$ClassStatus == 'INITIALIZING') {
+        } else if (self::$ClassStatus == self::STATUS_INITIALIZING) {
             throw new InitializationException('Using the core class while it is not fully initialized.');
         }
 

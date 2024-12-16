@@ -267,7 +267,7 @@ class RouterUri extends Uri {
     public function getMiddleware() : array {
         if (count($this->assignedMiddlewareList) != count($this->sortedMiddleeareList)) {
             $compareFunc = function ($a, $b) {
-                return $b->getPriority() - $a->getPriority();
+                return $a->compare($b);
             };
             $this->sortedMiddleeareList = $this->assignedMiddlewareList;
             

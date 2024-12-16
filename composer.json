@@ -18,19 +18,17 @@
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
         "ext-openssl": "*",
-        "webfiori/http":"v3.3.14",
-        "webfiori/file":"v1.3.6",
-        "webfiori/jsonx":"v3.3.0",
-        "webfiori/ui":"v2.6.3",
-        "webfiori/collections":"v1.1.4",
-        "webfiori/database":"v0.8.11",
-        "webfiori/cli":"v1.3.0",
-        "webfiori/mailer":"v1.2.0",
-        "webfiori/err":"v1.1.0"
+        "webfiori/http": "v3.3.14",
+        "webfiori/file": "v1.3.6",
+        "webfiori/jsonx": "v3.3.0",
+        "webfiori/ui": "v2.6.3",
+        "webfiori/collections": "v1.1.4",
+        "webfiori/database": "v0.8.11",
+        "webfiori/cli": "v1.3.0",
+        "webfiori/mailer": "v1.2.0",
+        "webfiori/err": "v1.1.0"
     },
-    "require-dev": {
-        
-    },
+    "require-dev": {},
     "autoload": {
         "psr-4": {
             "webfiori\\framework\\": "webfiori/framework/"

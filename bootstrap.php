@@ -77,6 +77,7 @@ ClassLoader::get([
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
+App::initiate('app');
 App::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");

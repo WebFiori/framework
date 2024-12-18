@@ -287,7 +287,8 @@ class App {
         //Following lines of code assumes that the class exist on the folder: 
         //\vendor\webfiori\framework\webfiori\framework
         //Its used to construct the folder at which index file will exist at
-        $vendorPath = '\vendor\webfiori\framework\webfiori\framework';
+        $DS = DIRECTORY_SEPARATOR;
+        $vendorPath = $DS.'vendor'.$DS.'webfiori'.$DS.'framework'.$DS.'webfiori'.$DS.'framework';
         $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
         return $rootPath;
     }
@@ -362,7 +363,7 @@ class App {
             /**
              * Path to WebFiori's core library.
              */
-            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor\webfiori\framework\webfiori\framework');
+            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'webfiori'.DS.'framework');
         }
         self::initAutoLoader();
         self::checkStandardLibs();
@@ -607,7 +608,8 @@ class App {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\framework\autoload\ClassLoader',false)) {
-            require_once WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
+            $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
+            require_once $autoloader;
         }
         self::$AU = ClassLoader::get();
 

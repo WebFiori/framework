@@ -12,3 +12,8 @@
 /php_cs.php.dist export-ignore
 /phpbench.json export-ignore
 /sonar-project.properties export-ignore
+/ecs.php export-ignore
+/CHANGELOG.md export-ignore
+/release-commit.php export-ignore
+/release-please-manifest.json export-ignore
+/release-please-config.json export-ignore

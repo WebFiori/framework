@@ -110,17 +110,7 @@ class App {
      * @since 1.0
      */
     private function __construct() {
-        
         $this->checkAppDir();
-        /**
-         * Change encoding of mb_ functions to UTF-8
-         */
-        if (function_exists('mb_internal_encoding')) {
-            $encoding = 'UTF-8';
-            mb_internal_encoding($encoding);
-            mb_http_output($encoding);
-            mb_regex_encoding($encoding);
-        }
         $this->setHandlers();
         Controller::get()->updateEnv();
         /**
@@ -318,9 +308,10 @@ class App {
         }
     }
     /**
-     * Initiate main environment variables which are used by the framework.
+     * Initiate main components of the application.
      * 
      * This method is intended to be called in the index file of the project.
+     * It should be first thing to be called.
      * 
      * @param string $appFolder The name of the folder at which the application
      * is created at.
@@ -332,6 +323,15 @@ class App {
      * Usually, its the value of the constant __DIR__.
      */
     public static function initiate(string $appFolder = 'app', string $publicFolder = 'public', string $indexDir = __DIR__) {
+        /**
+         * Change encoding of mb_ functions to UTF-8
+         */
+        if (function_exists('mb_internal_encoding')) {
+            $encoding = 'UTF-8';
+            mb_internal_encoding($encoding);
+            mb_http_output($encoding);
+            mb_regex_encoding($encoding);
+        }
         if (!defined('DS')) {
             /**
              * Directory separator.
@@ -619,13 +619,23 @@ class App {
         }
         self::call(APP_DIR.'\ini\InitAutoLoad::init');
     }
+    /**
+     * Initialize global constants which has information about framework version.
+     * 
+     * The constants which are defined by this method include the following:
+     * <ul>
+     * <li><b>WF_VERSION</b>: A string such as '3.0.0'.</li>
+     * <li><b>WF_VERSION_TYPE</b>: Type of the release such as 'RC', 'Alpha' or 'Stable'.</li>
+     * <li><b>WF_RELEASE_DATE</b>: The date at which the specified version was created at.</li>
+     * </ul>
+     */
     public static function initFrameworkVersionInfo() {
         /**
          * A constant that represents version number of the framework.
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-Beta.21');
+        define('WF_VERSION', '3.0.0-Beta.22');
         /**
          * A constant that tells the type of framework version.
          *

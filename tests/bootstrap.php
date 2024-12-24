@@ -2,6 +2,7 @@
 
 //Bootstrap file which is used to boot testing process.
 
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
@@ -15,8 +16,8 @@ define('TESTS_DIRECTORY', 'tests');
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
-    __DIR__.$DS.'webfiori',
-    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
+    __DIR__.$DS.'..'.$DS.'webfiori',
+    __DIR__.$DS.'..'.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
 ];
 fprintf(STDOUT, "PHP Version: '".PHP_VERSION."'\n");
 fprintf(STDOUT, "Version ID: '".PHP_VERSION_ID."'\n");

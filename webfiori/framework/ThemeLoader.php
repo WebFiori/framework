@@ -253,7 +253,9 @@ class ThemeLoader {
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
+                ob_start();
                 $ns = require_once $pathToScan.DS.$fileName;
+                ob_end_clean();
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
 

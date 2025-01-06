@@ -29,15 +29,11 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 ## Supported PHP Versions
 | Build Status |
 |:-----------:|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php70.yml/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php71.yml/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php72.yml/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php73.yml/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php74.yml/badge.svg?branch=master"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php80.yml/badge.svg?branch=master"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php81.yml/badge.svg?branch=master"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php82.yml/badge.svg?branch=master"></a>|
-|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php83.yml/badge.svg?branch=master"></a><br>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php83.yml/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php84.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php84.yml/badge.svg?branch=master"></a><br>|
 
 
 ## Key Features
@@ -66,6 +62,7 @@ Following table shows build status of the standard libraries that the framework 
 | Library | Build | Latest |
 |----|----|----|
 | [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/http.svg" /></a> |
+| [Cache](https://github.com/WebFiori/cache) | <a href="https://github.com/WebFiori/cache/actions"><img src="https://github.com/WebFiori/cache/actions/workflows/php84.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/cache/releases"><img src="https://img.shields.io/github/release/WebFiori/cache.svg" /></a> |
 | [File](https://github.com/WebFiori/file) | <a href="https://github.com/WebFiori/file/actions"><img src="https://github.com/WebFiori/file/actions/workflows/php83.yml/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/file/releases"><img src="https://img.shields.io/github/release/WebFiori/file.svg" /></a> |
 | [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
 | [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/actions/workflows/php83.yml/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |

@@ -667,7 +667,6 @@ class App {
             Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
-        MiddlewareManager::register(new CacheMiddleware());
         self::call(APP_DIR.'\ini\InitMiddleware::init');
     }
     /**

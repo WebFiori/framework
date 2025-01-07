@@ -20,7 +20,7 @@ class CacheMiddleware extends AbstractMiddleware {
     public function __construct() {
         parent::__construct('cache');
         $this->setPriority(50);
-        $this->addToGroups(['web', 'api']);
+        $this->addToGroups(['web']);
         $this->fromCache = false;
     }
     /**

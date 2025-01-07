@@ -12,7 +12,6 @@ namespace webfiori\framework\router;
 
 use Error;
 use Exception;
-use webfiori\cache\Cache;
 use webfiori\cli\Runner;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;

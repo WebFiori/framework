@@ -25,7 +25,6 @@ use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
 use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\middleware\CacheMiddleware;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\middleware\StartSessionMiddleware;
 use webfiori\framework\router\Router;

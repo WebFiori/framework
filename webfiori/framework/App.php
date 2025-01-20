@@ -498,6 +498,8 @@ class App {
         } catch (Exception $ex) {
             if (self::getRunner()->isCLI()) {
                 printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
+            } else {
+                throw new InitializationException($ex->getMessage(), $ex->getCode(), $ex);
             }
         }
     }

@@ -26,15 +26,19 @@ class DatabaseMigrationWriter extends ClassWriter {
      * Creates new instance of the class.
      *
      */
-    public function __construct(MigrationsRunner $runner) {
-        $count = count($runner->getMigrations());
-        $this->setMigrationOrder($count);
-        if ($count < 10) {
-            $name = 'Migration00'.$count;
-        } else if ($count < 100) {
-            $name = 'Migration0'.$count;
-        } else {
-            $name = 'Migration'.$count;
+    public function __construct(?MigrationsRunner $runner) {
+        $name = 'Migration';
+        
+        if ($runner !== null) {
+            $count = count($runner->getMigrations());
+            $this->setMigrationOrder($count);
+            if ($count < 10) {
+                $name = 'Migration00'.$count;
+            } else if ($count < 100) {
+                $name = 'Migration0'.$count;
+            } else {
+                $name = 'Migration'.$count;
+            }
         }
         
         $this->setMigrationName($name);

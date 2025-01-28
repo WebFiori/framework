@@ -115,6 +115,10 @@ class CreateCommand extends CLICommand {
             if (!$create->readClassInfo()) {
                 return -1;
             }
+        }  else if ($answer == 'Database migration.') {
+            $create = new \webfiori\framework\cli\helpers\CreateMigration($this);
+            $create->writeClass();
+            return 0;
         }
 
         return 0;
@@ -131,6 +135,7 @@ class CreateCommand extends CLICommand {
         $options['db'] = 'Database access class based on table.';
         $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
         $options['api-test'] = 'Web service test case.';
+        $options['migration'] = 'Database migration.';
         $options['q'] = 'Quit.';
         $what = $this->getArgValue('--c');
         $answer = null;

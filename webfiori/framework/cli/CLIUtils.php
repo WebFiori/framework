@@ -33,7 +33,7 @@ class CLIUtils {
         $dbConnectionsNames = array_keys($dbConnections);
 
         if (count($dbConnectionsNames) == 0) {
-            $c->warning('No database connections found in the class "'.APP_DIR.'\\AppConfig"!');
+            $c->warning('No database connections found in application configuration.');
             $c->info('Run the command "add" to add connections.');
 
             return null;
@@ -148,5 +148,30 @@ class CLIUtils {
         } while (!$tableClassNameValidity);
 
         return $tableObj;
+    }
+    /**
+     * Reads and returns the name of a database connection.
+     * 
+     * This method will display a list of all stored connections in the configuration
+     * and returns one of them.
+     * 
+     * @return string The name of selected connection. An empty string is returned
+     * if none is selected.
+     */
+    public function getConnection() : string {
+        $dbConnections = array_keys(App::getConfig()->getDBConnections());
+
+        if (count($dbConnections) != 0) {
+            $dbConnections[] = 'None';
+            $conn = $this->select('Select database connecion:', $dbConnections, count($dbConnections) - 1);
+
+            if ($conn != 'None') {
+                return $conn;
+            }
+        } else {
+            $this->warning('No database connections were found.');
+        }
+
+        return '';
     }
 }

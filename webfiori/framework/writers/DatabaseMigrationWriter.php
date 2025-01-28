@@ -10,7 +10,6 @@
  */
 namespace webfiori\framework\writers;
 
-use Override;
 use webfiori\database\Database;
 use webfiori\database\migration\AbstractMigration;
 use webfiori\database\migration\MigrationsRunner;
@@ -60,7 +59,6 @@ class DatabaseMigrationWriter extends ClassWriter {
         $this->order = $order;
     }
 
-    #[Override]
     public function writeClassBody() {
         $this->append([
             '/**',
@@ -71,22 +69,33 @@ class DatabaseMigrationWriter extends ClassWriter {
         ], 1);
         $this->append("parent::__construct('".$this->getMigrationName()."', ".$this->getMigrationOrder().");", 2);
         $this->append('}', 1);
-        $this->f('up', ['schema' => 'Database']);
-        $this->f('down', ['schema' => 'Database']);
+        $this->append('/**', 1);
+        $this->append(' * Performs the action that will apply the migration.', 1);
+        $this->append(' * ', 1);
+        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' */', 1);
+        $this->append($this->f('up', ['schema' => 'Database']), 1);
+        $this->append('//TODO: Implement the action which will apply the migration to database.', 2);
+        $this->append('}', 1);
+        $this->append('/**', 1);
+        $this->append(' * Performs the action that will revert back the migration.', 1);
+        $this->append(' * ', 1);
+        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' */', 1);
+        $this->append($this->f('down', ['schema' => 'Database']), 1);
+        $this->append('//TODO: Implement the action which will revert back the migration.', 2);
+        $this->append('}', 1);
+        $this->append('}');
     }
-
-    #[Override]
     public function writeClassComment() {
         $classTop = [
             '/**',
-            ' * A database migration which is created using the command "create".',
-            ' *',
+            ' * A database migration class.',
             ' */'
         ];
         $this->append($classTop);
     }
 
-    #[Override]
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends AbstractMigration {');
     }

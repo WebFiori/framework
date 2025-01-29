@@ -25,10 +25,10 @@
         "webfiori/cache": "v1.1.0",
         "webfiori/http": "v3.6.0",
         "webfiori/file": "v1.3.8",
-        "webfiori/jsonx": "v3.3.1",
+        "webfiori/jsonx": "v3.3.2",
         "webfiori/ui": "v2.6.4",
         "webfiori/collections": "v1.1.5",
-        "webfiori/database": "v0.8.12",
+        "webfiori/database": "v0.9.1",
         "webfiori/cli": "v1.3.0",
         "webfiori/mailer": "v1.3.1",
         "webfiori/err": "v1.1.0"

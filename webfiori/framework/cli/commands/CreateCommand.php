@@ -118,6 +118,9 @@ class CreateCommand extends CLICommand {
         }  else if ($answer == 'Database migration.') {
             $create = new \webfiori\framework\cli\helpers\CreateMigration($this);
             $create->writeClass();
+            $writer = $create->getWriter();
+            $this->info("Migration Name: ".$writer->getMigrationName());
+            $this->info("Migration Order: ".$writer->getMigrationOrder());
             return 0;
         }
 

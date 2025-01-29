@@ -34,17 +34,17 @@ class CreateMigration extends CreateClassHelper {
     public function __construct(CreateCommand $command) {
         $ns = APP_DIR.'\\database\\migrations';
 
-        if (!$command->hasArg('--defaults')) {
+        if (!$command->isArgProvided('--defaults')) {
             $ns = CLIUtils::readNamespace($command, $ns , 'Migration namespace:');
         }
         
-        $runner = new MigrationsRunner(APP_PATH. str_replace('\\', DS, $ns), $ns, null);
+        $runner = new MigrationsRunner(ROOT_PATH.DS. str_replace('\\', DS, $ns), $ns, null);
         parent::__construct($command, new DatabaseMigrationWriter($runner));
         $this->writer = $this->getWriter();
         $this->setNamespace($ns);
         
-        if (!$command->hasArg('--defaults')) {
-            $this->setClassName(CLIUtils::readClassName($command, null, 'Provide an optional name for the class that will have migration logic:'));
+        if (!$command->isArgProvided('--defaults')) {
+            $this->setClassName($command->readClassName('Provide an optional name for the class that will have migration logic:', null));
             $this->readClassInfo();
         }
     }

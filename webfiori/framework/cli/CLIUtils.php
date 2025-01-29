@@ -63,8 +63,7 @@ class CLIUtils {
      */
     public static function readClassName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
         do {
-            $c->readClassName($prompt, $suffix, $errMsg);
-            $className = trim($c->getInput($prompt));
+            $className = $c->readClassName($prompt, $suffix, $errMsg);
 
             if ($suffix !== null) {
                 $subSuffix = substr($className, strlen($className) - strlen($suffix));

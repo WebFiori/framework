@@ -176,7 +176,7 @@ class SessionsManagerTest extends TestCase {
      * @depends testInitSessionsDb
      */
     public function testDatabaseSession02() {
-        $conn = ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('sessions-connection');

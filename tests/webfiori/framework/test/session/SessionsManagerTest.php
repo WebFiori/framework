@@ -162,7 +162,9 @@ class SessionsManagerTest extends TestCase {
     public function testDatabaseSession01() {
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::setStorage(new DatabaseSessionStorage());
@@ -174,7 +176,9 @@ class SessionsManagerTest extends TestCase {
      * @depends testInitSessionsDb
      */
     public function testDatabaseSession02() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost');
+        $conn = ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
@@ -282,7 +286,9 @@ class SessionsManagerTest extends TestCase {
     public function testDropDbTables00() {
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
@@ -309,7 +315,9 @@ class SessionsManagerTest extends TestCase {
      * @depends testDatabaseSession01
      */
     public function testInitSessionsDb() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
         $conn->setName('sessions-connection');
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();

@@ -14,7 +14,7 @@ class CreateCommandTest extends CreateTestCase {
     public function testCreate00() {
         $runner = App::getRunner();
         $runner->setInputs([
-            '10',
+            '11',
         ]);
         $runner->setArgsVector([
             'webfiori',

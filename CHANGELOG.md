@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.0.0-Beta.24](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.23...v3.0.0-Beta.24) (2025-01-29)
+
+
+### Bug Fixes
+
+* Show Exception on Initialization ([2341841](https://github.com/WebFiori/framework/commit/2341841f9718beb99330f8529e01600d61acfecf))
+
+
+### Miscellaneous Chores
+
+* release v3.0.0-Beta.24 ([2870002](https://github.com/WebFiori/framework/commit/28700026d50339f1b3be07f21d801594d682b7b4))
+* Update composer.json ([08c60a8](https://github.com/WebFiori/framework/commit/08c60a878c48198f61b2149127113c359ca5f635))
+* Updated Framework Version ([36b0f55](https://github.com/WebFiori/framework/commit/36b0f5514329db80bae9102094e402e240987260))
+
 ## [3.0.0-Beta.23](https://github.com/WebFiori/framework/compare/v3.0.1-Beta.22...v3.0.0-Beta.23) (2025-01-07)
 
 

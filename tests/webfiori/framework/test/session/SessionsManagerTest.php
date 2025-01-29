@@ -161,7 +161,7 @@ class SessionsManagerTest extends TestCase {
      */
     public function testDatabaseSession01() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
         $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -285,7 +285,7 @@ class SessionsManagerTest extends TestCase {
      */
     public function testDropDbTables00() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
         $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
             'TrustServerCertificate' => 'true'
         ]);

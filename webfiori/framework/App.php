@@ -422,6 +422,7 @@ class App {
                     '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
                     '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
+                    '\\webfiori\\framework\\cli\\commands\\RunMigrationsCommand',
                 ];
 
                 foreach ($commands as $c) {

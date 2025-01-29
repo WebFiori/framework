@@ -28,6 +28,7 @@ class HelpCommandTest extends CLITestCase {
             "    run-query:           Execute SQL query on specific database.\n",
             "    update-settings:     Update application settings which are stored in specific configuration driver.\n",
             "    update-table:        Update a database table.\n",
+            "    migrations:          Execute database migrations.\n",
         ], $this->executeMultiCommand([
             'help',
         ]));

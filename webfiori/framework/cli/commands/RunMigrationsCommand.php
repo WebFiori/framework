@@ -26,6 +26,7 @@ use webfiori\framework\DB;
  * @author Ibrahim
  */
 class RunMigrationsCommand extends CLICommand {
+    private $migrationsRunner;
     public function __construct() {
         parent::__construct('migrations', [
             new Argument('--ns', 'The namespace that holds the migrations', true),
@@ -38,8 +39,16 @@ class RunMigrationsCommand extends CLICommand {
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
+        $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\\database\\migrations';
+        if (!$this->hasMigrations($ns)) {
+            return 0;
+        }
+        
+        if (!$this->hasConnections()) {
+            return 0;
+        }
         $dbConnections = array_keys(App::getConfig()->getDBConnections());
-
+                
         if ($this->isArgProvided('--connection')) {
             $connection = $this->getArgValue('--connection');
 
@@ -49,20 +58,39 @@ class RunMigrationsCommand extends CLICommand {
             }
         } else {
             $connection = CLIUtils::getConnectionName($this);
-            if ($connection === null) {
-                return -2;
-            }
         }
-        $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\database\\migrations';
+        
         $connectionInfo = App::getConfig()->getDBConnection($connection);
-        $runner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $ns), $ns, $connectionInfo);
-        $applied = $runner->apply();
-        $this->info("Number of applied migrations: ".count($applied));
+        $this->migrationsRunner->setConnectionInfo($connectionInfo);
+        
+        $applied = $this->migrationsRunner->apply();
+        
         if (count($applied) != 0) {
+            $this->info("Number of applied migrations: ".count($applied));
             $this->println("Names of applied migrations:");
+            $this->printList(array_map(function (AbstractMigration $migration) {
+                return $migration->getName();
+            }, $applied));
+        } else {
+            $this->info("No migrations were executed.");
         }
-        $this->printList(array_map(function (AbstractMigration $migration) {
-            return $migration->getName();
-        }, $applied));
+        
+    }
+    private function hasConnections() : bool {
+        $dbConnections = App::getConfig()->getDBConnections();
+        if (count($dbConnections) == 0) {
+            $this->info('No connections were found in application configuration.');
+            return false;
+        }
+        return true;
+    }
+    private function hasMigrations(string $namespace) : bool {
+        $this->migrationsRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
+        
+        if (count($this->migrationsRunner->getMigrations()) == 0) {
+            $this->info("No migrations were found in the namespace '$namespace'.");
+            return false;
+        }
+        return true;
     }
 }

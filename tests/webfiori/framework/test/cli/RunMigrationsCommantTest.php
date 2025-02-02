@@ -104,7 +104,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations05() {
         $this->assertEquals([
-            "Error: The argument --runner has invalid value:  Exception: \"Call to private webfiori\framework\App::__construct() from scope webfiori\framework\cli\commands\RunMigrationsCommand\".\n",
+            "Error: The argument --runner has invalid value: Exception: \"Call to private webfiori\framework\App::__construct() from scope webfiori\framework\cli\commands\RunMigrationsCommand\".\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--runner' => '\\webfiori\\framework\\App',

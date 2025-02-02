@@ -17,7 +17,7 @@ class CreateMigrationTest extends CLITestCase {
         $order = $this->getOrder();
         
         $this->assertEquals([
-            'Info: New class was created at "C:\Server\apache2\htdocs\framework\app\database\migrations".'."\n",
+            'Info: New class was created at "'. APP_PATH .'database\migrations".'."\n",
             "Info: Migration Name: $name\n",
             "Info: Migration Order: $order\n"
         ], $this->executeMultiCommand([
@@ -43,7 +43,7 @@ class CreateMigrationTest extends CLITestCase {
             "Provide an optional name for the class that will have migration logic:\n",
             "Enter an optional name for the migration: Enter = '$defaultName'\n",
             "Enter an optional execution order for the migration: Enter = '$order'\n",
-            'Info: New class was created at "C:\Server\apache2\htdocs\framework\app\database\migrations".'."\n",
+            'Info: New class was created at "'. APP_PATH .'database\migrations".'."\n",
             "Info: Migration Name: Great One\n",
             "Info: Migration Order: 11\n"
         ], $this->executeMultiCommand([

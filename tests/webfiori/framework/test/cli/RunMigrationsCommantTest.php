@@ -124,7 +124,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
     private function createMigration() : string {
-        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations', '\\app\\database\\migrations', null);
+        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);
         $writer = new DatabaseMigrationWriter($runner);
         $writer->writeClass();
         return $writer->getName(true);

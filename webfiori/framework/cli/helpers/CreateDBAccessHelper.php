@@ -53,7 +53,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
     public function readDbClassInfo() {
         $info = $this->getClassInfo(APP_DIR.'\\database', 'DB');
         $this->getWriter()->setNamespace($info['namespace']);
-        $this->getWriter()->setPath(APP_PATH.DS.$info['namespace']);
+        $this->getWriter()->setPath(ROOT_PATH.DS.$info['namespace']);
         $this->getWriter()->setClassName($info['name']);
         $this->getWriter()->setConnection($this->getConnection());
     }

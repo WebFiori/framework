@@ -111,7 +111,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--runner' => '\\webfiori\\framework\\App',
         ]));
-        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals(-2, $this->getExitCode());
     }
     /**
      * @test

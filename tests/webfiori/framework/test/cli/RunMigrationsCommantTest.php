@@ -188,7 +188,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations09() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS', 1433, [
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost', 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -201,9 +201,14 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Failed to execute migrations due to following:\n",
-            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
-            "Info: No migrations were executed.\n"
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Found 1 migration(s).\n",
+            "Success: Migration 'Migration000' applied successfuly.\n",
+            "Info: Number of applied migrations: 1\n",
+            "Names of applied migrations:\n",
+            "- Migration000\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -212,7 +217,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             '7',
             ''
         ]));
-        $this->assertEquals(-1, $this->getExitCode());
+        $this->assertEquals(0, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
         $this->removeClass($clazz);
     }

@@ -78,8 +78,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database due to the following error:\n",
-            ""
+            "Error: 2002 - Unable to connect to database: 2002 - No such file or directory\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -130,7 +129,9 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations07() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_dbx');
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_dbx', 'localhost', 1433, [
+            
+        ]);
         $conn->setName('default-conn');
         $clazz = $this->createMigration();
         $this->assertTrue(class_exists($clazz));

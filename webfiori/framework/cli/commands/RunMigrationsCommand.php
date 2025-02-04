@@ -42,6 +42,18 @@ class RunMigrationsCommand extends CLICommand {
             new Argument('--ini', 'Creates migrations table in database if not exist.', true),
         ], 'Execute database migrations.');
     }
+    private function createMigrationsTable() : bool {
+        $this->println("Initializing migrations table...");
+        try {
+            $this->migrationsRunner->table('migrations')->createTable()->execute();
+        } catch (DatabaseException $ex) {
+            $this->error("Unable to create migrations table due to following:");
+            $this->println($ex->getMessage());
+            return false;
+        }
+        $this->success("Migrations table succesfully created.");
+        return true;
+    }
     /**
      * Execute the command.
      *
@@ -55,27 +67,15 @@ class RunMigrationsCommand extends CLICommand {
                     return 0;
                 }
                 if ($this->isConnectionSet()) {
-                    $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
-                    $this->println("Initializing migrations table...");
-                    try {
-                        $this->migrationsRunner->table('migrations')->createTable()->execute();
-                    } catch (DatabaseException $ex) {
-                        $this->error("Unable to create migrations table due to following:");
-                        $this->println($ex->getMessage());
+                    $this->migrationsRunner = new MigrationsRunner(APP_PATH, '\\app', $this->connectionInfo);
+                    if(!$this->createMigrationsTable()) {
                         return -1;
                     }
-                    $this->success("Migrations table succesfully created.");
                 } else {
                     return -2;
                 }
             } else if ($this->migrationsRunner !== null) {
-                $this->println("Initializing migrations table...");
-                try {
-                    $this->println($this->migrationsRunner->table('migrations')->createTable()->getQuery());
-                        $this->migrationsRunner->table('migrations')->createTable()->execute();
-                } catch (DatabaseException $ex) {
-                    $this->error("Unable to create migrations table due to following:");
-                    $this->println($ex->getMessage());
+                if (!$this->createMigrationsTable()) {
                     return -1;
                 }
             } else {
@@ -206,11 +206,13 @@ class RunMigrationsCommand extends CLICommand {
     }
     private function hasMigrations(string $namespace) : bool {
         $this->migrationsRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
-        
-        if (count($this->migrationsRunner->getMigrations()) == 0) {
+        $this->println("Checking namespace '$namespace' for migrations...");
+        $count = count($this->migrationsRunner->getMigrations());
+        if ($count == 0) {
             $this->info("No migrations were found in the namespace '$namespace'.");
             return false;
         }
+        $this->println("Found $count migration(s).");
         return true;
     }
 }

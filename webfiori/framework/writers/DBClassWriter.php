@@ -43,7 +43,7 @@ class DBClassWriter extends ClassWriter {
      * database operations based on.
      */
     public function __construct(?string $className = 'NewDBOperationsClass', string $ns = '\\', ?Table $table = null) {
-        parent::__construct($className, $ns, $ns);
+        parent::__construct($className, ROOT_PATH.DS.$ns, $ns);
 
         if ($table !== null) {
             $this->setTable($table);

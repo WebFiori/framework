@@ -232,7 +232,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $this->println("Now, time to collect database table information.");
         $ns = CLIUtils::readNamespace($this->getCommand(), APP_DIR.'\\database', 'Provide us with a namespace for table class:');
         $this->tableObjWriter->setNamespace($ns);
-        $this->tableObjWriter->setPath($ns);
+        $this->tableObjWriter->setPath(ROOT_PATH.DS.$ns);
 
         $create = new CreateTableObj($this->getCommand());
         $create->getWriter()->setTable($this->tableObjWriter->getTable());
@@ -240,7 +240,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
         $tableHelper->setTableName();
         $tableHelper->setTableComment();
         $tableHelper->getCreateHelper()->setNamespace($ns);
-        $tableHelper->getCreateHelper()->setPath($ns);
+        $tableHelper->getCreateHelper()->setPath(ROOT_PATH.DS.$ns);
         $tableHelper->getCreateHelper()->setClassName($this->tableObjWriter->getName());
         $this->println('Now you have to add columns to the table.');
         $tableHelper->addColumns();
@@ -319,7 +319,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
             $writer->addUseStatement($t->getEntityMapper()->getEntityName(true));
             $writer->addUseStatement(Json::class);
             $writer->setNamespace($this->apisNs);
-            $writer->setPath($this->apisNs);
+            $writer->setPath(ROOT_PATH.DS.$this->apisNs);
             $writer->setClassName($sName);
             $apiType = $serviceProps['type'];
 

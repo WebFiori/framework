@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
+use webfiori\file\File;
 use webfiori\framework\App;
 
 /**
@@ -127,6 +128,7 @@ class CreateRESTTest extends CreateTestCase {
 
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
+            $this->assertTrue(File::isFileExist(ROOT_PATH.DS.$clazz.'.php'));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));

@@ -67,7 +67,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations03() {
-        $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
+        $conn = new ConnectionInfo('mysql', 'root', 'x123456', 'testing_db');
         $conn->setName('default-conn');
         $clazz = $this->createMigration();
         $this->assertTrue(class_exists($clazz));
@@ -78,6 +78,8 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
+            "Error: Unable to connect to database due to the following error:\n",
+            ""
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -123,6 +125,33 @@ class RunMigrationsCommantTest extends CLITestCase {
             '--runner' => '\\app\\database\\migrations\\emptyRunner\XRunner',
         ]));
         $this->assertEquals(0, $this->getExitCode());
+    }
+    /**
+     * @test
+     */
+    public function testRunMigrations07() {
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_dbx');
+        $conn->setName('default-conn');
+        $clazz = $this->createMigration();
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->assertEquals([
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Invalid answer.\n",
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Unable to connect to database due to the following error:\n",
+            ""
+        ], $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+        ], [
+            '7',
+            ''
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
+        App::getConfig()->removeAllDBConnections();
     }
     private function createMigration() : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);

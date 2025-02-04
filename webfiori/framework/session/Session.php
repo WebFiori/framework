@@ -276,7 +276,7 @@ class Session implements JsonI {
      * @return string A new random session ID.
      *
      */
-    public static function generateSessionID(string $sessionName = null): string {
+    public static function generateSessionID(?string $sessionName = null): string {
         $date = date('Y-m-d\TH:i:sO');
         $hash = hash('sha256', $date);
         $salt = time() + call_user_func(self::$randFunc, 0, 100);

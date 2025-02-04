@@ -187,7 +187,7 @@ class App {
      *
      * @since 1.3.6
      */
-    public static function autoRegister(string $folder, callable $regCallback, string $suffix = null, array $constructorParams = [], array $otherParams = []) {
+    public static function autoRegister(string $folder, callable $regCallback, ?string $suffix = null, array $constructorParams = [], array $otherParams = []) {
         $dir = APP_PATH.$folder;
 
         if (!File::isDirectory($dir)) {

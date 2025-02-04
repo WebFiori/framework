@@ -149,7 +149,7 @@ class RunMigrationsCommand extends CLICommand {
         }
         return false;
     }
-    private function applyNext(&$listOfApplied) {
+    private function applyNext(&$listOfApplied) : bool {
         try {
             $applied = $this->migrationsRunner->applyOne();
             
@@ -161,8 +161,8 @@ class RunMigrationsCommand extends CLICommand {
                 return false;
             }
         } catch (DatabaseException $ex) {
-            $this->error('Failed to execute migrations due to following error:');
-            $this->println($ex->getCode().' - '.$ex->getMessage());
+            $this->error('Failed to execute migrations due to following:');
+            $this->println($ex->getMessage());
             return false;
         }
     }

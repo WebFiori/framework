@@ -67,7 +67,7 @@ class ClassDriver implements ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value = null, string $description = null) {
+    public function addEnvVar(string $name, mixed $value = null, ?string $description = null) {
         $this->configVars['env-vars'][$name] = [
             'value' => $value,
             'description' => $description

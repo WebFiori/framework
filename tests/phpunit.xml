@@ -50,6 +50,7 @@
             <file>../webfiori/framework/cli/commands/UpdateTableCommand.php</file>
             <file>../webfiori/framework/cli/commands/VersionCommand.php</file>
             <file>../webfiori/framework/cli/commands/WHelpCommand.php</file>
+            <file>../webfiori/framework/cli/commands/RunMigrationsCommand.php</file>
             <file>../webfiori/framework/cli/CLITestCase.php</file>
             <file>../webfiori/framework/cli/CLIUtils.php</file>
             
@@ -65,6 +66,8 @@
             <file>../webfiori/framework/cli/helpers/CreateWebService.php</file>
             <file>../webfiori/framework/cli/helpers/TableObjHelper.php</file>
             <file>../webfiori/framework/cli/helpers/CreateAPITestCase.php</file>
+            <file>../webfiori/framework/cli/helpers/CreateMigration.php</file>
+            
             
             <file>../webfiori/framework/writers/CLICommandClassWriter.php</file>
             <file>../webfiori/framework/writers/ClassWriter.php</file>
@@ -77,6 +80,7 @@
             <file>../webfiori/framework/writers/ThemeComponentWriter.php</file>
             <file>../webfiori/framework/writers/WebServiceWriter.php</file>
             <file>../webfiori/framework/writers/APITestCaseWriter.php</file>
+            <file>../webfiori/framework/writers/DatabaseMigrationWriter.php</file>
             
         </whitelist>
     </filter>

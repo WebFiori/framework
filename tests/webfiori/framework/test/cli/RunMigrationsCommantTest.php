@@ -153,6 +153,69 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals(-1, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
     }
+    /**
+     * @test
+     */
+    public function testRunMigrations08() {
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+        $clazz = $this->createMigration();
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->assertEquals([
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Invalid answer.\n",
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Failed to execute migrations due to following:\n",
+            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
+            "Info: No migrations were executed.\n"
+        ], $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+        ], [
+            '7',
+            ''
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
+        App::getConfig()->removeAllDBConnections();
+        $this->removeClass($clazz);
+    }
+    /**
+     * @test
+     */
+    public function testRunMigrations09() {
+        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', 'localhost\SQLEXPRESS', 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+        $clazz = $this->createMigration();
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->assertEquals([
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Invalid answer.\n",
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Error: Failed to execute migrations due to following:\n",
+            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
+            "Info: No migrations were executed.\n"
+        ], $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--ini'
+        ], [
+            '7',
+            ''
+        ]));
+        $this->assertEquals(-1, $this->getExitCode());
+        App::getConfig()->removeAllDBConnections();
+        $this->removeClass($clazz);
+    }
     private function createMigration() : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);
         $writer = new DatabaseMigrationWriter($runner);

@@ -36,7 +36,7 @@ class Controller {
      *
      * @param string|null $description An optional text that describes the variable.
      */
-    public function addEnvVar(string $name, $value, string $description = null) {
+    public function addEnvVar(string $name, $value, ?string $description = null) {
         $this->getDriver()->addEnvVar($name, $value, $description);
     }
     /**

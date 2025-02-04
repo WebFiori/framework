@@ -18,6 +18,7 @@ use webfiori\database\migration\AbstractMigration;
 use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
+use webfiori\database\ConnectionInfo;
 /**
  *
  * @author Ibrahim
@@ -28,11 +29,17 @@ class RunMigrationsCommand extends CLICommand {
      * @var MigrationsRunner
      */
     private $migrationsRunner;
+    /**
+     * 
+     * @var ConnectionInfo
+     */
+    private $connectionInfo;
     public function __construct() {
         parent::__construct('migrations', [
             new Argument('--ns', 'The namespace that holds the migrations', true),
             new Argument('--connection', 'The name of database connection to be used in executing the migrations.', true),
             new Argument('--runner', 'A class that extends the class "webfiori\database\migration\MigrationsRunner".', true),
+            new Argument('--ini', 'Creates migrations table in database if not exist.', true),
         ], 'Execute database migrations.');
     }
     /**
@@ -41,10 +48,42 @@ class RunMigrationsCommand extends CLICommand {
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
-        
+        if ($this->isArgProvided('--ini')) {
+            if ($this->getRunnerArgValidity() == 0) {
+                $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\\database\\migrations';
+                if (!$this->hasConnections()) {
+                    return 0;
+                }
+                if ($this->isConnectionSet()) {
+                    $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
+                    $this->println("Initializing migrations table...");
+                    try {
+                        $this->migrationsRunner->table('migrations')->createTable()->execute();
+                    } catch (DatabaseException $ex) {
+                        $this->error("Unable to create migrations table due to following:");
+                        $this->println($ex->getMessage());
+                        return -1;
+                    }
+                    $this->success("Migrations table succesfully created.");
+                } else {
+                    return -2;
+                }
+            } else if ($this->migrationsRunner !== null) {
+                $this->println("Initializing migrations table...");
+                try {
+                    $this->println($this->migrationsRunner->table('migrations')->createTable()->getQuery());
+                        $this->migrationsRunner->table('migrations')->createTable()->execute();
+                } catch (DatabaseException $ex) {
+                    $this->error("Unable to create migrations table due to following:");
+                    $this->println($ex->getMessage());
+                    return -1;
+                }
+            } else {
+                return -2;
+            }
+        }
         if ($this->getRunnerArgValidity() == 0) {
             $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\\database\\migrations';
-            $connectionInfo = null;
 
             if (!$this->hasMigrations($ns)) {
                 return 0;
@@ -53,23 +92,13 @@ class RunMigrationsCommand extends CLICommand {
             if (!$this->hasConnections()) {
                 return 0;
             }
-            $dbConnections = array_keys(App::getConfig()->getDBConnections());
+            
+            if ($this->isConnectionSet()) {
 
-            if ($this->isArgProvided('--connection')) {
-                $connection = $this->getArgValue('--connection');
-
-                if (!in_array($connection, $dbConnections)) {
-                    $this->error("No connection was found which has the name '$connection'.");
-                    return -1;
-                } else {
-                    $connectionInfo = App::getConfig()->getDBConnection($connection);
-                }
+                $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
             } else {
-                $connectionInfo = CLIUtils::getConnectionName($this);
+                return -2;
             }
-
-
-            $this->migrationsRunner->setConnectionInfo($connectionInfo);
         } else if ($this->migrationsRunner === null) {
             return -2;
         }
@@ -88,15 +117,37 @@ class RunMigrationsCommand extends CLICommand {
         while ($this->applyNext($listOfApplied)){};
         
         if (count($listOfApplied) != 0) {
-            $this->info("Number of applied migrations: ".count($applied));
+            $this->info("Number of applied migrations: ".count($listOfApplied));
             $this->println("Names of applied migrations:");
             $this->printList(array_map(function (AbstractMigration $migration) {
                 return $migration->getName();
-            }, $applied));
+            }, $listOfApplied));
         } else {
             $this->info("No migrations were executed.");
         }
+        return 0;
+    }
+    private function isConnectionSet() : bool {
+        if ($this->connectionInfo !== null) {
+            return true;
+        }
+        $dbConnections = array_keys(App::getConfig()->getDBConnections());
         
+        if ($this->isArgProvided('--connection')) {
+            $connection = $this->getArgValue('--connection');
+
+            if (!in_array($connection, $dbConnections)) {
+                $this->error("No connection was found which has the name '$connection'.");
+                return false;
+            } else {
+                $this->connectionInfo = App::getConfig()->getDBConnection($connection);
+                return true;
+            }
+        } else {
+            $this->connectionInfo = CLIUtils::getConnectionName($this);
+            return true;
+        }
+        return false;
     }
     private function applyNext(&$listOfApplied) {
         try {
@@ -137,6 +188,7 @@ class RunMigrationsCommand extends CLICommand {
                 return -1;
             } else {
                 $this->migrationsRunner = $runnerInst;
+                $this->connectionInfo = $runnerInst->getConnectionInfo();
                 return 1;
             }
         } else {

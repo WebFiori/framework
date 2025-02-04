@@ -77,7 +77,20 @@ class RunMigrationsCommand extends CLICommand {
             $this->info("No migrations where found in the namespace '".$this->migrationsRunner->getMigrationsNamespace()."'.");
             return 0;
         }
-        $applied = $this->migrationsRunner->apply();
+        
+        if (!$this->migrationsRunner->isConnected()) {
+            $this->error('Unable to connect to database due to the following error:');
+            $err = $this->migrationsRunner->getLastError();
+            $this->println($err['code'].' - '.$err['message']);
+            return -1;
+        }
+        try {
+            $applied = $this->migrationsRunner->apply();
+        } catch (\webfiori\database\DatabaseException $ex) {
+            $this->error('Failed to execute migrations due to following error:');
+            $this->println($ex->getMessage());
+            return -1;
+        }
         
         if (count($applied) != 0) {
             $this->info("Number of applied migrations: ".count($applied));

@@ -41,7 +41,7 @@ class CreateDBAccessTest extends CreateTestCase {
             "Entity class name:\n",
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Info: New class was created at \"app\database\".\n"
+            "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
         ], $runner->getOutput());
         $clazz = '\\app\\database\\EmployeeOperationsDB';
         $this->assertTrue(class_exists($clazz));
@@ -76,7 +76,7 @@ class CreateDBAccessTest extends CreateTestCase {
             "Entity class name:\n",
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Info: New class was created at \"app\database\\empl\".\n"
+            "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database".DS."empl\".\n"
         ], $runner->getOutput());
         $clazz = '\\app\\database\\empl\\EmployeeSDB';
         $this->assertTrue(class_exists($clazz));
@@ -119,7 +119,7 @@ class CreateDBAccessTest extends CreateTestCase {
             "Entity class name:\n",
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Info: New class was created at \"app\database\".\n"
+            "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
         ], $runner->getOutput());
         $clazz = '\\app\\database\\Position2xDB';
         $this->assertTrue(class_exists($clazz));

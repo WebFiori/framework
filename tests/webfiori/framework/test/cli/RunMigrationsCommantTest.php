@@ -78,7 +78,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: 2002 - Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 2002 - No such file or directory\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -142,8 +142,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database due to the following error:\n",
-            ""
+            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',

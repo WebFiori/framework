@@ -88,17 +88,17 @@ class RunMigrationsCommand extends CLICommand {
         while ($this->applyNext($listOfApplied)){};
         
         if (count($listOfApplied) != 0) {
-            $this->info("Number of applied migrations: ".count($applied));
+            $this->info("Number of applied migrations: ".count($listOfApplied));
             $this->println("Names of applied migrations:");
             $this->printList(array_map(function (AbstractMigration $migration) {
                 return $migration->getName();
-            }, $applied));
+            }, $listOfApplied));
         } else {
             $this->info("No migrations were executed.");
         }
-        
+        return 0;
     }
-    private function applyNext(&$listOfApplied) {
+    private function applyNext(&$listOfApplied) : bool {
         try {
             $applied = $this->migrationsRunner->applyOne();
             
@@ -110,8 +110,8 @@ class RunMigrationsCommand extends CLICommand {
                 return false;
             }
         } catch (DatabaseException $ex) {
-            $this->error('Failed to execute migrations due to following error:');
-            $this->println($ex->getCode().' - '.$ex->getMessage());
+            $this->error('Failed to execute migrations due to following:');
+            $this->println($ex->getMessage());
             return false;
         }
     }

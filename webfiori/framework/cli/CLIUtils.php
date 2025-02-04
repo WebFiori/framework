@@ -61,7 +61,7 @@ class CLIUtils {
      *
      * @return string A string that represents a valid class name.
      */
-    public static function readClassName(CLICommand $c, string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
+    public static function readClassName(CLICommand $c, ?string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
         do {
             $className = $c->readClassName($prompt, $suffix, $errMsg);
 

@@ -27,7 +27,7 @@ interface ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value = null, string $description = null);
+    public function addEnvVar(string $name, mixed $value = null, ?string $description = null);
     /**
      * Adds new database connections information or update existing connections.
      *

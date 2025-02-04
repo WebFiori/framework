@@ -453,7 +453,7 @@ class User implements JsonI, SessionUser {
      *
      * @since 1.6
      */
-    public function setLastPasswordResetDate(string $date = null) {
+    public function setLastPasswordResetDate(?string $date = null) {
         $this->lastPasswordReset = $date;
     }
     /**

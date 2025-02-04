@@ -40,7 +40,7 @@ use webfiori\ui\HTMLNode;
  *
  * @throws MissingLangException
  */
-function label(string $path, string $langCode = null) {
+function label(string $path, ?string $langCode = null) {
     return Lang::getLabel($path, $langCode);
 }
 /**

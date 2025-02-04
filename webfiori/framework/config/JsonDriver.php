@@ -87,7 +87,7 @@ class JsonDriver implements ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value = null, string $description = null) {
+    public function addEnvVar(string $name, mixed $value = null, ?string $description = null) {
         $this->json->get('env-vars')->add($name, new Json([
             'value' => $value,
             'description' => $description

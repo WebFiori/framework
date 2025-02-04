@@ -219,7 +219,7 @@ class Lang {
      * @param string $dir A directory to the language variable (such as 'pages/login/login-label').
      * This also can be a string similar to 'pages.login.login-label'.
      *
-     * @param string $langCode An optional language code. If provided, the
+     * @param string|null $langCode An optional language code. If provided, the
      * method will attempt to replace active language with the provided
      * one. If not provided, the method
      * will attempt to load a translation based on the session or default
@@ -233,7 +233,7 @@ class Lang {
      * @throws MissingLangException
      * @since 1.0
      */
-    public static function getLabel(string $dir, string $langCode = null) {
+    public static function getLabel(string $dir, ?string $langCode = null) {
         if ($langCode === null) {
             $session = SessionsManager::getActiveSession();
 

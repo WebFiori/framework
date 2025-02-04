@@ -43,7 +43,7 @@ class CreateClassHelper {
      *
      * @param ClassWriter $writer The writer that will hold class information.
      */
-    public function __construct(CLICommand $command, ClassWriter $writer = null) {
+    public function __construct(CLICommand $command, ?ClassWriter $writer = null) {
         $this->command = $command;
         $this->classWriter = $writer;
         $this->classInfoReader = new ClassInfoReader($this->command);
@@ -60,16 +60,14 @@ class CreateClassHelper {
      *
      * @param string $confirmTxt The text of the question which will be asked.
      *
-     * @return boolean If the user choose 'y', the method will return true. If
-     * he choose 'n', the method will return false.
-     *
      * @param boolean|null $default Default answer to use if empty input is given.
      * It can be true for 'y' and false for 'n'. Default value is null which
      * means no default will be used.
-     *
-     *
+     * 
+     * @return boolean If the user choose 'y', the method will return true. If
+     * he choose 'n', the method will return false.
      */
-    public function confirm(string $confirmTxt, $default = null) {
+    public function confirm(string $confirmTxt, ?bool $default = null) {
         return $this->getCommand()->confirm($confirmTxt, $default);
     }
     /**
@@ -92,7 +90,7 @@ class CreateClassHelper {
      * @param string $suffix A string to append to the name of the class if it
      * was not in provided name.
      */
-    public function getClassInfo($defaultNs = null, $suffix = null) {
+    public function getClassInfo(?string $defaultNs = null, ?string $suffix = null) {
         return $this->classInfoReader->readClassInfo($defaultNs, $suffix);
     }
     /**
@@ -126,7 +124,7 @@ class CreateClassHelper {
      * user.
      *
      */
-    public function getInput(string $prompt, string $default = null, InputValidator $validator = null) {
+    public function getInput(string $prompt, ?string $default = null, ?InputValidator $validator = null) {
         return $this->getCommand()->getInput($prompt, $default, $validator);
     }
     /**

@@ -46,7 +46,7 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_PATH is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj = null) {
+    public function __construct(?AbstractWebService $webServicesObj = null) {
         parent::__construct('NewWebService', APP_PATH.'apis', APP_DIR.'\\apis');
 
         $this->setSuffix('Service');

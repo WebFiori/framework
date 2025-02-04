@@ -42,7 +42,7 @@ class DBClassWriter extends ClassWriter {
      * @param Table $table The table instance at which the class will build
      * database operations based on.
      */
-    public function __construct($className = 'NewDBOperationsClass', $ns = '\\', Table $table = null) {
+    public function __construct(?string $className = 'NewDBOperationsClass', string $ns = '\\', ?Table $table = null) {
         parent::__construct($className, $ns, $ns);
 
         if ($table !== null) {

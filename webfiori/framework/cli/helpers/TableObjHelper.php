@@ -337,7 +337,7 @@ class TableObjHelper {
      * @param string $defaultName A string to set as default table name in case
      * of hitting 'enter' without providing a value.
      */
-    public function setTableName($defaultName = null) {
+    public function setTableName(?string $defaultName = null) {
         $invalidTableName = true;
         $helper = $this->getCreateHelper();
 

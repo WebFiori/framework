@@ -164,7 +164,7 @@ class TasksManager {
      *
      * @since 1.0
      */
-    public static function createTask(string $when = '*/5 * * * *', string $taskName = '', callable $function = null, array $funcParams = []) : bool {
+    public static function createTask(string $when = '*/5 * * * *', string $taskName = '', ?callable $function = null, array $funcParams = []) : bool {
         try {
             $task = new BaseTask($when);
 
@@ -260,7 +260,7 @@ class TasksManager {
      *
      * @since 1.0.1
      */
-    public static function execLog(bool $bool = null) : bool {
+    public static function execLog(?bool $bool = null) : bool {
         if ($bool !== null) {
             self::get()->setLogEnabledHelper($bool);
         }
@@ -644,7 +644,7 @@ class TasksManager {
      *
      * @since 1.0.6
      */
-    public static function run(string $pass = '', string $taskName = null, bool $force = false, SchedulerCommand $command = null) {
+    public static function run(string $pass = '', ?string $taskName = null, bool $force = false, ?SchedulerCommand $command = null) {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
@@ -929,7 +929,7 @@ class TasksManager {
      * @param bool $xForce
      * @param SchedulerCommand|null $command
      */
-    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, SchedulerCommand $command = null) {
+    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, ?SchedulerCommand $command = null) {
         if ($task->isTime() || $xForce) {
             if ($command !== null) {
                 $task->setCommand($command);
@@ -965,7 +965,7 @@ class TasksManager {
      * @param AbstractTask|null $task
      * @since 1.0.4
      */
-    private function setActiveTaskHelper(AbstractTask $task = null) {
+    private function setActiveTaskHelper(?AbstractTask $task = null) {
         $this->activeTask = $task;
 
         if ($task !== null) {

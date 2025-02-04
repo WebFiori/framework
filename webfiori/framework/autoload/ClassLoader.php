@@ -318,7 +318,7 @@ class ClassLoader {
      * loaded.
      *
      */
-    public static function getClassPath(string $className, string $namespace = null, bool $load = false): array {
+    public static function getClassPath(string $className, ?string $namespace = null, bool $load = false): array {
         $retVal = [];
 
         if ($load === true) {
@@ -397,7 +397,7 @@ class ClassLoader {
      *
      * @throws Exception
      */
-    public  static function isLoaded(string $class, string $ns = null): bool {
+    public  static function isLoaded(string $class, ?string $ns = null): bool {
         foreach (self::getLoadedClasses() as $classArr) {
             if ($ns !== null) {
                 if ($class == $classArr[ClassInfo::NAME]

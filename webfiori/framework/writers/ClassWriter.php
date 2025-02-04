@@ -136,7 +136,7 @@ abstract class ClassWriter {
      * @return string The method will create method definition string and return
      * it.
      */
-    public function f($funcName, $argsArr = [], $returns = null) {
+    public function f($funcName, $argsArr = [], ?string $returns = null) {
         $argsPart = '(';
 
         foreach ($argsArr as $argName => $argType) {

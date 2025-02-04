@@ -17,6 +17,8 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test00() {
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
+        $clazz = "\\app\\database\\migrations\\Migration000";
+        $this->removeClass($clazz);
         $runner = new MigrationsRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
@@ -27,7 +29,7 @@ class DatabaseMigrationWriterTest extends TestCase {
             "webfiori\database\migration\AbstractMigration",
         ], $writter->getUseStatements());
         $writter->writeClass();
-        $clazz = "\\app\\database\\migrations\\Migration000";
+        
         $this->assertTrue(class_exists($clazz));
         $runner = new MigrationsRunner($path, $ns, null);
         $migrations = $runner->getMigrations();

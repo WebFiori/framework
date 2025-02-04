@@ -130,7 +130,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations07() {
         $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_dbx', 'localhost', 1433, [
-            
+            'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
         $clazz = $this->createMigration();

@@ -13,6 +13,7 @@ namespace webfiori\framework\cli\commands;
 use Throwable;
 use webfiori\cli\Argument;
 use webfiori\cli\CLICommand;
+use webfiori\database\DatabaseException;
 use webfiori\database\migration\AbstractMigration;
 use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
@@ -79,20 +80,14 @@ class RunMigrationsCommand extends CLICommand {
         }
         
         if (!$this->migrationsRunner->isConnected()) {
-            $this->error('Unable to connect to database due to the following error:');
             $err = $this->migrationsRunner->getLastError();
-            $this->println($err['code'].' - '.$err['message']);
+            $this->error($err['message']);
             return -1;
         }
-        try {
-            $applied = $this->migrationsRunner->apply();
-        } catch (\webfiori\database\DatabaseException $ex) {
-            $this->error('Failed to execute migrations due to following error:');
-            $this->println($ex->getMessage());
-            return -1;
-        }
+        $listOfApplied = [];
+        while ($this->applyNext($listOfApplied)){};
         
-        if (count($applied) != 0) {
+        if (count($listOfApplied) != 0) {
             $this->info("Number of applied migrations: ".count($applied));
             $this->println("Names of applied migrations:");
             $this->printList(array_map(function (AbstractMigration $migration) {
@@ -102,6 +97,23 @@ class RunMigrationsCommand extends CLICommand {
             $this->info("No migrations were executed.");
         }
         
+    }
+    private function applyNext(&$listOfApplied) {
+        try {
+            $applied = $this->migrationsRunner->applyOne();
+            
+            if ($applied !== null) {
+                $this->success("Migration '".$applied->getName()."' applied successfuly.");
+                $listOfApplied[] = $applied;
+                return true;
+            } else {
+                return false;
+            }
+        } catch (DatabaseException $ex) {
+            $this->error('Failed to execute migrations due to following error:');
+            $this->println($ex->getCode().' - '.$ex->getMessage());
+            return false;
+        }
     }
     private function getRunnerArgValidity() {
         $runner = $this->getArgValue('--runner');

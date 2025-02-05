@@ -4,6 +4,8 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
+use webfiori\database\ConnectionInfo;
+use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\JsonDriver;
@@ -12,6 +14,7 @@ $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
+define('SQL_SERVER_HOST', 'localhost');
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
@@ -99,6 +102,11 @@ register_shutdown_function(function()
     App::getConfig()->remove();
     JsonDriver::setConfigFileName('super-confx.json');
     App::getConfig()->remove();
+    $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+        'TrustServerCertificate' => 'true'
+    ]);
+    $runner = new MigrationsRunner(APP_PATH, '', $conn);
+    $runner->dropMigrationsTable();
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"---------------------------------\n");

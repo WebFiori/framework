@@ -181,6 +181,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
+            "Executing migration...\n",
             "Error: Failed to execute migrations due to following:\n",
             "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
             "Info: No migrations were executed.\n"

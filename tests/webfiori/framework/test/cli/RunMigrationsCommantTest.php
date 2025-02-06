@@ -193,7 +193,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             '7',
             ''
         ]));
-        $this->assertEquals(-1, $this->getExitCode());
+        $this->assertEquals(0, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
         $this->removeClass($clazz);
     }

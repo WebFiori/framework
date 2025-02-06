@@ -136,7 +136,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations07() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_dbx', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, 'testing_dbx', SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -166,7 +166,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations08() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -201,7 +201,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations09() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -240,7 +240,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations10() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -274,7 +274,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations11() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -309,7 +309,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations12() {
-        $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eux', 'testing_db', SQL_SERVER_HOST, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, '1234567890@Eux', SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
@@ -460,7 +460,7 @@ class RunMigrationsCommantTest extends CLITestCase {
     }
     private function removeMigTable(?ConnectionInfo $conn = null) {
         if ($conn === null) {
-            $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+            $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
                 'TrustServerCertificate' => 'true'
             ]);
         }

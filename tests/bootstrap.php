@@ -15,6 +15,9 @@ $DS = DIRECTORY_SEPARATOR;
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
 define('SQL_SERVER_HOST', 'localhost');
+define('SQL_SERVER_USER', 'sa');
+define('SQL_SERVER_PASS', '1234567890@Eu');
+define('SQL_SERVER_DB', 'testing_db');
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
@@ -102,7 +105,7 @@ register_shutdown_function(function()
     App::getConfig()->remove();
     JsonDriver::setConfigFileName('super-confx.json');
     App::getConfig()->remove();
-    $conn = new ConnectionInfo('mssql', 'sa', '1234567890@Eu', 'testing_db', SQL_SERVER_HOST, 1433, [
+    $conn = new ConnectionInfo(SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
         'TrustServerCertificate' => 'true'
     ]);
     $runner = new MigrationsRunner(APP_PATH, '', $conn);

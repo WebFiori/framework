@@ -370,7 +370,7 @@ abstract class ClassWriter {
         if (strlen($trimmed) == 0) {
             return false;
         }
-        $this->path = $path;
+        $this->path = str_replace('\\', DS, str_replace('/', DS, $trimmed));
 
         return true;
     }

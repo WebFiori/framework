@@ -58,69 +58,49 @@ class RunMigrationsCommand extends CLICommand {
         $this->success("Migrations table succesfully created.");
         return true;
     }
+    private function hasMigrationsTable(?MigrationsRunner $runner) : bool {
+        if (!$this->isArgProvided('--ini')) {
+            return true;
+        }
+        $conn = $this->getDBConnection($runner);
+        if ($conn !== null) {
+            $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
+            $temp->createMigrationsTable();
+            return true;
+        }
+        return false;
+    }
+    private function getNS(?MigrationsRunner $runner = null) {
+        if ($this->isArgProvided('--ns')) {
+            return $this->getArgValue('--ns');
+        } else if ($runner !== null) {
+            return $runner->getMigrationsNamespace();
+        } else {
+            $this->info("Using default namespace for migrations.");
+            return '\\'.APP_DIR.'\\database\\migrations';
+        }
+    }
+
     /**
      * Execute the command.
      *
      * @return int 0 in case of success. Other value if failed.
      */
     public function exec() : int {
-        if ($this->isArgProvided('--ini')) {
-            if ($this->getRunnerArgValidity() == 0) {
-                $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\\database\\migrations';
-                if (!$this->hasConnections()) {
-                    return 0;
-                }
-                if ($this->isConnectionSet()) {
-                    $this->migrationsRunner = new MigrationsRunner(APP_PATH, '\\app', null);
-                    if(!$this->createMigrationsTable()) {
-                        return -1;
-                    }
-                } else {
-                    return -2;
-                }
-            } else if (!$this->createMigrationsTable()) {
-                return -1;
-            }
-        }
-        if ($this->getRunnerArgValidity() == 0) {
-            if ($this->isArgProvided('--ns')) {
-                $ns = $this->getArgValue('--ns');
-            } else {
-                $this->info("Using default namespace for migrations.");
-                $ns = '\\'.APP_DIR.'\\database\\migrations';
-            }
-            
-
-            if (!$this->hasMigrations($ns)) {
-                return 0;
-            }
-
-            if (!$this->hasConnections()) {
-                return 0;
-            }
-            
-            if ($this->isConnectionSet()) {
-
-                $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
-            } else {
-                return -2;
-            }
-        } else if ($this->migrationsRunner === null) {
-            return -2;
-        }
         
-        if (count($this->migrationsRunner->getMigrations()) === 0) {
-            $this->info("No migrations where found in the namespace '".$this->migrationsRunner->getMigrationsNamespace()."'.");
+        $runner = $this->getRunnerArg();
+        $ns = $this->getNS($runner);
+        $this->hasMigrationsTable($runner);
+        
+        if (!$this->hasMigrations($ns)) {
             return 0;
         }
         
-        if (!$this->migrationsRunner->isConnected()) {
-            $err = $this->migrationsRunner->getLastError();
-            $this->error($err['message']);
-            return -1;
-        }
+        $this->executeMigrations($runner);
+    }
+    private function executeMigrations(MigrationsRunner $runner) {
         $listOfApplied = [];
-        while ($this->applyNext($listOfApplied)){};
+        while ($this->applyNext($runner, $listOfApplied)){};
         
         if (count($listOfApplied) != 0) {
             $this->info("Number of applied migrations: ".count($listOfApplied));
@@ -133,9 +113,13 @@ class RunMigrationsCommand extends CLICommand {
         }
         return 0;
     }
-    private function isConnectionSet() : bool {
-        if ($this->connectionInfo !== null) {
-            return true;
+    private function getDBConnection(?MigrationsRunner $runner = null) : ?ConnectionInfo {
+        
+        if ($runner !== null) {
+            return $runner->getConnectionInfo();
+        }
+        if (!$this->hasConnections()) {
+            return null;
         }
         $dbConnections = array_keys(App::getConfig()->getDBConnections());
         
@@ -144,21 +128,18 @@ class RunMigrationsCommand extends CLICommand {
 
             if (!in_array($connection, $dbConnections)) {
                 $this->error("No connection was found which has the name '$connection'.");
-                return false;
+                return null;
             } else {
-                $this->connectionInfo = App::getConfig()->getDBConnection($connection);
-                return true;
+                return App::getConfig()->getDBConnection($connection);
             }
         } else {
-            $this->connectionInfo = CLIUtils::getConnectionName($this);
-            return true;
+            return CLIUtils::getConnectionName($this);
         }
-        return false;
     }
-    private function applyNext(&$listOfApplied) : bool {
+    private function applyNext(MigrationsRunner $runner, &$listOfApplied) : bool {
         try {
             $this->println("Executing migration...");
-            $applied = $this->migrationsRunner->applyOne();
+            $applied = $runner->applyOne();
             
             if ($applied !== null) {
                 $this->success("Migration '".$applied->getName()."' applied successfuly.");
@@ -174,11 +155,11 @@ class RunMigrationsCommand extends CLICommand {
             return false;
         }
     }
-    private function getRunnerArgValidity() {
+    private function getRunnerArg() : ?MigrationsRunner {
         $runner = $this->getArgValue('--runner');
         
         if ($runner === null) {
-            return 0;
+            return null;
         }
         
         if (class_exists($runner)) {
@@ -186,22 +167,18 @@ class RunMigrationsCommand extends CLICommand {
                 $runnerInst = new $runner();
             } catch (Throwable $exc) {
                 $this->error('The argument --runner has invalid value: Exception: "'.$exc->getMessage().'".');
-                return -1;
+                return null;
             }
-
-
 
             if (!($runnerInst instanceof MigrationsRunner)) {
                 $this->error('The argument --runner has invalid value: "'.$runner.'" is not an instance of "MigrationsRunner".');
-                return -1;
+                return null;
             } else {
-                $this->migrationsRunner = $runnerInst;
-                $this->connectionInfo = $runnerInst->getConnectionInfo();
-                return 1;
+                return $runnerInst;
             }
         } else {
             $this->error('The argument --runner has invalid value: Class "'.$runner.'" does not exist.');
-            return -1;
+            return null;
         }
     }
     private function hasConnections() : bool {
@@ -213,14 +190,14 @@ class RunMigrationsCommand extends CLICommand {
         return true;
     }
     private function hasMigrations(string $namespace) : bool {
-        $this->migrationsRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
+        $tmpRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
         $this->println("Checking namespace '$namespace' for migrations...");
-        $count = count($this->migrationsRunner->getMigrations());
+        $count = count($tmpRunner->getMigrations());
         if ($count == 0) {
-            $this->info("No migrations were found in the namespace '$namespace'.");
+            $this->info("No migrations found in the namespace '$namespace'.");
             return false;
         }
-        $this->println("Found $count migration(s).");
+        $this->info("Found $count migration(s) in the namespace '$namespace'.");
         return true;
     }
 }

@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\ThemeLoader;
 
 /**
@@ -9,7 +10,7 @@ use webfiori\framework\ThemeLoader;
  *
  * @author Ibrahim
  */
-class CreateThemeTest extends CreateTestCase {
+class CreateThemeTest extends CLITestCase {
     /**
      * @test
      */

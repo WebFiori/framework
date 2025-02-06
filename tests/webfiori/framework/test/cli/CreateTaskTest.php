@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\scheduler\AbstractTask;
 
 /**
@@ -9,7 +10,7 @@ use webfiori\framework\scheduler\AbstractTask;
  *
  * @author Ibrahim
  */
-class CreateTaskTest extends CreateTestCase {
+class CreateTaskTest extends CLITestCase {
     /**
      * @test
      */

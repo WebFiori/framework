@@ -4,13 +4,14 @@ namespace webfiori\framework\test\cli;
 use webfiori\database\ConnectionInfo;
 use webfiori\file\File;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 
 /**
  * Description of CreateRESTTest
  *
  * @author Ibrahim
  */
-class CreateRESTTest extends CreateTestCase {
+class CreateRESTTest extends CLITestCase {
     /**
      * @test
      */

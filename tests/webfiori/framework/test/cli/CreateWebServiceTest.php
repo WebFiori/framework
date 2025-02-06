@@ -2,16 +2,18 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamOption;
 use webfiori\http\ParamType;
 use webfiori\http\RequestMethod;
 use webfiori\http\RequestParameter;
+use const ROOT_PATH;
 /**
  *
  * @author Ibrahim
  */
-class CreateWebServiceTest extends CreateTestCase {
+class CreateWebServiceTest extends CLITestCase {
     /**
      * @test
      */

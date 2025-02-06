@@ -3,13 +3,14 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 
 /**
  * Description of CreateDBAccessTest
  *
  * @author Ibrahim
  */
-class CreateDBAccessTest extends CreateTestCase {
+class CreateDBAccessTest extends CLITestCase {
     /**
      * @test
      */

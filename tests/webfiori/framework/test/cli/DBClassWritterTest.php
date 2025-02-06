@@ -4,6 +4,7 @@ namespace webfiori\framework\test\cli;
 use tables\EmployeeInfoTable;
 use tables\PositionInfoTable;
 use tables\UserInfoTable;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\writers\DBClassWriter;
 
 /**
@@ -11,7 +12,7 @@ use webfiori\framework\writers\DBClassWriter;
  *
  * @author Ibrahim
  */
-class DBClassWritterTest extends CreateTestCase {
+class DBClassWritterTest extends CLITestCase {
     /**
      * @test
      */

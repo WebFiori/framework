@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\middleware\AbstractMiddleware;
 
 /**
@@ -9,7 +10,7 @@ use webfiori\framework\middleware\AbstractMiddleware;
  *
  * @author Ibrahim
  */
-class CreateMiddlewareTest extends CreateTestCase {
+class CreateMiddlewareTest extends CLITestCase {
     /**
      * @test
      */

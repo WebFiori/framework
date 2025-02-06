@@ -2,12 +2,13 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 /**
  * Description of TestCreateCommand
  *
  * @author Ibrahim
  */
-class CreateCommandTest extends CreateTestCase {
+class CreateCommandTest extends CLITestCase {
     /**
      * @test
      */

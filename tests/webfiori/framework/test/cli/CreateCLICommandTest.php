@@ -3,10 +3,11 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\cli\CLICommand;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 /**
  * @author Ibrahim
  */
-class CreateCLICommandTest extends CreateTestCase {
+class CreateCLICommandTest extends CLITestCase {
     /**
      * @test
      */

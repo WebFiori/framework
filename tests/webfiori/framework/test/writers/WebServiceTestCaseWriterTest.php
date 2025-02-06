@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\framework\test\writers;
 
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\scheduler\webServices\ForceTaskExecutionService;
 use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\test\cli\CreateTestCase;
 use webfiori\framework\writers\APITestCaseWriter;
 /**
  *
  * @author Ibrahim
  */
-class WebServiceTestCaseWriterTest extends CreateTestCase {
+class WebServiceTestCaseWriterTest extends CLITestCase {
     /**
      * @test
      */

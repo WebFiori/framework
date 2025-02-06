@@ -3,8 +3,9 @@ namespace webfiori\framework\test\cli;
 
 use app\database\TestTable;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 
-class CreateEntityTest extends CreateTestCase {
+class CreateEntityTest extends CLITestCase {
     /**
      * @test
      */

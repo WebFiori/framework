@@ -35,7 +35,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
+            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Info: No connections were found in application configuration.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -57,7 +57,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
+            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Error: No connection was found which has the name 'ABC'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -65,27 +65,27 @@ class RunMigrationsCommantTest extends CLITestCase {
             '--connection' => 'ABC'
         ]));
         $this->removeClass($clazz);
-        $this->assertEquals(-2, $this->getExitCode());
+        $this->assertEquals(0, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
     }
     /**
      * @test
      */
     public function testRunMigrations03() {
-        $conn = new ConnectionInfo('mysql', 'root', 'x123456', 'testing_db');
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, 'x123456', SQL_SERVER_DB);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration();
+        $clazz = $this->createMigration('PO', 'MyPOMigration');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
+            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 2 - [Microsoft][ODBC Driver 18 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -93,7 +93,8 @@ class RunMigrationsCommantTest extends CLITestCase {
             '7',
             ''
         ]));
-        $this->assertEquals(-1, $this->getExitCode());
+        $this->assertEquals(0, $this->getExitCode());
+        $this->removeClass($clazz);
         App::getConfig()->removeAllDBConnections();
     }
     /**
@@ -125,7 +126,8 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations06() {
         $this->assertEquals([
-            "Info: No migrations where found in the namespace '\app\database\migrations\\emptyRunner'.\n",
+            "Checking namespace '\app\database\migrations\\emptyRunner' for migrations...\n",
+            "Info: No migrations found in the namespace '\app\database\migrations\\emptyRunner'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--runner' => '\\app\\database\\migrations\\emptyRunner\XRunner',
@@ -140,12 +142,12 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration();
+        $clazz = $this->createMigration('Cool', 'CoolOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
+            "Info: Found 2 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
@@ -160,6 +162,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             ''
         ]));
         $this->assertEquals(-1, $this->getExitCode());
+        $this->removeClass($clazz);
         App::getConfig()->removeAllDBConnections();
     }
     /**
@@ -170,7 +173,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration();
+        $clazz = $this->createMigration('Super', 'SuperMigration');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
@@ -365,6 +368,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals([
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
             "Executing migration...\n",
             "Success: Migration 'First One' applied successfuly.\n",
             "Executing migration...\n",
@@ -449,11 +453,14 @@ class RunMigrationsCommantTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
     }
-    private function createMigration(?string $name = null) : string {
+    private function createMigration(?string $name = null, ?string $className = null) : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);
         $writer = new DatabaseMigrationWriter($runner);
         if ($name !== null) {
             $writer->setMigrationName($name);
+        }
+        if ($className !== null) {
+            $writer->setClassName($className);
         }
         $writer->writeClass();
         return $writer->getName(true);

@@ -184,6 +184,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
             "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
+            "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,

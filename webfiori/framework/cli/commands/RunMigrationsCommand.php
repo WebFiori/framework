@@ -40,13 +40,17 @@ class RunMigrationsCommand extends CLICommand {
             new Argument('--connection', 'The name of database connection to be used in executing the migrations.', true),
             new Argument('--runner', 'A class that extends the class "webfiori\database\migration\MigrationsRunner".', true),
             new Argument('--ini', 'Creates migrations table in database if not exist.', true),
+            new Argument('--rollback', 'Rollback last applied migration.', true),
         ], 'Execute database migrations.');
     }
     private function createMigrationsTable() : bool {
         $this->println("Initializing migrations table...");
         try {
+            if ($this->connectionInfo !== null && $this->migrationsRunner->getConnectionInfo() === null) {
+                $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
+            }
             $this->migrationsRunner->table('migrations')->createTable()->execute();
-        } catch (DatabaseException $ex) {
+        } catch (Throwable $ex) {
             $this->error("Unable to create migrations table due to following:");
             $this->println($ex->getMessage());
             return false;
@@ -67,23 +71,25 @@ class RunMigrationsCommand extends CLICommand {
                     return 0;
                 }
                 if ($this->isConnectionSet()) {
-                    $this->migrationsRunner = new MigrationsRunner(APP_PATH, '\\app', $this->connectionInfo);
+                    $this->migrationsRunner = new MigrationsRunner(APP_PATH, '\\app', null);
                     if(!$this->createMigrationsTable()) {
                         return -1;
                     }
                 } else {
                     return -2;
                 }
-            } else if ($this->migrationsRunner !== null) {
-                if (!$this->createMigrationsTable()) {
-                    return -1;
-                }
-            } else {
-                return -2;
+            } else if (!$this->createMigrationsTable()) {
+                return -1;
             }
         }
         if ($this->getRunnerArgValidity() == 0) {
-            $ns = $this->isArgProvided('--ns') ? $this->getArgValue('--ns') : '\\'.APP_DIR.'\\database\\migrations';
+            if ($this->isArgProvided('--ns')) {
+                $ns = $this->getArgValue('--ns');
+            } else {
+                $this->info("Using default namespace for migrations.");
+                $ns = '\\'.APP_DIR.'\\database\\migrations';
+            }
+            
 
             if (!$this->hasMigrations($ns)) {
                 return 0;
@@ -151,6 +157,7 @@ class RunMigrationsCommand extends CLICommand {
     }
     private function applyNext(&$listOfApplied) : bool {
         try {
+            $this->println("Executing migration...");
             $applied = $this->migrationsRunner->applyOne();
             
             if ($applied !== null) {
@@ -160,9 +167,10 @@ class RunMigrationsCommand extends CLICommand {
             } else {
                 return false;
             }
-        } catch (DatabaseException $ex) {
-            $this->error('Failed to execute migrations due to following:');
+        } catch (Throwable $ex) {
+            $this->error('Failed to execute migration due to following:');
             $this->println($ex->getMessage());
+            $this->warning('Execution stopped.');
             return false;
         }
     }

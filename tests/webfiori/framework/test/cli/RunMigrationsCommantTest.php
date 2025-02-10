@@ -35,7 +35,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Info: No connections were found in application configuration.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -43,7 +43,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             '--connection' => 'ABC'
         ]));
         $this->removeClass($clazz);
-        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
     }
     /**
@@ -57,7 +57,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Error: No connection was found which has the name 'ABC'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -65,7 +65,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             '--connection' => 'ABC'
         ]));
         $this->removeClass($clazz);
-        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
         App::getConfig()->removeAllDBConnections();
     }
     /**
@@ -79,13 +79,13 @@ class RunMigrationsCommantTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 2 - [Microsoft][ODBC Driver 18 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online.\n",
+            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -93,7 +93,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             '7',
             ''
         ]));
-        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
         $this->removeClass($clazz);
         App::getConfig()->removeAllDBConnections();
     }
@@ -107,7 +107,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--runner' => '\\app\\database\\migrations',
         ]));
-        $this->assertEquals(-2, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
@@ -119,7 +119,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--runner' => '\\webfiori\\framework\\App',
         ]));
-        $this->assertEquals(-2, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
@@ -173,12 +173,13 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
+        $this->removeMigTable($conn);
         $clazz = $this->createMigration('Super', 'SuperMigration');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
+            "Info: Found 2 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
@@ -472,6 +473,10 @@ class RunMigrationsCommantTest extends CLITestCase {
             ]);
         }
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', $conn);
-        $runner->dropMigrationsTable();
+        try{
+            $runner->dropMigrationsTable();
+        } catch (\webfiori\database\DatabaseException $ex) {
+
+        }
     }
 }

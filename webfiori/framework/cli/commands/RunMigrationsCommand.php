@@ -58,17 +58,34 @@ class RunMigrationsCommand extends CLICommand {
         $this->success("Migrations table succesfully created.");
         return true;
     }
-    private function hasMigrationsTable(?MigrationsRunner $runner) : bool {
+    /**
+     * Checks if the argument '--ini' is provided or not and initialize
+     * migrations table if provided.
+     * 
+     * @param MigrationsRunner|null $runner An optional instance which will be
+     * used to run the migrations. If provided, the table will be created based
+     * on the connection of the runner.
+     * 
+     * @return bool If the argument '--ini' is not provided, true is returned.
+     * Other than that, an attempt to create the migrations table will be made.
+     * If created, true is returned. Other than that, false is returned.
+     */
+    private function checkMigrationsTable(?MigrationsRunner $runner) {
         if (!$this->isArgProvided('--ini')) {
-            return true;
+            return 0;
         }
         $conn = $this->getDBConnection($runner);
         if ($conn !== null) {
             $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
-            $temp->createMigrationsTable();
-            return true;
+            try {
+                $temp->createMigrationsTable();
+            } catch (Throwable $ex) {
+                $this->error('Unable to create migrations table: '.$ex->getMessage());
+                return -1;
+            }
+            return 0;
         }
-        return false;
+        return 0;
     }
     private function getNS(?MigrationsRunner $runner = null) {
         if ($this->isArgProvided('--ns')) {
@@ -89,14 +106,30 @@ class RunMigrationsCommand extends CLICommand {
     public function exec() : int {
         
         $runner = $this->getRunnerArg();
+        if (!($runner instanceof MigrationsRunner) && $runner !== null) {
+            return -1;
+        }
         $ns = $this->getNS($runner);
-        $this->hasMigrationsTable($runner);
-        
+        if ($this->checkMigrationsTable($runner) == -1) {
+            return -1;
+        }
+
         if (!$this->hasMigrations($ns)) {
             return 0;
         }
         
-        $this->executeMigrations($runner);
+        $connection = $this->getDBConnection($runner);
+        
+        if (!($connection instanceof ConnectionInfo)) {
+            return -1;
+        }
+        try {
+            $runner = new MigrationsRunner(ROOT_PATH.DS. str_replace('\\', DS, $ns), $ns, $connection);
+        } catch (Throwable $ex) {
+            $this->error($ex->getMessage());
+            return -1;
+        }
+        return $this->executeMigrations($runner);
     }
     private function executeMigrations(MigrationsRunner $runner) {
         $listOfApplied = [];
@@ -113,13 +146,31 @@ class RunMigrationsCommand extends CLICommand {
         }
         return 0;
     }
-    private function getDBConnection(?MigrationsRunner $runner = null) : ?ConnectionInfo {
+    /**
+     * Returns the connection that will be used in running the migrations.
+     * 
+     * The method will first check on the provided runner. If it has connection,
+     * it will be returned. Then it will check if the argument '--connection' is
+     * provided or not. If provided, the method will check if such connection
+     * exist in application configuration. If no connection was found, null
+     * is returned. If the argument '--connection' is not provided, the method will
+     * ask the user to select a connection from the connections which
+     * exist in application configuration.
+     * 
+     * @param MigrationsRunner|null $runner If given and the connection is set
+     * on the instance, it will be returned.
+     * 
+     * @return ConnectionInfo|null
+     */
+    private function getDBConnection(?MigrationsRunner $runner = null) {
         
         if ($runner !== null) {
-            return $runner->getConnectionInfo();
+            if ($runner->getConnectionInfo() !== null) {
+                return $runner->getConnectionInfo();
+            }
         }
         if (!$this->hasConnections()) {
-            return null;
+            return -1;
         }
         $dbConnections = array_keys(App::getConfig()->getDBConnections());
         
@@ -128,7 +179,7 @@ class RunMigrationsCommand extends CLICommand {
 
             if (!in_array($connection, $dbConnections)) {
                 $this->error("No connection was found which has the name '$connection'.");
-                return null;
+                return -1;
             } else {
                 return App::getConfig()->getDBConnection($connection);
             }
@@ -155,7 +206,11 @@ class RunMigrationsCommand extends CLICommand {
             return false;
         }
     }
-    private function getRunnerArg() : ?MigrationsRunner {
+    /**
+     * 
+     * @return MigrationsRunner|int|null
+     */
+    private function getRunnerArg() {
         $runner = $this->getArgValue('--runner');
         
         if ($runner === null) {
@@ -167,18 +222,18 @@ class RunMigrationsCommand extends CLICommand {
                 $runnerInst = new $runner();
             } catch (Throwable $exc) {
                 $this->error('The argument --runner has invalid value: Exception: "'.$exc->getMessage().'".');
-                return null;
+                return -1;
             }
 
             if (!($runnerInst instanceof MigrationsRunner)) {
                 $this->error('The argument --runner has invalid value: "'.$runner.'" is not an instance of "MigrationsRunner".');
-                return null;
+                return -1;
             } else {
                 return $runnerInst;
             }
         } else {
             $this->error('The argument --runner has invalid value: Class "'.$runner.'" does not exist.');
-            return null;
+            return -1;
         }
     }
     private function hasConnections() : bool {

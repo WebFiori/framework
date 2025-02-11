@@ -19,7 +19,7 @@ class Migration000 extends AbstractMigration {
      * @param Database $schema The database at which the migration will be applied to.
      */
     public function up(Database $schema) {
-        $schema->x();
+        $this->x();
     }
     /**
      * Performs the action that will revert back the migration.

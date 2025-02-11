@@ -17,7 +17,7 @@ class RunMigrationsCommantTest extends CLITestCase {
     public function testRunMigrations00() {
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Info: No migrations were found in the namespace '\app\database\migrations'.\n",
+            "Info: No migrations found in the namespace '\app\database\migrations'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -85,7 +85,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -153,7 +153,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -187,7 +187,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
-            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
+            "208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
             "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
         ], $this->executeMultiCommand([
@@ -435,13 +435,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals([
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
+            "Checking namespace '\app\database\migrations\multiErr' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiErr'.\n",
             "Executing migration...\n",
             "Success: Migration 'First One' applied successfuly.\n",
             "Executing migration...\n",
             "Success: Migration 'Second one' applied successfuly.\n",
             "Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
-            "Call to undefined method app\database\migrations\multiErr\MultiErrRunner::x()\n",
+            "Call to undefined method app\database\migrations\multiErr\Migration000::x() at line 22\n",
             "Warning: Execution stopped.\n",
             "Info: Number of applied migrations: 2\n",
             "Names of applied migrations:\n",

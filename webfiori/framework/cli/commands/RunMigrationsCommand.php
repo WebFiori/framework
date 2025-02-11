@@ -70,11 +70,13 @@ class RunMigrationsCommand extends CLICommand {
      * Other than that, an attempt to create the migrations table will be made.
      * If created, true is returned. Other than that, false is returned.
      */
-    private function checkMigrationsTable(?MigrationsRunner $runner) {
+    private function checkMigrationsTable(?MigrationsRunner $runner, $conn = null) {
         if (!$this->isArgProvided('--ini')) {
             return 0;
         }
-        $conn = $this->getDBConnection($runner);
+        if ($conn === null) {
+            $conn = $this->getDBConnection($runner);
+        }
         if ($conn !== null) {
             $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
             try {
@@ -108,23 +110,26 @@ class RunMigrationsCommand extends CLICommand {
     public function exec() : int {
         
         $runner = $this->getRunnerArg();
+        
         if (!($runner instanceof MigrationsRunner) && $runner !== null) {
             return -1;
         }
         $ns = $this->getNS($runner);
-        if ($this->checkMigrationsTable($runner) == -1) {
-            return -1;
-        }
-
+        
         if (!$this->hasMigrations($ns)) {
             return 0;
         }
         
         $connection = $this->getDBConnection($runner);
-        
         if (!($connection instanceof ConnectionInfo)) {
             return -1;
         }
+        
+        if ($this->checkMigrationsTable($runner, $connection) == -1) {
+            return -1;
+        }
+
+        
         try {
             $runner = new MigrationsRunner(ROOT_PATH.DS. str_replace('\\', DS, $ns), $ns, $connection);
         } catch (Throwable $ex) {
@@ -191,7 +196,7 @@ class RunMigrationsCommand extends CLICommand {
     }
     private function applyNext(MigrationsRunner $runner, &$listOfApplied) : bool {
         try {
-            $this->println("Executing migration...");
+            //$this->println("Executing migration...");
             $applied = $runner->applyOne();
             
             if ($applied !== null) {
@@ -203,7 +208,7 @@ class RunMigrationsCommand extends CLICommand {
             }
         } catch (Throwable $ex) {
             $this->error('Failed to execute migration due to following:');
-            $this->println($ex->getMessage().' at line '.$ex->getLine());
+            $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
             $this->warning('Execution stopped.');
             return false;
         }

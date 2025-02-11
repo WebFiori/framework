@@ -1,12 +1,20 @@
 <?php
 namespace webfiori\framework\test\cli;
 
+use app\database\migrations\multiErr\MultiErrRunner;
 use webfiori\database\ConnectionInfo;
+use webfiori\database\DatabaseException;
 use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\cli\commands\RunMigrationsCommand;
 use webfiori\framework\writers\DatabaseMigrationWriter;
+use const APP_PATH;
+use const DS;
+use const SQL_SERVER_DB;
+use const SQL_SERVER_HOST;
+use const SQL_SERVER_PASS;
+use const SQL_SERVER_USER;
 /**
  * @author Ibrahim
  */
@@ -147,7 +155,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Info: Found 2 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
@@ -179,15 +187,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Info: Found 2 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Executing migration...\n",
+            //"Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
-            "208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'migrations'.\n",
+            "208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
             "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
         ], $this->executeMultiCommand([
@@ -213,6 +221,8 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Invalid answer.\n",
@@ -220,9 +230,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
-            "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
-            "Executing migration...\n",
+            //"Executing migration...\n",
             "Success: Migration 'Migration000' applied successfuly.\n",
             "Info: Number of applied migrations: 1\n",
             "Names of applied migrations:\n",
@@ -252,11 +260,12 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
-            "Initializing migrations table...\n",
-            "Success: Migrations table succesfully created.\n",
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Found 1 migration(s).\n",
-            "Executing migration...\n",
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            
+            //"Executing migration...\n",
             "Success: Migration 'Cool One' applied successfuly.\n",
             "Info: Number of applied migrations: 1\n",
             "Names of applied migrations:\n",
@@ -286,14 +295,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
+            "Info: Using default namespace for migrations.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Found 1 migration(s).\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
-            "Info: Using default namespace for migrations.\n",
-            "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
-            "Executing migration...\n",
+            
+            //"Executing migration...\n",
             "Success: Migration 'Cool One' applied successfuly.\n",
             "Info: Number of applied migrations: 1\n",
             "Names of applied migrations:\n",
@@ -319,6 +329,9 @@ class RunMigrationsCommantTest extends CLITestCase {
         $conn->setName('default-conn');
         App::getConfig()->addOrUpdateDBConnection($conn);
         $this->assertEquals([
+            "Info: Using default namespace for migrations.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
@@ -338,6 +351,9 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations13() {
         $this->assertEquals([
+            "Info: Using default namespace for migrations.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "\n",
             "Info: No connections were found in application configuration.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -352,6 +368,8 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations14() {
         $this->assertEquals([
+            "Checking namespace '\app\database\migrations\emptyRunner' for migrations...\n",
+            "\n",
             "Initializing migrations table...\n",
             "Error: Unable to create migrations table due to following:\n",
             "Connection information not set.\n",
@@ -369,12 +387,10 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals([
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
+            "\n",
             "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
-            "Executing migration...\n",
             "Success: Migration 'First One' applied successfuly.\n",
-            "Executing migration...\n",
             "Success: Migration 'Second one' applied successfuly.\n",
-            "Executing migration...\n",
             "Success: Migration 'Third One' applied successfuly.\n",
             "Info: Number of applied migrations: 3\n",
             "Names of applied migrations:\n",
@@ -437,13 +453,13 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Success: Migrations table succesfully created.\n",
             "Checking namespace '\app\database\migrations\multiErr' for migrations...\n",
             "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiErr'.\n",
-            "Executing migration...\n",
+            //"Executing migration...\n",
             "Success: Migration 'First One' applied successfuly.\n",
-            "Executing migration...\n",
+            //"Executing migration...\n",
             "Success: Migration 'Second one' applied successfuly.\n",
-            "Executing migration...\n",
+            //"Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
-            "Call to undefined method app\database\migrations\multiErr\Migration000::x() at line 22\n",
+            "Call to undefined method app\database\migrations\multiErr\Migration000::x() (Line 22)\n",
             "Warning: Execution stopped.\n",
             "Info: Number of applied migrations: 2\n",
             "Names of applied migrations:\n",
@@ -455,6 +471,8 @@ class RunMigrationsCommantTest extends CLITestCase {
             '--ini'
         ]));
         $this->assertEquals(0, $this->getExitCode());
+        $r = new MultiErrRunner();
+        $this->removeMigTable($r->getConnectionInfo());
     }
     private function createMigration(?string $name = null, ?string $className = null) : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);
@@ -477,7 +495,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', $conn);
         try{
             $runner->dropMigrationsTable();
-        } catch (\webfiori\database\DatabaseException $ex) {
+        } catch (DatabaseException $ex) {
 
         }
     }

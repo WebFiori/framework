@@ -41,18 +41,20 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration();
         $this->assertTrue(class_exists($clazz));
         
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--connection' => 'ABC'
+        ]);
+        $this->removeClass($clazz);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Info: No connections were found in application configuration.\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-            '--connection' => 'ABC'
-        ]));
-        $this->removeClass($clazz);
+        ], $output);
+        
         $this->assertEquals(-1, $this->getExitCode());
-        App::getConfig()->removeAllDBConnections();
+        
     }
     /**
      * @test
@@ -63,18 +65,21 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration();
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--connection' => 'ABC'
+        ]);
+        $this->removeClass($clazz);
+        App::getConfig()->removeAllDBConnections();
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
             "Error: No connection was found which has the name 'ABC'.\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-            '--connection' => 'ABC'
-        ]));
-        $this->removeClass($clazz);
+        ], $output);
+        
         $this->assertEquals(-1, $this->getExitCode());
-        App::getConfig()->removeAllDBConnections();
+        
     }
     /**
      * @test
@@ -85,6 +90,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration('PO', 'MyPOMigration');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+        ], [
+            '7',
+            ''
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeClass($clazz);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
@@ -94,16 +108,10 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-        ], [
-            '7',
-            ''
-        ]));
+        ], $output);
         $this->assertEquals(-1, $this->getExitCode());
-        $this->removeClass($clazz);
-        App::getConfig()->removeAllDBConnections();
+        
+        
     }
     /**
      * @test
@@ -185,6 +193,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration('Super', 'SuperMigration');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+        ], [
+            '7',
+            ''
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeClass($clazz);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
@@ -193,21 +210,14 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            //"Executing migration...\n",
+            "Starting to execute migrations...\n",
             "Error: Failed to execute migration due to following:\n",
             "208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
             "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-        ], [
-            '7',
-            ''
-        ]));
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
-        App::getConfig()->removeAllDBConnections();
-        $this->removeClass($clazz);
+        
     }
     /**
      * @test
@@ -220,6 +230,17 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration();
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--ini'
+        ], [
+            '7',
+            ''
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeMigTable($conn);
+        $this->removeClass($clazz);
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
@@ -230,23 +251,14 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
-            //"Executing migration...\n",
+            "Starting to execute migrations...\n",
             "Success: Migration 'Migration000' applied successfuly.\n",
             "Info: Number of applied migrations: 1\n",
             "Names of applied migrations:\n",
             "- Migration000\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-            '--ini'
-        ], [
-            '7',
-            ''
-        ]));
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
-        App::getConfig()->removeAllDBConnections();
-        $this->removeMigTable($conn);
-        $this->removeClass($clazz);
+        
     }
     /**
      * @test
@@ -259,29 +271,30 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration('Cool One');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
-        $this->assertEquals([
-            "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
-            "Initializing migrations table...\n",
-            "Success: Migrations table succesfully created.\n",
-            
-            //"Executing migration...\n",
-            "Success: Migration 'Cool One' applied successfuly.\n",
-            "Info: Number of applied migrations: 1\n",
-            "Names of applied migrations:\n",
-            "- Cool One\n",
-        ], $this->executeMultiCommand([
+        $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
             '--ini',
             '--connection' => 'default-conn'
         ], [
 
-        ]));
-        $this->assertEquals(0, $this->getExitCode());
+        ]);
         App::getConfig()->removeAllDBConnections();
         $this->removeClass($clazz);
         $this->removeMigTable($conn);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            "Starting to execute migrations...\n",
+            "Success: Migration 'Cool One' applied successfuly.\n",
+            "Info: Number of applied migrations: 1\n",
+            "Names of applied migrations:\n",
+            "- Cool One\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        
     }
     /**
      * @test
@@ -294,30 +307,31 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration('Cool One');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
-        $this->assertEquals([
-            "Info: Using default namespace for migrations.\n",
-            "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Found 1 migration(s).\n",
-            "Select database connection:\n",
-            "0: default-conn <--\n",
-            "Initializing migrations table...\n",
-            "Success: Migrations table succesfully created.\n",
-            
-            //"Executing migration...\n",
-            "Success: Migration 'Cool One' applied successfuly.\n",
-            "Info: Number of applied migrations: 1\n",
-            "Names of applied migrations:\n",
-            "- Cool One\n",
-        ], $this->executeMultiCommand([
+        $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ini',
         ], [
             ''
-        ]));
-        $this->assertEquals(0, $this->getExitCode());
+        ]);
         App::getConfig()->removeAllDBConnections();
         $this->removeClass($clazz);
         $this->removeMigTable($conn);
+        $this->assertEquals([
+            "Info: Using default namespace for migrations.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Select database connection:\n",
+            "0: default-conn <--\n",
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            "Starting to execute migrations...\n",
+            "Success: Migration 'Cool One' applied successfuly.\n",
+            "Info: Number of applied migrations: 1\n",
+            "Names of applied migrations:\n",
+            "- Cool One\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        
     }
     /**
      * @test
@@ -327,7 +341,16 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
+        $clazz = $this->createMigration('Oh S', 'OhSuperMg');
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ini',
+        ], [
+            ''
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeClass($clazz);
         $this->assertEquals([
             "Info: Using default namespace for migrations.\n",
             "Checking namespace '\app\database\migrations' for migrations...\n",
@@ -336,48 +359,47 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Error: Unable to create migrations table due to following:\n",
-            "Not connected to database.\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ini',
-        ], [
-            ''
-        ]));
+            "Unable to connect to database: 18456 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+        ], $output);
         $this->assertEquals(-1, $this->getExitCode());
-        App::getConfig()->removeAllDBConnections();
+        
     }
     /**
      * @test
      */
     public function testRunMigrations13() {
-        $this->assertEquals([
-            "Info: Using default namespace for migrations.\n",
-            "Checking namespace '\app\database\migrations' for migrations...\n",
-            "\n",
-            "Info: No connections were found in application configuration.\n",
-        ], $this->executeMultiCommand([
+        $clazz = $this->createMigration();
+        $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ini',
         ], [
             ''
-        ]));
-        $this->assertEquals(0, $this->getExitCode());
+        ]);
+        $this->removeClass($clazz);
+        $this->assertEquals([
+            "Info: Using default namespace for migrations.\n",
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Info: No connections were found in application configuration.\n",
+        ], $output);
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test
      */
     public function testRunMigrations14() {
-        $this->assertEquals([
-            "Checking namespace '\app\database\migrations\emptyRunner' for migrations...\n",
-            "\n",
-            "Initializing migrations table...\n",
-            "Error: Unable to create migrations table due to following:\n",
-            "Connection information not set.\n",
-        ], $this->executeMultiCommand([
+        //$clazz = $this->createMigration();
+        $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
-            '--runner' => '\\app\\database\\migrations\\emptyRunner\XRunner',
+            '--runner' => '\\app\\database\\migrations\\noConn\XRunner',
             '--ini'
-        ]));
+        ]);
+        //$this->removeClass($clazz);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\\noConn' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations\\noConn'.\n",
+            "Info: No connections were found in application configuration.\n",
+        ], $output);
         $this->assertEquals(-1, $this->getExitCode());
     }
     /**
@@ -385,10 +407,11 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations15() {
         $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
             "Initializing migrations table...\n",
             "Success: Migrations table succesfully created.\n",
-            "\n",
-            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Starting to execute migrations...\n",
             "Success: Migration 'First One' applied successfuly.\n",
             "Success: Migration 'Second one' applied successfuly.\n",
             "Success: Migration 'Third One' applied successfuly.\n",
@@ -437,7 +460,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals([
             "Info: Using default namespace for migrations.\n",
             "Checking namespace '\app\database\migrations' for migrations...\n",
-            "Info: No migrations were found in the namespace '\app\database\migrations'.\n"
+            "Info: No migrations found in the namespace '\app\database\migrations'.\n"
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             
@@ -448,16 +471,19 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations19() {
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multiErr\MultiErrRunner',
+            '--ini'
+        ]);
         $this->assertEquals([
-            "Initializing migrations table...\n",
-            "Success: Migrations table succesfully created.\n",
             "Checking namespace '\app\database\migrations\multiErr' for migrations...\n",
             "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiErr'.\n",
-            //"Executing migration...\n",
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            "Starting to execute migrations...\n",
             "Success: Migration 'First One' applied successfuly.\n",
-            //"Executing migration...\n",
             "Success: Migration 'Second one' applied successfuly.\n",
-            //"Executing migration...\n",
             "Error: Failed to execute migration due to following:\n",
             "Call to undefined method app\database\migrations\multiErr\Migration000::x() (Line 22)\n",
             "Warning: Execution stopped.\n",
@@ -465,11 +491,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Names of applied migrations:\n",
             "- First One\n",
             "- Second one\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--runner' => '\\app\\database\\migrations\\multiErr\MultiErrRunner',
-            '--ini'
-        ]));
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
         $r = new MultiErrRunner();
         $this->removeMigTable($r->getConnectionInfo());

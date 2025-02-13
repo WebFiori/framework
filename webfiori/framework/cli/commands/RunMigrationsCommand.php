@@ -50,7 +50,7 @@ class RunMigrationsCommand extends CLICommand {
                 $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
             }
             $this->migrationsRunner->table('migrations')->createTable()->execute();
-        } catch (Throwable $ex) {
+        } catch (\Throwable $ex) {
             $this->error("Unable to create migrations table due to following:");
             $this->println($ex->getMessage());
             return false;
@@ -139,6 +139,7 @@ class RunMigrationsCommand extends CLICommand {
         return $this->executeMigrations($runner);
     }
     private function executeMigrations(MigrationsRunner $runner) {
+        $this->println("Starting to execute migrations...");
         $listOfApplied = [];
         while ($this->applyNext($runner, $listOfApplied)){};
         

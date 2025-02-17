@@ -78,13 +78,16 @@ class RunMigrationsCommand extends CLICommand {
             $conn = $this->getDBConnection($runner);
         }
         if ($conn !== null) {
-            $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
+            
             try {
                 $this->println("Initializing migrations table...");
+                $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
+                
                 $temp->createMigrationsTable();
                 $this->success("Migrations table succesfully created.");
-            } catch (Throwable $ex) {
-                $this->error('Unable to create migrations table: '.$ex->getMessage());
+            } catch (\Throwable $ex) {
+                $this->error('Unable to create migrations table due to following:');
+                $this->println($ex->getMessage());
                 return -1;
             }
             return 0;

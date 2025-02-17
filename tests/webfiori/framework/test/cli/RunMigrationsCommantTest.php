@@ -268,7 +268,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration('Cool One');
+        $clazz = $this->createMigration('Cool One', 'CLSOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $output = $this->executeMultiCommand([
@@ -304,7 +304,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration('Cool One');
+        $clazz = $this->createMigration('Cool One', 'ColOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $output = $this->executeMultiCommand([
@@ -433,6 +433,9 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations16() {
         $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Starting to execute migrations...\n",
             "Info: No migrations were executed.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -451,7 +454,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--runner' => '\\app\\database\\migrations\\multi\Migration000',
         ]));
-        $this->assertEquals(-2, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test

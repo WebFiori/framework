@@ -107,7 +107,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $output);
         $this->assertEquals(-1, $this->getExitCode());
         
@@ -169,7 +169,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
+            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -212,7 +212,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Starting to execute migrations...\n",
             "Error: Failed to execute migration due to following:\n",
-            "208 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
+            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
             "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
         ], $output);
@@ -268,7 +268,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration('Cool One');
+        $clazz = $this->createMigration('Cool One', 'CLSOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $output = $this->executeMultiCommand([
@@ -304,7 +304,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration('Cool One');
+        $clazz = $this->createMigration('Cool One', 'ColOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
         $output = $this->executeMultiCommand([
@@ -359,7 +359,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Error: Unable to create migrations table due to following:\n",
-            "Unable to connect to database: 18456 - [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $output);
         $this->assertEquals(-1, $this->getExitCode());
         
@@ -433,6 +433,9 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations16() {
         $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Starting to execute migrations...\n",
             "Info: No migrations were executed.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
@@ -451,7 +454,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--runner' => '\\app\\database\\migrations\\multi\Migration000',
         ]));
-        $this->assertEquals(-2, $this->getExitCode());
+        $this->assertEquals(-1, $this->getExitCode());
     }
     /**
      * @test

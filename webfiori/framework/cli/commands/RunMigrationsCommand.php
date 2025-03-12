@@ -139,7 +139,22 @@ class RunMigrationsCommand extends CLICommand {
             $this->error($ex->getMessage());
             return -1;
         }
-        return $this->executeMigrations($runner);
+        if ($this->isArgProvided("--rollback")) {
+            return $this->rollbackMigration($runner);
+        } else {
+            return $this->executeMigrations($runner);
+        }
+    }
+    private function rollbackMigration(MigrationsRunner $runner) {
+        $this->println("Rolling back last executed migration...");
+        $migration = $runner->rollback();
+        
+        if ($migration !== null) {
+            $this->success("Migration '".$migration->getName()."' was successfully rolled back.");
+        } else {
+            $this->info("No migration rolled back.");
+        }
+        return 0;
     }
     private function executeMigrations(MigrationsRunner $runner) {
         $this->println("Starting to execute migrations...");

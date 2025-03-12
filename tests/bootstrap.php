@@ -18,6 +18,7 @@ define('SQL_SERVER_HOST', 'localhost');
 define('SQL_SERVER_USER', 'sa');
 define('SQL_SERVER_PASS', '1234567890@Eu');
 define('SQL_SERVER_DB', 'testing_db');
+define('ODBC_VERSION', 18);
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.

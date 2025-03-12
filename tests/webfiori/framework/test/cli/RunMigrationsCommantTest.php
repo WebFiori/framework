@@ -161,6 +161,15 @@ class RunMigrationsCommantTest extends CLITestCase {
         $clazz = $this->createMigration('Cool', 'CoolOne');
         $this->assertTrue(class_exists($clazz));
         App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+        ], [
+            '7',
+            ''
+        ]);
+        $this->removeClass($clazz);
+        App::getConfig()->removeAllDBConnections();
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
@@ -170,16 +179,9 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Select database connection:\n",
             "0: default-conn <--\n",
             "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
-        ], $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-        ], [
-            '7',
-            ''
-        ]));
+        ], $output);
         $this->assertEquals(-1, $this->getExitCode());
-        $this->removeClass($clazz);
-        App::getConfig()->removeAllDBConnections();
+        
     }
     /**
      * @test
@@ -540,19 +542,11 @@ class RunMigrationsCommantTest extends CLITestCase {
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');
-        $clazz = $this->createMigration('ABCD Cool', 'ABCCool');
-        $this->assertTrue(class_exists($clazz));
+        
+        $ns = '\\app\\database\\migrations';
+        $clazz = $this->createAndRunMigration($conn, $ns, 'ABCD Cool', 'ABCCool');
         App::getConfig()->addOrUpdateDBConnection($conn);
         
-        $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--ns' => '\\app\\database\\migrations',
-            '--connection' => 'default-conn',
-            '--ini'
-        ], [
-            '7',
-            ''
-        ]);
         $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -569,7 +563,219 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Success: Migration 'ABCD Cool' was successfully rolled back.\n",
         ], $output);
         $this->assertEquals(0, $this->getExitCode());
+    }
+    /**
+     * @test
+     */
+    public function testRollback02() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
         
+        $ns = '\\app\\database\\migrations';
+        $clazz = $this->createAndRunMigration($conn, $ns, 'ABCD Cool', 'ABCCool');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--rollback',
+            '--connection' => 'default-conn',
+        ]);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--rollback',
+            '--connection' => 'default-conn',
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeMigTable($conn);
+        $this->removeClass($clazz);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Rolling back last executed migration...\n",
+            "Info: No migration rolled back.\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+    /**
+     * @test
+     */
+    public function testRollback03() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\MultiRunner',
+            '--ini'
+        ]);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+        ]);
+
+        App::getConfig()->removeAllDBConnections();
+        
+        
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back last executed migration...\n",
+            "Success: Migration 'Third One' was successfully rolled back.\n",
+        ], $output);
+        
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+        ]);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back last executed migration...\n",
+            "Success: Migration 'Second one' was successfully rolled back.\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+        ]);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back last executed migration...\n",
+            "Success: Migration 'First One' was successfully rolled back.\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+        ]);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back last executed migration...\n",
+            "Info: No migration rolled back.\n",
+        ], $output);
+        $this->removeMigTable($conn);
+    }
+    /**
+     * @test
+     */
+    public function testRollback04() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\MultiRunner',
+            '--ini'
+        ]);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+            '--all'
+        ]);
+        
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back migrations...\n",
+            "Success: Migration 'Third One' was successfully rolled back.\n",
+            "Success: Migration 'Second one' was successfully rolled back.\n",
+            "Success: Migration 'First One' was successfully rolled back.\n",
+        ], $output);
+        
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multi\\MultiRunner',
+            '--rollback',
+            '--all'
+        ]);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multi' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multi'.\n",
+            "Rolling back migrations...\n",
+            "Info: No migration rolled back.\n",
+        ], $output);
+        $this->removeMigTable($conn);
+    }
+    /**
+     * @test
+     */
+    public function testRollback05() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multiDownErr\MultiErrRunner',
+            '--ini'
+        ]);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multiDownErr\MultiErrRunner',
+            '--rollback',
+            '--all'
+        ]);
+        
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multiDownErr' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiDownErr'.\n",
+            "Rolling back migrations...\n",
+            "Success: Migration 'Third One' was successfully rolled back.\n",
+            "Error: Failed to execute migration due to following:\n",
+            "Call to undefined method webfiori\database\migration\MigrationsRunner::do() (Line 30)\n",
+            "Warning: Execution stopped.\n",
+        ], $output);
+        
+        $this->assertEquals(-1, $this->getExitCode());
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--runner' => '\\app\\database\\migrations\\multiDownErr\MultiErrRunner',
+            '--rollback',
+            '--all'
+        ]);
+        
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations\multiDownErr' for migrations...\n",
+            "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiDownErr'.\n",
+            "Rolling back migrations...\n",
+            "Error: Failed to execute migration due to following:\n",
+            "Call to undefined method webfiori\database\migration\MigrationsRunner::do() (Line 30)\n",
+            "Warning: Execution stopped.\n",
+        ], $output);
+        $this->removeMigTable($conn);
+    }
+    private function createAndRunMigration(ConnectionInfo $connection, string $ns, ?string $name = null, ?string $className = null) : string {
+        $clazz = $this->createMigration($name, $className);
+        App::getConfig()->addOrUpdateDBConnection($connection);
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => $ns,
+            '--connection' => $connection->getName(),
+            '--ini'
+        ]);
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->removeDBConnection($connection->getName());
+        return $clazz;
     }
     private function createMigration(?string $name = null, ?string $className = null) : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);

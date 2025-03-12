@@ -13,12 +13,11 @@ namespace webfiori\framework\cli\commands;
 use Throwable;
 use webfiori\cli\Argument;
 use webfiori\cli\CLICommand;
-use webfiori\database\DatabaseException;
+use webfiori\database\ConnectionInfo;
 use webfiori\database\migration\AbstractMigration;
 use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
-use webfiori\database\ConnectionInfo;
 /**
  *
  * @author Ibrahim
@@ -41,23 +40,10 @@ class RunMigrationsCommand extends CLICommand {
             new Argument('--runner', 'A class that extends the class "webfiori\database\migration\MigrationsRunner".', true),
             new Argument('--ini', 'Creates migrations table in database if not exist.', true),
             new Argument('--rollback', 'Rollback last applied migration.', true),
+            new Argument('--all', 'If provided with the option --rollback, all migrations will be rolled back.', true),
         ], 'Execute database migrations.');
     }
-    private function createMigrationsTable() : bool {
-        $this->println("Initializing migrations table...");
-        try {
-            if ($this->connectionInfo !== null && $this->migrationsRunner->getConnectionInfo() === null) {
-                $this->migrationsRunner->setConnectionInfo($this->connectionInfo);
-            }
-            $this->migrationsRunner->table('migrations')->createTable()->execute();
-        } catch (\Throwable $ex) {
-            $this->error("Unable to create migrations table due to following:");
-            $this->println($ex->getMessage());
-            return false;
-        }
-        $this->success("Migrations table succesfully created.");
-        return true;
-    }
+    
     /**
      * Checks if the argument '--ini' is provided or not and initialize
      * migrations table if provided.
@@ -146,15 +132,48 @@ class RunMigrationsCommand extends CLICommand {
         }
     }
     private function rollbackMigration(MigrationsRunner $runner) {
-        $this->println("Rolling back last executed migration...");
-        $migration = $runner->rollback();
-        
-        if ($migration !== null) {
-            $this->success("Migration '".$migration->getName()."' was successfully rolled back.");
+        $isAll = $this->isArgProvided('--all');
+        $rolledCount = 0;
+        if ($isAll) {
+            $this->println("Rolling back migrations...");
+            do {
+                $migration = $this->doRollback($runner);
+                if ($migration === false) {
+                    return -1;
+                }
+                $this->printInfo($migration, $rolledCount);
+            } while ($migration !== null);
         } else {
+            $this->println("Rolling back last executed migration...");
+            $migration = $this->doRollback($runner);
+            if ($migration === false) {
+                return -1;
+            }
+            $this->printInfo($migration, $rolledCount);
+        }
+        if ($rolledCount == 0) {
             $this->info("No migration rolled back.");
         }
+        
+        
         return 0;
+    }
+    private function doRollback(MigrationsRunner $runner) {
+        try {
+            return $runner->rollback();
+            
+        } catch (Throwable $ex) {
+            $this->error('Failed to execute migration due to following:');
+            $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
+            $this->warning('Execution stopped.');
+            return false;
+        }
+    }
+    private function printInfo(?AbstractMigration $migration, &$rolledCount = 0) {
+        if ($migration !== null) {
+            $rolledCount++;
+            $this->success("Migration '".$migration->getName()."' was successfully rolled back.");
+        }
     }
     private function executeMigrations(MigrationsRunner $runner) {
         $this->println("Starting to execute migrations...");

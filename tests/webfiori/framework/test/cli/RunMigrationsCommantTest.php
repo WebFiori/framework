@@ -107,7 +107,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $output);
         $this->assertEquals(-1, $this->getExitCode());
         
@@ -169,7 +169,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
+            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--ns' => '\\app\\database\\migrations',
@@ -212,7 +212,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Starting to execute migrations...\n",
             "Error: Failed to execute migration due to following:\n",
-            "208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
+            "208 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Invalid object name 'migrations'. (Line 361)\n",
             "Warning: Execution stopped.\n",
             "Info: No migrations were executed.\n"
         ], $output);
@@ -359,7 +359,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "0: default-conn <--\n",
             "Initializing migrations table...\n",
             "Error: Unable to create migrations table due to following:\n",
-            "Unable to connect to database: 18456 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user 'sa'.\n",
+            "Unable to connect to database: 18456 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Login failed for user 'sa'.\n",
         ], $output);
         $this->assertEquals(-1, $this->getExitCode());
         
@@ -498,6 +498,78 @@ class RunMigrationsCommantTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $r = new MultiErrRunner();
         $this->removeMigTable($r->getConnectionInfo());
+    }
+    /**
+     * @test
+     */
+    public function testRollback00() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+        $clazz = $this->createMigration('ABC', 'ABC');
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--rollback',
+            '--connection' => 'default-conn',
+            '--ini'
+        ], [
+            ''
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeMigTable($conn);
+        $this->removeClass($clazz);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Initializing migrations table...\n",
+            "Success: Migrations table succesfully created.\n",
+            "Rolling back last executed migration...\n",
+            "Info: No migration rolled back.\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+    /**
+     * @test
+     */
+    public function testRollback01() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('default-conn');
+        $clazz = $this->createMigration('ABCD Cool', 'ABCCool');
+        $this->assertTrue(class_exists($clazz));
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        
+        $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--connection' => 'default-conn',
+            '--ini'
+        ], [
+            '7',
+            ''
+        ]);
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommand::class,
+            '--ns' => '\\app\\database\\migrations',
+            '--rollback',
+            '--connection' => 'default-conn',
+        ]);
+        App::getConfig()->removeAllDBConnections();
+        $this->removeMigTable($conn);
+        $this->removeClass($clazz);
+        $this->assertEquals([
+            "Checking namespace '\app\database\migrations' for migrations...\n",
+            "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
+            "Rolling back last executed migration...\n",
+            "Success: Migration 'ABCD Cool' was successfully rolled back.\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        
     }
     private function createMigration(?string $name = null, ?string $className = null) : string {
         $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);

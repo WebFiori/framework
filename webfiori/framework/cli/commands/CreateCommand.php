@@ -20,6 +20,7 @@ use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
+use webfiori\framework\cli\helpers\CreateMigration;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
@@ -116,7 +117,7 @@ class CreateCommand extends CLICommand {
                 return -1;
             }
         }  else if ($answer == 'Database migration.') {
-            $create = new \webfiori\framework\cli\helpers\CreateMigration($this);
+            $create = new CreateMigration($this);
             if ($create->isConfigured()) {
                 $create->writeClass();
                 $writer = $create->getWriter();

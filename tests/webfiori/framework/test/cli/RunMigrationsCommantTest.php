@@ -85,7 +85,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations03() {
-        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, 'x123456', SQL_SERVER_DB, 1433, [
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, 'x123456', SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
         $conn->setName('default-conn');

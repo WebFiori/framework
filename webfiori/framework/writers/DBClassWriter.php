@@ -238,7 +238,7 @@ class DBClassWriter extends ClassWriter {
             ], 2);
         }
         $this->append([
-            "\$this->register('".str_replace("\\", "\\\\", $this->getPath())."');",
+            "\$this->register('".str_replace("\\", "\\\\", $this->getNamespace())."');",
         ], 2);
         $this->append('}', 1);
 
@@ -353,7 +353,7 @@ class DBClassWriter extends ClassWriter {
         $this->append($paramsComment, 1);
 
         if (strpos($phpType, '|null') !== false) {
-            $phpType = substr($phpType,0, strlen($phpType) - strlen('|null'));
+            $phpType = '?'.substr($phpType,0, strlen($phpType) - strlen('|null'));
         }
         $this->append([
             " */",

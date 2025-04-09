@@ -85,7 +85,9 @@ class RunMigrationsCommantTest extends CLITestCase {
      * @test
      */
     public function testRunMigrations03() {
-        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, 'x123456', SQL_SERVER_DB);
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, 'x123456', SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
         $conn->setName('default-conn');
         $clazz = $this->createMigration('PO', 'MyPOMigration');
         $this->assertTrue(class_exists($clazz));
@@ -170,6 +172,8 @@ class RunMigrationsCommantTest extends CLITestCase {
         ]);
         $this->removeClass($clazz);
         App::getConfig()->removeAllDBConnections();
+        $err = ODBC_VERSION == 17 ? "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n"
+                : "Error: Unable to connect to database: 18456 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Login failed for user 'sa'.\n";
         $this->assertEquals([
             "Checking namespace '\app\database\migrations' for migrations...\n",
             "Info: Found 1 migration(s) in the namespace '\app\database\migrations'.\n",
@@ -178,7 +182,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Error: Invalid answer.\n",
             "Select database connection:\n",
             "0: default-conn <--\n",
-            "Error: Unable to connect to database: 4060 - [Microsoft][ODBC Driver ".ODBC_VERSION." for SQL Server][SQL Server]Cannot open database \"testing_dbx\" requested by the login. The login failed.\n",
+            $err,
         ], $output);
         $this->assertEquals(-1, $this->getExitCode());
         

@@ -110,7 +110,12 @@ register_shutdown_function(function()
         'TrustServerCertificate' => 'true'
     ]);
     $runner = new MigrationsRunner(APP_PATH, '', $conn);
-    $runner->dropMigrationsTable();
+    try {
+        $runner->dropMigrationsTable();
+    } catch (\Exception $exc) {
+        
+    }
+
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"---------------------------------\n");

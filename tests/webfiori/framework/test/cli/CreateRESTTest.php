@@ -129,7 +129,7 @@ class CreateRESTTest extends CLITestCase {
 
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
-            $this->assertTrue(File::isFileExist(ROOT_PATH.DS.$clazz.'.php'));
+            $this->assertTrue(File::isFileExist(ROOT_PATH.DS. str_replace('\\', DS, $clazz).'.php'));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));

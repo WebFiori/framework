@@ -46,11 +46,12 @@ class CreateMigration extends CreateClassHelper {
             parent::__construct($command, new DatabaseMigrationWriter($runner));
             $this->writer = $this->getWriter();
             $this->setNamespace($ns);
-
+            
+            $this->isConfigured = true;
             if (!$command->isArgProvided('--defaults')) {
                 $this->setClassName($command->readClassName('Provide an optional name for the class that will have migration logic:', null));
                 $this->readClassInfo();
-                $this->isConfigured = true;
+                
             }
         }
     }
@@ -71,8 +72,6 @@ class CreateMigration extends CreateClassHelper {
             } else {
                 return null;
             }
-        } else {
-            return null;
         }
         return new MigrationsRunner($path, $ns, null);
     }

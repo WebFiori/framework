@@ -2,14 +2,16 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\database\ConnectionInfo;
+use webfiori\file\File;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 
 /**
  * Description of CreateRESTTest
  *
  * @author Ibrahim
  */
-class CreateRESTTest extends CreateTestCase {
+class CreateRESTTest extends CLITestCase {
     /**
      * @test
      */
@@ -59,7 +61,7 @@ class CreateRESTTest extends CreateTestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals(array_merge([
-            "Warning: No database connections found in the class \"app\AppConfig\"!\n",
+            "Warning: No database connections found in application configuration.\n",
             "Info: Run the command \"add\" to add connections.\n",
             "Database type:\n",
             "0: mysql\n",
@@ -127,6 +129,7 @@ class CreateRESTTest extends CreateTestCase {
 
         foreach ($apiClazzes as $clazz) {
             $this->assertTrue(class_exists($clazz));
+            $this->assertTrue(File::isFileExist(ROOT_PATH.DS. str_replace('\\', DS, $clazz).'.php'));
         }
         $this->assertTrue(class_exists($tableClazz));
         $this->assertTrue(class_exists($entityClazz));
@@ -190,7 +193,7 @@ class CreateRESTTest extends CreateTestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $this->assertEquals(array_merge([
-            "Warning: No database connections found in the class \"app\AppConfig\"!\n",
+            "Warning: No database connections found in application configuration.\n",
             "Info: Run the command \"add\" to add connections.\n","Database type:\n",
             "0: mysql\n",
             "1: mssql\n",

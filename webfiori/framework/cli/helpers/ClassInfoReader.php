@@ -45,7 +45,7 @@ class ClassInfoReader {
      *
      * @return string A string that represents the name of the class.
      */
-    public function getName($suffix = null, $errMsg = 'Invalid class name is given.') {
+    public function getName(?string $suffix = null, $errMsg = 'Invalid class name is given.') {
         return $this->getOwner()->readClassName('Enter a name for the new class:', $suffix, $errMsg);
     }
     /**
@@ -74,7 +74,7 @@ class ClassInfoReader {
      * @param string $defaultNs An optional default namespace to use in case the
      * user did not provide a one. Note that this also will be the default path.
      *
-     * @param string $suffix An optional string which will be appended to the
+     * @param string|null $suffix An optional string which will be appended to the
      * name of the class.
      *
      * @return array The method will return an array that contains 3 indices:
@@ -85,7 +85,7 @@ class ClassInfoReader {
      * <li><b>path</b>: The location at which the class will be created.</li>
      * </ul>
      */
-    public function readClassInfo($defaultNs = null, $suffix = null) {
+    public function readClassInfo(?string $defaultNs = null, ?string $suffix = null) {
         $classExist = true;
 
         do {

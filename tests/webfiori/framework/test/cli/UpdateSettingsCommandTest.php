@@ -17,7 +17,9 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function test00() {
+        App::getConfig()->remove();
         JsonDriver::setConfigFileName('app-config.json');
+        App::getConfig()->initialize(true);
         $runner = App::getRunner();
         $runner->setArgsVector([
             'webfiori',

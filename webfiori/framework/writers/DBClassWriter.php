@@ -42,8 +42,8 @@ class DBClassWriter extends ClassWriter {
      * @param Table $table The table instance at which the class will build
      * database operations based on.
      */
-    public function __construct($className = 'NewDBOperationsClass', $ns = '\\', Table $table = null) {
-        parent::__construct($className, $ns, $ns);
+    public function __construct(?string $className = 'NewDBOperationsClass', string $ns = '\\', ?Table $table = null) {
+        parent::__construct($className, ROOT_PATH.DS.$ns, $ns);
 
         if ($table !== null) {
             $this->setTable($table);
@@ -238,7 +238,7 @@ class DBClassWriter extends ClassWriter {
             ], 2);
         }
         $this->append([
-            "\$this->register('".str_replace("\\", "\\\\", $this->getPath())."');",
+            "\$this->register('".str_replace("\\", "\\\\", $this->getNamespace())."');",
         ], 2);
         $this->append('}', 1);
 
@@ -353,7 +353,7 @@ class DBClassWriter extends ClassWriter {
         $this->append($paramsComment, 1);
 
         if (strpos($phpType, '|null') !== false) {
-            $phpType = substr($phpType,0, strlen($phpType) - strlen('|null'));
+            $phpType = '?'.substr($phpType,0, strlen($phpType) - strlen('|null'));
         }
         $this->append([
             " */",

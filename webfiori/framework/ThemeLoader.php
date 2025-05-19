@@ -175,7 +175,7 @@ class ThemeLoader {
      *
      * @since 1.0
      */
-    public static function usingTheme(string $themeName = null) {
+    public static function usingTheme(?string $themeName = null) {
         $trimmedName = trim((string)$themeName);
 
         if (strlen($trimmedName) != 0) {
@@ -253,7 +253,9 @@ class ThemeLoader {
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
+                ob_start();
                 $ns = require_once $pathToScan.DS.$fileName;
+                ob_end_clean();
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
 

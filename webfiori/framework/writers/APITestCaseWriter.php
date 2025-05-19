@@ -27,11 +27,11 @@ class APITestCaseWriter extends ClassWriter {
      *
      * @param WebServicesManager|null $manager Web services manager instance.
      *
-     * @param AbstractWebService $service The web service at which the test case
+     * @param AbstractWebService|string|null $service The web service at which the test case
      * will be based on.
      */
-    public function __construct(WebServicesManager $manager = null, $service = null) {
-        parent::__construct('WebService', ROOT_PATH.'\\tests\\apis', 'tests\\apis');
+    public function __construct(?WebServicesManager $manager = null, null|string|AbstractWebService $service = null) {
+        parent::__construct('WebService', ROOT_PATH.DS.'tests'.DS.'apis', 'tests\\apis');
         $this->setSuffix('Test');
 
         if ($manager !== null) {

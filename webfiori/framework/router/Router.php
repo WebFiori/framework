@@ -507,14 +507,16 @@ class Router {
             Response::addHeader('content-type','text/xml');
         };
         self::closure([
-            'path' => '/sitemap.xml',
-            'route-to' => $sitemapFunc,
-            'in-sitemap' => true
+            RouteOption::PATH => '/sitemap.xml',
+            RouteOption::TO => $sitemapFunc,
+            RouteOption::SITEMAP => true,
+            RouteOption::CACHE_DURATION => 86400//1 day
         ]);
         self::closure([
-            'path' => '/sitemap',
-            'route-to' => $sitemapFunc,
-            'in-sitemap' => true
+            RouteOption::PATH => '/sitemap',
+            RouteOption::TO => $sitemapFunc,
+            RouteOption::SITEMAP => true,
+            RouteOption::CACHE_DURATION => 86400//1 day
         ]);
     }
     /**
@@ -529,7 +531,8 @@ class Router {
      * Adds new route to a web page.
      *
      * Note that the route which created using this method will be added to
-     * 'global' and 'web' middleware groups.
+     * 'global' and 'web' middleware groups. Additionally, the routes will
+     * be cached for one hour.
      *
      * @param array $options An associative array that contains route
      * options. Available options are:
@@ -755,13 +758,14 @@ class Router {
         $asApi = $options[RouteOption::API];
         $closureParams = $options[RouteOption::CLOSURE_PARAMS] ;
         $path = $options[RouteOption::PATH];
+        $cache = $options[RouteOption::CACHE_DURATION];
 
         if ($routeType == self::CLOSURE_ROUTE && !is_callable($routeTo)) {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
         $routeUri->setAction($options[RouteOption::ACTION]);
-
+        $routeUri->setCacheDuration($cache);
         if (!$this->hasRouteHelper($routeUri)) {
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
@@ -928,6 +932,12 @@ class Router {
         } else {
             $caseSensitive = true;
         }
+        
+        if (isset($options[RouteOption::CACHE_DURATION])) {
+            $cacheDuration = $options[RouteOption::CACHE_DURATION];
+        } else {
+            $cacheDuration = 0;
+        }
 
         $routeType = $options[RouteOption::TYPE] ?? Router::CUSTOMIZED;
 
@@ -978,7 +988,8 @@ class Router {
             RouteOption::VALUES => $varValues,
             RouteOption::MIDDLEWARE => $mdArr,
             RouteOption::REQUEST_METHODS => $this->getRequestMethodsHelper($options),
-            RouteOption::ACTION => $action
+            RouteOption::ACTION => $action,
+            RouteOption::CACHE_DURATION => $cacheDuration
         ];
     }
     private function copyOptionsToSub($options, &$subRoute) {
@@ -1367,7 +1378,6 @@ class Router {
     private function routeFound(RouterUri $route, bool $loadResource) {
         if ($route->isRequestMethodAllowed()) {
             $this->uriObj = $route;
-            $route->getMiddleware()->insertionSort(false);
 
             foreach ($route->getMiddleware() as $mw) {
                 $mw->before(Request::get(), Response::get());
@@ -1376,7 +1386,6 @@ class Router {
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
                 define('API_CALL', true);
             }
-
             if (is_callable($route->getRouteTo())) {
                 if ($loadResource === true) {
                     call_user_func_array($route->getRouteTo(),$route->getClosureParams());
@@ -1453,6 +1462,7 @@ class Router {
      * @throws RoutingException
      */
     private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
+        
         $pathArray = $routeUri->getPathArray();
         $requestMethod = Request::getMethod();
         $indexToSearch = 'static';
@@ -1600,7 +1610,10 @@ class Router {
         if (gettype($options) == 'array') {
             $options[RouteOption::TYPE] = Router::VIEW_ROUTE;
             self::addToMiddlewareGroup($options, 'web');
-
+            if (!isset($options[RouteOption::CACHE_DURATION])) {
+                //Cache pages for 1 hour by default
+                $options[RouteOption::CACHE_DURATION] = 3600;
+            }
             return Router::getInstance()->addRouteHelper1($options);
         }
 

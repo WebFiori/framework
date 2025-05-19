@@ -3,12 +3,15 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\App;
+use webfiori\framework\config\ClassDriver;
 
 class SettingsCommandTest extends TestCase {
     /**
      * @test
      */
     public function test00() {
+        App::setConfigDriver(ClassDriver::class);
+        App::getConfig()->remove();
         App::getConfig()->initialize(true);
         $runner = App::getRunner();
         $runner->setInputs();

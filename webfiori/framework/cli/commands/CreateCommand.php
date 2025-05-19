@@ -20,6 +20,7 @@ use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateDBAccessHelper;
 use webfiori\framework\cli\helpers\CreateFullRESTHelper;
 use webfiori\framework\cli\helpers\CreateMiddleware;
+use webfiori\framework\cli\helpers\CreateMigration;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
@@ -115,6 +116,17 @@ class CreateCommand extends CLICommand {
             if (!$create->readClassInfo()) {
                 return -1;
             }
+        }  else if ($answer == 'Database migration.') {
+            $create = new CreateMigration($this);
+            if ($create->isConfigured()) {
+                $create->writeClass();
+                $writer = $create->getWriter();
+                $this->info("Migration Name: ".$writer->getMigrationName());
+                $this->info("Migration Order: ".$writer->getMigrationOrder());
+                return 0;
+            } else {
+                return -1;
+            }
         }
 
         return 0;
@@ -131,6 +143,7 @@ class CreateCommand extends CLICommand {
         $options['db'] = 'Database access class based on table.';
         $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
         $options['api-test'] = 'Web service test case.';
+        $options['migration'] = 'Database migration.';
         $options['q'] = 'Quit.';
         $what = $this->getArgValue('--c');
         $answer = null;

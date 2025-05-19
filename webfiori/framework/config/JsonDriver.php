@@ -64,7 +64,7 @@ class JsonDriver implements ConfigurationDriver {
                     'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
                 ], 'none', 'same'),
                 "CLI_HTTP_HOST" => new Json([
-                    "value" => "example.com",
+                    "value" => "127.0.0.1",
                     "description" => "Host name that will be used when runing the application as command line utility."
                 ], 'none', 'same')
             ], 'none', 'same'),
@@ -87,7 +87,7 @@ class JsonDriver implements ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value = null, string $description = null) {
+    public function addEnvVar(string $name, mixed $value = null, ?string $description = null) {
         $this->json->get('env-vars')->add($name, new Json([
             'value' => $value,
             'description' => $description

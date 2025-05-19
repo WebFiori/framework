@@ -1,14 +1,14 @@
 <?php
 namespace webfiori\framework\test\writers;
 
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\test\cli\CreateTestCase;
 use webfiori\framework\writers\MiddlewareClassWriter;
 /**
  *
  * @author Ibrahim
  */
-class MiddlewareWritterTest extends CreateTestCase {
+class MiddlewareWritterTest extends CLITestCase {
     /**
      * @test
      */

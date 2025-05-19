@@ -2,7 +2,10 @@
 
 //Bootstrap file which is used to boot testing process.
 
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
+use webfiori\database\ConnectionInfo;
+use webfiori\database\migration\MigrationsRunner;
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\JsonDriver;
@@ -11,17 +14,24 @@ $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
+define('SQL_SERVER_HOST', 'localhost');
+define('SQL_SERVER_USER', 'sa');
+define('SQL_SERVER_PASS', '1234567890@Eu');
+define('SQL_SERVER_DB', 'testing_db');
+define('ODBC_VERSION', 18);
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
-    __DIR__.$DS.'webfiori',
-    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
+    __DIR__.$DS.'..'.$DS.'webfiori',
+    __DIR__.$DS.'..'.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
 ];
 fprintf(STDOUT, "PHP Version: '".PHP_VERSION."'\n");
 fprintf(STDOUT, "Version ID: '".PHP_VERSION_ID."'\n");
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
+$ROOT = substr(__DIR__, 0, strlen(__DIR__) - strlen(TESTS_DIRECTORY));
+fprintf(STDOUT,"Project Directory: '".$ROOT."'.\n");
 fprintf(STDOUT,'Include Path: \''.get_include_path().'\''."\n");
 fprintf(STDOUT,"Tryning to load the class 'ClassLoader'...\n");
 $isAutoloaderLoaded = false;
@@ -71,15 +81,16 @@ ClassLoader::get([
         'app'
     ],
     'define-root' => true,
-    'root' => __DIR__,
+    'root' => $ROOT,
     'on-load-failure' => 'do-nothing'
 ]);
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
+App::initiate('app', 'public', $ROOT);
 App::start();
 fprintf(STDOUT,'Done.'."\n");
-fprintf(STDOUT,'Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");
+fprintf(STDOUT,'Autoload Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");
 define('TESTS_PATH', ClassLoader::get()->root().$DS.TESTS_DIRECTORY);
 fprintf(STDOUT,'Tests Path: '.TESTS_PATH."\n");
 fprintf(STDOUT,'App Path: '.APP_PATH."\n");
@@ -95,7 +106,18 @@ register_shutdown_function(function()
     App::getConfig()->remove();
     JsonDriver::setConfigFileName('super-confx.json');
     App::getConfig()->remove();
+    $conn = new ConnectionInfo('mssql',SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+        'TrustServerCertificate' => 'true'
+    ]);
+    $runner = new MigrationsRunner(APP_PATH, '', $conn);
+    try {
+        $runner->dropMigrationsTable();
+    } catch (\Exception $exc) {
+        
+    }
+
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Starting to run tests...\n");
+fprintf(STDOUT,"---------------------------------\n");

@@ -13,6 +13,7 @@ namespace webfiori\framework;
 use webfiori\file\exceptions\FileException;
 use webfiori\file\File;
 use webfiori\framework\config\ClassDriver;
+use webfiori\json\Json;
 /**
  * A class which is used to create application initialization classes.
  *
@@ -25,6 +26,7 @@ class Ini {
     private $docEmptyLine;
     private $docEnd;
     private $docStart;
+    private static $DIR_TO_CREATE;
     /**
      * An instance of the class.
      *
@@ -150,11 +152,16 @@ class Ini {
         return self::$singleton;
     }
     public static function mkdir($dir) {
+        self::$DIR_TO_CREATE = $dir;
         if (!is_dir($dir)) {
-            set_error_handler(function (int $errno, string $errstr)
-            {
+            set_error_handler(function (int $errno, string $errstr) {
                 http_response_code(500);
-                die('Unable to create one or more of application directories due to an error: "Code: '.$errno.', Message: '.$errstr.'"');
+                header('content-type:application/json');
+                die('{'
+                    . '"message":"Unable to create application directory due to an error: '.$errstr.'",'
+                    . '"code":'.$errno.','
+                    . '"dir":"'.Json::escapeJSONSpecialChars(self::$DIR_TO_CREATE).'"'
+                    . '}');
             });
             mkdir($dir);
             restore_error_handler();

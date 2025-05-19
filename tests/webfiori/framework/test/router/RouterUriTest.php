@@ -19,9 +19,9 @@ class RouterUriTest extends TestCase {
         $uri = new RouterUri('https://www3.programmingacademia.com:80/test', '');
         MiddlewareManager::register(new TestMiddleware());
         $uri->addMiddleware('global');
-        $this->assertEquals(1, $uri->getMiddleware()->size());
+        $this->assertEquals(1, count($uri->getMiddleware()));
         $uri->addMiddleware('Super Cool Middleware');
-        $this->assertEquals(2, $uri->getMiddleware()->size());
+        $this->assertEquals(2, count($uri->getMiddleware()));
         $this->assertFalse($uri->isDynamic());
     }
     /**

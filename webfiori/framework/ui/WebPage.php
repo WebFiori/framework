@@ -685,7 +685,7 @@ class WebPage {
      *
      * @since 1.0
      */
-    public function includeI18nLables($bool = null) : bool {
+    public function includeI18nLables(?bool $bool = null) : bool {
         if ($bool !== null) {
             $this->includeLables = $bool === true;
         }
@@ -1002,7 +1002,7 @@ class WebPage {
      *
      * @see Theme::usingTheme()
      */
-    public function setTheme($themeNameOrClass = null) {
+    public function setTheme(?string $themeNameOrClass = null) {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
             return;
         }
@@ -1188,7 +1188,7 @@ class WebPage {
         }
         $this->setLang($langCodeFromSession);
     }
-    private function getConfigVar(string $meth, string $default = null, array $params = []) {
+    private function getConfigVar(string $meth, ?string $default = null, array $params = []) {
         try {
             return call_user_func_array([App::getConfig(), $meth], $params);
         } catch (InitializationException $ex) {

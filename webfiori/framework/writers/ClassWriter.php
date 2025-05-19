@@ -131,12 +131,13 @@ abstract class ClassWriter {
      * indices of the array are parameters names and values are types of
      * parameters.
      *
-     * @param string|null $returns An optional name of return type.
+     * @param string|null $returns An optional name of return type. This can be
+     * a string such as 'int|null|Object'.
      *
      * @return string The method will create method definition string and return
      * it.
      */
-    public function f($funcName, $argsArr = [], $returns = null) {
+    public function f($funcName, $argsArr = [], ?string $returns = null) {
         $argsPart = '(';
 
         foreach ($argsArr as $argName => $argType) {
@@ -370,7 +371,7 @@ abstract class ClassWriter {
         if (strlen($trimmed) == 0) {
             return false;
         }
-        $this->path = $path;
+        $this->path = str_replace('\\', DS, str_replace('/', DS, $trimmed));
 
         return true;
     }

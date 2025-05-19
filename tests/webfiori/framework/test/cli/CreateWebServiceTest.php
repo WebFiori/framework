@@ -2,16 +2,18 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamOption;
 use webfiori\http\ParamType;
 use webfiori\http\RequestMethod;
 use webfiori\http\RequestParameter;
+use const ROOT_PATH;
 /**
  *
  * @author Ibrahim
  */
-class CreateWebServiceTest extends CreateTestCase {
+class CreateWebServiceTest extends CLITestCase {
     /**
      * @test
      */
@@ -52,7 +54,8 @@ class CreateWebServiceTest extends CreateTestCase {
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Web service test case.\n",
-            "10: Quit. <--\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
             "Enter a name for the new web service:\n",
@@ -63,9 +66,10 @@ class CreateWebServiceTest extends CreateTestCase {
             "2: GET <--\n",
             "3: HEAD\n",
             "4: OPTIONS\n",
-            "5: POST\n",
-            "6: PUT\n",
-            "7: TRACE\n",
+            "5: PATCH\n",
+            "6: POST\n",
+            "7: PUT\n",
+            "8: TRACE\n",
             "Would you like to add another request method?(y/N)\n",
             "Would you like to add request parameters to the service?(y/N)\n",
             "Enter a name for the request parameter:\n",
@@ -123,7 +127,7 @@ class CreateWebServiceTest extends CreateTestCase {
             'Service\'s Desc',
             '',
             'y',
-            '5',
+            '6',
             'n',
             'y',
             'a-number',
@@ -151,9 +155,10 @@ class CreateWebServiceTest extends CreateTestCase {
             "2: GET <--\n",
             "3: HEAD\n",
             "4: OPTIONS\n",
-            "5: POST\n",
-            "6: PUT\n",
-            "7: TRACE\n",
+            "5: PATCH\n",
+            "6: POST\n",
+            "7: PUT\n",
+            "8: TRACE\n",
             "Would you like to add another request method?(y/N)\n",
             "Request method:\n",
             "0: CONNECT\n",
@@ -161,9 +166,10 @@ class CreateWebServiceTest extends CreateTestCase {
             "2: GET <--\n",
             "3: HEAD\n",
             "4: OPTIONS\n",
-            "5: POST\n",
-            "6: PUT\n",
-            "7: TRACE\n",
+            "5: PATCH\n",
+            "6: POST\n",
+            "7: PUT\n",
+            "8: TRACE\n",
             "Would you like to add another request method?(y/N)\n",
             "Would you like to add request parameters to the service?(y/N)\n",
             "Enter a name for the request parameter:\n",
@@ -220,7 +226,7 @@ class CreateWebServiceTest extends CreateTestCase {
             'Service\'s Desc',
             '',
             'y',
-            '5',
+            '6',
             'n',
             'y',
             'a-number',
@@ -248,9 +254,10 @@ class CreateWebServiceTest extends CreateTestCase {
             "2: GET <--\n",
             "3: HEAD\n",
             "4: OPTIONS\n",
-            "5: POST\n",
-            "6: PUT\n",
-            "7: TRACE\n",
+            "5: PATCH\n",
+            "6: POST\n",
+            "7: PUT\n",
+            "8: TRACE\n",
             "Would you like to add another request method?(y/N)\n",
             "Request method:\n",
             "0: CONNECT\n",
@@ -258,9 +265,10 @@ class CreateWebServiceTest extends CreateTestCase {
             "2: GET <--\n",
             "3: HEAD\n",
             "4: OPTIONS\n",
-            "5: POST\n",
-            "6: PUT\n",
-            "7: TRACE\n",
+            "5: PATCH\n",
+            "6: POST\n",
+            "7: PUT\n",
+            "8: TRACE\n",
             "Would you like to add another request method?(y/N)\n",
             "Would you like to add request parameters to the service?(y/N)\n",
             "Enter a name for the request parameter:\n",

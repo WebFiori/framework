@@ -3,10 +3,11 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\cli\CLICommand;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 /**
  * @author Ibrahim
  */
-class CreateCLICommandTest extends CreateTestCase {
+class CreateCLICommandTest extends CLITestCase {
     /**
      * @test
      */
@@ -39,7 +40,8 @@ class CreateCLICommandTest extends CreateTestCase {
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Web service test case.\n",
-            "10: Quit. <--\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\commands'\n",
             "Enter a name for the command:\n",

@@ -67,7 +67,7 @@ class ClassDriver implements ConfigurationDriver {
      * @param string $description An optional description to describe the porpuse
      * of the constant.
      */
-    public function addEnvVar(string $name, $value = null, string $description = null) {
+    public function addEnvVar(string $name, mixed $value = null, ?string $description = null) {
         $this->configVars['env-vars'][$name] = [
             'value' => $value,
             'description' => $description
@@ -889,12 +889,16 @@ class ClassDriver implements ConfigurationDriver {
             'version-info' => [
                 'version' => '1.0',
                 'version-type' => 'Stable',
-                'release-date' => '2021-01-10'
+                'release-date' => date('Y-m-d')
             ],
             'env-vars' => [
                 'WF_VERBOSE' => [
                     'value' => false,
                     'description' => 'Configure the verbosity of error messsages at run-time. This should be set to true in testing and false in production.'
+                ],
+                "CLI_HTTP_HOST" => [
+                    "value" => "127.0.0.1",
+                    "description" => "Host name that will be used when runing the application as command line utility."
                 ]
             ],
             'site' => [

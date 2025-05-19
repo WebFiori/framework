@@ -4,13 +4,13 @@ namespace webfiori\framework\test\writers;
 use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
-use webfiori\framework\test\cli\CreateTestCase;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\writers\TableClassWriter;
 /**
  *
  * @author Ibrahim
  */
-class TableWritterTest extends CreateTestCase {
+class TableWritterTest extends CLITestCase {
     /**
      * @test
      */

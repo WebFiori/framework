@@ -320,7 +320,7 @@ class PageTest extends TestCase {
         $this->assertEquals('ltr',$page->getWritingDir());
         $this->assertNotNull($page->getTranslation());
         $this->assertEquals('https://127.0.0.1/',$page->getCanonical());
-        $this->assertEquals('http://127.0.0.1',$page->getBase());
+        $this->assertEquals('https://127.0.0.1',$page->getBase());
     }
     /**
      * @test

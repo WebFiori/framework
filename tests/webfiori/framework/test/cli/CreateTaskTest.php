@@ -2,6 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\scheduler\AbstractTask;
 
 /**
@@ -9,7 +10,7 @@ use webfiori\framework\scheduler\AbstractTask;
  *
  * @author Ibrahim
  */
-class CreateTaskTest extends CreateTestCase {
+class CreateTaskTest extends CLITestCase {
     /**
      * @test
      */
@@ -42,7 +43,8 @@ class CreateTaskTest extends CreateTestCase {
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Web service test case.\n",
-            "10: Quit. <--\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
             "Enter a name for the task:\n",
@@ -91,7 +93,8 @@ class CreateTaskTest extends CreateTestCase {
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Web service test case.\n",
-            "10: Quit. <--\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
             "Error: A class in the given namespace which has the given name was found.\n",
@@ -144,7 +147,8 @@ class CreateTaskTest extends CreateTestCase {
             "7: Database access class based on table.\n",
             "8: Complete REST backend (Database table, entity, database access and web services).\n",
             "9: Web service test case.\n",
-            "10: Quit. <--\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
             "Enter a name for the task:\n",

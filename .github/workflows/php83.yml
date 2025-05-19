@@ -2,9 +2,9 @@ name: Build PHP 8.3
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ main, dev ]
 
 jobs:
   
@@ -14,7 +14,7 @@ jobs:
       sql.data:
         image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          SA_PASSWORD: 1234567890@Eu
+          SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
           ACCEPT_EULA: Y
           MSSQL_PID: Express
         ports:
@@ -46,25 +46,30 @@ jobs:
         with:
           mysql version: '5.7'
           mysql database: 'testing_db'
-          mysql root password: 123456
+          mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           mysql user: 'root' 
-          mysql password: 123456
+          mysql password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           
       - name: Wait for MySQL
         run: |
-          while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
+          while ! mysqladmin ping --host=127.0.0.1 --password=${{ secrets.MYSQL_ROOT_PASSWORD }} --silent; do
             sleep 1
           done
           
       - name: Setup MSSQL
-        run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
-          
+        run: |
+         curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+         curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+         sudo apt update
+         sudo apt install mssql-tools18
+         /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} -Q 'create database testing_db' -C
+      
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev
-      
-      - name: Execute Tests
-        run: phpunit
         
+      - name: Execute Tests
+        run: phpunit --configuration tests/phpunit.xml
+      
       - name: CodeCov
         uses: codecov/codecov-action@v4
         with:
@@ -118,5 +123,36 @@ jobs:
         
       - name: Benchmarking
         run: phpbench run tests/webfiori/benchmark --report=default
+  release_staging:
+    name: Prepare Beta Release Branch / Publish Release
+    needs:
+      - "test"
+      - "coding_standards_check"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          release-type: php
+          target-branch: dev
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+  release_prod:
+    name: Prepare Production Release Branch / Publish Release
+    needs:
+      - "test"
+      - "coding_standards_check"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          release-type: php
+          target-branch: master
+          config-file: release-please-config.json
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       

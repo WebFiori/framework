@@ -12,7 +12,6 @@ namespace webfiori\framework\router;
 
 use Closure;
 use InvalidArgumentException;
-use webfiori\collections\LinkedList;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\http\Uri;
 use webfiori\ui\HTMLNode;
@@ -46,6 +45,8 @@ class RouterUri extends Uri {
      */
     private $action;
     private $assignedMiddlewareList;
+    private $sortedMiddleeareList;
+    private $cacheDuration;
     /**
      *
      * @var array
@@ -131,12 +132,34 @@ class RouterUri extends Uri {
         $this->isCS = $caseSensitive;
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
-        $this->assignedMiddlewareList = new LinkedList();
+        $this->assignedMiddlewareList = [];
+        $this->sortedMiddleeareList = [];
 
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
         $this->addMiddleware('global');
+        $this->setCacheDuration(0);
+    }
+    /**
+     * Returns the duration of URI cache.
+     * 
+     * @return int The duration of URI cache. Default value is zero which indicates
+     * that no caching will happen.
+     */
+    public function getCacheDuration() : int {
+        return $this->cacheDuration;
+    }
+    /**
+     * Sets the duration of URI cache.
+     * 
+     * @param int $val A positive value that represent cache duration in seconds.
+     * If 0 is given, it indicates that no caching will happen.
+     */
+    public function setCacheDuration(int $val) {
+        if ($val >= 0) {
+            $this->cacheDuration = $val;
+        }
     }
     /**
      * Adds a language to the set of languages at which the resource that the URI
@@ -168,12 +191,12 @@ class RouterUri extends Uri {
             $group = MiddlewareManager::getGroup($name);
 
             foreach ($group as $mw) {
-                $this->assignedMiddlewareList->add($mw);
+                $this->assignedMiddlewareList[] = $mw;
             }
 
             return;
         }
-        $this->assignedMiddlewareList->add($mw);
+        $this->assignedMiddlewareList[] = $mw;
     }
     /**
      * Returns the name of the action that will be called in the controller.
@@ -238,12 +261,19 @@ class RouterUri extends Uri {
     /**
      * Returns a list that holds objects for the middleware.
      *
-     * @return LinkedList
+     * @return array
      *
-     * @since 1.4.0
      */
-    public function getMiddleware() : LinkedList {
-        return $this->assignedMiddlewareList;
+    public function getMiddleware() : array {
+        if (count($this->assignedMiddlewareList) != count($this->sortedMiddleeareList)) {
+            $compareFunc = function ($a, $b) {
+                return $a->compare($b);
+            };
+            $this->sortedMiddleeareList = $this->assignedMiddlewareList;
+            
+            usort($this->sortedMiddleeareList, $compareFunc);
+        }
+        return $this->sortedMiddleeareList;
     }
 
     /**

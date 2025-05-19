@@ -311,7 +311,7 @@ class PrivilegesGroup implements JsonI {
      *
      * @since 1.1
      */
-    public function setParentGroup(PrivilegesGroup $group = null) : bool {
+    public function setParentGroup(?PrivilegesGroup $group = null) : bool {
         if ($group !== null) {
             if ($group !== $this && $group->getID() != $this->getID()) {
                 $this->parentGroup = $group;

@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/actions/workflows/php84.yml/badge.svg?branch=main"></a>
   <a href="https://codecov.io/gh/WebFiori/framework">
-    <img src="https://codecov.io/gh/WebFiori/framework/branch/master/graph/badge.svg" />
+    <img src="https://codecov.io/gh/WebFiori/framework/branch/main/graph/badge.svg" />
   </a>
   <a href="https://sonarcloud.io/dashboard?id=WebFiori_framework">
       <img src="https://sonarcloud.io/api/project_badges/measure?project=WebFiori_framework&metric=alert_status" />

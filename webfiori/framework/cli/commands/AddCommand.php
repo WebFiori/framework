@@ -75,12 +75,16 @@ class AddCommand extends CLICommand {
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);
-
+        $orgHost = $connInfoObj->getHost();
+        $orgErr = $addConnection !== true ? $addConnection->getMessage() : '';
+        
         if ($addConnection !== true) {
             if ($connInfoObj->getHost() == '127.0.0.1') {
+                $this->println("Trying with 'localhost'...");
                 $connInfoObj->setHost('localhost');
                 $addConnection = $this->tryConnect($connInfoObj);
             } else if ($connInfoObj->getHost() == 'localhost') {
+                $this->println("Trying with '127.0.0.1'...");
                 $connInfoObj->setHost('127.0.0.1');
                 $addConnection = $this->tryConnect($connInfoObj);
             }
@@ -92,8 +96,9 @@ class AddCommand extends CLICommand {
             App::getConfig()->addOrUpdateDBConnection($connInfoObj);
             $this->success('Connection information was stored in application configuration.');
         } else {
+            $connInfoObj->setHost($orgHost);
             $this->error('Unable to connect to the database.');
-            $this->error($addConnection->getMessage());
+            $this->error($orgErr);
             $this->confirmAdd($connInfoObj);
         }
 

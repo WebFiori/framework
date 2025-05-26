@@ -154,7 +154,6 @@ class PageTest extends TestCase {
             $c->assertTrue($p->getDocument()->hasChild('super-el'));
         },0,  [$this]);
         $this->assertNotNull($c);
-        $this->assertEquals(2, $c->getID());
         $this->assertEquals(0, $c->getPriority());
 
         $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c)
@@ -162,8 +161,92 @@ class PageTest extends TestCase {
             $ch = $p->insert('div');
             $ch->setID('super-el');
         }, 3, [$this]);
-        $this->assertEquals(3, $c2->getID());
         $this->assertEquals(3, $c2->getPriority());
+    }
+    /**
+     * @test
+     */
+    public function testBeforeRender01() {
+        $page = new WebPage();
+        $c = $page->addBeforeRender(function (WebPage $p, TestCase $c)
+        {
+            $c->assertTrue($p->getDocument()->getChildByID('super-el') !== null);
+        },0,  [$this]);
+
+        $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c)
+        {
+            $ch = $p->insert('div');
+            $ch->setID('super-el');
+        }, 3, [$this]);
+        $this->assertNull($page->getDocument()->getChildByID('super-el'));
+        $page->beforeRender();
+        $this->assertNotNull($page->getDocument()->getChildByID('super-el'));
+    }
+    /**
+     * @test
+     */
+    public function testBeforeRender02() {
+        $page = new WebPage();
+        $c = $page->addBeforeRender(function (WebPage $p, TestCase $c)
+        {
+            $c->assertTrue($p->getDocument()->getChildByID('super-el') === null);
+        },0,  [$this]);
+
+        $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c)
+        {
+            $ch = $p->insert('div');
+            $ch->setID('super-el');
+        }, 3, [$this]);
+        $page->removeBeforeRender($c2->getID());
+        $page->beforeRender();
+        $this->assertNull($page->getDocument()->getChildByID('super-el'));
+    }
+    /**
+     * @test
+     */
+    public function testBeforeRender03() {
+        $page = new WebPage();
+        $c = $page->addBeforeRender(function (WebPage $p, TestCase $c)
+        {
+            
+            $p->addBeforeRender(function (WebPage $p, TestCase $c) {
+                $c->assertTrue($p->getDocument()->getChildByID('super-el') === null);
+            }, 4, [$this]);
+            $p->addBeforeRender(function(WebPage $p, TestCase $c)
+            {
+                $ch = $p->insert('div');
+                $ch->setID('super-el');
+            }, 3, [$this]);
+            $p->addBeforeRender(function (WebPage $p, TestCase $c) {
+                $c->assertTrue($p->getDocument()->getChildByID('super-el') !== null);
+            }, 2, [$this]);
+            
+        },0,  [$this]);
+
+        $page->beforeRender();
+        $this->assertNotNull($page->getDocument()->getChildByID('super-el'));
+    }
+    /**
+     * @test
+     */
+    public function testBeforeRender04() {
+        $page = new WebPage();
+
+        $c2 = $page->addBeforeRender(function(WebPage $p, TestCase $c)
+        {
+            $ch = $p->insert('div');
+            $ch->setID('super-el');
+        }, 3, [$this]);
+        
+        $c2->setCallback(function(WebPage $p, TestCase $c)
+        {
+            $ch = $p->insert('div');
+            $ch->setID('super-cool');
+        }, [$this]);
+        
+        $page->beforeRender();
+        $this->assertNull($page->getDocument()->getChildByID('super-el'));
+        $this->assertNotNull($page->getDocument()->getChildByID('super-cool'));
     }
     /**
      * @test

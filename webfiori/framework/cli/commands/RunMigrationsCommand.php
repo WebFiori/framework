@@ -232,7 +232,19 @@ class RunMigrationsCommand extends CLICommand {
             return CLIUtils::getConnectionName($this);
         }
     }
+    public function getNext(MigrationsRunner $runner) : ?AbstractMigration {
+        foreach ($runner->getMigrations() as $m) {
+            if ($runner->isApplied($m->getName())) {
+                continue;
+            } else {
+                return $m;
+            }
+        }
+        return null;
+    }
     private function applyNext(MigrationsRunner $runner, &$listOfApplied) : bool {
+        $toBeApplied = $this->getNext($runner);
+        
         try {
             //$this->println("Executing migration...");
             $applied = $runner->applyOne();
@@ -248,6 +260,15 @@ class RunMigrationsCommand extends CLICommand {
             $this->error('Failed to execute migration due to following:');
             $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
             $this->warning('Execution stopped.');
+            $this->warning('Rolling back changes...');
+            
+            try {
+                $toBeApplied->down($runner);
+            } catch (Throwable $exc) {
+                $this->error('Failed to rollback due to following:');
+                $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
+            }
+
             return false;
         }
     }

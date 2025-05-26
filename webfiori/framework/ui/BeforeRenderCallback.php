@@ -42,10 +42,22 @@ class BeforeRenderCallback implements Comparable {
      *
      */
     public function __construct(callable $func, int $priority = 0, array $params = []) {
+        $this->setCallback($func, $params);
+        $this->setPriority($priority >= 0 ? $priority : 0);
+        $this->isExecuted = false;
+        $this->setID(hash('sha256', microtime().''.$priority.random_bytes(20)));
+    }
+    /**
+     * Sets the callback.
+     * 
+     * @param callable $func A function to be executed.
+     * 
+     * @param array $params An optional array that can hold extra parameters to
+     * pass to the callback.
+     */
+    public function setCallback(callable $func, array $params = []) {
         $this->callback = $func;
         $this->params = $params;
-        $this->priority = $priority >= 0 ? $priority : 0;
-        $this->isExecuted = false;
     }
     /**
      * Execute the callback.
@@ -75,9 +87,9 @@ class BeforeRenderCallback implements Comparable {
     /**
      * Returns the identifier of the callback.
      *
-     * @return int The identifier of the callback.
+     * @return string The identifier of the callback.
      */
-    public function getID() : int {
+    public function getID() : string {
         return $this->id;
     }
     /**
@@ -104,9 +116,9 @@ class BeforeRenderCallback implements Comparable {
     /**
      * Sets a unique identifier for the callback.
      *
-     * @param int $id A unique identifier for the callback.
+     * @param string $id A unique identifier for the callback.
      */
-    public function setID(int $id) {
+    public function setID(string $id) {
         $this->id = $id;
     }
     /**

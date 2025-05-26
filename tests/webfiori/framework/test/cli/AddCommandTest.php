@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
+use webfiori\cli\CommandTestCase;
 use webfiori\cli\Runner;
 use webfiori\file\File;
 use webfiori\framework\App;
@@ -13,30 +13,32 @@ use webfiori\framework\config\Controller;
  *
  * @author Ibrahim
  */
-class AddCommandTest extends TestCase {
+class AddCommandTest extends CommandTestCase {
     /**
      * @test
      */
     public function test00() {
+        $output = $this->executeSingleCommand(new AddCommand(), [], [
+            '3'
+        ]);
         $runner = new Runner();
         $runner->setInputs([
             '3'
         ]);
-        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
             "2: New website language.\n",
             "3: Quit. <--\n"
-        ], $runner->getOutput());
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test
      */
     public function testAddDBConnection00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new AddCommand(), [], [
             '0',
             '0',
             '127.0.0.1',
@@ -46,11 +48,8 @@ class AddCommandTest extends TestCase {
             'testing_db',
             ''
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'add'
-        ]);
-        $this->assertEquals(0, $runner->start());
+
+        
         $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) - 1);
         $this->assertEquals([
             "What would you like to add?\n",
@@ -70,7 +69,8 @@ class AddCommandTest extends TestCase {
             "Trying to connect to the database...\n",
             "Success: Connected. Adding the connection...\n",
             "Success: Connection information was stored in application configuration.\n"
-        ], $runner->getOutput());
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test
@@ -111,8 +111,9 @@ class AddCommandTest extends TestCase {
             "Database name:\n",
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
+            "Trying with 'localhost'...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in application configuration.\n"
         ], $runner->getOutput());
@@ -155,8 +156,9 @@ class AddCommandTest extends TestCase {
             "Database name:\n",
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
+            "Trying with 'localhost'...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 2002 - No such file or directory\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
         ], $runner->getOutput());
     }

@@ -236,9 +236,8 @@ class WebPage {
      *
      * @since 1.0
      */
-    public function addBeforeRender(callable $callable, $priority = 0, array $params = []) : BeforeRenderCallback {
+    public function &addBeforeRender(callable $callable, $priority = 0, array $params = []) : BeforeRenderCallback {
         $beforeRender = new BeforeRenderCallback($callable, $priority, $params);
-        $beforeRender->setID($this->beforeRenderCallbacks->size() + 1);
         $this->beforeRenderCallbacks->add($beforeRender);
 
         return $beforeRender;
@@ -729,6 +728,29 @@ class WebPage {
         return $this->theme instanceof Theme;
     }
     /**
+     * Removes a callback given its ID.
+     * 
+     * @param string $id The unique identifier of the callback.
+     * 
+     * @return BeforeRenderCallback|null If removed, an object will be returned
+     * that holds its information. Other than that, null is returned.
+     */
+    public function removeBeforeRender(string $id) : ?BeforeRenderCallback {
+        $index = -1;
+        $tempIndex = 0;
+        
+        foreach ($this->beforeRenderCallbacks as $callback) {
+            
+            if ($callback->getID() == $id) {
+                $index = $tempIndex;
+                break;
+            }
+            $tempIndex++;
+        }
+        
+        return $this->beforeRenderCallbacks->remove($index);
+    }
+    /**
      * Removes a child node from the document of the page.
      *
      * @param HTMLNode|string $node The node that will be removed.  This also
@@ -762,7 +784,7 @@ class WebPage {
      * @since 1.0
      */
     public function render(bool $formatted = false, bool $returnResult = false) {
-        $this->invokeBeforeRender();
+        $this->beforeRender();
 
         if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
@@ -1227,6 +1249,10 @@ class WebPage {
 
         return $headNode;
     }
+    public function beforeRender() {
+        $this->beforeRenderCallbacks->insertionSort(false);
+        $this->invokeBeforeRender();
+    }
     private function invokeBeforeRender(int $current = 0) {
         $currentCount = count($this->beforeRenderCallbacks);
 
@@ -1237,6 +1263,9 @@ class WebPage {
         $newCount = count($this->beforeRenderCallbacks);
 
         if ($newCount != $currentCount) {
+            //This part is used to handel callbacks
+            //which are added during the process of executing
+            //callbacks
             $this->beforeRenderCallbacks->insertionSort(false);
             $this->invokeBeforeRender();
         } else {

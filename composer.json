@@ -33,7 +33,13 @@
         "webfiori/mailer": "v1.3.1",
         "webfiori/err": "v1.2.0"
     },
-    "require-dev": {},
+    "scripts": {
+        "test": "phpunit --configuration tests/phpunit.xml",
+        "test-10": "phpunit --configuration tests/phpunit10.xml"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
     "autoload": {
         "psr-4": {
             "webfiori\\framework\\": "webfiori/framework/"

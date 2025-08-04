@@ -32,7 +32,7 @@ class AddCommandTest extends CommandTestCase {
             "2: New website language.\n",
             "3: Quit. <--\n"
         ], $output);
-        $this->assertSameOutput(0, $this->getExitCode());
+        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test
@@ -51,7 +51,7 @@ class AddCommandTest extends CommandTestCase {
 
         $count = count(App::getConfig()->getDBConnections());
         $connName = 'db-connection-'.$count;
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -95,7 +95,7 @@ class AddCommandTest extends CommandTestCase {
         $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
         $this->assertEquals(0, $runner->start());
 
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -141,7 +141,7 @@ class AddCommandTest extends CommandTestCase {
         $this->assertEquals(0, $runner->start());
         $count = count(App::getConfig()->getDBConnections());
         $connName = 'db-connection-'.($count);
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -178,7 +178,7 @@ class AddCommandTest extends CommandTestCase {
             'ltr',
         ]);
         $this->assertEquals(0, $runner->runCommand(new AddCommand()));
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -207,7 +207,7 @@ class AddCommandTest extends CommandTestCase {
             'EN',
         ]);
         $this->assertEquals(0, $runner->runCommand(new AddCommand()));
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -229,7 +229,7 @@ class AddCommandTest extends CommandTestCase {
         ]);
 
         $this->assertEquals(-1, $runner->runCommand(new AddCommand()));
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -263,7 +263,7 @@ class AddCommandTest extends CommandTestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
-        $this->assertSameOutput([
+        $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
@@ -286,14 +286,5 @@ class AddCommandTest extends CommandTestCase {
         $file = new File(ROOT_PATH.$classPath.'.php');
         $file->remove();
     }
-    public function assertSameOutput(array $expected, array $actual) {
-        $count1 = count($expected);
-        $count2 = count($actual);
-        
-        $loopUpTo = $count1 >= $count2 ? $count2 : $count1;
-        
-        for ($x = 0 ; $x < $loopUpTo ; $x++) {
-            $this->assertStringContainsString($expected[$x], $actual[$x]);
-        }
-    }
+    
 }

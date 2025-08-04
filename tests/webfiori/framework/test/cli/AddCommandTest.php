@@ -49,8 +49,8 @@ class AddCommandTest extends CommandTestCase {
             ''
         ]);
 
-        
-        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) - 1);
+        $count = count(App::getConfig()->getDBConnections());
+        $connName = 'db-connection-'.$count;
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -139,7 +139,8 @@ class AddCommandTest extends CommandTestCase {
             'add'
         ]);
         $this->assertEquals(0, $runner->start());
-        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
+        $count = count(App::getConfig()->getDBConnections());
+        $connName = 'db-connection-'.($count);
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -285,4 +286,5 @@ class AddCommandTest extends CommandTestCase {
         $file = new File(ROOT_PATH.$classPath.'.php');
         $file->remove();
     }
+    
 }

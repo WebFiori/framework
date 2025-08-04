@@ -1,0 +1,67 @@
+name: Build PHP 8.1
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+    
+    services:
+        sql.data:
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          env:
+            SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+            ACCEPT_EULA: Y
+            MSSQL_PID: Express
+          ports:
+            - "1433:1433"
+            
+    steps: 
+
+    - name: Shutdown Ubuntu MySQL
+      run: sudo service mysql stop
+
+    - name: Set up MySQL
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: '5.7'
+        mysql database: 'testing_db'
+        mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        mysql user: 'root' 
+        mysql password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping --host=127.0.0.1 --password=${{ secrets.MYSQL_ROOT_PASSWORD }} --silent; do
+          sleep 1
+        done
+
+    - name: Setup MSSQL
+      run: |
+       curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+       curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+       sudo apt update
+       sudo apt install mssql-tools18
+       /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P ${{ secrets.SA_PASSWORD }} -Q 'create database testing_db' -C
+         
+    - name: Run Tests
+      
+      uses: WebFiori/workflows/.github/workflows/test-php.yaml@main
+      with:
+        php-version: '8.1'
+    
+
+  code-coverage:
+    name: Coverage
+    needs: test
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@main
+    with:
+      php-version: '8.1'
+      coverage-file: 'php-8.1-coverage.xml'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    
+        
+          

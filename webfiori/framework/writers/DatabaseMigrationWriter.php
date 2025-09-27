@@ -11,7 +11,7 @@
 namespace webfiori\framework\writers;
 
 use WebFiori\Database\Database;
-use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\AbstractMigration;
 use WebFiori\Database\Schema\SchemaRunner;
 
 /**
@@ -26,11 +26,11 @@ class DatabaseMigrationWriter extends ClassWriter {
      * Creates new instance of the class.
      *
      */
-    public function __construct(?MigrationsRunner $runner) {
+    public function __construct(?SchemaRunner $runner) {
         $name = 'Migration';
         
         if ($runner !== null) {
-            $count = count($runner->getMigrations());
+            $count = count($runner->getChanges());
             $this->setMigrationOrder($count);
             if ($count < 10) {
                 $name = 'Migration00'.$count;

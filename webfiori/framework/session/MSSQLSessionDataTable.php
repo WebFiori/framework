@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\session;
 
-use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MsSql\MSSQLTable;
 
 /**
  * A class which represents the database table 'session_data'.

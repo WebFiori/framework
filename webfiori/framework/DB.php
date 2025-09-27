@@ -13,7 +13,7 @@ namespace webfiori\framework;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Database;
 use WebFiori\Database\DatabaseException;
-use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
 use WebFiori\Database\Table;
 

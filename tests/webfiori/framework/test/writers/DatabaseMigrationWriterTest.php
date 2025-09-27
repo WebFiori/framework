@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\AbstractMigration;
 use WebFiori\Database\Schema\SchemaRunner;
 use WebFiori\File\File;
 use webfiori\framework\writers\DatabaseMigrationWriter;
@@ -19,7 +19,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $ns = '\\app\\database\\migrations';
         $clazz = "\\app\\database\\migrations\\Migration000";
         $this->removeClass($clazz);
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $this->assertEquals('app\\database\\migrations', $writter->getNamespace());
@@ -31,7 +31,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $writter->writeClass();
         
         $this->assertTrue(class_exists($clazz));
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner($path, $ns, null);
         $migrations = $runner->getMigrations();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
@@ -46,7 +46,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test01() {
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $writter->setClassName('MyMigration');
         $writter->setMigrationName('A test migration.');
@@ -57,7 +57,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $writter->writeClass();
         $clazz = "\\app\\database\\migrations\\MyMigration";
         $this->assertTrue(class_exists($clazz));
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner($path, $ns, null);
         $migrations = $runner->getMigrations();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
@@ -72,13 +72,13 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test02() {
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $writter->writeClass();
         $clazz = "\\app\\database\\migrations\\Migration000";
         $this->assertTrue(class_exists($clazz));
-        $runner2 = new MigrationsRunner($path, $ns, null);
+        $runner2 = new SchemaRunner($path, $ns, null);
         $migrations = $runner2->getMigrations();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
@@ -91,7 +91,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $writter2->writeClass();
         $clazz2 = "\\app\\database\\migrations\\Migration001";
         $this->assertTrue(class_exists($clazz));
-        $runner3 = new MigrationsRunner($path, $ns, null);
+        $runner3 = new SchemaRunner($path, $ns, null);
         $migrations2 = $runner3->getMigrations();
         $this->assertEquals(2, count($migrations2));
         $m01 = $migrations2[1];
@@ -108,7 +108,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
         for ($x = 0 ; $x < 110 ; $x++) {
-            $runner = new MigrationsRunner($path, $ns, null);
+            $runner = new SchemaRunner($path, $ns, null);
             $writter = new DatabaseMigrationWriter($runner);
             if ($x < 10) {
                 $name = 'Migration00'.$x;
@@ -121,7 +121,7 @@ class DatabaseMigrationWriterTest extends TestCase {
             $writter->writeClass();
             $clazz = "\\app\\database\\migrations\\".$name;
             $this->assertTrue(class_exists($clazz));
-            $xRunner = new MigrationsRunner($path, $ns, null);
+            $xRunner = new SchemaRunner($path, $ns, null);
             
             $migrations = $xRunner->getMigrations();
             $this->assertEquals($x + 1, count($migrations));

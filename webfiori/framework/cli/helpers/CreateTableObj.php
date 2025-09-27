@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
-use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\TableClassWriter;

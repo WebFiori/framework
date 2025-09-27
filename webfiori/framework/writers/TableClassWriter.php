@@ -18,7 +18,7 @@ use WebFiori\Database\DataType;
 use WebFiori\Database\EntityMapper;
 use WebFiori\Database\FK;
 use WebFiori\Database\mssql\MSSQLColumn;
-use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\mysql\MySQLColumn;
 use WebFiori\Database\MySql\MySQLTable;
 use WebFiori\Database\Table;
@@ -236,7 +236,7 @@ class TableClassWriter extends ClassWriter {
         if ($this->tableObj instanceof MySQLTable) {
             $this->addUseStatement("WebFiori\Database\MySql\MySQLTable");
         } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->addUseStatement("WebFiori\Database\MSSql\MSSQLTable");
+            $this->addUseStatement("WebFiori\Database\MsSql\MSSQLTable");
         }
         $this->addUseStatement(ColOption::class);
         $this->addUseStatement(DataType::class);

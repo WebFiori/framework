@@ -438,11 +438,10 @@ abstract class AbstractTask implements JsonI {
      * @since 1.0
      */
     public function exec(bool $force = false): bool {
-        $xForce = $force === true;
         $retVal = false;
-        $this->setIsForced($xForce);
+        $this->setIsForced($force);
 
-        if ($xForce || $this->isTime()) {
+        if ($force || $this->isTime()) {
             //Called to set the values of task args
             $this->getArgsValues();
             $isSuccessRun = $this->callMethod('execute');
@@ -1457,14 +1456,13 @@ abstract class AbstractTask implements JsonI {
                 }
 
                 return $retVal;
-            } else {
-                //Step val
-                if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
-                    return self::INV_VAL;
-                }
-
-                return self::STEP_VAL;
             }
+            //Step val
+            if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
+                return self::INV_VAL;
+            }
+
+            return self::STEP_VAL;
         }
 
         return $retVal;
@@ -1575,7 +1573,7 @@ abstract class AbstractTask implements JsonI {
      * @since 1.0
      */
     private function setIsForced(bool $bool) {
-        $this->isForced = $bool === true;
+        $this->isForced = $bool;
     }
 
 

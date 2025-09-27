@@ -1,7 +1,7 @@
 <?php
 namespace app\database;
 
-use webfiori\database\mysql\MySQLTable;
+use WebFiori\Database\MySql\MySQLTable;
 /**
  * A class which represents the database table 'test'.
  * The table which is associated with this class will have the following columns:

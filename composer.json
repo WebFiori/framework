@@ -28,10 +28,10 @@
         "webfiori/jsonx": "v3.3.2",
         "webfiori/ui": "v2.6.4",
         "webfiori/collections": "v1.1.5",
-        "webfiori/database": "v0.10.0",
         "webfiori/cli": "v1.3.1",
         "webfiori/mailer": "v1.3.1",
         "webfiori/err": "v1.2.0"
+        "webfiori/database": "v1.0.*",
     },
     "scripts": {
         "test": "phpunit --configuration tests/phpunit.xml",

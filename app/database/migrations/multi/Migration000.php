@@ -1,8 +1,8 @@
 <?php
 namespace app\database\migrations\multi;
 
-use webfiori\database\Database;
-use webfiori\database\migration\AbstractMigration;
+use WebFiori\Database\Database;
+use WebFiori\Database\migration\AbstractMigration;
 /**
  * A database migration class.
  */

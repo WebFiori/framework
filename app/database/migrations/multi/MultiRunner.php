@@ -1,8 +1,8 @@
 <?php
 namespace app\database\migrations\multi;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Schema\SchemaRunner;
 use const APP_PATH;
 use const DS;
 

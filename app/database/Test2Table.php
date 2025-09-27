@@ -1,7 +1,7 @@
 <?php
 namespace app\database;
 
-use webfiori\database\mysql\MySQLTable;
+use WebFiori\Database\MySql\MySQLTable;
 /**
  * Description of TestTable
  *

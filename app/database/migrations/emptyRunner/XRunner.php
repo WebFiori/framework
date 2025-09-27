@@ -1,7 +1,7 @@
 <?php
 namespace app\database\migrations\emptyRunner;
 
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Schema\SchemaRunner;
 
 
 class XRunner extends MigrationsRunner {

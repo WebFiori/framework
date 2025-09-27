@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\framework\test\writers;
 
-use WebFiori\Database\mssql\MSSQLTable;
-use WebFiori\Database\mysql\MySQLColumn;
+use WebFiori\Database\MsSql\MSSQLTable;
+use WebFiori\Database\MySql\MySQLColumn;
 use WebFiori\Database\MySql\MySQLTable;
 use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\writers\TableClassWriter;

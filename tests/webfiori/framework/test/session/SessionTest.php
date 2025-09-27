@@ -164,7 +164,7 @@ class SessionTest extends TestCase {
         $this->assertEquals(6, $s->getDuration());
         $sessionId = $s->getId();
         $s->close();
-        sleep(7);
+        sleep(1);
         
         // Create new session with same ID to simulate cookie persistence
         $s2 = new Session(['name' => 'session','duration' => 0.1, 'session-id' => $sessionId]);
@@ -225,7 +225,7 @@ class SessionTest extends TestCase {
      */
     public function testStart01($session) {
         $this->assertEquals(0,$session->getPassedTime());
-        sleep(10);
+        sleep(1);
         $session->start();
         $this->assertEquals(SessionStatus::RESUMED,$session->getStatus());
         $this->assertTrue(in_array($session->getStartedAt(),[

@@ -26,13 +26,13 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\Database\Database",
-            "WebFiori\Database\migration\AbstractMigration",
+            "WebFiori\Database\Schema\AbstractMigration",
         ], $writter->getUseStatements());
         $writter->writeClass();
         
         $this->assertTrue(class_exists($clazz));
         $runner = new SchemaRunner($path, $ns, null);
-        $migrations = $runner->getMigrations();
+        $migrations = $runner->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
@@ -58,7 +58,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $clazz = "\\app\\database\\migrations\\MyMigration";
         $this->assertTrue(class_exists($clazz));
         $runner = new SchemaRunner($path, $ns, null);
-        $migrations = $runner->getMigrations();
+        $migrations = $runner->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
@@ -79,7 +79,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $clazz = "\\app\\database\\migrations\\Migration000";
         $this->assertTrue(class_exists($clazz));
         $runner2 = new SchemaRunner($path, $ns, null);
-        $migrations = $runner2->getMigrations();
+        $migrations = $runner2->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
@@ -92,7 +92,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $clazz2 = "\\app\\database\\migrations\\Migration001";
         $this->assertTrue(class_exists($clazz));
         $runner3 = new SchemaRunner($path, $ns, null);
-        $migrations2 = $runner3->getMigrations();
+        $migrations2 = $runner3->getChanges();
         $this->assertEquals(2, count($migrations2));
         $m01 = $migrations2[1];
         $this->assertTrue($m00 instanceof AbstractMigration);
@@ -123,7 +123,7 @@ class DatabaseMigrationWriterTest extends TestCase {
             $this->assertTrue(class_exists($clazz));
             $xRunner = new SchemaRunner($path, $ns, null);
             
-            $migrations = $xRunner->getMigrations();
+            $migrations = $xRunner->getChanges();
             $this->assertEquals($x + 1, count($migrations));
             $m = $migrations[$x];
             $this->assertTrue($m instanceof AbstractMigration);

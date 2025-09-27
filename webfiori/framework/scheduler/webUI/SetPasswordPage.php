@@ -2,7 +2,7 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 
 /**
  * A page which has inputs to set tasks scheduler protection password.

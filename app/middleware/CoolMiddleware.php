@@ -2,8 +2,8 @@
 namespace app\middleware;
 
 use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 /**
  * A middleware which is created using the command "create".
  *

@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\ui\serverErrPage;
 
-use webfiori\error\AbstractHandler;
+use WebFiori\Error\AbstractHandler;
 use webfiori\framework\ui\WebPage;
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or
  * any other errors.

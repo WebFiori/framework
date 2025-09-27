@@ -11,7 +11,7 @@
 namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\AbstractWebService;
+use WebFiori\Http\AbstractWebService;
 /**
  * A service which is used to log out user in scheduler web interface.
  *

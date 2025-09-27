@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\database\Database;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Database;
+use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
 
 /**
  * A writer class which is used to create new database migration.

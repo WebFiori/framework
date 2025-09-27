@@ -1,12 +1,12 @@
 <?php
 namespace webfiori\framework\config;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\email\SMTPAccount;
-use webfiori\file\File;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Mail\SMTPAccount;
+use WebFiori\File\File;
 use webfiori\framework\exceptions\InitializationException;
-use webfiori\http\Uri;
-use webfiori\json\Json;
+use WebFiori\Http\Uri;
+use WebFiori\Json\Json;
 
 /**
  * Application configuration driver which is used to read and write application

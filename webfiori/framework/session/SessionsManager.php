@@ -11,7 +11,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\exceptions\SessionException;
-use webfiori\http\Request;
+use WebFiori\Http\Request;
 /**
  * A class which is used to manage user sessions.
  *

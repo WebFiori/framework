@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\file\File;
+use WebFiori\File\File;
 use webfiori\framework\Theme;
-use webfiori\ui\HeadNode;
+use WebFiori\UI\HeadNode;
 /**
  * A class which is used to create basic theme skeleton.
  *

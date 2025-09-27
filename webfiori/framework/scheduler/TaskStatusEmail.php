@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework\scheduler;
 
-use webfiori\file\File;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\EmailMessage;
-use webfiori\ui\HTMLNode;
-use webfiori\ui\TableRow;
+use WebFiori\UI\HTMLNode;
+use WebFiori\UI\TableRow;
 /**
  * A class which can be used to send an email regarding the status of
  * background task execution.

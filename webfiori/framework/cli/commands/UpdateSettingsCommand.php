@@ -11,9 +11,9 @@
 namespace webfiori\framework\cli\commands;
 
 use Throwable;
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
-use webfiori\cli\InputValidator;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\InputValidator;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
 use webfiori\framework\router\Router;
@@ -26,7 +26,7 @@ use webfiori\framework\Theme;
  *
  * @since 2.3.1
  */
-class UpdateSettingsCommand extends CLICommand {
+class UpdateSettingsCommand extends Command {
     public function __construct() {
         parent::__construct('update-settings', [
             new Argument('--w', 'An argument which is used to indicate what will be updated. '

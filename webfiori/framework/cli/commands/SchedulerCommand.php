@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
 /**
@@ -21,7 +21,7 @@ use webfiori\framework\scheduler\TasksManager;
  * @author Ibrahim
  * @version 1.0
  */
-class SchedulerCommand extends CLICommand {
+class SchedulerCommand extends Command {
     /**
      * Creates new instance of the class.
      * The command will have name '--scheduler'. This command is used to

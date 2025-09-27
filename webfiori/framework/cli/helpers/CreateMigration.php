@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DatabaseMigrationWriter;

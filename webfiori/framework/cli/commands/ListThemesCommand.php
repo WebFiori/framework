@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 use webfiori\framework\ThemeLoader;
 
 /**
@@ -19,7 +19,7 @@ use webfiori\framework\ThemeLoader;
  *
  * @author Ibrahim
  */
-class ListThemesCommand extends CLICommand {
+class ListThemesCommand extends Command {
     /**
      * Creates new instance of the class.
      * The command will have name '--list-themes'. In addition to that,

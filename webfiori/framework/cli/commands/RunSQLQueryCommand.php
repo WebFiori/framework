@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
-use webfiori\database\Database;
-use webfiori\database\DatabaseException;
-use webfiori\database\Table;
-use webfiori\file\File;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
+use WebFiori\Database\Database;
+use WebFiori\Database\DatabaseException;
+use WebFiori\Database\Table;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\DB;
@@ -27,7 +27,7 @@ use webfiori\framework\DB;
  *
  * @version 1.0
  */
-class RunSQLQueryCommand extends CLICommand {
+class RunSQLQueryCommand extends Command {
     public function __construct() {
         parent::__construct('run-query', [
             new Argument('--connection', 'Database connection that the query will be executed on.', true),

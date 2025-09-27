@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework;
 
-use webfiori\email\Email;
-use webfiori\email\exceptions\SMTPException;
-use webfiori\email\SMTPAccount;
+use WebFiori\Mail\Email;
+use WebFiori\Mail\Exceptions\SMTPException;
+use WebFiori\Mail\SMTPAccount;
 use webfiori\framework\exceptions\MissingLangException;
 /**
  * A class that can be used to write HTML formatted Email messages.

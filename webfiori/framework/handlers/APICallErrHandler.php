@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\handlers;
 
-use webfiori\error\AbstractHandler;
+use WebFiori\Error\AbstractHandler;
 use webfiori\framework\App;
 use webfiori\framework\router\Router;
-use webfiori\http\Request;
-use webfiori\http\Response;
-use webfiori\json\Json;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
+use WebFiori\Json\Json;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
  *

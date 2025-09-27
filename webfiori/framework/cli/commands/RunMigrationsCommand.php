@@ -11,18 +11,18 @@
 namespace webfiori\framework\cli\commands;
 
 use Throwable;
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
 /**
  *
  * @author Ibrahim
  */
-class RunMigrationsCommand extends CLICommand {
+class RunMigrationsCommand extends Command {
     /**
      * 
      * @var MigrationsRunner
@@ -37,7 +37,7 @@ class RunMigrationsCommand extends CLICommand {
         parent::__construct('migrations', [
             new Argument('--ns', 'The namespace that holds the migrations', true),
             new Argument('--connection', 'The name of database connection to be used in executing the migrations.', true),
-            new Argument('--runner', 'A class that extends the class "webfiori\database\migration\MigrationsRunner".', true),
+            new Argument('--runner', 'A class that extends the class "WebFiori\Database\Schema\SchemaRunner".', true),
             new Argument('--ini', 'Creates migrations table in database if not exist.', true),
             new Argument('--rollback', 'Rollback last applied migration.', true),
             new Argument('--all', 'If provided with the option --rollback, all migrations will be rolled back.', true),

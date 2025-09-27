@@ -1,9 +1,9 @@
 <?php
 namespace webfiori\framework\cli;
 
-use webfiori\cli\CLICommand;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\Table;
+use WebFiori\Cli\Command;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Table;
 use webfiori\framework\App;
 use webfiori\framework\writers\ClassWriter;
 /**
@@ -21,13 +21,13 @@ class CLIUtils {
      * the application. If no connections are stored in the class 'AppConfig',
      * the method will simply return null.
      *
-     * @param CLICommand $c The command which is used to read inputs and send
+     * @param Command $c The command which is used to read inputs and send
      * outputs.
      *
      * @return ConnectionInfo|null If a connection was found, the method will return it's
      * information as an object of type 'ConnectionInfo'. Other than that null is returned.
      */
-    public static function getConnectionName(CLICommand $c) {
+    public static function getConnectionName(Command $c) {
         $connName = $c->getArgValue('--connection');
         $dbConnections = App::getConfig()->getDBConnections();
         $dbConnectionsNames = array_keys($dbConnections);
@@ -52,7 +52,7 @@ class CLIUtils {
     /**
      * Reads and validates class name.
      *
-     * @param CLICommand $c The command that will be used to read the input from.
+     * @param Command $c The command that will be used to read the input from.
      *
      * @param string|null $suffix An optional string to append to class name.
      *
@@ -61,7 +61,7 @@ class CLIUtils {
      *
      * @return string A string that represents a valid class name.
      */
-    public static function readClassName(CLICommand $c, ?string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
+    public static function readClassName(Command $c, ?string $suffix = null, string $prompt = 'Enter class name:', string $errMsg = 'Invalid class name is given.') : string {
         do {
             $className = $c->readClassName($prompt, $suffix, $errMsg);
 
@@ -85,7 +85,7 @@ class CLIUtils {
     /**
      * Reads and validates class namespace.
      *
-     * @param CLICommand $c The command that will be used to read the input from.
+     * @param Command $c The command that will be used to read the input from.
      *
      * @param string $defaultNs An optional string that will be used as default
      * namespace if no input is provided.
@@ -95,7 +95,7 @@ class CLIUtils {
      *
      * @return string A validated string that represents a namespace.
      */
-    public static function readNamespace(CLICommand $c, string $defaultNs = '\\', string $prompt = 'Enter class namespace:') : string {
+    public static function readNamespace(Command $c, string $defaultNs = '\\', string $prompt = 'Enter class namespace:') : string {
         do {
             $ns = str_replace('/','\\',trim($c->getInput($prompt, $defaultNs)));
             $isNameValid = ClassWriter::isValidNamespace($ns);
@@ -115,13 +115,13 @@ class CLIUtils {
      * If the argument is not specified or invalid, the method will prompt the
      * user to enter class name.
      *
-     * @param CLICommand $c The command which is used to read inputs and send
+     * @param Command $c The command which is used to read inputs and send
      * outputs.
      *
      * @return Table The method will return an instance of the class if
      * successfully created.
      */
-    public static function readTable(CLICommand $c) : Table {
+    public static function readTable(Command $c) : Table {
         $tableClassNameValidity = false;
         $tableClassName = $c->getArgValue('--table');
         $tableObj = null;

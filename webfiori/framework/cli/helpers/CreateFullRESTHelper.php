@@ -10,16 +10,16 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Table;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\writers\DBClassWriter;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\TableClassWriter;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\json\Json;
+use WebFiori\Json\Json;
 /**
  * A helper class for creating database tables classes.
  *

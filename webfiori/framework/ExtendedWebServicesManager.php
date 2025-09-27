@@ -11,11 +11,11 @@
 namespace webfiori\framework;
 
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\AbstractWebService;
-use webfiori\http\Request;
-use webfiori\http\WebServicesManager;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\Request;
+use WebFiori\Http\WebServicesManager;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language
  * response messages.

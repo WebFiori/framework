@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\database\Database;
-use webfiori\database\DatabaseException;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Database;
+use WebFiori\Database\DatabaseException;
+use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Table;
 
 /**
  * A class that can be used to represent system database.

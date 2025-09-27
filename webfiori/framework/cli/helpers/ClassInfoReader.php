@@ -11,7 +11,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use InvalidArgumentException;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Command;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\Util;
 /**
@@ -23,16 +23,16 @@ use webfiori\framework\Util;
 class ClassInfoReader {
     /**
      *
-     * @var CLICommand
+     * @var Command
      */
     private $ownerCommand;
     /**
      * Creates new instance of the class.
      *
-     * @param CLICommand $owner The command that owns the reader. Its used to read
+     * @param Command $owner The command that owns the reader. Its used to read
      * user input and send output.
      */
-    public function __construct(CLICommand $owner) {
+    public function __construct(Command $owner) {
         $this->ownerCommand = $owner;
     }
 
@@ -63,7 +63,7 @@ class ClassInfoReader {
     /**
      * Returns the command that owns the instance.
      *
-     * @return CLICommand
+     * @return Command
      */
     public function getOwner() {
         return $this->ownerCommand;

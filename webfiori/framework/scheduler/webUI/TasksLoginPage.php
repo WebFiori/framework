@@ -11,7 +11,7 @@
 namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 /**
  * A page which is used to show login form to enter login information to
  * access tasks management web interface.

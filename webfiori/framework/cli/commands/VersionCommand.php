@@ -10,13 +10,13 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Command;
 /**
  * Description of VersionCommand
  *
  * @author Ibrahim
  */
-class VersionCommand extends CLICommand {
+class VersionCommand extends Command {
     public function __construct() {
         parent::__construct('v', [], 'Display framework version info.');
     }

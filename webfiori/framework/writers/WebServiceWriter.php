@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\http\AbstractWebService;
-use webfiori\http\ParamOption;
-use webfiori\http\ParamType;
-use webfiori\http\RequestMethod;
-use webfiori\http\RequestParameter;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\ParamOption;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\RequestParameter;
 
 /**
  * A writer class which is used to create new web service class.

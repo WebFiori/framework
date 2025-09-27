@@ -13,14 +13,13 @@ namespace webfiori\framework\scheduler;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
-use webfiori\collections\Queue;
-use webfiori\error\TraceEntry;
+use WebFiori\Collections\Queue;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
 use webfiori\framework\Util;
-use webfiori\http\Request;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
+use WebFiori\Http\Request;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
 /**
  * An abstract class that contains basic functionality for implementing background
  * tasks.
@@ -1539,12 +1538,12 @@ abstract class AbstractTask implements JsonI {
         $trace = debug_backtrace();
         $firstEntry = $ex->getTrace()[0];
         $firstEntry['line'] = $ex->getLine();
-        $e = new TraceEntry($firstEntry);
+        $e = "File: " . ($firstEntry["file"] ?? "unknown") . " Line: " . ($firstEntry["line"] ?? "unknown");
         TasksManager::log('#'.$index.' '.$e);
         $index++;
 
         foreach ($trace as $traceEntry) {
-            $e = new TraceEntry($traceEntry);
+            $e = "File: " . ($traceEntry["file"] ?? "unknown") . " Line: " . ($traceEntry["line"] ?? "unknown");
             TasksManager::log('#'.$index.' '.$e);
             $index++;
         }

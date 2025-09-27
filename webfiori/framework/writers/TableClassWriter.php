@@ -12,16 +12,16 @@ namespace webfiori\framework\writers;
 
 use const APP_DIR;
 use const APP_PATH;
-use webfiori\database\ColOption;
-use webfiori\database\Column;
-use webfiori\database\DataType;
-use webfiori\database\EntityMapper;
-use webfiori\database\FK;
-use webfiori\database\mssql\MSSQLColumn;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
+use WebFiori\Database\ColOption;
+use WebFiori\Database\Column;
+use WebFiori\Database\DataType;
+use WebFiori\Database\EntityMapper;
+use WebFiori\Database\FK;
+use WebFiori\Database\mssql\MSSQLColumn;
+use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\mysql\MySQLColumn;
+use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Table;
 
 /**
  * A class which is used to write database table classes.
@@ -49,7 +49,7 @@ class TableClassWriter extends ClassWriter {
     /**
      * Creates new instance of the class.
      *
-     * @param Table $tableObj An object of type 'webfiori\database\Table' which contains the
+     * @param Table $tableObj An object of type 'WebFiori\Database\Table' which contains the
      * information of the table class that will be created.
      * @param array $classInfoArr An associative array that contains the information
      * of the class that will be created. The array must have the following indices:
@@ -234,9 +234,9 @@ class TableClassWriter extends ClassWriter {
     }
     private function addAllUse() {
         if ($this->tableObj instanceof MySQLTable) {
-            $this->addUseStatement("webfiori\database\mysql\MySQLTable");
+            $this->addUseStatement("WebFiori\Database\MySql\MySQLTable");
         } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
+            $this->addUseStatement("WebFiori\Database\MSSql\MSSQLTable");
         }
         $this->addUseStatement(ColOption::class);
         $this->addUseStatement(DataType::class);

@@ -1,12 +1,12 @@
 <?php
 namespace webfiori\framework\config;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\email\SMTPAccount;
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Mail\SMTPAccount;
+use WebFiori\File\exceptions\FileException;
+use WebFiori\File\File;
 use webfiori\framework\writers\LangClassWriter;
-use webfiori\http\Uri;
+use WebFiori\Http\Uri;
 
 /**
  * A configuration driver which is used to store configuration on PHP class.

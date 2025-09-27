@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\APITestCaseWriter;
-use webfiori\http\WebServicesManager;
+use WebFiori\Http\WebServicesManager;
 /**
  * A helper class which is used to help in creating test cases for web APIs classes using CLI.
  *

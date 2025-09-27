@@ -11,13 +11,13 @@
 namespace webfiori\framework\cli\helpers;
 
 use Throwable;
-use webfiori\cli\CLICommand;
-use webfiori\cli\InputValidator;
-use webfiori\database\Column;
-use webfiori\database\mssql\MSSQLColumn;
-use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\InputValidator;
+use WebFiori\Database\Column;
+use WebFiori\Database\mssql\MSSQLColumn;
+use WebFiori\Database\mysql\MySQLColumn;
+use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Table;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\DB;
@@ -34,7 +34,7 @@ class TableObjHelper {
     /**
      * Creates new instance of the class.
      *
-     * @param CLICommand $c
+     * @param Command $c
      *
      * @param Table $t An instance at which the class will use to create or
      * modify as class.

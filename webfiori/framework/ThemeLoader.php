@@ -15,11 +15,11 @@ use Error;
 use Exception;
 use const ROOT_PATH;
 use const THEMES_PATH;
-use webfiori\file\File;
+use WebFiori\File\File;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 
 
 /**

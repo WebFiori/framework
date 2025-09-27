@@ -13,7 +13,7 @@ namespace webfiori\framework\ui;
 use Error;
 use Exception;
 use TypeError;
-use webfiori\collections\LinkedList;
+use WebFiori\Collections\LinkedList;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\MissingLangException;
@@ -26,12 +26,12 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
 use webfiori\framework\Util;
-use webfiori\http\Request;
-use webfiori\http\Response;
-use webfiori\json\Json;
-use webfiori\ui\HeadNode;
-use webfiori\ui\HTMLDoc;
-use webfiori\ui\HTMLNode;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
+use WebFiori\Json\Json;
+use WebFiori\UI\HeadNode;
+use WebFiori\UI\HTMLDoc;
+use WebFiori\UI\HTMLNode;
 require_once 'ui-functions.php';
 /**
  * A base class that can be used to implement web pages.

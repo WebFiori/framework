@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\middleware;
 
-use webfiori\collections\Comparable;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Collections\Comparable;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 
 /**
  * An abstract class that can be used to implement custom middleware.

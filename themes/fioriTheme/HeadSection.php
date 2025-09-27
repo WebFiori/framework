@@ -1,7 +1,7 @@
 <?php
 namespace themes\fioriTheme;
 
-use webfiori\ui\HeadNode;
+use WebFiori\UI\HeadNode;
 
 /**
  * A class that represents "head" tag of the theme.

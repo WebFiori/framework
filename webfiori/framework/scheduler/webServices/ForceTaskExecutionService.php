@@ -11,9 +11,9 @@
 namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\http\RequestParameter;
-use webfiori\http\WebServicesManager;
-use webfiori\json\Json;
+use WebFiori\Http\RequestParameter;
+use WebFiori\Http\WebServicesManager;
+use WebFiori\Json\Json;
 /**
  * A web service which is used to force task execution using web interface.
  *

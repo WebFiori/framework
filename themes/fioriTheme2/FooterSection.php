@@ -1,7 +1,7 @@
 <?php
 namespace themes\fioriTheme2;
 
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 
 /**
  * A class that represents footer section of the theme.

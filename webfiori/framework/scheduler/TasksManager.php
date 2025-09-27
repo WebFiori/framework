@@ -12,10 +12,10 @@ namespace webfiori\framework\scheduler;
 
 use const DS;
 use Exception;
-use webfiori\cli\CLICommand;
-use webfiori\cli\Runner;
-use webfiori\collections\Queue;
-use webfiori\file\File;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Runner;
+use WebFiori\Collections\Queue;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\router\Router;
@@ -61,7 +61,7 @@ class TasksManager {
     private $activeTask;
     /**
      *
-     * @var CLICommand
+     * @var Command
      */
     private $command;
     /**

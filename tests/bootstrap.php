@@ -4,8 +4,8 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
-use webfiori\database\ConnectionInfo;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\JsonDriver;
@@ -14,11 +14,11 @@ $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
-define('SQL_SERVER_HOST', 'localhost');
+define('SQL_SERVER_HOST', 'localhost\SQLEXPRESS');
 define('SQL_SERVER_USER', 'sa');
 define('SQL_SERVER_PASS', '1234567890@Eu');
 define('SQL_SERVER_DB', 'testing_db');
-define('ODBC_VERSION', 18);
+define('ODBC_VERSION', 17);
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.

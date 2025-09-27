@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\TableObjHelper;
@@ -20,7 +20,7 @@ use webfiori\framework\cli\helpers\TableObjHelper;
  *
  * @author Ibrahim
  */
-class UpdateTableCommand extends CLICommand {
+class UpdateTableCommand extends Command {
     /**
      * Creates new instance of the class.
      */

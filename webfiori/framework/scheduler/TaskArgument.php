@@ -11,8 +11,8 @@
 namespace webfiori\framework\scheduler;
 
 use InvalidArgumentException;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
 /**
  * A class that represents execution argument of a task.
  *

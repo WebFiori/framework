@@ -12,11 +12,11 @@ namespace webfiori\framework;
 
 use ReflectionClass;
 use webfiori\framework\ui\WebPage;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
-use webfiori\ui\exceptions\InvalidNodeNameException;
-use webfiori\ui\HeadNode;
-use webfiori\ui\HTMLNode;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
+use WebFiori\UI\exceptions\InvalidNodeNameException;
+use WebFiori\UI\HeadNode;
+use WebFiori\UI\HTMLNode;
 /**
  * A base class that is used to construct website UI.
  *

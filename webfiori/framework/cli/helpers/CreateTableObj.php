@@ -10,13 +10,13 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\cli\CLICommand;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
+use WebFiori\Cli\Command;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\MSSql\MSSQLTable;
+use WebFiori\Database\MySql\MySQLTable;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\TableClassWriter;
-use webfiori\json\CaseConverter;
+use WebFiori\Json\CaseConverter;
 /**
  * A helper class for creating database tables classes.
  *
@@ -30,7 +30,7 @@ class CreateTableObj extends CreateClassHelper {
      *
      * @param Table $t An optional table instance to associate the writer with.
      */
-    public function __construct(CLICommand $command) {
+    public function __construct(Command $command) {
         parent::__construct($command, new TableClassWriter());
     }
 

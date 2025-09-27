@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\cli\Runner;
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\Cli\Runner;
+use WebFiori\File\exceptions\FileException;
+use WebFiori\File\File;
 use webfiori\framework\exceptions\SessionException;
 /**
  * The default sessions storage engine.

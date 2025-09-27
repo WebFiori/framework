@@ -1,8 +1,8 @@
 <?php
 
 use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 
 /**
  * Description of TestMiddleware

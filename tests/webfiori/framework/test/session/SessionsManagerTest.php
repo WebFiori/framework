@@ -2,8 +2,8 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\DatabaseSessionStorage;

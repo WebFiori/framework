@@ -2,7 +2,7 @@
 namespace webfiori\framework\test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 
 /**
  * Description of RequestTest

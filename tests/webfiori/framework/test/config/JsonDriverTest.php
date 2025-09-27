@@ -2,9 +2,9 @@
 namespace webfiori\framework\test\config;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\ConnectionInfo;
-use webfiori\email\SMTPAccount;
-use webfiori\file\File;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Mail\SMTPAccount;
+use WebFiori\File\File;
 use webfiori\framework\config\JsonDriver;
 use const DS;
 /**

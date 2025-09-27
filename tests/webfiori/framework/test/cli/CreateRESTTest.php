@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\database\ConnectionInfo;
-use webfiori\file\File;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
 

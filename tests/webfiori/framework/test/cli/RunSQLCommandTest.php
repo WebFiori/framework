@@ -3,8 +3,8 @@ namespace webfiori\framework\test\cli;
 
 use tables\Schema;
 use tables\Schema2;
-use webfiori\cli\CommandTestCase;
-use webfiori\database\ConnectionInfo;
+use WebFiori\Cli\CommandTestCase;
+use WebFiori\Database\ConnectionInfo;
 use webfiori\framework\App;
 use webfiori\framework\config\Controller;
 use webfiori\framework\config\JsonDriver;

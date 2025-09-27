@@ -2,9 +2,9 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
-use webfiori\file\File;
+use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
+use WebFiori\File\File;
 use webfiori\framework\writers\DatabaseMigrationWriter;
 
 /**
@@ -25,8 +25,8 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals('app\\database\\migrations', $writter->getNamespace());
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\database\Database",
-            "webfiori\database\migration\AbstractMigration",
+            "WebFiori\Database\Database",
+            "WebFiori\Database\migration\AbstractMigration",
         ], $writter->getUseStatements());
         $writter->writeClass();
         

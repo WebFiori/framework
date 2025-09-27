@@ -11,7 +11,7 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\User;
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 /**
  * Description of PageTest
  *

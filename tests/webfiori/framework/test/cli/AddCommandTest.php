@@ -1,9 +1,9 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\cli\CommandTestCase;
-use webfiori\cli\Runner;
-use webfiori\file\File;
+use WebFiori\Cli\CommandTestCase;
+use WebFiori\Cli\Runner;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\config\Controller;
@@ -92,7 +92,7 @@ class AddCommandTest extends CommandTestCase {
             'webfiori',
             'add'
         ]);
-        $connName = 'db-connection-'.count(App::getConfig()->getDBConnections());
+        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
         $this->assertEquals(0, $runner->start());
 
         $this->assertEquals([
@@ -140,7 +140,7 @@ class AddCommandTest extends CommandTestCase {
         ]);
         $this->assertEquals(0, $runner->start());
         $count = count(App::getConfig()->getDBConnections());
-        $connName = 'db-connection-'.($count);
+        $connName = 'db-connection-'.$count;
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",

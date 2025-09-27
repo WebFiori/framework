@@ -3,11 +3,11 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
-use webfiori\http\AbstractWebService;
-use webfiori\http\ParamOption;
-use webfiori\http\ParamType;
-use webfiori\http\RequestMethod;
-use webfiori\http\RequestParameter;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\ParamOption;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\RequestParameter;
 use const ROOT_PATH;
 /**
  *

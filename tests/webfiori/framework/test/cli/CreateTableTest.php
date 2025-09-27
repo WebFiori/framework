@@ -2,11 +2,11 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\DataType;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
-use webfiori\file\File;
+use WebFiori\Database\DataType;
+use WebFiori\Database\mssql\MSSQLTable;
+use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Table;
+use WebFiori\File\File;
 use webfiori\framework\App;
 /**
  * Description of CreateTableTest

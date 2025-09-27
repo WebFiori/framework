@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\cli\commands\CreateCommand;
 /**

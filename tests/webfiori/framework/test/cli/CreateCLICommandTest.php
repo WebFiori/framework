@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\CLICommand;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
 /**

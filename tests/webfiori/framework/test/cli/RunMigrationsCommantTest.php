@@ -2,9 +2,9 @@
 namespace webfiori\framework\test\cli;
 
 use app\database\migrations\multiErr\MultiErrRunner;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\cli\commands\RunMigrationsCommand;
@@ -746,7 +746,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Rolling back migrations...\n",
             "Success: Migration 'Third One' was successfully rolled back.\n",
             "Error: Failed to execute migration due to following:\n",
-            "Call to undefined method webfiori\database\migration\MigrationsRunner::do() (Line 30)\n",
+            "Call to undefined method WebFiori\Database\Schema\SchemaRunner::do() (Line 30)\n",
             "Warning: Execution stopped.\n",
         ], $output);
         
@@ -763,7 +763,7 @@ class RunMigrationsCommantTest extends CLITestCase {
             "Info: Found 3 migration(s) in the namespace '\app\database\migrations\multiDownErr'.\n",
             "Rolling back migrations...\n",
             "Error: Failed to execute migration due to following:\n",
-            "Call to undefined method webfiori\database\migration\MigrationsRunner::do() (Line 30)\n",
+            "Call to undefined method WebFiori\Database\Schema\SchemaRunner::do() (Line 30)\n",
             "Warning: Execution stopped.\n",
         ], $output);
         $this->removeMigTable($conn);

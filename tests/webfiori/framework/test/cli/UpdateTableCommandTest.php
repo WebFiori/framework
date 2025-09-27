@@ -2,8 +2,8 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\Table;
-use webfiori\file\File;
+use WebFiori\Database\Table;
+use WebFiori\File\File;
 use webfiori\framework\App;
 
 class UpdateTableCommandTest extends TestCase {
@@ -292,7 +292,7 @@ class UpdateTableCommandTest extends TestCase {
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
         $fk = $obj->getForeignKey('new_fk');
-        $this->assertTrue($fk instanceof \webfiori\database\ForeignKey);
+        $this->assertTrue($fk instanceof \WebFiori\Database\ForeignKey);
         $this->assertTrue($fk->getSource() instanceof \app\database\Test2Table);
         $col1 = $fk->getOwnerCols()['id'];
         $this->assertEquals('`id`', $col1->getName());

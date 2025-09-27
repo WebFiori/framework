@@ -3,8 +3,8 @@ namespace webfiori\framework\test;
 
 use app\database\TestTable;
 use PHPUnit\Framework\TestCase;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
 use webfiori\framework\App;
 use webfiori\framework\DB;
 

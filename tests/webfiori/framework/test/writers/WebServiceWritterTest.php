@@ -3,7 +3,7 @@ namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\http\AbstractWebService;
+use WebFiori\Http\AbstractWebService;
 /**
  * @author Ibrahim
  */
@@ -17,9 +17,9 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
             "webfiori\\http\\RequestMethod"
         ], $writter->getUseStatements());
     }
@@ -33,9 +33,9 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
             "webfiori\\http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
@@ -61,9 +61,9 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
             "webfiori\\http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([

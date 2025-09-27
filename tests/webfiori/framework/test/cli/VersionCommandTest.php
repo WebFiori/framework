@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\Runner;
+use WebFiori\Cli\Runner;
 use webfiori\framework\cli\commands\VersionCommand;
 /**
  * Description of VersionCommandTest

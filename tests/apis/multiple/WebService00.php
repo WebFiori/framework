@@ -1,10 +1,10 @@
 <?php
 namespace tests\apis\multiple;
 
-use webfiori\http\AbstractWebService;
-use webfiori\http\ParamType;
-use webfiori\http\ParamOption;
-use webfiori\http\RequestMethod;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\ParamOption;
+use WebFiori\Http\RequestMethod;
 
 
 /**

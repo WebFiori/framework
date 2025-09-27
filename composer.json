@@ -23,7 +23,6 @@
         "ext-fileinfo": "*",
         "ext-openssl": "*",
         "webfiori/cache": "v1.1.0",
-        "webfiori/http": "v3.6.1",
         "webfiori/file": "v1.3.8",
         "webfiori/jsonx": "v3.3.2",
         "webfiori/ui": "v2.6.4",
@@ -31,6 +30,7 @@
         "webfiori/cli": "v1.3.1",
         "webfiori/mailer": "v1.3.1",
         "webfiori/err": "v1.2.0"
+        "webfiori/http": "v4.0.*",
         "webfiori/database": "v1.0.*",
     },
     "scripts": {

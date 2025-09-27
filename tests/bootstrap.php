@@ -109,9 +109,9 @@ register_shutdown_function(function()
     $conn = new ConnectionInfo('mssql',SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
         'TrustServerCertificate' => 'true'
     ]);
-    $runner = new MigrationsRunner(APP_PATH, '', $conn);
+    $runner = new SchemaRunner(APP_PATH, '', $conn);
     try {
-        $runner->dropMigrationsTable();
+        $runner->dropChangesTable();
     } catch (\Exception $exc) {
         
     }

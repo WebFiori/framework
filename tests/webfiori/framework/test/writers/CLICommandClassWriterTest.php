@@ -2,15 +2,15 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use WebFiori\Cli\CLICommand;
-use webfiori\framework\writers\CLICommandClassWriter;
+use WebFiori\Cli\Command;
+use webfiori\framework\writers\CommandClassWriter;
 
 class CLICommandClassWriterTest extends TestCase {
     /**
      * @test
      */
     public function test00() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertEquals('NewCommand', $writer->getName());
         $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'NewCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
@@ -18,7 +18,7 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $this->assertEquals([
-            'WebFiori\Cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $this->assertTrue(class_exists($writer->getNamespace().'\\'.$writer->getName()));
@@ -28,7 +28,7 @@ class CLICommandClassWriterTest extends TestCase {
      * @test
      */
     public function test01() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertFalse($writer->setCommandName('invalid name'));
         $this->assertFalse($writer->setCommandName('   '));
         $this->assertTrue($writer->setCommandName('Lets-Do-It'));
@@ -49,14 +49,14 @@ class CLICommandClassWriterTest extends TestCase {
         $writer->setCommandDescription('Random desc');
         $this->assertEquals('Random desc', $writer->getDescription());
         $this->assertEquals([
-            'WebFiori\Cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $clazz = $writer->getNamespace().'\\'.$writer->getName();
         $this->assertTrue(class_exists($clazz));
         $writer->removeClass();
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertTrue($clazzObj instanceof Command);
         $this->assertEquals('Lets-Do-It', $clazzObj->getName());
         $this->assertEquals('Random desc', $clazzObj->getDescription());
         $this->assertEquals([
@@ -71,7 +71,7 @@ class CLICommandClassWriterTest extends TestCase {
      * @test
      */
     public function test02() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertFalse($writer->setCommandName('invalid name'));
         $this->assertFalse($writer->setCommandName('   '));
         $this->assertTrue($writer->setCommandName('Lets-Do-It'));
@@ -92,14 +92,14 @@ class CLICommandClassWriterTest extends TestCase {
         $writer->setCommandDescription(' ');
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([
-            'WebFiori\Cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $clazz = $writer->getNamespace().'\\'.$writer->getName();
         $this->assertTrue(class_exists($clazz));
         $writer->removeClass();
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertTrue($clazzObj instanceof Command);
         $this->assertEquals('Lets-Do-It', $clazzObj->getName());
         $this->assertEquals('<NO DESCRIPTION>', $clazzObj->getDescription());
         $this->assertEquals([

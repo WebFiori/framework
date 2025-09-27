@@ -71,7 +71,7 @@ class AddCommand extends Command {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1)));
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);

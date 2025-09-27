@@ -87,11 +87,7 @@ class TaskStatusEmail extends EmailMessage {
             $this->insert($paragraph);
             $this->insert('p')->text('Technical Info:');
             $this->insert($this->createTaskInfoTable($activeTask));
-            $logTxt = '';
-
-            foreach (TasksManager::getLogArray() as $logEntry) {
-                $logTxt .= $logEntry."\r\n";
-            }
+            $logTxt = implode("\r\n", TasksManager::getLogArray()) . "\r\n";
             $file = new File(APP_PATH.'sto'.DS.'logs'.DS.'scheduler'.DS.$activeTask->getTaskName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
             $file->write(false, true);

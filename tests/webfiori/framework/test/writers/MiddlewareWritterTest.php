@@ -20,8 +20,8 @@ class MiddlewareWritterTest extends CLITestCase {
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
             "webfiori\\framework\\session\\SessionsManager",
-            "webfiori\\http\\Request",
-            "webfiori\\http\\Response",
+            "WebFiori\\Http\\Request",
+            "WebFiori\\Http\\Response",
         ], $writter->getUseStatements());
         $this->assertEquals('New Middleware', $writter->getMiddlewareName());
         $this->assertEquals(0, $writter->getMiddlewarePriority());
@@ -44,8 +44,8 @@ class MiddlewareWritterTest extends CLITestCase {
         $this->assertEquals([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
             "webfiori\\framework\\session\\SessionsManager",
-            "webfiori\\http\\Request",
-            "webfiori\\http\\Response",
+            "WebFiori\\Http\\Request",
+            "WebFiori\\Http\\Response",
         ], $writter->getUseStatements());
         $this->assertEquals('Super Middleware', $writter->getMiddlewareName());
         $this->assertEquals(100, $writter->getMiddlewarePriority());

@@ -20,7 +20,7 @@ class WebServiceWritterTest extends TestCase {
             "WebFiori\Http\AbstractWebService",
             "WebFiori\Http\ParamType",
             "WebFiori\Http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
     }
     /**
@@ -36,7 +36,7 @@ class WebServiceWritterTest extends TestCase {
             "WebFiori\Http\AbstractWebService",
             "WebFiori\Http\ParamType",
             "WebFiori\Http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',
@@ -64,7 +64,7 @@ class WebServiceWritterTest extends TestCase {
             "WebFiori\Http\AbstractWebService",
             "WebFiori\Http\ParamType",
             "WebFiori\Http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',

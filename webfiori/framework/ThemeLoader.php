@@ -253,17 +253,18 @@ class ThemeLoader {
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
-                ob_start();
-                $ns = require_once $pathToScan.DS.$fileName;
-                ob_end_clean();
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
-                $aCName = $aNs.$cName;
+                $aCName = '\\'.self::THEMES_DIR.'\\'.$dirName.'\\'.$cName;
 
-                if (!class_exists($aCName)) {
-                    $aCName = '\\'.self::THEMES_DIR.'\\'.$dirName.'\\'.$cName;
+                try {
+                    ob_start();
+                    require_once $pathToScan.DS.$fileName;
+                    ob_end_clean();
+                } catch (\Throwable $ex ) {
+                    continue; // Skip problematic theme files
                 }
 
-                if (class_exists($aCName)) {
+                if (class_exists($aCName, false)) {
+                    
                     try {
                         $instance = new $aCName();
                     } catch (Error $ex) {

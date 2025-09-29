@@ -4,9 +4,9 @@ namespace app\database\migrations\noConn;
 use WebFiori\Database\Schema\SchemaRunner;
 
 
-class XRunner extends MigrationsRunner {
+class XRunner extends SchemaRunner {
     
     public function __construct() {
-        parent::__construct(APP_PATH.'database'.DS.'migrations'.DS.'noConn', '\\app\\database\\migrations\\noConn', null);
+        parent::__construct(null);
     }
 }

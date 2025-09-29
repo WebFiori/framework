@@ -25,7 +25,7 @@ use webfiori\framework\cli\CLIUtils;
 class RunMigrationsCommand extends Command {
     /**
      * 
-     * @var MigrationsRunner
+     * @var SchemaRunner
      */
     private $migrationsRunner;
     /**
@@ -48,7 +48,7 @@ class RunMigrationsCommand extends Command {
      * Checks if the argument '--ini' is provided or not and initialize
      * migrations table if provided.
      * 
-     * @param MigrationsRunner|null $runner An optional instance which will be
+     * @param SchemaRunner|null $runner An optional instance which will be
      * used to run the migrations. If provided, the table will be created based
      * on the connection of the runner.
      * 
@@ -56,7 +56,7 @@ class RunMigrationsCommand extends Command {
      * Other than that, an attempt to create the migrations table will be made.
      * If created, true is returned. Other than that, false is returned.
      */
-    private function checkMigrationsTable(?MigrationsRunner $runner, $conn = null) {
+    private function checkMigrationsTable(?SchemaRunner $runner, $conn = null) {
         if (!$this->isArgProvided('--ini')) {
             return 0;
         }
@@ -67,9 +67,9 @@ class RunMigrationsCommand extends Command {
             
             try {
                 $this->println("Initializing migrations table...");
-                $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
+                $temp = $runner !== null ? $runner : new SchemaRunner($conn);
                 
-                $temp->createMigrationsTable();
+                $temp->createSchemaTable();
                 $this->success("Migrations table succesfully created.");
             } catch (\Throwable $ex) {
                 $this->error('Unable to create migrations table due to following:');
@@ -80,11 +80,11 @@ class RunMigrationsCommand extends Command {
         }
         return 0;
     }
-    private function getNS(?MigrationsRunner $runner = null) {
+    private function getNS(?SchemaRunner $runner = null) {
         if ($this->isArgProvided('--ns')) {
             return $this->getArgValue('--ns');
         } else if ($runner !== null) {
-            return $runner->getMigrationsNamespace();
+            // Removed getMigrationsNamespace() call as it doesn't exist in SchemaRunner
         } else {
             $this->info("Using default namespace for migrations.");
             return '\\'.APP_DIR.'\\database\\migrations';
@@ -100,7 +100,7 @@ class RunMigrationsCommand extends Command {
         
         $runner = $this->getRunnerArg();
         
-        if (!($runner instanceof MigrationsRunner) && $runner !== null) {
+        if (!($runner instanceof SchemaRunner) && $runner !== null) {
             return -1;
         }
         $ns = $this->getNS($runner);
@@ -120,7 +120,7 @@ class RunMigrationsCommand extends Command {
 
         
         try {
-            $runner = new MigrationsRunner(ROOT_PATH.DS. str_replace('\\', DS, $ns), $ns, $connection);
+            $runner = new SchemaRunner($connection);
         } catch (Throwable $ex) {
             $this->error($ex->getMessage());
             return -1;
@@ -131,7 +131,7 @@ class RunMigrationsCommand extends Command {
             return $this->executeMigrations($runner);
         }
     }
-    private function rollbackMigration(MigrationsRunner $runner) {
+    private function rollbackMigration(SchemaRunner $runner) {
         $isAll = $this->isArgProvided('--all');
         $rolledCount = 0;
         if ($isAll) {
@@ -158,9 +158,9 @@ class RunMigrationsCommand extends Command {
         
         return 0;
     }
-    private function doRollback(MigrationsRunner $runner) {
+    private function doRollback(SchemaRunner $runner) {
         try {
-            return $runner->rollback();
+            return $runner->rollbackUpTo(null);
             
         } catch (Throwable $ex) {
             $this->error('Failed to execute migration due to following:');
@@ -175,7 +175,7 @@ class RunMigrationsCommand extends Command {
             $this->success("Migration '".$migration->getName()."' was successfully rolled back.");
         }
     }
-    private function executeMigrations(MigrationsRunner $runner) {
+    private function executeMigrations(SchemaRunner $runner) {
         $this->println("Starting to execute migrations...");
         $listOfApplied = [];
         while ($this->applyNext($runner, $listOfApplied)){};
@@ -202,12 +202,12 @@ class RunMigrationsCommand extends Command {
      * ask the user to select a connection from the connections which
      * exist in application configuration.
      * 
-     * @param MigrationsRunner|null $runner If given and the connection is set
+     * @param SchemaRunner|null $runner If given and the connection is set
      * on the instance, it will be returned.
      * 
      * @return ConnectionInfo|null
      */
-    private function getDBConnection(?MigrationsRunner $runner = null) {
+    private function getDBConnection(?SchemaRunner $runner = null) {
         
         if ($runner !== null) {
             if ($runner->getConnectionInfo() !== null) {
@@ -232,8 +232,8 @@ class RunMigrationsCommand extends Command {
             return CLIUtils::getConnectionName($this);
         }
     }
-    public function getNext(MigrationsRunner $runner) : ?AbstractMigration {
-        foreach ($runner->getMigrations() as $m) {
+    public function getNext(SchemaRunner $runner) : ?AbstractMigration {
+        foreach ($runner->getChanges() as $m) {
             if ($runner->isApplied($m->getName())) {
                 continue;
             } else {
@@ -242,7 +242,7 @@ class RunMigrationsCommand extends Command {
         }
         return null;
     }
-    private function applyNext(MigrationsRunner $runner, &$listOfApplied) : bool {
+    private function applyNext(SchemaRunner $runner, &$listOfApplied) : bool {
         $toBeApplied = $this->getNext($runner);
         
         try {
@@ -274,7 +274,7 @@ class RunMigrationsCommand extends Command {
     }
     /**
      * 
-     * @return MigrationsRunner|int|null
+     * @return SchemaRunner|int|null
      */
     private function getRunnerArg() {
         $runner = $this->getArgValue('--runner');
@@ -291,8 +291,8 @@ class RunMigrationsCommand extends Command {
                 return -1;
             }
 
-            if (!($runnerInst instanceof MigrationsRunner)) {
-                $this->error('The argument --runner has invalid value: "'.$runner.'" is not an instance of "MigrationsRunner".');
+            if (!($runnerInst instanceof SchemaRunner)) {
+                $this->error('The argument --runner has invalid value: "'.$runner.'" is not an instance of "SchemaRunner".');
                 return -1;
             } else {
                 return $runnerInst;
@@ -311,9 +311,9 @@ class RunMigrationsCommand extends Command {
         return true;
     }
     private function hasMigrations(string $namespace) : bool {
-        $tmpRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
+        $tmpRunner = new SchemaRunner(null);
         $this->println("Checking namespace '$namespace' for migrations...");
-        $count = count($tmpRunner->getMigrations());
+        $count = count($tmpRunner->getChanges());
         if ($count == 0) {
             $this->info("No migrations found in the namespace '$namespace'.");
             return false;

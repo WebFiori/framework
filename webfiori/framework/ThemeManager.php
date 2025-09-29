@@ -26,8 +26,6 @@ use webfiori\http\Response;
  * @version 2.0.0
  */
 class ThemeManager {
-   
-
     /**
      * An array that contains all registered themes.
      *

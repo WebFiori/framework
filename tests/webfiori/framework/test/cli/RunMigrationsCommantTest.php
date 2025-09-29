@@ -455,7 +455,7 @@ class RunMigrationsCommantTest extends CLITestCase {
      */
     public function testRunMigrations17() {
         $this->assertEquals([
-            "Error: The argument --runner has invalid value: \"\app\database\migrations\multi\Migration000\" is not an instance of \"MigrationsRunner\".\n",
+            "Error: The argument --runner has invalid value: \"\app\database\migrations\multi\Migration000\" is not an instance of \"SchemaRunner\".\n",
         ], $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--runner' => '\\app\\database\\migrations\\multi\Migration000',
@@ -782,7 +782,7 @@ class RunMigrationsCommantTest extends CLITestCase {
         return $clazz;
     }
     private function createMigration(?string $name = null, ?string $className = null) : string {
-        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', null);
+        $runner = new SchemaRunner(null);
         $writer = new DatabaseMigrationWriter($runner);
         if ($name !== null) {
             $writer->setMigrationName($name);
@@ -799,9 +799,9 @@ class RunMigrationsCommantTest extends CLITestCase {
                 'TrustServerCertificate' => 'true'
             ]);
         }
-        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations'.DS.'commands', '\\app\\database\\migrations\\commands', $conn);
+        $runner = new SchemaRunner($conn);
         try{
-            $runner->dropMigrationsTable();
+            $runner->dropSchemaTable();
         } catch (DatabaseException $ex) {
 
         }

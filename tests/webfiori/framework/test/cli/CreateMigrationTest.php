@@ -60,12 +60,12 @@ class CreateMigrationTest extends CLITestCase {
         $this->removeClass($clazz);
     }
     private function getOrder() {
-        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations', '\\app\\database\\migrations', null);
-        return count($runner->getMigrations());
+        $runner = new SchemaRunner(null);
+        return count($runner->getChanges());
     }
     private function getMName() {
-        $runner = new MigrationsRunner(APP_PATH.DS.'database'.DS.'migrations', '\\app\\database\\migrations', null);
-        $count = count($runner->getMigrations());
+        $runner = new SchemaRunner(null);
+        $count = count($runner->getChanges());
         if ($count < 10) {
             return 'Migration00'.$count;
         } else if ($count < 100) {

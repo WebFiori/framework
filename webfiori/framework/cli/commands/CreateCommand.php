@@ -120,9 +120,6 @@ class CreateCommand extends Command {
             $create = new CreateMigration($this);
             if ($create->isConfigured()) {
                 $create->writeClass();
-                $writer = $create->getWriter();
-                $this->info("Migration Name: ".$writer->getMigrationName());
-                $this->info("Migration Order: ".$writer->getMigrationOrder());
                 return 0;
             } else {
                 return -1;

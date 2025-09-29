@@ -22,10 +22,6 @@ use webfiori\framework\writers\DatabaseMigrationWriter;
  * @version 1.0
  */
 class CreateMigration extends CreateClassHelper {
-    /**
-     * @var DatabaseMigrationWriter
-     */
-    private $writer;
     private $isConfigured;
     /**
      * Creates new instance of the class.
@@ -44,14 +40,12 @@ class CreateMigration extends CreateClassHelper {
             $command->error("Unable to set migrations path.");
         } else {
             parent::__construct($command, new DatabaseMigrationWriter($runner));
-            $this->writer = $this->getWriter();
             $this->setNamespace($ns);
             
             $this->isConfigured = true;
             if (!$command->isArgProvided('--defaults')) {
                 $this->setClassName($command->readClassName('Provide an optional name for the class that will have migration logic:', null));
-                $this->readClassInfo();
-                
+
             }
         }
     }
@@ -73,16 +67,7 @@ class CreateMigration extends CreateClassHelper {
                 return null;
             }
         }
-        return new MigrationsRunner($path, $ns, null);
+        return new SchemaRunner(null);
     }
 
-    private function readClassInfo() {
-        
-        $name = $this->getInput('Enter an optional name for the migration:', $this->writer->getMigrationName());
-        $order = $this->getCommand()->readInteger('Enter an optional execution order for the migration:', $this->writer->getMigrationOrder());
-        
-
-        $this->writer->setMigrationName($name);
-        $this->writer->setMigrationOrder($order);
-    }
 }

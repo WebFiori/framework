@@ -20,8 +20,6 @@ use WebFiori\Database\Schema\SchemaRunner;
  * @author Ibrahim
  */
 class DatabaseMigrationWriter extends ClassWriter {
-    private $order;
-    private $name;
     /**
      * Creates new instance of the class.
      *
@@ -31,7 +29,6 @@ class DatabaseMigrationWriter extends ClassWriter {
         
         if ($runner !== null) {
             $count = count($runner->getChanges());
-            $this->setMigrationOrder($count);
             if ($count < 10) {
                 $name = 'Migration00'.$count;
             } else if ($count < 100) {
@@ -41,7 +38,7 @@ class DatabaseMigrationWriter extends ClassWriter {
             }
         }
         
-        $this->setMigrationName($name);
+        $this->setClassName($name);
         
         parent::__construct($name, APP_PATH.'database'.DS.'migrations', APP_DIR.'\\database\\migrations');
         $this->addUseStatement([
@@ -49,18 +46,6 @@ class DatabaseMigrationWriter extends ClassWriter {
             AbstractMigration::class,
         ]);
         
-    }
-    public function getMigrationName() : string {
-        return $this->name;
-    }
-    public function getMigrationOrder() : int {
-        return $this->order;
-    }
-    public function setMigrationName(string $name) {
-        $this->name = $name;
-    }
-    public function setMigrationOrder(int $order) {
-        $this->order = $order;
     }
 
     public function writeClassBody() {
@@ -71,22 +56,22 @@ class DatabaseMigrationWriter extends ClassWriter {
             $this->f('__construct'),
 
         ], 1);
-        $this->append("parent::__construct('".$this->getMigrationName()."', ".$this->getMigrationOrder().");", 2);
+        $this->append("parent::__construct();", 2);
         $this->append('}', 1);
         $this->append('/**', 1);
         $this->append(' * Performs the action that will apply the migration.', 1);
         $this->append(' * ', 1);
-        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('up', ['schema' => 'Database']), 1);
+        $this->append($this->f('up', ['db' => 'Database']), 1);
         $this->append('//TODO: Implement the action which will apply the migration to database.', 2);
         $this->append('}', 1);
         $this->append('/**', 1);
         $this->append(' * Performs the action that will revert back the migration.', 1);
         $this->append(' * ', 1);
-        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('down', ['schema' => 'Database']), 1);
+        $this->append($this->f('down', ['db' => 'Database']), 1);
         $this->append('//TODO: Implement the action which will revert back the migration.', 2);
         $this->append('}', 1);
         $this->append('}');

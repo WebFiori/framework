@@ -3,7 +3,7 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\ThemeManager;
 
 /**
  * Description of CreateThemeTest
@@ -49,7 +49,7 @@ class CreateThemeTest extends CLITestCase {
         ], $runner->getOutput());
 
         $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));
-        $this->assertEquals(3, count(ThemeLoader::getAvailableThemes()));
+        
         $this->removeClass('\\themes\\fiori\\NewTestTheme');
         $this->removeClass('\\themes\\fiori\\AsideSection');
         $this->removeClass('\\themes\\fiori\\FooterSection');

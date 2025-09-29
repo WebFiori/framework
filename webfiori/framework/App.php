@@ -358,6 +358,12 @@ class App {
              */
             define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
         }
+        if (!defined('PUBLIC_FOLDER')) {
+            /**
+             * Name of public folder.
+             */
+            define('PUBLIC_FOLDER', $publicFolder);
+        }
         if (!defined('WF_CORE_PATH')) {
             /**
              * Path to WebFiori's core library.

@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\ThemeManager;
 
 /**
  * A CLI command which is used to list all registered themes.
@@ -41,7 +41,7 @@ class ListThemesCommand extends Command {
      * @since 1.0
      */
     public function exec() : int {
-        $themesArr = ThemeLoader::getAvailableThemes();
+        $themesArr = ThemeManager::getRegisteredThemes();
 
         $themsCount = count($themesArr);
         $themeName = $this->getArgValue('--theme-name');

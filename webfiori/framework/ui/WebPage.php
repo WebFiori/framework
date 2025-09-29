@@ -24,7 +24,7 @@ use webfiori\framework\router\Router;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\ThemeManager;
 use webfiori\framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
@@ -1021,8 +1021,6 @@ class WebPage {
      * Finally, an exception will be thrown if theme component is not found.
      *
      * @since 1.0
-     *
-     * @see Theme::usingTheme()
      */
     public function setTheme(?string $themeNameOrClass = null) {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
@@ -1037,7 +1035,7 @@ class WebPage {
         if (strlen($xthemeName) == 0) {
             $xthemeName = $themeNameOrClass;
         }
-        $tmpTheme = ThemeLoader::usingTheme($xthemeName);
+        $tmpTheme = ThemeManager::usingTheme($xthemeName);
 
         if ($tmpTheme !== null) {
             if ($this->theme !== null && $tmpTheme->getName() == $this->theme->getName()) {
@@ -1074,6 +1072,7 @@ class WebPage {
             $this->theme->invokeAfterLoaded();
         }
     }
+    
     /**
      * Sets the title of the page.
      *

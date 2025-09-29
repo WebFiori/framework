@@ -19,12 +19,13 @@ use WebFiori\Json\Json;
  * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
+    
     /**
-     * The location at which the configuration file will be kept at.
-     *
-     * @var string The file will be stored at [APP_PATH]/config/';
+     * Returns the path to JSON configuration files.
      */
-    const JSON_CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR;
+    private static function getConfigPath(): string {
+        return APP_PATH.'config'.DIRECTORY_SEPARATOR;
+    }
     /**
      * The name of JSON configuration file.
      */
@@ -466,7 +467,7 @@ class JsonDriver implements ConfigurationDriver {
      * file with same name, it will be overriden.
      */
     public function initialize(bool $reCreate = false) {
-        $path = self::JSON_CONFIG_FILE_PATH.self::getConfigFileName().'.json';
+        $path = self::getConfigPath().self::getConfigFileName().'.json';
 
         if (!file_exists($path) || $reCreate) {
             $this->writeJson();
@@ -480,7 +481,7 @@ class JsonDriver implements ConfigurationDriver {
      * be set using the method JsonDriver::setConfigFileName()
      */
     public function remove() {
-        $f = new File(self::JSON_CONFIG_FILE_PATH.DIRECTORY_SEPARATOR.self::getConfigFileName().'.json');
+        $f = new File(self::getConfigPath().self::getConfigFileName().'.json');
         $f->remove();
     }
     public function removeAllDBConnections() {
@@ -746,7 +747,7 @@ class JsonDriver implements ConfigurationDriver {
         return $code;
     }
     private function writeJson() {
-        $file = new File(self::JSON_CONFIG_FILE_PATH.self::getConfigFileName().'.json');
+        $file = new File(self::getConfigPath().self::getConfigFileName().'.json');
         $file->remove();
         $json = $this->toJSON();
         $json->setIsFormatted(true);

@@ -105,9 +105,9 @@ class JsonDriverTest extends TestCase {
             'AR' => 'تطبيق',
             'EN' => 'Cool App'
         ],$driver->getAppNames());
-        $this->assertTrue(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
+        $this->assertTrue(File::isFileExist(JsonDriver::getConfigPath().DS.$driver->getConfigFileName().'.json'));
         $driver->remove();
-        $this->assertFalse(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
+        $this->assertFalse(File::isFileExist(JsonDriver::getConfigPath().DS.$driver->getConfigFileName().'.json'));
     }
     /**
      * @test

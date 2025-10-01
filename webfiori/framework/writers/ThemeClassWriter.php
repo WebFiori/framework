@@ -13,6 +13,8 @@ namespace webfiori\framework\writers;
 use WebFiori\File\File;
 use webfiori\framework\Theme;
 use WebFiori\UI\HeadNode;
+use WebFiori\UI\HTMLNode;
+
 /**
  * A class which is used to create basic theme skeleton.
  *
@@ -181,16 +183,12 @@ class ThemeClassWriter extends ClassWriter {
     public function writeUseStatements() {
         parent::writeUseStatements();
         $this->addUseStatement([
-                Theme::class
+            Theme::class,
+            HeadNode::class
         ]);
 
-        if (PHP_VERSION_ID <= 70333) {
-            $this->addUseStatement([
-                    HeadNode::class
-            ]);
-        }
         $this->addUseStatement([
-            'webfiori\\ui\\HTMLNode',
+            HTMLNode::class,
             $this->getNamespace().'\\AsideSection',
             $this->getNamespace().'\\FooterSection',
             $this->getNamespace().'\\HeadSection',

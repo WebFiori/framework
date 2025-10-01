@@ -6,11 +6,13 @@
     </report>
   </coverage>
   <php>
-    </php>
+  </php>
   <logging/>
   <testsuites>
     <testsuite name="General Tests">
       <directory>./webfiori/framework/test</directory>
+      <exclude>./webfiori/framework/test/theme</exclude>
+      <exclude>./webfiori/framework/test/cli</exclude>
     </testsuite>
     <testsuite name="Database Tests">
       <file>./webfiori/framework/test/DBTest.php</file>

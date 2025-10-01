@@ -3,10 +3,11 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\middleware\AbstractMiddleware;
 
 /**
- * Description of CreateThemeTest
+ * Description of CreateMiddlewareTest
  *
  * @author Ibrahim
  */
@@ -15,22 +16,19 @@ class CreateMiddlewareTest extends CLITestCase {
      * @test
      */
     public function testCreateMiddleware00() {
-        $runner = $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create'
-        ]);
-        $runner->setInputs([
+        ], [
             '4',
             'NewCoolMd',
             'app\middleware',
             'Check is authorized',
             '22',
-            '',
-            '',
+            "\n", // Hit Enter to pick default value (no group)
         ]);
 
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -51,33 +49,31 @@ class CreateMiddlewareTest extends CLITestCase {
             "Enter middleware priority: Enter = '0'\n",
             "Would you like to add the middleware to a group?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."middleware\".\n",
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\middleware\\NewCoolMdMiddleware'));
         $this->removeClass('\\app\\middleware\\NewCoolMdMiddleware');
     }
+    
     /**
      * @test
      */
     public function testCreateMiddleware01() {
-        $runner = $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'middleware'
-        ]);
-        $runner->setInputs([
+        ], [
             'NewCool',
             'app\middleware',
-            '  ',
+            '  ', // Invalid input (spaces only)
             'Check is cool',
-            
             '22',
             'y',
             'global',
             'n'
         ]);
 
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
@@ -89,7 +85,8 @@ class CreateMiddlewareTest extends CLITestCase {
             "Enter group name:\n",
             "Would you like to add the middleware to another group?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."middleware\".\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\middleware\\NewCoolMiddleware';
         $this->assertTrue(class_exists($clazz));
         $clazzObj = new $clazz();

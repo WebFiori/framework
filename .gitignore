@@ -17,3 +17,4 @@ app/config/*
 !/app/config/config-with-err-00.json
 *.Identifier
 tests/clover.xml
+/.vscode

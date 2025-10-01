@@ -3,6 +3,7 @@ namespace webfiori\framework\test\cli;
 
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\ThemeManager;
 
 /**
@@ -15,19 +16,16 @@ class CreateThemeTest extends CLITestCase {
      * @test
      */
     public function testCreateTheme00() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create'
-        ]);
-        $runner->setInputs([
+        ], [
             '6',
             'NewTest',
             'themes\\fiori',
-            '',
+            "\n", // Hit Enter to pick default value
         ]);
-
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -46,7 +44,7 @@ class CreateThemeTest extends CLITestCase {
             "Enter an optional namespace for the class: Enter = 'themes'\n",
             'Creating theme at "'.ROOT_PATH.DS.'themes'.DS."fiori\"...\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'themes'.DS."fiori\".\n",
-        ], $runner->getOutput());
+        ], $output);
 
         $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));
         
@@ -55,5 +53,59 @@ class CreateThemeTest extends CLITestCase {
         $this->removeClass('\\themes\\fiori\\FooterSection');
         $this->removeClass('\\themes\\fiori\\HeadSection');
         $this->removeClass('\\themes\\fiori\\HeaderSection');
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateThemeWithExistingName() {
+        $runner = App::getRunner();
+        $ns = '\\themes\\fioriTheme';
+        $name = 'NewFTestTheme';
+
+        $ns2 = '\\themes\\cool';
+        $name2 = 'NewFTestTheme';
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'webfiori',
+            'create'
+        ], [
+            '6',
+            $name,
+            $ns,
+            $name2,
+            $ns2,
+            "\n" // Hit Enter to pick default value
+        ]);
+        
+        // Verify exact output array for duplicate theme creation attempt
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background Task.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Web service test case.\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'themes'\n",
+            "Error: A class in the given namespace which has the given name was found.\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'themes'\n",
+            'Creating theme at "'.ROOT_PATH.DS.'themes'.DS."cool\"...\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'themes'.DS."cool\".\n",
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        $this->removeClass($ns2.'\\'.$name2);
+        $this->removeClass($ns2.'\\AsideSection');
+        $this->removeClass($ns2.'\\FooterSection');
+        $this->removeClass($ns2.'\\HeadSection');
+        $this->removeClass($ns2.'\\HeaderSection');
     }
 }

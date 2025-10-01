@@ -5,6 +5,7 @@ use WebFiori\Database\ConnectionInfo;
 use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
 
 /**
  * Description of CreateRESTTest
@@ -17,13 +18,12 @@ class CreateRESTTest extends CLITestCase {
      */
     public function test00() {
         App::getConfig()->removeAllDBConnections();
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'rest'
-        ]);
-        $runner->setInputs([
+        ], [
             '0',
             'SuperUser',
             'app\\entity\\super',
@@ -40,26 +40,27 @@ class CreateRESTTest extends CLITestCase {
             "The unique ID of the super user.",
             "y",
             'first-name',
-            'varchar',//type
+            'varchar',
             '50',
-            'n',//primary
-            'n',//unique
-            '',//default
-            'n',//null,
-            'No Comment.',//optional comments
+            'n',
+            'n',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n',
+            'No Comment.',
             "y",
             'is-happy',
-            'bool',//type
+            'bool',
             'n',
-            'true',//default
-            'n',//null,
-            'Check if the hero is happy or not.',//optional comment
+            'true',
+            'n',
+            'Check if the hero is happy or not.',
             "n",
             'n',
             "y",
             "app\\apis\\super"
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals(array_merge([
             "Warning: No database connections found in application configuration.\n",
             "Info: Run the command \"add\" to add connections.\n",
@@ -113,7 +114,8 @@ class CreateRESTTest extends CLITestCase {
             "Creating database access class...\n",
             "Writing web services...\n",
             "Done.\n"
-        ]), $runner->getOutput());
+        ]), $output);
+        
         $tableClazz = '\\app\\database\\super\\SuperUserTable';
         $entityClazz = '\\app\\entity\\super\\SuperUser';
         $dbClazz = "\\app\\database\\super\\SuperUserDB";
@@ -142,18 +144,18 @@ class CreateRESTTest extends CLITestCase {
         $this->removeClass($entityClazz);
         $this->removeClass($dbClazz);
     }
+    
     /**
      * @test
      */
     public function test01() {
         App::getConfig()->removeAllDBConnections();
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'rest'
-        ]);
-        $runner->setInputs([
+        ], [
             '0',
             'SuperUserX',
             'app\\entity\\super',
@@ -166,32 +168,33 @@ class CreateRESTTest extends CLITestCase {
             "int",
             "11",
             "n",
-            'n',//unique
-            '',//default
-            'n',//null,
+            'n',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n',
             "The unique ID of the super user.",
             "y",
             'first-name',
-            'varchar',//type
+            'varchar',
             '50',
-            'n',//primary
-            'n',//unique
-            '',//default
-            'n',//null,
-            'No Comment.',//optional comments
+            'n',
+            'n',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n',
+            'No Comment.',
             "y",
             'is-happy',
-            'bool',//type
+            'bool',
             'n',
-            'true',//default
-            'n',//null,
-            'Check if the hero is happy or not.',//optional comment
+            'true',
+            'n',
+            'Check if the hero is happy or not.',
             "n",
             'n',
             "y",
             "app\\apis\\super"
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals(array_merge([
             "Warning: No database connections found in application configuration.\n",
             "Info: Run the command \"add\" to add connections.\n","Database type:\n",
@@ -246,7 +249,8 @@ class CreateRESTTest extends CLITestCase {
             "Creating database access class...\n",
             "Writing web services...\n",
             "Done.\n"
-        ]), $runner->getOutput());
+        ]), $output);
+        
         $tableClazz = '\\app\\database\\super\\SuperUserXTable';
         $entityClazz = '\\app\\entity\\super\\SuperUserX';
         $dbClazz = "\\app\\database\\super\\SuperUserXDB";
@@ -275,6 +279,7 @@ class CreateRESTTest extends CLITestCase {
         $this->removeClass($entityClazz);
         $this->removeClass($dbClazz);
     }
+    
     /**
      * @test
      */
@@ -284,13 +289,12 @@ class CreateRESTTest extends CLITestCase {
             'connection-name' => 'Super Connection'
         ]);
         App::getConfig()->addOrUpdateDBConnection($conn);
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'rest',
-        ]);
-        $runner->setInputs([
+        ], [
             'Super Connection',
             'SuperUserX9',
             'app\\entity\\super',
@@ -303,32 +307,33 @@ class CreateRESTTest extends CLITestCase {
             "int",
             "11",
             "n",
-            'n',//unique
-            '',//default
-            'n',//null,
+            'n',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n',
             "The unique ID of the super user.",
             "y",
             'first-name',
-            'varchar',//type
+            'varchar',
             '50',
-            'n',//primary
-            'n',//unique
-            '',//default
-            'n',//null,
-            'No Comment.',//optional comments
+            'n',
+            'n',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n',
+            'No Comment.',
             "y",
             'is-happy',
-            'bool',//type
+            'bool',
             'n',
-            'true',//default
-            'n',//null,
-            'Check if the hero is happy or not.',//optional comment
+            'true',
+            'n',
+            'Check if the hero is happy or not.',
             "n",
             'n',
             "y",
             "app\\apis\\super"
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals(array_merge([
             "Select database connection:\n",
             "0: Super Connection <--\n",
@@ -379,7 +384,8 @@ class CreateRESTTest extends CLITestCase {
             "Creating database access class...\n",
             "Writing web services...\n",
             "Done.\n"
-        ]), $runner->getOutput());
+        ]), $output);
+        
         $tableClazz = '\\app\\database\\super\\SuperUserX9Table';
         $entityClazz = '\\app\\entity\\super\\SuperUserX9';
         $dbClazz = "\\app\\database\\super\\SuperUserX9DB";

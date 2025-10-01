@@ -1,9 +1,10 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use WebFiori\Cli\CLICommand;
-use webfiori\framework\App;
+use WebFiori\Cli\Command;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
+
 /**
  * @author Ibrahim
  */
@@ -12,22 +13,20 @@ class CreateCLICommandTest extends CLITestCase {
      * @test
      */
     public function testCreateCommand00() {
-        $runner = $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create'
-        ]);
-        $runner->setInputs([
+        ], [
             '5',
             'NewCLI',
             'app\commands',
             'print-hello',
             'Prints \'Hello World\' in the console.',
             'N',
-            '',
+            "\n", // Hit Enter to pick default value
         ]);
 
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -48,21 +47,25 @@ class CreateCLICommandTest extends CLITestCase {
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."commands\".\n",
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\commands\\NewCLICommand'));
         $this->removeClass('\\app\\commands\\NewCLICommand');
     }
+    
     /**
      * @test
      */
     public function testCreateCommand01() {
-        $runner = $runner = App::getRunner();
-        $runner->setArgsVector([
+        $clazz = '\\app\\commands\\DoItCommand';
+        if (class_exists($clazz)) {
+            $this->removeClass($clazz);
+        }
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'command'
-        ]);
-        $runner->setInputs([
+        ], [
             'DoIt',
             'app\commands',
             'do-it',
@@ -75,14 +78,14 @@ class CreateCLICommandTest extends CLITestCase {
             "y",
             "Say No",
             "y",
-            "Say No",
+            "Say No", // Duplicate value to test validation
             'n',
             'y',
-            '',
+            "\n", // Hit Enter to pick default value (empty default)
             'n'
         ]);
 
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\commands'\n",
@@ -103,11 +106,11 @@ class CreateCLICommandTest extends CLITestCase {
             "Enter default value:\n",
             "Would you like to add more arguments?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."commands\".\n",
-        ], $runner->getOutput());
-        $clazz = '\\app\\commands\\DoItCommand';
+        ], $output);
+        
         $this->assertTrue(class_exists($clazz));
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertTrue($clazzObj instanceof Command);
         $this->assertEquals('do-it', $clazzObj->getName());
         $arg = $clazzObj->getArg('--what-to-do');
         $this->assertNotNull($arg);

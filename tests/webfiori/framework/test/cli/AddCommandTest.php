@@ -1,10 +1,9 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use WebFiori\Cli\CommandTestCase;
-use WebFiori\Cli\Runner;
 use WebFiori\File\File;
 use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\config\Controller;
 
@@ -13,7 +12,7 @@ use webfiori\framework\config\Controller;
  *
  * @author Ibrahim
  */
-class AddCommandTest extends CommandTestCase {
+class AddCommandTest extends CLITestCase {
     /**
      * @test
      */
@@ -21,10 +20,8 @@ class AddCommandTest extends CommandTestCase {
         $output = $this->executeSingleCommand(new AddCommand(), [], [
             '3'
         ]);
-        $runner = new Runner();
-        $runner->setInputs([
-            '3'
-        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -32,7 +29,6 @@ class AddCommandTest extends CommandTestCase {
             "2: New website language.\n",
             "3: Quit. <--\n"
         ], $output);
-        $this->assertEquals(0, $this->getExitCode());
     }
     /**
      * @test
@@ -42,15 +38,15 @@ class AddCommandTest extends CommandTestCase {
             '0',
             '0',
             '127.0.0.1',
-            '',
+            "\n", // Hit Enter to pick default value (port 3306)
             'root',
             '123456',
             'testing_db',
-            ''
+            "\n" // Hit Enter to pick default value (connection name)
         ]);
 
         $count = count(App::getConfig()->getDBConnections());
-        $connName = 'db-connection-'.($count + 1);
+        $connName = 'db-connection-'.$count;
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -76,25 +72,24 @@ class AddCommandTest extends CommandTestCase {
      * @test
      */
     public function testAddDBConnection01() {
-        $runner = App::getRunner();
-        $runner->setInputs([
+        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
+        
+        $output = $this->executeSingleCommand(new AddCommand(), [
+            'webfiori',
+            'add'
+        ], [
             '0',
             '0',
             '127.0.0.1',
-            '',
+            "\n", // Hit Enter to pick default value (port 3306)
             'root',
             '12345326',
             'testing_db',
-            '',
+            "\n", // Hit Enter to pick default value (connection name)
             'y'
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'add'
-        ]);
-        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
-        $this->assertEquals(0, $runner->start());
 
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -116,31 +111,31 @@ class AddCommandTest extends CommandTestCase {
             "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in application configuration.\n"
-        ], $runner->getOutput());
+        ], $output);
     }
     /**
      * @test
      */
     public function testAddDBConnection02() {
-        $runner = App::getRunner();
-        $runner->setInputs([
+        $count = count(App::getConfig()->getDBConnections());
+        $connName = 'db-connection-'.($count + 1);
+        
+        $output = $this->executeSingleCommand(new AddCommand(), [
+            'webfiori',
+            'add'
+        ], [
             '0',
             '0',
             '127.0.0.1',
-            '',
+            "\n", // Hit Enter to pick default value (port 3306)
             'root',
             '12345326',
             'testing_db',
-            '',
+            "\n", // Hit Enter to pick default value (connection name)
             'n'
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'add'
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $count = count(App::getConfig()->getDBConnections());
-        $connName = 'db-connection-'.($count + 1);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -161,15 +156,14 @@ class AddCommandTest extends CommandTestCase {
             "Error: Unable to connect to the database.\n",
             "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
-        ], $runner->getOutput());
+        ], $output);
     }
 
     /**
      * @test
      */
     public function testAddLang00() {
-        $runner = new Runner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new AddCommand(), [], [
             '2',
             'FK',
             'F Name',
@@ -177,7 +171,8 @@ class AddCommandTest extends CommandTestCase {
             'Default f Title',
             'ltr',
         ]);
-        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -192,7 +187,7 @@ class AddCommandTest extends CommandTestCase {
             "0: ltr\n",
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
         $this->removeClass('\\app\\langs\\LangFK');
         Controller::getDriver()->initialize();
@@ -201,12 +196,12 @@ class AddCommandTest extends CommandTestCase {
      * @test
      */
     public function testAddLang01() {
-        $runner = new Runner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new AddCommand(), [], [
             '2',
             'EN',
         ]);
-        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -215,20 +210,19 @@ class AddCommandTest extends CommandTestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Info: This language already added. Nothing changed.\n",
-        ], $runner->getOutput());
+        ], $output);
         Controller::getDriver()->initialize();
     }
     /**
      * @test
      */
     public function testAddLang02() {
-        $runner = new Runner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new AddCommand(), [], [
             '2',
             'FKRR',
         ]);
 
-        $this->assertEquals(-1, $runner->runCommand(new AddCommand()));
+        $this->assertEquals(-1, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -237,7 +231,7 @@ class AddCommandTest extends CommandTestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Error: Invalid language code.\n",
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }
@@ -245,24 +239,24 @@ class AddCommandTest extends CommandTestCase {
      * @test
      */
     public function testAddSMTPConnection00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
+        $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
+        
+        $output = $this->executeSingleCommand(new AddCommand(), [
+            'webfiori',
+            'add'
+        ], [
             '1',
             '127.0.0.1',
-            '',
+            "\n", // Hit Enter to pick default value (port 25)
             'test@example.com',
             '12345326',
             'test@example.com',
             'test@example.com',
-            '',
+            "\n", // Hit Enter to pick default value (connection name)
             'n'
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'add'
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -280,11 +274,7 @@ class AddCommandTest extends CommandTestCase {
             "Error: Unable to connect to SMTP server.\n",
             "Error Information: \n",
             "Would you like to store connection information anyway?(y/N)\n",
-        ], $runner->getOutput());
-    }
-    private function removeClass($classPath) {
-        $file = new File(ROOT_PATH.$classPath.'.php');
-        $file->remove();
+        ], $output);
     }
     
 }

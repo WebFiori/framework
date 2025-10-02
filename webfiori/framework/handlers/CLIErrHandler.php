@@ -38,7 +38,7 @@ class CLIErrHandler extends AbstractHandler {
     /**
      * Handles the exception
      */
-    public function handle() {
+    public function handle() : void {
         $stream = App::getRunner()->getOutputStream();
         $stream->prints(Formatter::format("Uncaught Exception\n", [
             'color' => 'red',

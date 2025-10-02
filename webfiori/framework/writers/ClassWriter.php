@@ -67,6 +67,7 @@ abstract class ClassWriter {
      */
     public function __construct(string $name = 'NewClass', string $path = ROOT_PATH, string $namespace = '\\') {
         $this->suffix = '';
+
         $this->useArr = [];
 
         if (!$this->setClassName($name)) {
@@ -453,7 +454,7 @@ abstract class ClassWriter {
         if ($classSuffix == '') {
             return $className;
         }
-        $subSuffix = substr($className, strlen($className) - strlen($classSuffix));
+        $subSuffix = substr($className.'', strlen($className.'') - strlen($classSuffix.''));
 
         if ($subSuffix == $classSuffix) {
             return substr($className, 0, -strlen($classSuffix));

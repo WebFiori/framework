@@ -25,18 +25,8 @@ class DatabaseMigrationWriter extends ClassWriter {
      *
      */
     public function __construct(?SchemaRunner $runner) {
-        $name = 'Migration';
-        
-        if ($runner !== null) {
-            $count = count($runner->getChanges());
-            if ($count < 10) {
-                $name = 'Migration00'.$count;
-            } else if ($count < 100) {
-                $name = 'Migration0'.$count;
-            } else {
-                $name = 'Migration'.$count;
-            }
-        }
+        $name = 'Database';
+        $this->setSuffix('Migration');
         
         $this->setClassName($name);
         
@@ -63,7 +53,7 @@ class DatabaseMigrationWriter extends ClassWriter {
         $this->append(' * ', 1);
         $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('up', ['db' => 'Database']), 1);
+        $this->append($this->f('up', ['db' => 'Database'], 'void'), 1);
         $this->append('//TODO: Implement the action which will apply the migration to database.', 2);
         $this->append('}', 1);
         $this->append('/**', 1);
@@ -71,7 +61,7 @@ class DatabaseMigrationWriter extends ClassWriter {
         $this->append(' * ', 1);
         $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('down', ['db' => 'Database']), 1);
+        $this->append($this->f('down', ['db' => 'Database'], 'void'), 1);
         $this->append('//TODO: Implement the action which will revert back the migration.', 2);
         $this->append('}', 1);
         $this->append('}');

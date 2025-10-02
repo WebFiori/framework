@@ -118,12 +118,8 @@ class CreateCommand extends Command {
             }
         }  else if ($answer == 'Database migration.') {
             $create = new CreateMigration($this);
-            if ($create->isConfigured()) {
-                $create->writeClass();
-                return 0;
-            } else {
-                return -1;
-            }
+            $create->writeClass();
+            return 0;
         }
 
         return 0;

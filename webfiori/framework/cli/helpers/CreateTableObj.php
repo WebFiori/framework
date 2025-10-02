@@ -46,7 +46,7 @@ class CreateTableObj extends CreateClassHelper {
         $this->setClassInfo(APP_DIR.'\\database', 'Table');
 
         $tableHelper = new TableObjHelper($this, $tempTable);
-        $tableHelper->setTableName(CaseConverter::toSnackCase($this->getWriter()->getName()));
+        $tableHelper->setTableName(CaseConverter::toSnakeCase($this->getWriter()->getName()));
         $tableHelper->setTableComment();
 
         $this->println('Now you have to add columns to the table.');

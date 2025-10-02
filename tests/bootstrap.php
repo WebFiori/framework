@@ -114,6 +114,9 @@ register_shutdown_function(function()
         $runner->dropChangesTable();
     } catch (\Exception $exc) {
         
+    } catch (\Throwable $exc) {
+        fprintf(STDOUT,'Error on register_shutdown_function:'."\n\n");
+        fprintf(STDOUT, $exc->getMessage()."\n");
     }
 
 });

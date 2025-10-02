@@ -735,8 +735,7 @@ class App {
      * Sets new error and exception handler.
      */
     private function setHandlers() {
-        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
-        // Handler::registerHandler(new CLIErrHandler());
+        Handler::registerHandler(new CLIErrHandler());
         // Handler::registerHandler(new APICallErrHandler());
         // Handler::registerHandler(new HTTPErrHandler());
         // Handler::unregisterHandler(Handler::getHandler('Default'));

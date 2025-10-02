@@ -1,4 +1,7 @@
 <?php
+if (function_exists('xdebug_break')) {
+    xdebug_break(); // Pause here so VS Code can catch up and bind other breakpoints
+}
 
 //Bootstrap file which is used to boot testing process.
 

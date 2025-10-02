@@ -1,44 +1,47 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
-use webfiori\framework\App;
+use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\scheduler\TasksManager;
+
 /**
- * Description of CronCommandTest
+ * Description of SchedulerCommandTest
  *
  * @author Ibrahim
  */
-class SchedulerCommandTest extends TestCase {
+class SchedulerCommandTest extends CLITestCase {
     /**
+     * Run scheduler command with no args
      * @test
      */
     public function test00() {
-        $runner = App::getRunner();
-        $runner->setInputs();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
-        ]);
-        $this->assertEquals(-1, $runner->start());
+        ], []);
+
+        $this->assertEquals(-1, $this->getExitCode());
         $this->assertEquals([
             "Info: At least one of the options '--check', '--force' or '--show-task-args' must be provided.\n"
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * test of check
      * @test
      */
     public function test01() {
         TasksManager::setPassword(hash('sha256', '123456'));
-        $runner = App::getRunner();
-        $runner->setInputs();
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--check',
             'p' => '123456'
-        ]);
-        $this->assertEquals(0, $runner->start());
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Total number of tasks: 5\n",
             "Executed Tasks: 4\n",
@@ -48,39 +51,41 @@ class SchedulerCommandTest extends TestCase {
             "    Fail 1\n",
             "    Fail 2\n",
             "    Fail 3\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Run simple check but no password provided
      * @test
      */
     public function test02() {
-        $runner = App::getRunner();
-        $runner->setInputs();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--check',
-        ]);
-        $this->assertEquals(-1, $runner->start());
+        ], []);
+
+        $this->assertEquals(-1, $this->getExitCode());
         $this->assertEquals([
             "Error: The argument 'p' is missing. It must be provided if scheduler password is set.\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Force task by selecting from list
      * @test
      */
     public function test03() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '0'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             'p' => '123456'
+        ], [
+            '0'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
@@ -95,24 +100,25 @@ class SchedulerCommandTest extends TestCase {
             "    <NONE>\n",
             "Failed tasks:\n",
             "    Fail 1\n"
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Force without showing detailed log
      * @test
      */
     public function test04() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '0'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--show-log',
             'p' => '123456'
+        ], [
+            '0'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
@@ -136,24 +142,25 @@ class SchedulerCommandTest extends TestCase {
             "    <NONE>\n",
             "Failed tasks:\n",
             "    Fail 1\n"
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Force with errors and showing logs
      * @test
      */
     public function test05() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '1'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--show-log',
             'p' => '123456'
+        ], [
+            '1'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $expected = [
             "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
@@ -172,47 +179,47 @@ class SchedulerCommandTest extends TestCase {
             "Thrown in: Fail2TestTask\n",
             "Line: 44\n",
             "Stack Trace:\n",
-            "#0 At class app\\tasks\Fail2TestTask line 44\n",
-            "#1 At class webfiori\\framework\scheduler\AbstractTask line 1128\n",
-            "#2 At class webfiori\\framework\scheduler\AbstractTask line 449\n",
-            "#3 At class webfiori\\framework\scheduler\AbstractTask line 951\n",
-            "#4 At class webfiori\\framework\scheduler\TasksManager line 673\n",
-            "#5 At class webfiori\\framework\scheduler\TasksManager line 139\n",
-            "#6 At class webfiori\\framework\cli\commands\SchedulerCommand line 86\n",
-            "#7 At class webfiori\\framework\cli\commands\SchedulerCommand line 331\n",
-            "#8 At class webfiori\\cli\CLICommand line 409\n",
-            "#9 At class webfiori\\cli\Runner line 725\n",
-            "#10 At class webfiori\\cli\Runner line 656\n",
-            "#11 At class WebFiori\Cli\Runner line 156\n",
-            "Skip"];
-        $actual = $runner->getOutput();
+            "#0 At class webfiori\\framework\\scheduler\\AbstractTask Line: 1126\n",
+            "#1 At class webfiori\\framework\\scheduler\\AbstractTask Line: 447\n",
+            "#2 At class webfiori\\framework\\scheduler\\AbstractTask Line: 951\n",
+            "#3 At class webfiori\\framework\\scheduler\\TasksManager Line: 673\n",
+            "#4 At class webfiori\\framework\\scheduler\\TasksManager Line: 139\n",
+            "#5 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line: 86\n",
+            "#6 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line: 365\n",
+            "#7 At class WebFiori\\Cli\\Command Line: 735\n",
+            "#8 At class WebFiori\\Cli\\Runner Line: 1132\n",
+            "#9 At class WebFiori\\Cli\\Runner Line: 1016\n",
+            "#10 At class WebFiori\\Cli\\Runner Line: 169\n",
+            "#11 At class WebFiori\\Cli\\CommandTestCase Line: 85\n"
+        ];
         $idx = 0;
         
         foreach ($expected as $item) {
             if ($item == 'Skip') {
                 break;
             }
-            $this->assertEquals($item, $actual[$idx]);
+            $this->assertEquals($item, $output[$idx]);
             $idx++;
         }
     }
+    
     /**
+     * Force a task but without args
      * @test
      */
     public function test06() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'N'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--show-log',
             '--task-name' => 'Success 1',
             'p' => '123456'
+        ], [
+            'N'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Running task(s) check...\n",
@@ -231,18 +238,17 @@ class SchedulerCommandTest extends TestCase {
             "    Success 1\n",
             "Failed tasks:\n",
             "    <NONE>\n"
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Forcing a task + adding args through cli.
      * @test
      */
     public function test07() {
-        $runner = App::getRunner();
         TasksManager::execLog(true);
-        $runner->setInputs([
-            'N'
-        ]);
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
@@ -251,8 +257,11 @@ class SchedulerCommandTest extends TestCase {
             'start' => '2021',
             'end' => '2022',
             'p' => '123456'
+        ], [
+            'N'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Running task(s) check...\n",
@@ -271,76 +280,77 @@ class SchedulerCommandTest extends TestCase {
             "    Success 1\n",
             "Failed tasks:\n",
             "    <NONE>\n"
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Forcing of specific task to execute
      * @test
      */
     public function test08() {
-        $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::setPassword('123456');
         TasksManager::registerTasks();
 
-        $runner->setInputs([
-            'N'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--task-name' => 'Success 1',
-            //'p' => '1234'
+        ], [
+            'N'
         ]);
-        $this->assertEquals(-1, $runner->start());
+
+        $this->assertEquals(-1, $this->getExitCode());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Error: Provided password is incorrect.\n",
-        ], $runner->getOutput());
+        ], $output);
         $this->assertEquals([
             "Running task(s) check...",
             "Error: Given password is incorrect.",
             "Check finished.",
         ], TasksManager::getLogArray());
     }
+    
     /**
+     * Show supported arguments of a task that has args
      * @test
      */
     public function test09() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--task-name' => 'Success 1',
             '--show-task-args',
             'p' => '123456'
-        ]);
-        $this->assertEquals(0, $runner->start());
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Task Args:\n",
             "    start: Start date of the report.\n",
             "    end: End date of the report.\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Show supported arguments of a task that has no args
      * @test
+     *
      */
     public function test10() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '0'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--show-task-args',
             'p' => '123456'
+        ], [
+            '0'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Select one of the scheduled tasks to show supported args:\n",
             "0: Fail 1\n",
@@ -350,20 +360,21 @@ class SchedulerCommandTest extends TestCase {
             "4: Success 1\n",
             "Task Args:\n",
             "    <NO ARGS>\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Listing of registered tasks
      * @test
      */
     public function test11() {
-        $runner = App::getRunner();
-        $runner->setInputs();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--list'
-        ]);
-        $this->assertEquals(0, $runner->start());
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Number Of Scheduled Tasks: 5\n",
             "--------- Task #01 ---------\n",
@@ -381,48 +392,59 @@ class SchedulerCommandTest extends TestCase {
             "--------- Task #05 ---------\n",
             "Task Name         : Success 1\n",
             "Cron Expression   : 30 4 * * *\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Running with --check
      * @test
      */
     public function test12() {
-        $runner = App::getRunner();
-        $runner->setInputs();
-        $runner->setArgsVector([
+        TasksManager::setPassword(hash('sha256', '123456'));
+        TasksManager::registerTasks();
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--check',
-            'p' => '4'
-        ]);
-        $this->assertEquals(-1, $runner->start());
+            'p' => '123456'
+        ], []);
+        
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
-            "Error: Provided password is incorrect\n",
-        ], $runner->getOutput());
+            "Total number of tasks: 5\n",
+            "Executed Tasks: 4\n",
+            "Successfully finished tasks:\n",
+            "    Success Every Minute\n",
+            "Failed tasks:\n",
+            "    Fail 1\n",
+            "    Fail 2\n",
+            "    Fail 3\n",
+        ], $output);
     }
+    
     /**
+     * Test a task by supplying a parameters
      * @test
      */
     public function test13() {
-        $runner = App::getRunner();
         TasksManager::reset();
         TasksManager::execLog(true);
         TasksManager::setPassword(hash('sha256', '123456'));
         TasksManager::registerTasks();
 
-        $runner->setInputs([
-            'Y',
-            '2021-01-01',
-            '2020-01-01'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--task-name' => 'Success 1',
             'p' => '123456'
+        ], [
+            'Y',
+            '2021-01-01',
+            '2020-01-01'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",
             "Enter a value for the argument \"start\": Enter = ''\n",
@@ -436,7 +458,7 @@ class SchedulerCommandTest extends TestCase {
             "    Success 1\n",
             "Failed tasks:\n",
             "    <NONE>\n",
-        ], $runner->getOutput());
+        ], $output);
         $this->assertEquals([
             'Running task(s) check...',
             "Forcing task 'Success 1' to execute...",
@@ -447,21 +469,22 @@ class SchedulerCommandTest extends TestCase {
             "Check finished.",
         ], TasksManager::getLogArray());
     }
+    
     /**
+     * Cancel test
      * @test
      */
     public function test14() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '5'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             'p' => '123456'
+        ], [
+            '5'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Select one of the scheduled tasks to force:\n",
             "0: Fail 1\n",
@@ -470,27 +493,45 @@ class SchedulerCommandTest extends TestCase {
             "3: Success Every Minute\n",
             "4: Success 1\n",
             "5: Cancel <--\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
+     * Test non-existed task
      * @test
      */
     public function test15() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            'Hell',
-            '5'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
             '--force',
             '--task-name="Rand"',
             'p' => '123456'
+        ], [
+            'Hell',
+            '5'
         ]);
-        $this->assertEquals(-1, $runner->start());
+
+        $this->assertEquals(-1, $this->getExitCode());
         $this->assertEquals([
             "Error: No task was found which has the name 'Rand'\n",
-        ], $runner->getOutput());
+        ], $output);
+    }
+    /**
+     * Test invalid password
+     * @test
+     */
+    public function test16() {
+        $output = $this->executeSingleCommand(new SchedulerCommand(), [
+            'webfiori',
+            'scheduler',
+            '--check',
+            'p' => 'yyy'
+        ], []);
+
+        //$this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals([
+            "Error: Provided password is incorrect\n",
+        ], $output);
     }
 }

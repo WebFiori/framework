@@ -350,6 +350,9 @@ class TasksManager {
     public static function getPassword() : string {
         return self::get()->getPasswordHelper();
     }
+    public static function getTasks() : array {
+        return self::get()->tasksQueue()->toArray();
+    }
     /**
      * Returns a task given its name.
      *
@@ -795,8 +798,7 @@ class TasksManager {
      * Sets the password that is used to protect tasks execution.
      *
      * The password is used to prevent unauthorized access to execute tasks.
-     * The provided password must be 'sha256' hashed string. It is recommended
-     * to hash the password externally then use the hash inside your code.
+     * The provided password will be 'sha256' hashed.
      *
      * @param string $pass The password that will be used.
      */
@@ -981,6 +983,10 @@ class TasksManager {
      * @since 1.0
      */
     private function setPasswordHelper(string $pass) {
+        if (strlen($pass) != 0) {
+            $this->accessPass = hash('sha256', $pass);
+            return;
+        }
         $this->accessPass = $pass;
     }
 }

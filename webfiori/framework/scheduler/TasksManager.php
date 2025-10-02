@@ -866,10 +866,12 @@ class TasksManager {
             if ($task->getTaskName() == 'Background Task') {
                 $task->setTaskName('task-'.$this->tasksQueue()->size());
             }
-            $retVal = $this->tasksQueue->enqueue($task);
 
-            if ($retVal === true && !in_array($task->getTaskName(), $this->tasksNamesArr)) {
-                $this->tasksNamesArr[] = $task->getTaskName();
+            if (!in_array($task->getTaskName(), $this->tasksNamesArr)) {
+                $retVal = $this->tasksQueue->enqueue($task);
+                if ($retVal) {
+                    $this->tasksNamesArr[] = $task->getTaskName();
+                }
             }
         }
 

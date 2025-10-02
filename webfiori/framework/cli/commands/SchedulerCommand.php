@@ -63,8 +63,11 @@ class SchedulerCommand extends Command {
      */
     public function exec() : int {
         $retVal = -1;
-
-        if ($this->isArgProvided('--list')) {
+        $count = count(TasksManager::getTasks());
+        if ($count == 0) {
+            $this->info("There are no scheduled tasks.");
+            $retVal = 0;
+        } else if ($this->isArgProvided('--list')) {
             $this->listTasks();
             $retVal = 0;
         } else if ($this->isArgProvided('--check')) {

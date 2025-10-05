@@ -1030,25 +1030,8 @@ abstract class AbstractTask implements JsonI {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
-            $tempTasksQueue = new Queue();
-            $nameTaken = false;
-
-            while ($task = TasksManager::tasksQueue()->dequeue()) {
-                if ($task->getTaskName() == $trimmed) {
-                    $nameTaken = true;
-                }
-                $tempTasksQueue->enqueue($task);
-            }
-
-            while ($task = $tempTasksQueue->dequeue()) {
-                TasksManager::scheduleTask($task);
-            }
-
-            if (!$nameTaken) {
-                $this->taskName = $trimmed;
-
-                return true;
-            }
+            $this->taskName = $trimmed;
+            return true;
         }
 
         return false;

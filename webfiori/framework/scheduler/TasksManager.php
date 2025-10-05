@@ -369,18 +369,14 @@ class TasksManager {
         $retVal = null;
 
         if (strlen($trimmed) != 0) {
-            $tempQ = new Queue();
+            $tasks = self::tasksQueue()->toArray();
 
-            while ($task = &self::tasksQueue()->dequeue()) {
-                $tempQ->enqueue($task);
+            foreach ($tasks as $task) {
 
                 if ($task->getTaskName() == $trimmed) {
                     $retVal = $task;
+                    break;
                 }
-            }
-
-            while ($task = &$tempQ->dequeue()) {
-                self::scheduleTask($task);
             }
         }
 

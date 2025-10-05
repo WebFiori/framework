@@ -11,8 +11,11 @@ use webfiori\framework\scheduler\TasksManager;
  * @author Ibrahim
  */
 class SchedulerCommandTest extends CLITestCase {
-    public function setup() : void {
+    public function setUp() : void {
+        parent::setUp();
+        TasksManager::reset();
         TasksManager::setPassword('123456');
+        TasksManager::registerTasks();
     }
     /**
      * @test
@@ -177,12 +180,12 @@ class SchedulerCommandTest extends CLITestCase {
             "Thrown in: Fail2TestTask\n",
             "Line: 44\n",
             "Stack Trace:\n",
-            "#0 At class webfiori\\framework\\scheduler\\AbstractTask Line: 1126\n",
+            "#0 At class webfiori\\framework\\scheduler\\AbstractTask Line: 1109\n",
             "#1 At class webfiori\\framework\\scheduler\\AbstractTask Line: 447\n",
             "#2 At class webfiori\\framework\\scheduler\\AbstractTask Line: 951\n",
-            "#3 At class webfiori\\framework\\scheduler\\TasksManager Line: 673\n",
-            "#4 At class webfiori\\framework\\scheduler\\TasksManager Line: 139\n",
-            "#5 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line: 86\n",
+            "#3 At class webfiori\\framework\\scheduler\\TasksManager Line: 672\n",
+            "#4 At class webfiori\\framework\\scheduler\\TasksManager Line: 142\n",
+            "#5 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line: 89\n",
             "#6 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line: 365\n",
             "#7 At class WebFiori\\Cli\\Command Line: 735\n",
             "#8 At class WebFiori\\Cli\\Runner Line: 1132\n",
@@ -417,7 +420,7 @@ class SchedulerCommandTest extends CLITestCase {
     public function testForceTaskWithInteractiveArguments() {
         TasksManager::reset();
         TasksManager::execLog(true);
-        TasksManager::setPassword(hash('sha256', '123456'));
+        TasksManager::setPassword('123456');
         TasksManager::registerTasks();
 
         $output = $this->executeSingleCommand(new SchedulerCommand(), [

@@ -23,7 +23,7 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Returns the path to JSON configuration files.
      */
-    private static function getConfigPath(): string {
+    public static function getConfigPath(): string {
         return APP_PATH.'config'.DIRECTORY_SEPARATOR;
     }
     /**

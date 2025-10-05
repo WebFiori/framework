@@ -1043,6 +1043,7 @@ class WebPage {
             }
             $this->theme = $tmpTheme;
             $this->theme->setPage($this);
+            $this->theme->invokeBeforeLoaded();
             $mainContentArea = $this->getDocument()->getChildByID(self::MAIN_ELEMENTS[2]);
 
             if ($mainContentArea === null) {

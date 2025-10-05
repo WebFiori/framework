@@ -217,7 +217,9 @@ class ThemeManager {
         if (class_exists($xName, false)) {
             
             foreach (self::$registeredThemes as $theme) {
-                if (get_class($theme) == $xName) {
+                $clazz = '\\'.get_class($theme);
+                
+                if ($clazz == $xName) {
                     return $theme;
                 }
             }

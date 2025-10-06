@@ -142,32 +142,35 @@ class ThemeManager {
      */
     private static function registerResourcesRoutes(Theme $theme) {
         $assetsFolderName = 'assets';
-        $publicPath = ROOT_PATH.DS.PUBLIC_FOLDER.DS.$assetsFolderName.DS;
-        $themeResourcesPath = $theme->getAbsolutePath().DS.$assetsFolderName.DS;
-        $themePublicPath = $publicPath.DS.$assetsFolderName.DS.$theme->getDirectoryName().DS.$theme->getVersion().DS;
+        $publicPath = ROOT_PATH.DS.PUBLIC_FOLDER.DS.$assetsFolderName;
+        $themeResourcesPath = $theme->getAbsolutePath().DS.$assetsFolderName;
+        $themePublicPath = $publicPath.DS.$theme->getDirectoryName().DS.$theme->getVersion();
 
         if (!is_dir($themePublicPath)) {
             mkdir($themePublicPath, 0777, true);
-            $jsDir = $themeResourcesPath.$theme->getJsDirName();
-            if (is_dir($jsDir)) {
-                mkdir($themePublicPath.DS.$theme->getJsDirName());
-                copy($jsDir, $themePublicPath.DS.$theme->getJsDirName());
-            }
-            $cssDir = $themeResourcesPath.$theme->getCssDirName();
-            if (is_dir($cssDir)) {
-                mkdir($themePublicPath.DS.$theme->getCssDirName());
-                copy($cssDir, $themePublicPath.DS.$theme->getCssDirName());
-            }
-            $ImagesDir = $themeResourcesPath.$theme->getImagesDirName();
-            if (is_dir($ImagesDir)) {
-                mkdir($themePublicPath.DS.$theme->getImagesDirName());
-                copy($ImagesDir, $themePublicPath.DS.$theme->getImagesDirName());
+        }
+        
+        if (is_dir($themeResourcesPath)) {
+            self::copyDirectory($themeResourcesPath, $themePublicPath);
+        }
+    }
+    
+    private static function copyDirectory($source, $destination) {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        
+        foreach ($iterator as $item) {
+            $destPath = $destination . DS . $iterator->getSubPathName();
+            if ($item->isDir()) {
+                if (!is_dir($destPath)) {
+                    mkdir($destPath, 0777, true);
+                }
+            } else {
+                copy($item, $destPath);
             }
         }
-
-        self::createAssetsRoutes($theme->getDirectoryName(), $theme->getJsDirName());
-        self::createAssetsRoutes($theme->getDirectoryName(), $theme->getCssDirName());
-        self::createAssetsRoutes($theme->getDirectoryName(), $theme->getImagesDirName());
     }
     private static function createAssetsRoutes($themeDirName, $dir) {
         Router::closure([

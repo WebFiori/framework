@@ -301,6 +301,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testGetSessionIDFromRequest() {
+        unset($_POST["my-s"]);
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
         putenv('REQUEST_METHOD=GET');
         $_GET['my-s'] = 'super';

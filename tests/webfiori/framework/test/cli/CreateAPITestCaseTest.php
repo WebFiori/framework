@@ -20,11 +20,11 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--service' => 'c'
         ]);
         
-        if ($output[0] !== "Error: The argument --manager has invalid value.\n") {
+        if ($output[0] !== "Error: The argument --manager has invalid value: Not a class: A\n") {
             $this->fail("Expected error message not found. Full output: " . implode('', $output));
         }
         
-        $this->assertEquals("Error: The argument --manager has invalid value.\n", $output[0]);
+        $this->assertEquals("Error: The argument --manager has invalid value: Not a class: A\n", $output[0]);
         $this->assertEquals(-1, $this->getExitCode());
     }
     /**
@@ -210,7 +210,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase07() {
         $this->assertEquals([
-            "Error: The argument --manager has invalid value.\n",
+            "Error: The argument --manager has invalid value: Not a class: \\tests\\apis\\emptyService\\Xyz\n",
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',

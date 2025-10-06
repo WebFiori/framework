@@ -76,28 +76,31 @@ class CreateAPITestCase extends CreateClassHelper {
         $instance = null;
 
         if ($m !== null) {
-            if (class_exists($m, false)) {
-                try {
-                    $instance = new $m();
-                } catch (\Throwable $ex) {
-                    $this->error("The argument --manager has invalid value.");
-                    return false;
-                }
+            try {
+            if (class_exists($m)) {
+                
+                $instance = new $m();
+                
 
                 if ($instance instanceof WebServicesManager) {
                     $this->writer->setServicesManager($instance);
 
                     return true;
                 } else {
-                    $this->error("The argument --manager has invalid value.");
+                    $this->error("The argument --manager has invalid value: Not an instance of ".WebServicesManager::class);
 
                     return false;
                 }
+                
             } else {
-                $this->error("The argument --manager has invalid value.");
+                $this->error("The argument --manager has invalid value: Not a class: ".$m);
 
                 return false;
             }
+            } catch (\Throwable $ex) {
+                    $this->error("The argument --manager has invalid value: ".$ex->getMessage());
+                    return false;
+                }
         }
 
         if ($instance === null) {

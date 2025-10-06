@@ -5,6 +5,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Lang;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\session\DefaultSessionStorage;
 /**
  * Description of LanguageTest
  *
@@ -175,6 +176,7 @@ class LanguageTest extends TestCase {
      */
     public function testGetLabel02() {
         $_SERVER['REQUEST_METHOD'] = 'POST';
+        SessionsManager::setStorage(new DefaultSessionStorage());
         SessionsManager::start('new-x-session');
         $_POST['lang'] = 'ar';
         $this->assertEquals('طباعة التقرير', Lang::getLabel('general.action.print','AR'));

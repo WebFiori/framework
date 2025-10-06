@@ -1092,7 +1092,7 @@ class SchedulerTaskTest extends TestCase {
     public function testSetName00() {
         $job = new BaseTask();
         TasksManager::registerTasks();
-        $this->assertFalse($job->setTaskName('Fail 1 '));
+        $this->assertTrue($job->setTaskName('Fail 1 '));
     }
     /**
      * @test

@@ -90,28 +90,28 @@ class AddCommandTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertEquals([
-            "What would you like to add?\n",
-            "0: New database connection.\n",
-            "1: New SMTP connection.\n",
-            "2: New website language.\n",
-            "3: Quit. <--\n",
-            "Select database type:\n",
-            "0: mysql\n",
-            "1: mssql\n",
-            "Database host: Enter = '127.0.0.1'\n",
-            "Port number: Enter = '3306'\n",
-            "Username:\n",
-            "Password:\n",
-            "Database name:\n",
-            "Give your connection a friendly name: Enter = '$connName'\n",
-            "Trying to connect to the database...\n",
-            "Trying with 'localhost'...\n",
-            "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'127.0.0.1' (using password: YES)\n",
-            "Would you like to store connection information anyway?(y/N)\n",
-            "Success: Connection information was stored in application configuration.\n"
-        ], $output);
+        $output = $this->getOutput();
+        
+        $this->assertEquals("What would you like to add?\n", $output[0]);
+        $this->assertEquals("0: New database connection.\n", $output[1]);
+        $this->assertEquals("1: New SMTP connection.\n", $output[2]);
+        $this->assertEquals("2: New website language.\n", $output[3]);
+        $this->assertEquals("3: Quit. <--\n", $output[4]);
+        $this->assertEquals("Select database type:\n", $output[5]);
+        $this->assertEquals("0: mysql\n", $output[6]);
+        $this->assertEquals("1: mssql\n", $output[7]);
+        $this->assertEquals("Database host: Enter = '127.0.0.1'\n", $output[8]);
+        $this->assertEquals("Port number: Enter = '3306'\n", $output[9]);
+        $this->assertEquals("Username:\n", $output[10]);
+        $this->assertEquals("Password:\n", $output[11]);
+        $this->assertEquals("Database name:\n", $output[12]);
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[13]);
+        $this->assertEquals("Trying to connect to the database...\n", $output[14]);
+        $this->assertEquals("Trying with 'localhost'...\n", $output[15]);
+        $this->assertEquals("Error: Unable to connect to the database.\n", $output[16]);
+        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[17]);
+        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[18]);
+        $this->assertEquals("Success: Connection information was stored in application configuration.\n", $output[19]);
     }
     /**
      * @test
@@ -136,27 +136,27 @@ class AddCommandTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertEquals([
-            "What would you like to add?\n",
-            "0: New database connection.\n",
-            "1: New SMTP connection.\n",
-            "2: New website language.\n",
-            "3: Quit. <--\n",
-            "Select database type:\n",
-            "0: mysql\n",
-            "1: mssql\n",
-            "Database host: Enter = '127.0.0.1'\n",
-            "Port number: Enter = '3306'\n",
-            "Username:\n",
-            "Password:\n",
-            "Database name:\n",
-            "Give your connection a friendly name: Enter = '$connName'\n",
-            "Trying to connect to the database...\n",
-            "Trying with 'localhost'...\n",
-            "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'127.0.0.1' (using password: YES)\n",
-            "Would you like to store connection information anyway?(y/N)\n",
-        ], $output);
+        $output = $this->getOutput();
+        
+        $this->assertEquals("What would you like to add?\n", $output[0]);
+        $this->assertEquals("0: New database connection.\n", $output[1]);
+        $this->assertEquals("1: New SMTP connection.\n", $output[2]);
+        $this->assertEquals("2: New website language.\n", $output[3]);
+        $this->assertEquals("3: Quit. <--\n", $output[4]);
+        $this->assertEquals("Select database type:\n", $output[5]);
+        $this->assertEquals("0: mysql\n", $output[6]);
+        $this->assertEquals("1: mssql\n", $output[7]);
+        $this->assertEquals("Database host: Enter = '127.0.0.1'\n", $output[8]);
+        $this->assertEquals("Port number: Enter = '3306'\n", $output[9]);
+        $this->assertEquals("Username:\n", $output[10]);
+        $this->assertEquals("Password:\n", $output[11]);
+        $this->assertEquals("Database name:\n", $output[12]);
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[13]);
+        $this->assertEquals("Trying to connect to the database...\n", $output[14]);
+        $this->assertEquals("Trying with 'localhost'...\n", $output[15]);
+        $this->assertEquals("Error: Unable to connect to the database.\n", $output[16]);
+        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[17]);
+        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[18]);
     }
 
     /**

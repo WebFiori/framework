@@ -76,8 +76,13 @@ class CreateAPITestCase extends CreateClassHelper {
         $instance = null;
 
         if ($m !== null) {
-            if (class_exists($m)) {
-                $instance = new $m();
+            if (class_exists($m, false)) {
+                try {
+                    $instance = new $m();
+                } catch (\Throwable $ex) {
+                    $this->error("The argument --manager has invalid value.");
+                    return false;
+                }
 
                 if ($instance instanceof WebServicesManager) {
                     $this->writer->setServicesManager($instance);
@@ -108,6 +113,7 @@ class CreateAPITestCase extends CreateClassHelper {
                 }
             }
         }
+        return false;
     }
     private function readServiceInfo() : bool {
         $selected = $this->getCommand()->getArgValue('--service');

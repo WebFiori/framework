@@ -8,7 +8,7 @@ use webfiori\framework\Access;
 use webfiori\framework\App;
 use webfiori\framework\Lang;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Theme;
+use webfiori\framework\ThemeManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\User;
 use WebFiori\UI\HTMLNode;
@@ -18,6 +18,23 @@ use WebFiori\UI\HTMLNode;
  * @author Ibrahim
  */
 class PageTest extends TestCase {
+    
+    protected function setUp(): void {
+        parent::setUp();
+        
+        // Register test themes to avoid directory creation errors
+        $registeredThemes = ThemeManager::getRegisteredThemes();
+        $themeNames = array_keys($registeredThemes);
+        
+        if (!in_array('New Theme 2', $themeNames)) {
+            ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
+        }
+        
+        if (!in_array('New Super Theme', $themeNames)) {
+            ThemeManager::register(new \themes\fioriTheme\NewFTestTheme());
+        }
+    }
+    
     /**
      * @test
      */

@@ -83,7 +83,7 @@ class AddCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 3306)
             'root',
-            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
+            'not_correct',
             'testing_db',
             "\n", // Hit Enter to pick default value (connection name)
             'y'
@@ -129,7 +129,7 @@ class AddCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 3306)
             'root',
-            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
+            'not_correct',
             'testing_db',
             "\n", // Hit Enter to pick default value (connection name)
             'n'

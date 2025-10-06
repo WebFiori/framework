@@ -144,10 +144,10 @@ class ThemeManager {
         $assetsFolderName = 'assets';
         $publicPath = ROOT_PATH.DS.PUBLIC_FOLDER.DS.$assetsFolderName.DS;
         $themeResourcesPath = $theme->getAbsolutePath().DS.$assetsFolderName.DS;
-        $themePublicPath = $publicPath.DS.$theme->getDirectoryName();
+        $themePublicPath = $publicPath.DS.$assetsFolderName.DS.$theme->getDirectoryName().DS.$theme->getVersion().DS;
 
         if (!is_dir($themePublicPath)) {
-            mkdir($themePublicPath, 0777);
+            mkdir($themePublicPath, 0777, true);
             $jsDir = $themeResourcesPath.$theme->getJsDirName();
             if (is_dir($jsDir)) {
                 mkdir($themePublicPath.DS.$theme->getJsDirName());

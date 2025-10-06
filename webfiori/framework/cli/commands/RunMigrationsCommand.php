@@ -35,7 +35,6 @@ class RunMigrationsCommand extends Command {
     private $connectionInfo;
     public function __construct() {
         parent::__construct('migrations', [
-            new Argument('--ns', 'The namespace that holds the migrations', true),
             new Argument('--connection', 'The name of database connection to be used in executing the migrations.', true),
             new Argument('--runner', 'A class that extends the class "WebFiori\Database\Schema\SchemaRunner".', true),
             new Argument('--ini', 'Creates migrations table in database if not exist.', true),
@@ -80,16 +79,6 @@ class RunMigrationsCommand extends Command {
         }
         return 0;
     }
-    private function getNS(?SchemaRunner $runner = null) {
-        if ($this->isArgProvided('--ns')) {
-            return $this->getArgValue('--ns');
-        } else if ($runner !== null) {
-            // Removed getMigrationsNamespace() call as it doesn't exist in SchemaRunner
-        } else {
-            $this->info("Using default namespace for migrations.");
-            return '\\'.APP_DIR.'\\database\\migrations';
-        }
-    }
 
     /**
      * Execute the command.
@@ -103,11 +92,6 @@ class RunMigrationsCommand extends Command {
         if (!($runner instanceof SchemaRunner) && $runner !== null) {
             return -1;
         }
-        $ns = $this->getNS($runner);
-        
-        if (!$this->hasMigrations($ns)) {
-            return 0;
-        }
         
         $connection = $this->getDBConnection($runner);
         if (!($connection instanceof ConnectionInfo)) {
@@ -119,12 +103,6 @@ class RunMigrationsCommand extends Command {
         }
 
         
-        try {
-            $runner = new SchemaRunner($connection);
-        } catch (Throwable $ex) {
-            $this->error($ex->getMessage());
-            return -1;
-        }
         if ($this->isArgProvided("--rollback")) {
             return $this->rollbackMigration($runner);
         } else {
@@ -136,20 +114,25 @@ class RunMigrationsCommand extends Command {
         $rolledCount = 0;
         if ($isAll) {
             $this->println("Rolling back migrations...");
-            do {
-                $migration = $this->doRollback($runner);
-                if ($migration === false) {
-                    return -1;
-                }
+            $migrations = $runner->rollbackUpTo(null);
+            foreach ($migrations as $migration) {
                 $this->printInfo($migration, $rolledCount);
-            } while ($migration !== null);
-        } else {
-            $this->println("Rolling back last executed migration...");
-            $migration = $this->doRollback($runner);
-            if ($migration === false) {
-                return -1;
             }
-            $this->printInfo($migration, $rolledCount);
+        } else {
+            $changes = $runner->getChanges();
+            $change = null;
+            $applied = null;
+
+            foreach ($changes as $change) {
+                if (!$runner->isApplied($change->getName())) {
+                    
+                    break;
+                }
+                $applied = $change;
+            }
+            if ($applied !== null) {
+                $runner->rollbackUpTo($applied->getName());
+            }
         }
         if ($rolledCount == 0) {
             $this->info("No migration rolled back.");
@@ -158,7 +141,7 @@ class RunMigrationsCommand extends Command {
         
         return 0;
     }
-    private function doRollback(SchemaRunner $runner) {
+    private function doRollback(SchemaRunner $runner) : array {
         try {
             return $runner->rollbackUpTo(null);
             
@@ -166,8 +149,8 @@ class RunMigrationsCommand extends Command {
             $this->error('Failed to execute migration due to following:');
             $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
             $this->warning('Execution stopped.');
-            return false;
         }
+        return [];
     }
     private function printInfo(?AbstractMigration $migration, &$rolledCount = 0) {
         if ($migration !== null) {

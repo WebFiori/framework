@@ -12,15 +12,18 @@ use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\JsonDriver;
+use webfiori\framework\ThemeManager;
+use themes\fioriTheme\NewFTestTheme;
+use themes\fioriTheme2\NewTestTheme2;
 
 $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
-define('SQL_SERVER_HOST', 'localhost\SQLEXPRESS');
-define('SQL_SERVER_USER', 'sa');
-define('SQL_SERVER_PASS', '1234567890@Eu');
-define('SQL_SERVER_DB', 'testing_db');
+define('SQL_SERVER_HOST', getenv('SQL_SERVER_HOST') ?: 'localhost');
+define('SQL_SERVER_USER', getenv('SQL_SERVER_USER') ?: 'sa');
+define('SQL_SERVER_PASS', getenv('SA_SQL_SERVER_PASSWORD') ?: '1234567890@Eu');
+define('SQL_SERVER_DB', getenv('SQL_SERVER_DB') ?: 'testing_db');
 define('ODBC_VERSION', 17);
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
@@ -112,10 +115,10 @@ register_shutdown_function(function()
     $conn = new ConnectionInfo('mssql',SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
         'TrustServerCertificate' => 'true'
     ]);
-    $runner = new SchemaRunner(APP_PATH, '', $conn);
+    
     try {
-        $runner->dropChangesTable();
-    } catch (\Exception $exc) {
+      //  $runner = new SchemaRunner($conn);
+      //  $runner->dropChangesTable();
         
     } catch (\Throwable $exc) {
         fprintf(STDOUT,'Error on register_shutdown_function:'."\n\n");
@@ -124,6 +127,11 @@ register_shutdown_function(function()
 
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
+fprintf(STDOUT,"---------------------------------\n");
+fprintf(STDOUT,"Adding themes...\n");
+ThemeManager::register(new NewFTestTheme());
+ThemeManager::register(new NewTestTheme2());
+fprintf(STDOUT,"Done\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Starting to run tests...\n");
 fprintf(STDOUT,"---------------------------------\n");

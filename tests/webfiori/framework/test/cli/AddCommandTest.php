@@ -83,7 +83,7 @@ class AddCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 3306)
             'root',
-            '12345326',
+            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
             'testing_db',
             "\n", // Hit Enter to pick default value (connection name)
             'y'
@@ -108,7 +108,7 @@ class AddCommandTest extends CLITestCase {
             "Trying to connect to the database...\n",
             "Trying with 'localhost'...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'127.0.0.1' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in application configuration.\n"
         ], $output);
@@ -129,7 +129,7 @@ class AddCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 3306)
             'root',
-            '12345326',
+            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
             'testing_db',
             "\n", // Hit Enter to pick default value (connection name)
             'n'
@@ -154,7 +154,7 @@ class AddCommandTest extends CLITestCase {
             "Trying to connect to the database...\n",
             "Trying with 'localhost'...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'127.0.0.1' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
         ], $output);
     }
@@ -258,7 +258,7 @@ class AddCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 25)
             'test@example.com',
-            '12345326',
+            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
             'test@example.com',
             'test@example.com',
             "\n", // Hit Enter to pick default value (connection name)

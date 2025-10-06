@@ -13,10 +13,11 @@ use webfiori\framework\writers\DatabaseMigrationWriter;
 class DatabaseMigrationWriterTest extends TestCase {
     
     protected function tearDown(): void {
-        // Clean up all migration files after each test
+        // Clean up only the Migration files created by this test (Migration000, Migration001, etc.)
         $migrationsDir = APP_PATH . DS . 'database' . DS . 'migrations';
         if (is_dir($migrationsDir)) {
-            $files = glob($migrationsDir . DS . 'Migration*.php');
+            // Only remove Migration files directly in the migrations directory, not in subdirectories
+            $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
             foreach ($files as $file) {
                 if (is_file($file)) {
                     unlink($file);

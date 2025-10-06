@@ -10,15 +10,17 @@ use webfiori\framework\cli\commands\CreateCommand;
 class CreateMigrationTest extends CLITestCase {
     
     protected function tearDown(): void {
-        // Clean up all migration files after each test
+        // Clean up only specific migration files created by this test
         $migrationsDir = APP_PATH . DS . 'database' . DS . 'migrations';
         if (is_dir($migrationsDir)) {
-            $files = glob($migrationsDir . DS . 'Migration*.php');
+            // Only remove Migration files directly in the migrations directory
+            $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
             foreach ($files as $file) {
                 if (is_file($file)) {
                     unlink($file);
                 }
             }
+            // Remove Cool* files created by this test
             $files = glob($migrationsDir . DS . 'Cool*.php');
             foreach ($files as $file) {
                 if (is_file($file)) {

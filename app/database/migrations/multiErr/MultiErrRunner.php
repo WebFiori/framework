@@ -3,8 +3,6 @@ namespace app\database\migrations\multiErr;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;
-use const APP_PATH;
-use const DS;
 
 
 class MultiErrRunner extends SchemaRunner {

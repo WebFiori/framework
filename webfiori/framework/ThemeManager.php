@@ -141,18 +141,28 @@ class ThemeManager {
      * @since 1.0.1
      */
     private static function registerResourcesRoutes(Theme $theme) {
+        $assetsFolderName = 'assets';
+        $publicPath = ROOT_PATH.DS.PUBLIC_FOLDER.DS.$assetsFolderName.DS;
+        $themeResourcesPath = $theme->getAbsolutePath().DS.$assetsFolderName.DS;
+        $themePublicPath = $publicPath.DS.$theme->getDirectoryName();
 
-        $publicPath = ROOT_PATH.DS.PUBLIC_FOLDER.DS;
-        $themePath = $publicPath.$theme->getDirectoryName();
-
-        if (!is_dir($themePath)) {
-            mkdir($themePath, 0777);
-            mkdir($themePath.DS.$theme->getJsDirName(), 0777);
-            copy($theme->getAbsolutePath().DS.'assets'.DS.$theme->getJsDirName(), $themePath.DS.$theme->getJsDirName());
-            mkdir($themePath.DS.$theme->getCssDirName(), 0777);
-            copy($theme->getAbsolutePath().DS.'assets'.DS.$theme->getCssDirName(), $themePath.DS.$theme->getCssDirName());
-            mkdir($themePath.DS.$theme->getImagesDirName(), 0777);
-            copy($theme->getAbsolutePath().DS.'assets'.DS.$theme->getImagesDirName(), $themePath.DS.$theme->getImagesDirName());
+        if (!is_dir($themePublicPath)) {
+            mkdir($themePublicPath, 0777);
+            $jsDir = $themeResourcesPath.$theme->getJsDirName();
+            if (is_dir($jsDir)) {
+                mkdir($themePublicPath.DS.$theme->getJsDirName());
+                copy($jsDir, $themePublicPath.DS.$theme->getJsDirName());
+            }
+            $cssDir = $themeResourcesPath.$theme->getCssDirName();
+            if (is_dir($cssDir)) {
+                mkdir($themePublicPath.DS.$theme->getCssDirName());
+                copy($cssDir, $themePublicPath.DS.$theme->getCssDirName());
+            }
+            $ImagesDir = $themeResourcesPath.$theme->getImagesDirName();
+            if (is_dir($ImagesDir)) {
+                mkdir($themePublicPath.DS.$theme->getImagesDirName());
+                copy($ImagesDir, $themePublicPath.DS.$theme->getImagesDirName());
+            }
         }
 
         self::createAssetsRoutes($theme->getDirectoryName(), $theme->getJsDirName());

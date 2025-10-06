@@ -60,6 +60,7 @@ class ThemeTest extends TestCase {
     public function testUseTheme00() {
         $themeName = 'New Theme 2';
         ThemeManager::resetRegistered();
+        ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
         //$this->assertFalse(Theme::isThemeLoaded($themeName));
         $theme = ThemeManager::usingTheme($themeName);
         $this->assertTrue($theme instanceof Theme);
@@ -84,6 +85,7 @@ class ThemeTest extends TestCase {
         App::getConfig()->setTheme('');
         $theme = ThemeManager::usingTheme();
         $this->assertNull($theme);
+        ThemeManager::register(new NewFTestTheme());
         $theme = ThemeManager::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());

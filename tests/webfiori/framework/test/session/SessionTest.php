@@ -6,12 +6,19 @@ use WebFiori\File\File;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionStatus;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\session\DefaultSessionStorage;
 /**
  * Description of SessionTest
  *
  * @author Eng.Ibrahim
  */
 class SessionTest extends TestCase {
+
+    protected function setUp(): void {
+        SessionsManager::setStorage(new DefaultSessionStorage());
+    }
+
     /**
      * @depends testStart00
      * @param Session $session

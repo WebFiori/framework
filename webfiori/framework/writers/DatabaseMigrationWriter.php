@@ -25,8 +25,8 @@ class DatabaseMigrationWriter extends ClassWriter {
      *
      */
     public function __construct(?SchemaRunner $runner) {
-        $name = 'Database';
-        $this->setSuffix('Migration');
+        $name = 'DatabaseMigration';
+        
         
         $this->setClassName($name);
         

@@ -225,7 +225,7 @@ abstract class ClassWriter {
      * Default is empty string.
      */
     public function getSuffix() : string {
-        return $this->suffix;
+        return $this->suffix !== null ? $this->suffix : '';
     }
     /**
      * Returns an array that contains all classes which will be included

@@ -1,6 +1,7 @@
 <?php
 namespace app\database\migrations\multi;
 
+use PHPUnit\TextUI\XmlConfiguration\Migration;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;
 use const APP_PATH;
@@ -14,5 +15,8 @@ class MultiRunner extends SchemaRunner {
             'TrustServerCertificate' => 'true'
         ]);
         parent::__construct($conn);
+        $this->register(Migration000::class);
+        $this->register(Migration001::class);
+        $this->register(Migration002::class);
     }
 }

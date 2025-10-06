@@ -8,6 +8,26 @@ use webfiori\framework\cli\commands\CreateCommand;
  * @author Ibrahim
  */
 class CreateMigrationTest extends CLITestCase {
+    
+    protected function tearDown(): void {
+        // Clean up all migration files after each test
+        $migrationsDir = APP_PATH . DS . 'database' . DS . 'migrations';
+        if (is_dir($migrationsDir)) {
+            $files = glob($migrationsDir . DS . 'Migration*.php');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+            $files = glob($migrationsDir . DS . 'Cool*.php');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
+        parent::tearDown();
+    }
     /**
      * @test
      */

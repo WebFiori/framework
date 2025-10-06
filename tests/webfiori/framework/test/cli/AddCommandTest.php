@@ -165,7 +165,7 @@ class AddCommandTest extends CLITestCase {
     public function testAddLang00() {
         $output = $this->executeSingleCommand(new AddCommand(), [], [
             '2',
-            'FK',
+            'ZZ',
             'F Name',
             'F description',
             'Default f Title',
@@ -188,8 +188,8 @@ class AddCommandTest extends CLITestCase {
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
         ], $output);
-        $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
-        $this->removeClass('\\app\\langs\\LangFK');
+        $this->assertTrue(class_exists('\\app\\langs\\LangZZ'));
+        $this->removeClass('\\app\\langs\\LangZZ');
         Controller::getDriver()->initialize();
     }
     /**
@@ -232,7 +232,6 @@ class AddCommandTest extends CLITestCase {
             "Language code:\n",
             "Error: Invalid language code.\n",
         ], $output);
-        $this->assertTrue(class_exists('\\app\\langs\\LangFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }
     /**

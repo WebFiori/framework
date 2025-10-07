@@ -94,7 +94,7 @@ ClassLoader::get([
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
-App::initiate('app', 'public', $ROOT);
+App::initiate('App', 'public', $ROOT);
 App::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Autoload Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");

@@ -13,7 +13,7 @@ namespace WebFiori\Framework\Handlers;
 use WebFiori\Error\AbstractHandler;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Router\Router;
-use WebFiori\Framework\UI\ServerErrPage\ServerErrPage;
+use WebFiori\Framework\Ui\ServerErrPage\ServerErrPage;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**

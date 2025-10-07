@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace WebFiori\Framework\UI;
+namespace WebFiori\Framework\Ui;
 
 /**
  * A page which is shown to the framework users when the developer has not

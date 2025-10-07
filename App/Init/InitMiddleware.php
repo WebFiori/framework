@@ -1,12 +1,13 @@
 <?php
-namespace App\Ini;
+
+namespace App\Init;
 
 class InitMiddleware {
     /**
-     * Register middleware which are created outside the folder 'app/middleware'.
+     * Register middleware which are created outside the folder '[APP_DIR]/middleware'.
      *
-     * @since 1.0
-     */
+     **/
     public static function init() {
+            
     }
 }

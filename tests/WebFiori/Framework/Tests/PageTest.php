@@ -9,7 +9,7 @@ use WebFiori\Framework\App;
 use WebFiori\Framework\Lang;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Framework\ThemeManager;
-use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Framework\User;
 use WebFiori\Ui\HTMLNode;
 /**

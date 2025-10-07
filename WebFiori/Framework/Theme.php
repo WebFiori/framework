@@ -11,7 +11,7 @@
 namespace WebFiori\Framework;
 
 use ReflectionClass;
-use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
 use WebFiori\Ui\exceptions\InvalidNodeNameException;

@@ -4,7 +4,7 @@ namespace WebFiori\Framework\Test\Cli;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Router\Router;
-use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\Ui\WebPage;
 /**
  * Description of ListRoutesCommandTest
  *

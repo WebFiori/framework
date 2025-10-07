@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace WebFiori\Framework\UI\ServerErrPage;
+namespace WebFiori\Framework\Ui\ServerErrPage;
 
 use WebFiori\Error\AbstractHandler;
-use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Ui\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or

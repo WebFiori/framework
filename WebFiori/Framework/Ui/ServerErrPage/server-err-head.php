@@ -1,5 +1,5 @@
 <?php
-namespace WebFiori\Framework\UI\ServerErrPage;
+namespace WebFiori\Framework\Ui\ServerErrPage;
 
 ?>
 <head>

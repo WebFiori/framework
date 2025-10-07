@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace WebFiori\Framework\UI;
+namespace WebFiori\Framework\Ui;
 
 use WebFiori\Framework\App;
 use WebFiori\Ui\HTMLNode;

@@ -127,12 +127,12 @@ class App {
 
         $this->initThemesPath();
         
-        if (!class_exists(APP_DIR.'\ini\InitPrivileges')) {
+        if (!class_exists(APP_DIR.'\\Init\\InitPrivileges')) {
             Ini::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
-        self::call(APP_DIR.'\ini\InitPrivileges::init');
+        self::call(APP_DIR.'\\Init\\InitPrivileges::init');
 
         $this->initMiddleware();
         $this->initRoutes();
@@ -384,7 +384,7 @@ class App {
      * @throws FileException
      */
     public static function getRunner() : Runner {
-        if (!class_exists(APP_DIR.'\ini\InitCommands')) {
+        if (!class_exists(APP_DIR.'\Init\InitCommands')) {
             Ini::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
         }
 
@@ -435,7 +435,7 @@ class App {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
-                self::call(APP_DIR.'\ini\InitCommands::init');
+                self::call(APP_DIR.'\Init\InitCommands::init');
             });
         }
 
@@ -621,11 +621,11 @@ class App {
         }
         self::$AU = ClassLoader::get();
 
-        if (!class_exists(APP_DIR.'\ini\InitAutoLoad')) {
+        if (!class_exists(APP_DIR.'\\Init\\InitAutoLoad')) {
             Ini::createAppDirs();
             Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
-        self::call(APP_DIR.'\ini\InitAutoLoad::init');
+        self::call(APP_DIR.'\\Init\\InitAutoLoad::init');
     }
     /**
      * Initialize global constants which has information about framework version.
@@ -671,11 +671,11 @@ class App {
             MiddlewareManager::register($inst);
         });
 
-        if (!class_exists(APP_DIR.'\ini\InitMiddleware')) {
+        if (!class_exists(APP_DIR.'\Init\InitMiddleware')) {
             Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
-        self::call(APP_DIR.'\ini\InitMiddleware::init');
+        self::call(APP_DIR.'\Init\InitMiddleware::init');
     }
     /**
      * @throws FileException
@@ -684,10 +684,10 @@ class App {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
-            if (!class_exists(APP_DIR.'\\ini\\routes\\'.$className)) {
+            if (!class_exists(APP_DIR.'\\Init\\routes\\'.$className)) {
                 Ini::get()->createRoutesClass($className);
             }
-            self::call(APP_DIR.'\ini\routes\\'.$className.'::create');
+            self::call(APP_DIR.'\Init\routes\\'.$className.'::create');
         }
 
         if (Router::routesCount() != 0) {
@@ -706,7 +706,7 @@ class App {
         $uriObj = new RouterUri(Request::getRequestedURI(), '');
         $pathArr = $uriObj->getPathArray();
 
-        if (!class_exists(APP_DIR.'\ini\InitTasks')) {
+        if (!class_exists(APP_DIR.'\Init\InitTasks')) {
             Ini::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
         }
 
@@ -716,7 +716,7 @@ class App {
             }
             TasksManager::getPassword(self::getConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
-            self::call(APP_DIR.'\ini\InitTasks::init');
+            self::call(APP_DIR.'\Init\InitTasks::init');
             TasksManager::registerTasks();
         }
     }

@@ -11,7 +11,7 @@
 namespace WebFiori\Framework;
 
 use WebFiori\Framework\Cli\Runner;
-use WebFiori\Framework\UI\MessageBox;
+use WebFiori\Framework\Ui\MessageBox;
 use WebFiori\Http\Response;
 /**
  * Framework utility class.

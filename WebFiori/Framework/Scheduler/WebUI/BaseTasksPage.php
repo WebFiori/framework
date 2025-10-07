@@ -11,7 +11,7 @@
 namespace WebFiori\Framework\Scheduler\WebUI;
 
 use WebFiori\Framework\App;
-use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Json\Json;
 use WebFiori\Ui\HTMLNode;
 use WebFiori\Ui\JsCode;

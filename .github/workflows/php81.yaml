@@ -89,7 +89,7 @@ jobs:
         run: composer install --prefer-source --no-interaction
       
       - name: Execute Tests
-        run: phpunit --configuration=tests/phpunit.xml --coverage-clover=clover.xml --verbose --stop-on-failure
+        run: phpunit --configuration=tests/phpunit.xml --coverage-clover=clover.xml --verbose
         
       - name: Rename coverage report
         run: |

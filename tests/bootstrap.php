@@ -20,6 +20,7 @@ $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
+define('MYSQL_ROOT_PASSWORD', getenv('MYSQL_ROOT_PASSWORD') ?: '123456');
 define('SQL_SERVER_HOST', getenv('SQL_SERVER_HOST') ?: 'localhost');
 define('SQL_SERVER_USER', getenv('SQL_SERVER_USER') ?: 'sa');
 define('SQL_SERVER_PASS', getenv('SA_SQL_SERVER_PASSWORD') ?: '1234567890@Eu');

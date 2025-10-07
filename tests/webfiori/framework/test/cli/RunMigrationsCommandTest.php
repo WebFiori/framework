@@ -27,7 +27,7 @@ class RunMigrationsCommandTest extends CLITestCase {
     }
     
     private function setupTestConnection(): void {
-        $this->testConnection = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', 'localhost', 3306);
+        $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 'localhost', 3306);
         $this->testConnection->setName('test-connection');
         App::getConfig()->addOrUpdateDBConnection($this->testConnection);
     }

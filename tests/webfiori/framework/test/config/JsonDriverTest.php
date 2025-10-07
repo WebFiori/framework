@@ -2,9 +2,9 @@
 namespace webfiori\framework\test\config;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\ConnectionInfo;
-use webfiori\email\SMTPAccount;
-use webfiori\file\File;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Mail\SMTPAccount;
+use WebFiori\File\File;
 use webfiori\framework\config\JsonDriver;
 use const DS;
 /**
@@ -105,9 +105,9 @@ class JsonDriverTest extends TestCase {
             'AR' => 'تطبيق',
             'EN' => 'Cool App'
         ],$driver->getAppNames());
-        $this->assertTrue(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
+        $this->assertTrue(File::isFileExist(JsonDriver::getConfigPath().DS.$driver->getConfigFileName().'.json'));
         $driver->remove();
-        $this->assertFalse(File::isFileExist(JsonDriver::JSON_CONFIG_FILE_PATH.DS.$driver->getConfigFileName().'.json'));
+        $this->assertFalse(File::isFileExist(JsonDriver::getConfigPath().DS.$driver->getConfigFileName().'.json'));
     }
     /**
      * @test

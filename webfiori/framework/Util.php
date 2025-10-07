@@ -12,7 +12,7 @@ namespace webfiori\framework;
 
 use webfiori\framework\cli\Runner;
 use webfiori\framework\ui\MessageBox;
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 /**
  * Framework utility class.
  *

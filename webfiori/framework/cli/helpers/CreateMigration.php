@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DatabaseMigrationWriter;
@@ -22,10 +22,6 @@ use webfiori\framework\writers\DatabaseMigrationWriter;
  * @version 1.0
  */
 class CreateMigration extends CreateClassHelper {
-    /**
-     * @var DatabaseMigrationWriter
-     */
-    private $writer;
     private $isConfigured;
     /**
      * Creates new instance of the class.
@@ -34,55 +30,17 @@ class CreateMigration extends CreateClassHelper {
      */
     public function __construct(CreateCommand $command) {
         $ns = APP_DIR.'\\database\\migrations';
-        $this->isConfigured = false;
         if (!$command->isArgProvided('--defaults')) {
             $ns = CLIUtils::readNamespace($command, $ns , 'Migration namespace:');
         }
         
-        $runner = $this->initRunner($ns, $command);
-        if ($runner === null) {
-            $command->error("Unable to set migrations path.");
-        } else {
-            parent::__construct($command, new DatabaseMigrationWriter($runner));
-            $this->writer = $this->getWriter();
-            $this->setNamespace($ns);
-            
-            $this->isConfigured = true;
-            if (!$command->isArgProvided('--defaults')) {
-                $this->setClassName($command->readClassName('Provide an optional name for the class that will have migration logic:', null));
-                $this->readClassInfo();
-                
-            }
-        }
+        $runner = new SchemaRunner(null);
+
+        parent::__construct($command, new DatabaseMigrationWriter($runner));
+        $this->setNamespace($ns);
+        $this->setClassName($command->readClassName('Provide a name for the class that will have migration logic:', null));
     }
     public function isConfigured() : bool {
         return $this->isConfigured;
-    }
-    private function initRunner($ns, $command) {
-        $path = ROOT_PATH.DS. str_replace('\\', DS, $ns);
-        if (!is_dir($path)) {
-            $command->warning("The path '$path' does not exist.");
-            $create = $command->confirm("Would you like to create it?", true);
-            
-            if ($create) {
-                if (!mkdir($path)) {
-                    $command->error("Unable to create directory.");
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-        return new MigrationsRunner($path, $ns, null);
-    }
-
-    private function readClassInfo() {
-        
-        $name = $this->getInput('Enter an optional name for the migration:', $this->writer->getMigrationName());
-        $order = $this->getCommand()->readInteger('Enter an optional execution order for the migration:', $this->writer->getMigrationOrder());
-        
-
-        $this->writer->setMigrationName($name);
-        $this->writer->setMigrationOrder($order);
     }
 }

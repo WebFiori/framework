@@ -13,10 +13,10 @@ namespace webfiori\framework;
 use Error;
 use Exception;
 use ReflectionClass;
-use webfiori\cli\Runner;
-use webfiori\error\Handler;
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\Cli\Runner;
+use WebFiori\Error\Handler;
+use WebFiori\File\exceptions\FileException;
+use WebFiori\File\File;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\ConfigurationDriver;
 use webfiori\framework\config\Controller;
@@ -30,8 +30,8 @@ use webfiori\framework\middleware\StartSessionMiddleware;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\scheduler\TasksManager;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 /**
  * The time at which the framework was booted in microseconds as a float.
  *
@@ -358,6 +358,12 @@ class App {
              */
             define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
         }
+        if (!defined('PUBLIC_FOLDER')) {
+            /**
+             * Name of public folder.
+             */
+            define('PUBLIC_FOLDER', $publicFolder);
+        }
         if (!defined('WF_CORE_PATH')) {
             /**
              * Path to WebFiori's core library.
@@ -542,16 +548,16 @@ class App {
      */
     private static function checkStandardLibs() {
         $standardLibsClasses = [
-            'webfiori/collections' => 'webfiori\\collections\\Node',
-            'webfiori/ui' => 'webfiori\\ui\\HTMLNode',
-            'webfiori/jsonx' => 'webfiori\\json\\Json',
-            'webfiori/database' => 'webfiori\\database\\ResultSet',
-            'webfiori/http' => 'webfiori\\http\\Response',
-            'webfiori/file' => 'webfiori\\file\\File',
-            'webfiori/mailer' => 'webfiori\\email\\SMTPAccount',
-            'webfiori/cli' => 'webfiori\\cli\\CLICommand',
-            'webfiori/err' => 'webfiori\\error\\ErrorHandlerException',
-            'webfiori/cache' => 'webfiori\\cache\\Cache'
+            'webfiori/collections' => 'WebFiori\\Collections\\Node',
+            'webfiori/ui' => 'WebFiori\\UI\\HTMLNode',
+            'webfiori/jsonx' => 'WebFiori\\Json\\Json',
+            'webfiori/database' => 'WebFiori\\Database\\ResultSet',
+            'webfiori/http' => 'WebFiori\\Http\\Response',
+            'webfiori/file' => 'WebFiori\\File\\File',
+            'webfiori/mailer' => 'WebFiori\\Mail\\SMTPAccount',
+            'webfiori/cli' => 'WebFiori\\Cli\\Command',
+
+            'webfiori/cache' => 'WebFiori\\Cache\\Cache'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {
@@ -729,10 +735,9 @@ class App {
      * Sets new error and exception handler.
      */
     private function setHandlers() {
-        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
         Handler::registerHandler(new CLIErrHandler());
-        Handler::registerHandler(new APICallErrHandler());
-        Handler::registerHandler(new HTTPErrHandler());
-        Handler::unregisterHandler(Handler::getHandler('Default'));
+        // Handler::registerHandler(new APICallErrHandler());
+        // Handler::registerHandler(new HTTPErrHandler());
+        // Handler::unregisterHandler(Handler::getHandler('Default'));
     }
 }

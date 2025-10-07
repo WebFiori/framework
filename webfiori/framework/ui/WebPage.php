@@ -13,7 +13,7 @@ namespace webfiori\framework\ui;
 use Error;
 use Exception;
 use TypeError;
-use webfiori\collections\LinkedList;
+use WebFiori\Collections\LinkedList;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\exceptions\MissingLangException;
@@ -24,14 +24,14 @@ use webfiori\framework\router\Router;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\ThemeManager;
 use webfiori\framework\Util;
-use webfiori\http\Request;
-use webfiori\http\Response;
-use webfiori\json\Json;
-use webfiori\ui\HeadNode;
-use webfiori\ui\HTMLDoc;
-use webfiori\ui\HTMLNode;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
+use WebFiori\Json\Json;
+use WebFiori\UI\HeadNode;
+use WebFiori\UI\HTMLDoc;
+use WebFiori\UI\HTMLNode;
 require_once 'ui-functions.php';
 /**
  * A base class that can be used to implement web pages.
@@ -1021,8 +1021,6 @@ class WebPage {
      * Finally, an exception will be thrown if theme component is not found.
      *
      * @since 1.0
-     *
-     * @see Theme::usingTheme()
      */
     public function setTheme(?string $themeNameOrClass = null) {
         if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
@@ -1037,7 +1035,7 @@ class WebPage {
         if (strlen($xthemeName) == 0) {
             $xthemeName = $themeNameOrClass;
         }
-        $tmpTheme = ThemeLoader::usingTheme($xthemeName);
+        $tmpTheme = ThemeManager::usingTheme($xthemeName);
 
         if ($tmpTheme !== null) {
             if ($this->theme !== null && $tmpTheme->getName() == $this->theme->getName()) {
@@ -1045,6 +1043,7 @@ class WebPage {
             }
             $this->theme = $tmpTheme;
             $this->theme->setPage($this);
+            $this->theme->invokeBeforeLoaded();
             $mainContentArea = $this->getDocument()->getChildByID(self::MAIN_ELEMENTS[2]);
 
             if ($mainContentArea === null) {
@@ -1074,6 +1073,7 @@ class WebPage {
             $this->theme->invokeAfterLoaded();
         }
     }
+    
     /**
      * Sets the title of the page.
      *

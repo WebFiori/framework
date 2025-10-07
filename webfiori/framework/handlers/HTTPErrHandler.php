@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\handlers;
 
-use webfiori\error\AbstractHandler;
+use WebFiori\Error\AbstractHandler;
 use webfiori\framework\App;
 use webfiori\framework\router\Router;
 use webfiori\framework\ui\serverErrPage\ServerErrPage;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 /**
  * Errors and exceptions handler which is used to handle errors in case of
  * HTTP request.

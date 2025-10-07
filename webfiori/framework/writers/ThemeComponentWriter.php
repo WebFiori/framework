@@ -56,7 +56,7 @@ class ThemeComponentWriter extends ClassWriter {
         $extendsClass = $this->getExtends();
         $comment = $this->getComment();
         $this->append([
-            'use webfiori\\ui\\'.$extendsClass.';',
+            'use WebFiori\\UI\\'.$extendsClass.';',
             '',
             '/**',
             '  * '.$comment,

@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\database\mysql\MySQLTable;
+use WebFiori\Database\MySql\MySQLTable;
 
 /**
  * A class which represents the database table '`sessions`'.

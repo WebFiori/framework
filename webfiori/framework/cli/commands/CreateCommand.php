@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 use webfiori\framework\cli\CLIUtils;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 use webfiori\framework\cli\helpers\CreateAPITestCase;
@@ -32,7 +32,7 @@ use webfiori\framework\cli\helpers\CreateWebService;
  * @author Ibrahim
  * @version 1.0
  */
-class CreateCommand extends CLICommand {
+class CreateCommand extends Command {
     public function __construct() {
         parent::__construct('create', [
             new Argument('--c', 'What will be created. Possible values: table, entity, web-service, job, middleware, command, theme.', true),
@@ -118,15 +118,8 @@ class CreateCommand extends CLICommand {
             }
         }  else if ($answer == 'Database migration.') {
             $create = new CreateMigration($this);
-            if ($create->isConfigured()) {
-                $create->writeClass();
-                $writer = $create->getWriter();
-                $this->info("Migration Name: ".$writer->getMigrationName());
-                $this->info("Migration Order: ".$writer->getMigrationOrder());
-                return 0;
-            } else {
-                return -1;
-            }
+            $create->writeClass();
+            return 0;
         }
 
         return 0;

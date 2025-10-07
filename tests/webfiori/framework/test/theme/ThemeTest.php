@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use themes\fioriTheme\NewFTestTheme;
 use webfiori\framework\App;
 use webfiori\framework\Theme;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\ThemeManager;
 /**
  * Description of ThemeTest
  *
@@ -15,7 +15,7 @@ use webfiori\framework\ThemeLoader;
  */
 class ThemeTest extends TestCase {
     public function testAvailableThemes00() {
-        $themes = ThemeLoader::getAvailableThemes();
+        $themes = ThemeManager::getRegisteredThemes();
         $this->assertEquals(2, count($themes));
     }
     /**
@@ -24,7 +24,7 @@ class ThemeTest extends TestCase {
     public function testCreateHTMLNode00() {
         App::getConfig()->setTheme('New Super Theme');
 
-        $theme = ThemeLoader::usingTheme();
+        $theme = ThemeManager::usingTheme();
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
         $node = $theme->createHTMLNode();
@@ -46,9 +46,9 @@ class ThemeTest extends TestCase {
      */
     public function testToJson00() {
         App::getConfig()->setTheme('');
-        $theme = ThemeLoader::usingTheme();
+        $theme = ThemeManager::usingTheme();
         $this->assertNull($theme);
-        $theme = ThemeLoader::usingTheme('New Super Theme');
+        $theme = ThemeManager::usingTheme('New Super Theme');
 
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
@@ -59,17 +59,18 @@ class ThemeTest extends TestCase {
      */
     public function testUseTheme00() {
         $themeName = 'New Theme 2';
-        ThemeLoader::resetLoaded();
+        ThemeManager::resetRegistered();
+        ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
         //$this->assertFalse(Theme::isThemeLoaded($themeName));
-        $theme = ThemeLoader::usingTheme($themeName);
+        $theme = ThemeManager::usingTheme($themeName);
         $this->assertTrue($theme instanceof Theme);
-        $this->assertTrue(ThemeLoader::isThemeLoaded($themeName));
+        $this->assertTrue(ThemeManager::isThemeRegistered($themeName));
         $this->assertEquals('1.0',$theme->getVersion());
         $this->assertEquals('This theme is in before loaded.',$theme->getDescription());
         $this->assertEquals('Ibrahim Ali',$theme->getAuthor());
         $this->assertEquals('https://opensource.org/licenses/MIT',$theme->getLicenseUrl());
         $this->assertEquals('MIT',$theme->getLicenseName());
-        $this->assertEquals(1,count(ThemeLoader::getLoadedThemes()));
+        $this->assertEquals(1,count(ThemeManager::getRegisteredThemes()));
         $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
         $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
         $this->assertEquals(ROOT_PATH.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
@@ -82,9 +83,10 @@ class ThemeTest extends TestCase {
      */
     public function testUseTheme01() {
         App::getConfig()->setTheme('');
-        $theme = ThemeLoader::usingTheme();
+        $theme = ThemeManager::usingTheme();
         $this->assertNull($theme);
-        $theme = ThemeLoader::usingTheme(NewFTestTheme::class);
+        ThemeManager::register(new NewFTestTheme());
+        $theme = ThemeManager::usingTheme(NewFTestTheme::class);
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('New Super Theme', $theme->getName());
         $this->assertEquals(App::getConfig()->getBaseURL(),$theme->getBaseURL());
@@ -98,6 +100,6 @@ class ThemeTest extends TestCase {
         $themeName = 'Not Exist';
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('No such theme: \''.$themeName.'\'.');
-        ThemeLoader::usingTheme('Not Exist');
+        ThemeManager::usingTheme('Not Exist');
     }
 }

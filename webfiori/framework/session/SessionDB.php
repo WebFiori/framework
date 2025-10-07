@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\database\DatabaseException;
+use WebFiori\Database\DatabaseException;
 use webfiori\framework\DB;
 /**
  * A class which includes all database related operations to add, update,

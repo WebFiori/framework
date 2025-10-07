@@ -13,9 +13,9 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\ServiceHolder;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\http\ParamType;
-use webfiori\http\RequestMethod;
-use webfiori\http\RequestParameter;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\RequestParameter;
 
 /**
  * A helper class for creating web services classes.

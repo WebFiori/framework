@@ -2,8 +2,8 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
 use webfiori\framework\App;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\session\DatabaseSessionStorage;
@@ -301,6 +301,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testGetSessionIDFromRequest() {
+        unset($_POST["my-s"]);
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
         putenv('REQUEST_METHOD=GET');
         $_GET['my-s'] = 'super';

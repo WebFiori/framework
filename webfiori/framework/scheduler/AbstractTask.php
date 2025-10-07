@@ -13,14 +13,14 @@ namespace webfiori\framework\scheduler;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
-use webfiori\collections\Queue;
-use webfiori\error\TraceEntry;
+use WebFiori\Cli\Runner;
+use WebFiori\Collections\Queue;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
 use webfiori\framework\Util;
-use webfiori\http\Request;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
+use WebFiori\Http\Request;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
 /**
  * An abstract class that contains basic functionality for implementing background
  * tasks.
@@ -439,11 +439,10 @@ abstract class AbstractTask implements JsonI {
      * @since 1.0
      */
     public function exec(bool $force = false): bool {
-        $xForce = $force === true;
         $retVal = false;
-        $this->setIsForced($xForce);
+        $this->setIsForced($force);
 
-        if ($xForce || $this->isTime()) {
+        if ($force || $this->isTime()) {
             //Called to set the values of task args
             $this->getArgsValues();
             $isSuccessRun = $this->callMethod('execute');
@@ -1032,25 +1031,8 @@ abstract class AbstractTask implements JsonI {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
-            $tempTasksQueue = new Queue();
-            $nameTaken = false;
-
-            while ($task = TasksManager::tasksQueue()->dequeue()) {
-                if ($task->getTaskName() == $trimmed) {
-                    $nameTaken = true;
-                }
-                $tempTasksQueue->enqueue($task);
-            }
-
-            while ($task = $tempTasksQueue->dequeue()) {
-                TasksManager::scheduleTask($task);
-            }
-
-            if (!$nameTaken) {
-                $this->taskName = $trimmed;
-
-                return true;
-            }
+            $this->taskName = $trimmed;
+            return true;
         }
 
         return false;
@@ -1407,6 +1389,9 @@ abstract class AbstractTask implements JsonI {
     }
 
     private function getArgValFromRequest($name) {
+        if (Runner::isCLI()) {
+            return null;
+        }
         $uName = str_replace(' ', '_', $name);
         $retVal = Request::getParam($name);
 
@@ -1458,14 +1443,13 @@ abstract class AbstractTask implements JsonI {
                 }
 
                 return $retVal;
-            } else {
-                //Step val
-                if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
-                    return self::INV_VAL;
-                }
-
-                return self::STEP_VAL;
             }
+            //Step val
+            if (!(strlen($split0[0]) != 0 && strlen($split0[1]) != 0)) {
+                return self::INV_VAL;
+            }
+
+            return self::STEP_VAL;
         }
 
         return $retVal;
@@ -1537,15 +1521,11 @@ abstract class AbstractTask implements JsonI {
         TasksManager::log('Stack Trace:');
         $index = 0;
         $trace = debug_backtrace();
-        $firstEntry = $ex->getTrace()[0];
-        $firstEntry['line'] = $ex->getLine();
-        $e = new TraceEntry($firstEntry);
-        TasksManager::log('#'.$index.' '.$e);
-        $index++;
+        
 
         foreach ($trace as $traceEntry) {
-            $e = new TraceEntry($traceEntry);
-            TasksManager::log('#'.$index.' '.$e);
+            $e =  ($traceEntry["class"] ?? "unknown") . " Line: " . ($traceEntry["line"] ?? "unknown");
+            TasksManager::log('#'.$index.' At class '.$e);
             $index++;
         }
 
@@ -1576,7 +1556,7 @@ abstract class AbstractTask implements JsonI {
      * @since 1.0
      */
     private function setIsForced(bool $bool) {
-        $this->isForced = $bool === true;
+        $this->isForced = $bool;
     }
 
 

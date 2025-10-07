@@ -10,14 +10,14 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Command;
 use webfiori\framework\App;
 /**
  * A CLI command which is used to show framework configuration.
  *
  * @author Ibrahim
  */
-class SettingsCommand extends CLICommand {
+class SettingsCommand extends Command {
     /**
      * Creates new instance of the class.
      * The command will have name '--show-config'. This command is used to display

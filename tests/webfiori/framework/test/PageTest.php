@@ -8,16 +8,61 @@ use webfiori\framework\Access;
 use webfiori\framework\App;
 use webfiori\framework\Lang;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Theme;
+use webfiori\framework\ThemeManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\User;
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 /**
  * Description of PageTest
  *
  * @author Ibrahim
  */
 class PageTest extends TestCase {
+    
+    protected function setUp(): void {
+        parent::setUp();
+        
+        // Register test themes to avoid directory creation errors
+        $registeredThemes = ThemeManager::getRegisteredThemes();
+        $themeNames = array_keys($registeredThemes);
+        
+        if (!in_array('New Theme 2', $themeNames)) {
+            ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
+        }
+        
+        if (!in_array('New Super Theme', $themeNames)) {
+            ThemeManager::register(new \themes\fioriTheme\NewFTestTheme());
+        }
+    }
+    
+    protected function tearDown(): void {
+        // Clean up theme assets from public directory
+        $assetsPath = ROOT_PATH . DS . PUBLIC_FOLDER . DS . 'assets';
+        if (is_dir($assetsPath)) {
+            // Only remove theme directories, not the entire assets folder
+            $themeDirs = ['fioriTheme', 'fioriTheme2', 'NewTestTheme2', 'NewFTestTheme'];
+            foreach ($themeDirs as $themeDir) {
+                $themePath = $assetsPath . DS . $themeDir;
+                if (is_dir($themePath)) {
+                    $this->removeDirectory($themePath);
+                }
+            }
+        }
+        parent::tearDown();
+    }
+    
+    private function removeDirectory($dir) {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . DS . $file;
+            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
+    
     /**
      * @test
      */
@@ -718,7 +763,8 @@ class PageTest extends TestCase {
         $page = new WebPage();
         $page->setTheme('      New Super Theme      ');
         $theme3 = $page->getTheme();
-        $this->assertTrue($theme3 instanceof Theme);
+        
+        $this->assertTrue($theme3 instanceof \webfiori\framework\Theme);
     }
     /**
      * @test

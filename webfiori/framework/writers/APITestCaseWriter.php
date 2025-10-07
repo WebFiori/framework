@@ -1,11 +1,11 @@
 <?php
 namespace webfiori\framework\writers;
 
-use webfiori\http\AbstractWebService;
-use webfiori\http\APITestCase;
-use webfiori\http\RequestMethod;
-use webfiori\http\ResponseMessage;
-use webfiori\http\WebServicesManager;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\APITestCase;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\ResponseMessage;
+use WebFiori\Http\WebServicesManager;
 
 /**
  * A helper class which is used to write unit test cases for web services.

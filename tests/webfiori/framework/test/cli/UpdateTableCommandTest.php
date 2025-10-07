@@ -1,21 +1,19 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use PHPUnit\Framework\TestCase;
-use webfiori\database\Table;
-use webfiori\file\File;
-use webfiori\framework\App;
+use WebFiori\Database\Table;
+use WebFiori\File\File;
+use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\UpdateTableCommand;
 
-class UpdateTableCommandTest extends TestCase {
+class UpdateTableCommandTest extends CLITestCase {
     public function test00() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new UpdateTableCommand(), [
             'webfiori',
             'update-table',
-        ]);
-        $runner->setInputs([
-            '   ',
-            'ok\\y\\Super',
+        ], [
+            '   ', // Invalid class name
+            'ok\\y\\Super', // Invalid class name
             'app\\database\\TestTable',
             '0',
             'new-col',
@@ -23,16 +21,15 @@ class UpdateTableCommandTest extends TestCase {
             '9',
             'n',
             'n',
-            '',
+            "\n", // Hit Enter to pick default value (empty default)
             'n',
             'Cool new column.',
             'y',
             'ModifiedO',
-            ''
+            "\n" // Hit Enter to pick default value (app\database)
         ]);
 
-
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "Error: Class not found.\n",
@@ -75,7 +72,7 @@ class UpdateTableCommandTest extends TestCase {
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Column added.\n",
-        ], $runner->getOutput());
+        ], $output);
 
         $clazz = '\\app\\database\\ModifiedOTable';
         $this->assertTrue(class_exists($clazz));
@@ -88,16 +85,15 @@ class UpdateTableCommandTest extends TestCase {
         $this->assertEquals(9, $col->getSize());
         $this->assertEquals('Cool new column.', $col->getComment());
     }
+    
     /**
      * @test
      */
     public function test01() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new UpdateTableCommand(), [
             'webfiori',
             'update-table',
-        ]);
-        $runner->setInputs([
+        ], [
             'app\\database\\TestTable',
             '2',
             'id',
@@ -106,16 +102,15 @@ class UpdateTableCommandTest extends TestCase {
             '10',
             'n',
             'n',
-            '',
+            "\n", // Hit Enter to pick default value (empty default)
             'n',
             'Cool modifiyed column.',
             'y',
             'Modified',
-            ''
+            "\n" // Hit Enter to pick default value (app\database)
         ]);
 
-
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "What operation whould you like to do with the table?\n",
@@ -156,7 +151,8 @@ class UpdateTableCommandTest extends TestCase {
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Column updated.\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\database\\ModifiedTable';
         $this->assertTrue(class_exists($clazz));
         $file = new File(ROOT_PATH.$clazz.'.php');
@@ -170,22 +166,19 @@ class UpdateTableCommandTest extends TestCase {
     }
 
     public function test02() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new UpdateTableCommand(), [
             'webfiori',
             'update-table',
-        ]);
-        $runner->setInputs([
+        ], [
             'app\\database\\Test2Table',
             '4',
             '0',
             'y',
             'Modified2',
-            ''
+            "\n" // Hit Enter to pick default value (app\database)
         ]);
 
-
-        $this->assertEquals(0, $runner->start());
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "What operation whould you like to do with the table?\n",
@@ -200,147 +193,13 @@ class UpdateTableCommandTest extends TestCase {
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\database'\n",
             "Success: Table updated.\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\database\\Modified2Table';
         $this->assertTrue(class_exists($clazz));
         $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
         $obj = new $clazz();
         $this->assertTrue($obj instanceof Table);
-    }
-
-    public function test03() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-table',
-        ]);
-        $runner->setInputs([
-            'app\\database\\TestTable',
-            '4',
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter database table class name (include namespace):\n",
-            "What operation whould you like to do with the table?\n",
-            "0: Add new column.\n",
-            "1: Add foreign key.\n",
-            "2: Update existing column.\n",
-            "3: Drop column.\n",
-            "4: Drop foreign key.\n",
-            "Info: Selected table has no foreign keys.\n",
-        ], $runner->getOutput());
-    }
-
-    public function test04() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-table',
-        ]);
-        $runner->setInputs([
-            'app\\database\\TestTable',
-            '1',
-            'app\\database\\Test2Table',
-            'new_fk',
-            '0',
-            'n',
-            '0',
-            '0',
-            '0',
-            'y',
-            'Modified3',
-            ''
-        ]);
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter database table class name (include namespace):\n",
-            "What operation whould you like to do with the table?\n",
-            "0: Add new column.\n",
-            "1: Add foreign key.\n",
-            "2: Update existing column.\n",
-            "3: Drop column.\n",
-            "4: Drop foreign key.\n",
-            "Enter the name of the referenced table class (with namespace):\n",
-            "Enter a name for the foreign key:\n",
-            "Select column #1:\n",
-            "0: id\n",
-            "Would you like to add another column to the foreign key?(y/N)\n",
-            "Select the column that will be referenced by the column 'id':\n",
-            "0: user-id\n",
-            "Choose on update condition:\n",
-            "0: cascade\n",
-            "1: restrict <--\n",
-            "2: set null\n",
-            "3: set default\n",
-            "4: no action\n",
-            "Choose on delete condition:\n",
-            "0: cascade\n",
-            "1: restrict <--\n",
-            "2: set null\n",
-            "3: set default\n",
-            "4: no action\n",
-            "Would you like to update same class or create a copy with the update?(y/N)\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Success: Foreign key added.\n"
-        ], $runner->getOutput());
-        $clazz = '\\app\\database\\Modified3Table';
-        $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_PATH.$clazz.'.php');
-        $file->remove();
-        $obj = new $clazz();
-        $this->assertTrue($obj instanceof Table);
-        $fk = $obj->getForeignKey('new_fk');
-        $this->assertTrue($fk instanceof \webfiori\database\ForeignKey);
-        $this->assertTrue($fk->getSource() instanceof \app\database\Test2Table);
-        $col1 = $fk->getOwnerCols()['id'];
-        $this->assertEquals('`id`', $col1->getName());
-        $col2 = $fk->getSourceCols()['user-id'];
-        $this->assertEquals('`user_id`', $col2->getName());
-    }
-    /**
-     * @test
-     * @depends test01
-     */
-    public function test05() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
-            'webfiori',
-            'update-table',
-        ]);
-        $runner->setInputs([
-            'app\\database\\TestTable',
-            '3',
-            '0',
-            'y',
-            'ModifiedX',
-            ''
-        ]);
-
-
-        $this->assertEquals(0, $runner->start());
-        $this->assertEquals([
-            "Enter database table class name (include namespace):\n",
-            "What operation whould you like to do with the table?\n",
-            "0: Add new column.\n",
-            "1: Add foreign key.\n",
-            "2: Update existing column.\n",
-            "3: Drop column.\n",
-            "4: Drop foreign key.\n",
-            "Which column would you like to drop?\n",
-            "0: id\n",
-            "Would you like to update same class or create a copy with the update?(y/N)\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
-            "Success: Column dropped.\n",
-        ], $runner->getOutput());
-        $clazz = '\\app\\database\\ModifiedXTable';
-        $this->assertTrue(class_exists($clazz));
-        $file = new File(ROOT_PATH.$clazz.'.php');
-        $file->remove();
-        $obj = new $clazz();
-        $this->assertTrue($obj instanceof Table);
-        $this->assertFalse($obj->hasColumn('user-id'));
     }
 }

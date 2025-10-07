@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\cli\CLICommand;
-use webfiori\cli\InputValidator;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\ClassWriter;
 /**
@@ -38,12 +38,12 @@ class CreateClassHelper {
     /**
      * Creates new instance.
      *
-     * @param CLICommand $command The command that will be used to read inputs
+     * @param Command $command The command that will be used to read inputs
      * and send outputs to the terminal.
      *
      * @param ClassWriter $writer The writer that will hold class information.
      */
-    public function __construct(CLICommand $command, ?ClassWriter $writer = null) {
+    public function __construct(Command $command, ?ClassWriter $writer = null) {
         $this->command = $command;
         $this->classWriter = $writer;
         $this->classInfoReader = new ClassInfoReader($this->command);
@@ -96,9 +96,9 @@ class CreateClassHelper {
     /**
      * Returns the command which is used to read inputs and show outputs.
      *
-     * @return CLICommand
+     * @return Command
      */
-    public function getCommand() : CLICommand {
+    public function getCommand() : Command {
         return $this->command;
     }
     /**
@@ -153,7 +153,7 @@ class CreateClassHelper {
      *
      * This method will work like the function fprintf(). The difference is that
      * it will print out to the stream at which was specified by the method
-     * CLICommand::setOutputStream() and the text can have formatting
+     * Command::setOutputStream() and the text can have formatting
      * options. Note that support for output formatting depends on terminal support for
      * ANSI escape codes.
      *
@@ -161,7 +161,7 @@ class CreateClassHelper {
      *
      * @param mixed $_ One or more extra arguments that can be supplied to the
      * method. The last argument can be an array that contains text formatting options.
-     * for available options, check the method CLICommand::formatOutput().
+     * for available options, check the method Command::formatOutput().
      */
     public function println($str = '', ...$_) {
         $this->getCommand()->println($str, $_);

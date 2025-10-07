@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 /**
  * A generic class for showing a floating box in web pages that can have any content
  * in its body.

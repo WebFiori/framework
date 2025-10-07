@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\collections\Comparable;
+use WebFiori\Collections\Comparable;
 /**
  * A class which is used to represent before render callbacks that can be assigned
  * to a web page.

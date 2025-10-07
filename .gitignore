@@ -15,3 +15,6 @@ app/sto
 app/config/*
 .idea/*
 !/app/config/config-with-err-00.json
+*.Identifier
+tests/clover.xml
+/.vscode

@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\file\File;
+use WebFiori\File\File;
 /**
  * A utility class which is used as a helper class to auto-generate PHP classes.
  * This class can be used to write .php classes.
@@ -67,6 +67,7 @@ abstract class ClassWriter {
      */
     public function __construct(string $name = 'NewClass', string $path = ROOT_PATH, string $namespace = '\\') {
         $this->suffix = '';
+
         $this->useArr = [];
 
         if (!$this->setClassName($name)) {
@@ -224,7 +225,7 @@ abstract class ClassWriter {
      * Default is empty string.
      */
     public function getSuffix() : string {
-        return $this->suffix;
+        return $this->suffix !== null ? $this->suffix : '';
     }
     /**
      * Returns an array that contains all classes which will be included
@@ -453,7 +454,7 @@ abstract class ClassWriter {
         if ($classSuffix == '') {
             return $className;
         }
-        $subSuffix = substr($className, strlen($className) - strlen($classSuffix));
+        $subSuffix = substr($className.'', strlen($className.'') - strlen($classSuffix.''));
 
         if ($subSuffix == $classSuffix) {
             return substr($className, 0, -strlen($classSuffix));

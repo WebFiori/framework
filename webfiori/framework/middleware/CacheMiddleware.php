@@ -2,11 +2,11 @@
 
 namespace webfiori\framework\middleware;
 
-use webfiori\cache\Cache;
+use WebFiori\Cache\Cache;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 
 
 class CacheMiddleware extends AbstractMiddleware {

@@ -2,15 +2,15 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\cli\CLICommand;
-use webfiori\framework\writers\CLICommandClassWriter;
+use WebFiori\Cli\Command;
+use webfiori\framework\writers\CommandClassWriter;
 
 class CLICommandClassWriterTest extends TestCase {
     /**
      * @test
      */
     public function test00() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertEquals('NewCommand', $writer->getName());
         $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'commands'.DS.'NewCommand.php', $writer->getAbsolutePath());
         $this->assertEquals('app\\commands', $writer->getNamespace());
@@ -18,7 +18,7 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $this->assertEquals([
-            'webfiori\cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $this->assertTrue(class_exists($writer->getNamespace().'\\'.$writer->getName()));
@@ -28,7 +28,7 @@ class CLICommandClassWriterTest extends TestCase {
      * @test
      */
     public function test01() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertFalse($writer->setCommandName('invalid name'));
         $this->assertFalse($writer->setCommandName('   '));
         $this->assertTrue($writer->setCommandName('Lets-Do-It'));
@@ -43,27 +43,27 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $writer->setArgs([
-            new \webfiori\cli\Argument('--do', 'A do arg', true)
+            new \WebFiori\Cli\Argument('--do', 'A do arg', true)
         ]);
         $this->assertEquals('', $writer->getDescription());
         $writer->setCommandDescription('Random desc');
         $this->assertEquals('Random desc', $writer->getDescription());
         $this->assertEquals([
-            'webfiori\cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $clazz = $writer->getNamespace().'\\'.$writer->getName();
         $this->assertTrue(class_exists($clazz));
         $writer->removeClass();
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertTrue($clazzObj instanceof Command);
         $this->assertEquals('Lets-Do-It', $clazzObj->getName());
         $this->assertEquals('Random desc', $clazzObj->getDescription());
         $this->assertEquals([
             '--do'
         ], $clazzObj->getArgsNames());
         $arg = $clazzObj->getArg('--do');
-        $this->assertTrue($arg instanceof \webfiori\cli\Argument);
+        $this->assertTrue($arg instanceof \WebFiori\Cli\Argument);
         $this->assertEquals('A do arg', $arg->getDescription());
         $this->assertTrue($arg->isOptional());
     }
@@ -71,7 +71,7 @@ class CLICommandClassWriterTest extends TestCase {
      * @test
      */
     public function test02() {
-        $writer = new CLICommandClassWriter();
+        $writer = new CommandClassWriter();
         $this->assertFalse($writer->setCommandName('invalid name'));
         $this->assertFalse($writer->setCommandName('   '));
         $this->assertTrue($writer->setCommandName('Lets-Do-It'));
@@ -86,27 +86,27 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $writer->setArgs([
-            new \webfiori\cli\Argument('--do', 'A do arg', true)
+            new \WebFiori\Cli\Argument('--do', 'A do arg', true)
         ]);
         $this->assertEquals('', $writer->getDescription());
         $writer->setCommandDescription(' ');
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([
-            'webfiori\cli\CLICommand'
+            'WebFiori\Cli\Command'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $clazz = $writer->getNamespace().'\\'.$writer->getName();
         $this->assertTrue(class_exists($clazz));
         $writer->removeClass();
         $clazzObj = new $clazz();
-        $this->assertTrue($clazzObj instanceof CLICommand);
+        $this->assertTrue($clazzObj instanceof Command);
         $this->assertEquals('Lets-Do-It', $clazzObj->getName());
         $this->assertEquals('<NO DESCRIPTION>', $clazzObj->getDescription());
         $this->assertEquals([
             '--do'
         ], $clazzObj->getArgsNames());
         $arg = $clazzObj->getArg('--do');
-        $this->assertTrue($arg instanceof \webfiori\cli\Argument);
+        $this->assertTrue($arg instanceof \WebFiori\Cli\Argument);
         $this->assertEquals('A do arg', $arg->getDescription());
         $this->assertTrue($arg->isOptional());
     }

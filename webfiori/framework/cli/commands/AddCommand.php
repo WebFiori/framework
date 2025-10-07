@@ -10,12 +10,12 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
-use webfiori\email\exceptions\SMTPException;
-use webfiori\email\SMTPAccount;
-use webfiori\email\SMTPServer;
+use WebFiori\Cli\Command;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
+use WebFiori\Mail\Exceptions\SMTPException;
+use WebFiori\Mail\SMTPAccount;
+use WebFiori\Mail\SMTPServer;
 use webfiori\framework\App;
 use webfiori\framework\DB;
 use webfiori\framework\writers\LangClassWriter;
@@ -29,7 +29,7 @@ use webfiori\framework\writers\LangClassWriter;
  *
  * @version 1.0
  */
-class AddCommand extends CLICommand {
+class AddCommand extends Command {
     public function __construct() {
         parent::__construct('add', [], 'Add a database connection or SMTP account.');
     }
@@ -71,7 +71,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(App::getConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1)));
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);

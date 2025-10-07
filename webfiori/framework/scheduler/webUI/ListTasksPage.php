@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\scheduler\webUI;
 
-use webfiori\file\File;
-use webfiori\http\Response;
+use WebFiori\File\File;
+use WebFiori\Http\Response;
 /**
  * A view to display information about scheduled tasks.
  *

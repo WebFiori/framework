@@ -12,9 +12,9 @@
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\Lang;
 use webfiori\framework\ui\WebPage;
-use webfiori\http\Response;
-use webfiori\json\JsonI;
-use webfiori\ui\HTMLNode;
+use WebFiori\Http\Response;
+use WebFiori\Json\JsonI;
+use WebFiori\UI\HTMLNode;
 
 /**
  * This file contains functions that can be used inside PHP templates. The

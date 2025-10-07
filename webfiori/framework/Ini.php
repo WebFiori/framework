@@ -10,10 +10,10 @@
  */
 namespace webfiori\framework;
 
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\File\exceptions\FileException;
+use WebFiori\File\File;
 use webfiori\framework\config\ClassDriver;
-use webfiori\json\Json;
+use WebFiori\Json\Json;
 /**
  * A class which is used to create application initialization classes.
  *

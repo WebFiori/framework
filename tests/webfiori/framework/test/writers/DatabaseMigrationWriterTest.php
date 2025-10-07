@@ -2,113 +2,139 @@
 namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
-use webfiori\file\File;
+use WebFiori\Database\Schema\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
+use WebFiori\File\File;
 use webfiori\framework\writers\DatabaseMigrationWriter;
 
 /**
  * @author Ibrahim
  */
 class DatabaseMigrationWriterTest extends TestCase {
+    
+    protected function tearDown(): void {
+        // Clean up only the Migration files created by this test (Migration000, Migration001, etc.)
+        $migrationsDir = APP_PATH . DS . 'database' . DS . 'migrations';
+        if (is_dir($migrationsDir)) {
+            // Only remove Migration files directly in the migrations directory, not in subdirectories
+            $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
+        parent::tearDown();
+    }
     /**
      * @test
      */
     public function test00() {
+        DatabaseMigrationWriter::resetCounter();
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
         $clazz = "\\app\\database\\migrations\\Migration000";
         $this->removeClass($clazz);
-        $runner = new MigrationsRunner($path, $ns, null);
+        $runner = new SchemaRunner(null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $this->assertEquals('app\\database\\migrations', $writter->getNamespace());
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\database\Database",
-            "webfiori\database\migration\AbstractMigration",
+            "WebFiori\Database\Database",
+            "WebFiori\Database\Schema\AbstractMigration",
         ], $writter->getUseStatements());
         $writter->writeClass();
         
         $this->assertTrue(class_exists($clazz));
-        $runner = new MigrationsRunner($path, $ns, null);
-        $migrations = $runner->getMigrations();
+        $runner->register($clazz);
+            $allClasses[] = $clazz;
+        $migrations = $runner->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('Migration000', $m00->getName());
-        $this->assertEquals(0, $m00->getOrder());
+        $this->assertEquals('app\\database\\migrations\\Migration000', $m00->getName());
         $this->removeClass($clazz);
+        $runner = new SchemaRunner(null);
     }
     /**
      * @test
      */
     public function test01() {
+        DatabaseMigrationWriter::resetCounter();
+        $runner = new SchemaRunner(null);
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
-        $runner = new MigrationsRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $writter->setClassName('MyMigration');
-        $writter->setMigrationName('A test migration.');
-        $writter->setMigrationOrder(3);
         $this->assertEquals('MyMigration', $writter->getName());
         $this->assertEquals('app\\database\\migrations', $writter->getNamespace());
 
         $writter->writeClass();
         $clazz = "\\app\\database\\migrations\\MyMigration";
         $this->assertTrue(class_exists($clazz));
-        $runner = new MigrationsRunner($path, $ns, null);
-        $migrations = $runner->getMigrations();
+        $runner->register($clazz);
+            $allClasses[] = $clazz;
+        $migrations = $runner->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('A test migration.', $m00->getName());
-        $this->assertEquals(3, $m00->getOrder());
+        $this->assertEquals('app\\database\\migrations\\MyMigration', $m00->getName());
         $this->removeClass($clazz);
+        $runner = new SchemaRunner(null);
     }
     /**
      * @test
      */
     public function test02() {
+        DatabaseMigrationWriter::resetCounter();
+        $runner = new SchemaRunner(null);
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
-        $runner = new MigrationsRunner($path, $ns, null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $writter->writeClass();
         $clazz = "\\app\\database\\migrations\\Migration000";
         $this->assertTrue(class_exists($clazz));
-        $runner2 = new MigrationsRunner($path, $ns, null);
-        $migrations = $runner2->getMigrations();
+        $runner->register($clazz);
+            $allClasses[] = $clazz;
+        $runner2 = new SchemaRunner(null);
+        $runner2->register($clazz);
+        $migrations = $runner2->getChanges();
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('Migration000', $m00->getName());
-        $this->assertEquals(0, $m00->getOrder());
+        $this->assertEquals('app\\database\\migrations\\Migration000', $m00->getName());
         
         $writter2 = new DatabaseMigrationWriter($runner2);
         $this->assertEquals('Migration001', $writter2->getName());
         $writter2->writeClass();
         $clazz2 = "\\app\\database\\migrations\\Migration001";
         $this->assertTrue(class_exists($clazz));
-        $runner3 = new MigrationsRunner($path, $ns, null);
-        $migrations2 = $runner3->getMigrations();
+        $runner->register($clazz);
+            $allClasses[] = $clazz;
+        $runner3 = new SchemaRunner(null);
+        $runner3->register($clazz);
+        $runner3->register($clazz2);
+        $migrations2 = $runner3->getChanges();
         $this->assertEquals(2, count($migrations2));
         $m01 = $migrations2[1];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('Migration001', $m01->getName());
-        $this->assertEquals(1, $m01->getOrder());
+        $this->assertEquals('app\\database\\migrations\\Migration001', $m01->getName());
         $this->removeClass($clazz);
+        $runner = new SchemaRunner(null);
         $this->removeClass($clazz2);
     }
     /**
      * @test
      */
     public function test03() {
+        DatabaseMigrationWriter::resetCounter();
+        $runner = new SchemaRunner(null);
         $path = APP_PATH.DS.'database'.DS.'migrations';
         $ns = '\\app\\database\\migrations';
+        $allClasses = [];
         for ($x = 0 ; $x < 110 ; $x++) {
-            $runner = new MigrationsRunner($path, $ns, null);
             $writter = new DatabaseMigrationWriter($runner);
             if ($x < 10) {
                 $name = 'Migration00'.$x;
@@ -121,14 +147,18 @@ class DatabaseMigrationWriterTest extends TestCase {
             $writter->writeClass();
             $clazz = "\\app\\database\\migrations\\".$name;
             $this->assertTrue(class_exists($clazz));
-            $xRunner = new MigrationsRunner($path, $ns, null);
+        $runner->register($clazz);
+            $allClasses[] = $clazz;
+            $xRunner = new SchemaRunner(null);
+            foreach ($allClasses as $cls) {
+                $xRunner->register($cls);
+            }
             
-            $migrations = $xRunner->getMigrations();
+            $migrations = $xRunner->getChanges();
             $this->assertEquals($x + 1, count($migrations));
             $m = $migrations[$x];
             $this->assertTrue($m instanceof AbstractMigration);
-            $this->assertEquals($name, $m->getName());
-            $this->assertEquals($x, $m->getOrder());
+            $this->assertEquals("app\\database\\migrations\\" . $name, $m->getName());
         }
         foreach ($migrations as $m) {
             $this->removeClass("\\app\\database\\migrations\\".$m->getName());

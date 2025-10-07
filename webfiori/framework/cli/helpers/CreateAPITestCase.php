@@ -12,7 +12,7 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\APITestCaseWriter;
-use webfiori\http\WebServicesManager;
+use WebFiori\Http\WebServicesManager;
 /**
  * A helper class which is used to help in creating test cases for web APIs classes using CLI.
  *
@@ -76,23 +76,31 @@ class CreateAPITestCase extends CreateClassHelper {
         $instance = null;
 
         if ($m !== null) {
+            try {
             if (class_exists($m)) {
+                
                 $instance = new $m();
+                
 
                 if ($instance instanceof WebServicesManager) {
                     $this->writer->setServicesManager($instance);
 
                     return true;
                 } else {
-                    $this->error("The argument --manager has invalid value.");
+                    $this->error("The argument --manager has invalid value: Not an instance of ".WebServicesManager::class);
 
                     return false;
                 }
+                
             } else {
-                $this->error("The argument --manager has invalid value.");
+                $this->error("The argument --manager has invalid value: Not a class: ".$m);
 
                 return false;
             }
+            } catch (\Throwable $ex) {
+                    $this->error("The argument --manager has invalid value: ".$ex->getMessage());
+                    return false;
+                }
         }
 
         if ($instance === null) {
@@ -108,6 +116,7 @@ class CreateAPITestCase extends CreateClassHelper {
                 }
             }
         }
+        return false;
     }
     private function readServiceInfo() : bool {
         $selected = $this->getCommand()->getArgValue('--service');

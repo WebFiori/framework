@@ -50,7 +50,7 @@ class SuccessTestEveryMinute extends AbstractTask {
      * Execute the process.
      */
     public function execute() {
-        TasksManager::logErr('Task '.$this->getTaskName().' Successfully completed.');
+        TasksManager::log('Task '.$this->getTaskName().' Successfully completed.');
         //TODO: Write the code that represents the process.
     }
     /**

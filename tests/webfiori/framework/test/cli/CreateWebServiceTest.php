@@ -1,14 +1,14 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
-use webfiori\http\AbstractWebService;
-use webfiori\http\ParamOption;
-use webfiori\http\ParamType;
-use webfiori\http\RequestMethod;
-use webfiori\http\RequestParameter;
-use const ROOT_PATH;
+use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\ParamOption;
+use WebFiori\Http\ParamType;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\RequestParameter;
+
 /**
  *
  * @author Ibrahim
@@ -18,14 +18,16 @@ class CreateWebServiceTest extends CLITestCase {
      * @test
      */
     public function test00() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'webfiori',
+            'create'
+        ], [
             '2',
             'NewWeb',
-            '',
+            "\n", // Hit Enter to pick default value (app\apis)
             'get-hello',
             'Service Desc',
-            '',
+            "\n", // Hit Enter to pick default value (GET method)
             'n',
             'y',
             'name',
@@ -34,14 +36,10 @@ class CreateWebServiceTest extends CLITestCase {
             'n',
             'n',
             'n',
-            '',
+            "\n", // Hit Enter to pick default value
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'create'
-        ]);
-        $result = $runner->start();
-        //$this->assertEquals(0, $result);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -91,7 +89,8 @@ class CreateWebServiceTest extends CLITestCase {
             "Creating the class...\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\apis\\NewWebService';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass('\\app\\apis\\NewWebService');
@@ -115,17 +114,21 @@ class CreateWebServiceTest extends CLITestCase {
                 ParamOption::OPTIONAL => false,
         ]);
     }
+    
     /**
      * @test
      */
     public function test01() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'webfiori',
+            'create',
+            '--c' => 'web-service'
+        ], [
             'NewWeb2',
-            '',
+            "\n", // Hit Enter to pick default value (app\apis)
             'get-hello-2',
             'Service\'s Desc',
-            '',
+            "\n", // Hit Enter to pick default value (GET method)
             'y',
             '6',
             'n',
@@ -134,16 +137,11 @@ class CreateWebServiceTest extends CLITestCase {
             '3',
             'Random\'s desc',
             'n',
-            '',
-            '',
+            "\n", // Hit Enter to pick default value
+            "\n", // Hit Enter to pick default value
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'create',
-            '--c' => 'web-service'
-        ]);
-        $result = $runner->start();
-        //$this->assertEquals(0, $result);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
@@ -190,7 +188,8 @@ class CreateWebServiceTest extends CLITestCase {
             "Creating the class...\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\apis\\NewWeb2Service';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass('\\app\\apis\\NewWeb2Service');
@@ -214,17 +213,21 @@ class CreateWebServiceTest extends CLITestCase {
                 ParamOption::OPTIONAL => false,
         ]);
     }
+    
     /**
      * @test
      */
     public function test02() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'webfiori',
+            'create',
+            '--c' => 'web-service'
+        ], [
             'NewWeb3',
-            '',
+            "\n", // Hit Enter to pick default value (app\apis)
             'get-hello-3',
             'Service\'s Desc',
-            '',
+            "\n", // Hit Enter to pick default value (GET method)
             'y',
             '6',
             'n',
@@ -233,16 +236,11 @@ class CreateWebServiceTest extends CLITestCase {
             '4',
             'Random\'s desc',
             'n',
-            '',
-            '',
+            "\n", // Hit Enter to pick default value
+            "\n", // Hit Enter to pick default value
         ]);
-        $runner->setArgsVector([
-            'webfiori',
-            'create',
-            '--c' => 'web-service'
-        ]);
-        $result = $runner->start();
-        //$this->assertEquals(0, $result);
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'app\apis'\n",
@@ -289,7 +287,8 @@ class CreateWebServiceTest extends CLITestCase {
             "Creating the class...\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
-        ], $runner->getOutput());
+        ], $output);
+        
         $clazz = '\\app\\apis\\NewWeb3Service';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
@@ -313,6 +312,7 @@ class CreateWebServiceTest extends CLITestCase {
                 ParamOption::OPTIONAL => false,
         ]);
     }
+    
     private function assertRequestParameter(RequestParameter $param, array $expected) {
         $this->assertEquals($expected[ParamOption::NAME], $param->getName());
         $this->assertEquals($expected[ParamOption::TYPE], $param->getType());

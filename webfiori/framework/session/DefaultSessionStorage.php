@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\cli\Runner;
-use webfiori\file\exceptions\FileException;
-use webfiori\file\File;
+use WebFiori\Cli\Runner;
+use WebFiori\File\exceptions\FileException;
+use WebFiori\File\File;
 use webfiori\framework\exceptions\SessionException;
 /**
  * The default sessions storage engine.
@@ -146,7 +146,7 @@ class DefaultSessionStorage implements SessionStorage {
      * @throws FileException
      */
     public function save(string $sessionId, string $serializedSession) {
-        if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__')) && $this->isStorageDirExist()) {
+        if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__') || class_exists('PHPUnit\\Framework\\TestCase')) && $this->isStorageDirExist()) {
             //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
             $file->setRawData($serializedSession);

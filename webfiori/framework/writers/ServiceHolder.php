@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\http\AbstractWebService;
+use WebFiori\Http\AbstractWebService;
 /**
  * A class which is used to hold CLI created services temporary.
  *

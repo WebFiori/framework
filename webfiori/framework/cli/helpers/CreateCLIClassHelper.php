@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\cli\InputValidator;
+use WebFiori\Cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\CLICommandClassWriter;
+use webfiori\framework\writers\CommandClassWriter;
 /**
  * A helper class which is used to help in creating CLI command classes using CLI.
  *
@@ -22,7 +22,7 @@ use webfiori\framework\writers\CLICommandClassWriter;
  */
 class CreateCLIClassHelper extends CreateClassHelper {
     /**
-     * @var CLICommandClassWriter
+     * @var CommandClassWriter
      */
     private $cliWriter;
     /**
@@ -31,7 +31,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command, new CLICommandClassWriter());
+        parent::__construct($command, new CommandClassWriter());
         $this->cliWriter = $this->getWriter();
     }
     public function readClassInfo() {
@@ -55,7 +55,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
         $addToMore = true;
 
         while ($addToMore) {
-            $argObj = new \webfiori\cli\Argument();
+            $argObj = new \WebFiori\Cli\Argument();
             $argName = $this->getInput('Enter argument name:');
 
             if (!$argObj->setName($argName)) {

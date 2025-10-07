@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\cli\InputValidator;
+use WebFiori\Cli\InputValidator;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\MiddlewareClassWriter;
 /**

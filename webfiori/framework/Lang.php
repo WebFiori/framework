@@ -12,7 +12,7 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
+use WebFiori\Http\Request;
 
 /**
  * A class that is can be used to make the application ready for

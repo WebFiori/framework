@@ -3,7 +3,7 @@ namespace webfiori\framework\test\writers;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\writers\WebServiceWriter;
-use webfiori\http\AbstractWebService;
+use WebFiori\Http\AbstractWebService;
 /**
  * @author Ibrahim
  */
@@ -17,10 +17,10 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
     }
     /**
@@ -33,10 +33,10 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',
@@ -61,10 +61,10 @@ class WebServiceWritterTest extends TestCase {
         $this->assertEquals('app\\apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\http\AbstractWebService",
-            "webfiori\http\ParamType",
-            "webfiori\http\ParamOption",
-            "webfiori\\http\\RequestMethod"
+            "WebFiori\Http\AbstractWebService",
+            "WebFiori\Http\ParamType",
+            "WebFiori\Http\ParamOption",
+            "WebFiori\\Http\\RequestMethod"
         ], $writter->getUseStatements());
         $writter->addRequestParam([
             'name' => 'param-1',

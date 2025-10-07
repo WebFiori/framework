@@ -1,12 +1,13 @@
 <?php
 namespace app\database\migrations\emptyRunner;
 
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Schema\SchemaRunner;
+use webfiori\framework\App;
 
-
-class XRunner extends MigrationsRunner {
+class XRunner extends SchemaRunner {
     
     public function __construct() {
-        parent::__construct(APP_PATH.'database'.DS.'migrations'.DS.'emptyRunner', '\\app\\database\\migrations\\emptyRunner', null);
+        $conn = App::getConfig()->getDBConnection('default-conn');
+        parent::__construct(null);
     }
 }

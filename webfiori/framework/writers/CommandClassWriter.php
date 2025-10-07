@@ -15,7 +15,7 @@ namespace webfiori\framework\writers;
  *
  * @author Ibrahim
  */
-class CLICommandClassWriter extends ClassWriter {
+class CommandClassWriter extends ClassWriter {
     private $args;
     private $desc;
     private $name;
@@ -48,7 +48,7 @@ class CLICommandClassWriter extends ClassWriter {
         $this->setSuffix('Command');
         $this->setNamespace(APP_DIR.'\\commands');
         $this->addUseStatement([
-            'webfiori\\cli\\CLICommand'
+            'WebFiori\\Cli\\Command'
         ]);
     }
     /**
@@ -167,7 +167,7 @@ class CLICommandClassWriter extends ClassWriter {
     }
 
     public function writeClassDeclaration() {
-        $this->append('class '.$this->getName().' extends CLICommand {');
+        $this->append('class '.$this->getName().' extends Command {');
     }
     private function writeConstructor() {
         $this->append([

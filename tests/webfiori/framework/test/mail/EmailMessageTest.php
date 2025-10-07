@@ -3,7 +3,7 @@ namespace webfiori\framework\test\mail;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use webfiori\email\SMTPAccount;
+use WebFiori\Mail\SMTPAccount;
 use webfiori\framework\App;
 use webfiori\framework\EmailMessage;
 use webfiori\framework\exceptions\MissingLangException;

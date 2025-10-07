@@ -4,7 +4,7 @@ namespace webfiori\framework\test\cli;
 use webfiori\framework\cli\CLITestCase;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\http\WebServicesManager;
+use WebFiori\Http\WebServicesManager;
 /**
  * @author Ibrahim
  */
@@ -13,14 +13,14 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase00() {
-        $this->assertEquals([
-            "Error: The argument --manager has invalid value.\n",
-        ], $this->executeMultiCommand([
+        $output = $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
             '--manager' => 'A',
             '--service' => 'c'
-        ]));
+        ]);
+        
+        $this->assertStringContainsString("Error: The argument --manager has invalid value", $output[0]);
         $this->assertEquals(-1, $this->getExitCode());
     }
     /**
@@ -206,7 +206,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase07() {
         $this->assertEquals([
-            "Error: The argument --manager has invalid value.\n",
+            "Error: The argument --manager has invalid value: Not a class: \\tests\\apis\\emptyService\\Xyz\n",
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',

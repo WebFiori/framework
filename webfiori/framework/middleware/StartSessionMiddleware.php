@@ -4,8 +4,8 @@ namespace webfiori\framework\middleware;
 
 use Error;
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 /**
  * A middleware which is used to initialize sessions.
  */

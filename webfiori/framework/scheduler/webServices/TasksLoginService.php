@@ -12,8 +12,8 @@ namespace webfiori\framework\scheduler\webServices;
 
 use webfiori\framework\scheduler\TasksManager;
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\AbstractWebService;
-use webfiori\http\RequestParameter;
+use WebFiori\Http\AbstractWebService;
+use WebFiori\Http\RequestParameter;
 /**
  * An API which is used to authenticate users to access scheduler web interface.
  *

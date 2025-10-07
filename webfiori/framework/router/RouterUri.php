@@ -13,8 +13,8 @@ namespace webfiori\framework\router;
 use Closure;
 use InvalidArgumentException;
 use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\http\Uri;
-use webfiori\ui\HTMLNode;
+use WebFiori\Http\Uri;
+use WebFiori\UI\HTMLNode;
 /**
  * A class that is used to split URIs and get their parameters.
  *

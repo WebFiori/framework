@@ -1,10 +1,11 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
+
 /**
- * Description of TestCreateCommand
+ * Description of CreateCommandTest
  *
  * @author Ibrahim
  */
@@ -13,15 +14,14 @@ class CreateCommandTest extends CLITestCase {
      * @test
      */
     public function testCreate00() {
-        $runner = App::getRunner();
-        $runner->setInputs([
-            '11',
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create'
+        ], [
+            '11',
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -36,21 +36,21 @@ class CreateCommandTest extends CLITestCase {
             "9: Web service test case.\n",
             "10: Database migration.\n",
             "11: Quit. <--\n",
-        ], $runner->getOutput());
+        ], $output);
     }
+    
     /**
      * @test
      */
     public function testCreate01() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
-            '',
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create'
+        ], [
+            "\n", // Hit Enter to pick default value (quit)
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "What would you like to create?\n",
             "0: Database table class.\n",
@@ -65,6 +65,6 @@ class CreateCommandTest extends CLITestCase {
             "9: Web service test case.\n",
             "10: Database migration.\n",
             "11: Quit. <--\n",
-        ], $runner->getOutput());
+        ], $output);
     }
 }

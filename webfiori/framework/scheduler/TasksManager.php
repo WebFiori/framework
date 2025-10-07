@@ -12,10 +12,10 @@ namespace webfiori\framework\scheduler;
 
 use const DS;
 use Exception;
-use webfiori\cli\CLICommand;
-use webfiori\cli\Runner;
-use webfiori\collections\Queue;
-use webfiori\file\File;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\Runner;
+use WebFiori\Collections\Queue;
+use WebFiori\File\File;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\router\Router;
@@ -61,7 +61,7 @@ class TasksManager {
     private $activeTask;
     /**
      *
-     * @var CLICommand
+     * @var Command
      */
     private $command;
     /**
@@ -350,6 +350,9 @@ class TasksManager {
     public static function getPassword() : string {
         return self::get()->getPasswordHelper();
     }
+    public static function getTasks() : array {
+        return self::get()->tasksQueue()->toArray();
+    }
     /**
      * Returns a task given its name.
      *
@@ -366,18 +369,14 @@ class TasksManager {
         $retVal = null;
 
         if (strlen($trimmed) != 0) {
-            $tempQ = new Queue();
+            $tasks = self::tasksQueue()->toArray();
 
-            while ($task = &self::tasksQueue()->dequeue()) {
-                $tempQ->enqueue($task);
+            foreach ($tasks as $task) {
 
                 if ($task->getTaskName() == $trimmed) {
                     $retVal = $task;
+                    break;
                 }
-            }
-
-            while ($task = &$tempQ->dequeue()) {
-                self::scheduleTask($task);
             }
         }
 
@@ -795,8 +794,7 @@ class TasksManager {
      * Sets the password that is used to protect tasks execution.
      *
      * The password is used to prevent unauthorized access to execute tasks.
-     * The provided password must be 'sha256' hashed string. It is recommended
-     * to hash the password externally then use the hash inside your code.
+     * The provided password will be 'sha256' hashed.
      *
      * @param string $pass The password that will be used.
      */
@@ -864,10 +862,12 @@ class TasksManager {
             if ($task->getTaskName() == 'Background Task') {
                 $task->setTaskName('task-'.$this->tasksQueue()->size());
             }
-            $retVal = $this->tasksQueue->enqueue($task);
 
-            if ($retVal === true && !in_array($task->getTaskName(), $this->tasksNamesArr)) {
-                $this->tasksNamesArr[] = $task->getTaskName();
+            if (!in_array($task->getTaskName(), $this->tasksNamesArr)) {
+                $retVal = $this->tasksQueue->enqueue($task);
+                if ($retVal) {
+                    $this->tasksNamesArr[] = $task->getTaskName();
+                }
             }
         }
 
@@ -981,6 +981,10 @@ class TasksManager {
      * @since 1.0
      */
     private function setPasswordHelper(string $pass) {
+        if (strlen($pass) != 0) {
+            $this->accessPass = hash('sha256', $pass);
+            return;
+        }
         $this->accessPass = $pass;
     }
 }

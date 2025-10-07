@@ -1,7 +1,7 @@
 <?php
 namespace tables;
 
-use webfiori\database\mysql\MySQLTable;
+use WebFiori\Database\MySql\MySQLTable;
 
 /**
  * Description of UserInfoTable

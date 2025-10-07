@@ -1,7 +1,7 @@
 <?php
 namespace tests\apis\multiple;
 
-use webfiori\http\WebServicesManager;
+use WebFiori\Http\WebServicesManager;
 /**
  *
  * @author Ibrahim

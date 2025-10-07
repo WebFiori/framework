@@ -10,8 +10,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
 use webfiori\framework\scheduler\AbstractTask;
 use webfiori\framework\scheduler\TasksManager;
 /**
@@ -21,7 +21,7 @@ use webfiori\framework\scheduler\TasksManager;
  * @author Ibrahim
  * @version 1.0
  */
-class SchedulerCommand extends CLICommand {
+class SchedulerCommand extends Command {
     /**
      * Creates new instance of the class.
      * The command will have name '--scheduler'. This command is used to
@@ -63,8 +63,11 @@ class SchedulerCommand extends CLICommand {
      */
     public function exec() : int {
         $retVal = -1;
-
-        if ($this->isArgProvided('--list')) {
+        $count = count(TasksManager::getTasks());
+        if ($count == 0) {
+            $this->info("There are no scheduled tasks.");
+            $retVal = 0;
+        } else if ($this->isArgProvided('--list')) {
             $this->listTasks();
             $retVal = 0;
         } else if ($this->isArgProvided('--check')) {

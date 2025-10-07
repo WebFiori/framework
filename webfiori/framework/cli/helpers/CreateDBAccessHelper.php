@@ -10,7 +10,7 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\database\Table;
+use WebFiori\Database\Table;
 use webfiori\framework\App;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\writers\DBClassWriter;
@@ -82,7 +82,7 @@ class CreateDBAccessHelper extends CreateClassHelper {
             $tableObj = new $tableClassName();
 
             if (!$tableObj instanceof Table) {
-                $this->getCommand()->error('The given class is not a child of the class "webfiori\database\Table".');
+                $this->getCommand()->error('The given class is not a child of the class "WebFiori\Database\Table".');
                 $tableClassName = '';
                 continue;
             }

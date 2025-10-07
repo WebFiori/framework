@@ -2,34 +2,33 @@
 namespace webfiori\framework\test\cli;
 
 use app\database\TestTable;
-use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
 
 class CreateEntityTest extends CLITestCase {
     /**
      * @test
      */
     public function testCreateEntity00() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
-            'NeEntity',
-            '',
-            'y',
-            'y',
-            'superNewAttr',
-            'y',
-            'superNewAttr',
-            'y',
-            'invalid name',
-            'n'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'entity',
             '--table' => TestTable::class
+        ], [
+            'NeEntity',
+            "\n", // Hit Enter to pick default value (app\entity)
+            'y',
+            'y',
+            'superNewAttr',
+            'y',
+            'superNewAttr', // Duplicate attribute name
+            'y',
+            'invalid name', // Invalid attribute name
+            'n'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "We need from you to give us entity class information.\n",
             "Enter a name for the new class:\n",
@@ -48,35 +47,35 @@ class CreateEntityTest extends CLITestCase {
             "Would you like to add another attribute?(y/N)\n",
             "Generating your entity...\n",
             "Success: Entity class created.\n"
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\entity\\NeEntity'));
         $this->removeClass('\\app\\entity\\NeEntity');
     }
+    
     /**
      * @test
      */
     public function testCreateEntity01() {
-        $runner = $runner = App::getRunner();
-        $runner->setInputs([
-            '1',
-            'NewEntity',
-            '           ',
-            'y',
-            'y',
-            'superNewAttr',
-            'y',
-            'superNewAttr',
-            'y',
-            'invalid name',
-            'n'
-        ]);
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
-            '--c' => 'entiy',
+            '--c' => 'entiy', // Invalid command value
             '--table' => TestTable::class
+        ], [
+            '1',
+            'NewEntity',
+            '           ', // Invalid namespace (spaces only)
+            'y',
+            'y',
+            'superNewAttr',
+            'y',
+            'superNewAttr', // Duplicate attribute name
+            'y',
+            'invalid name', // Invalid attribute name
+            'n'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Warning: The argument --c has invalid value.\n",
             "What would you like to create?\n",
@@ -109,7 +108,7 @@ class CreateEntityTest extends CLITestCase {
             "Would you like to add another attribute?(y/N)\n",
             "Generating your entity...\n",
             "Success: Entity class created.\n"
-        ], $runner->getOutput());
+        ], $output);
         $this->assertTrue(class_exists('\\app\\entity\\NewEntity'));
         $this->removeClass('\\app\\entity\\NewEntity');
     }

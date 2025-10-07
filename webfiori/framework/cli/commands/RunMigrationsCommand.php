@@ -11,314 +11,282 @@
 namespace webfiori\framework\cli\commands;
 
 use Throwable;
-use webfiori\cli\Argument;
-use webfiori\cli\CLICommand;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Cli\Argument;
+use WebFiori\Cli\Command;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Database;
+use WebFiori\Database\migration\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLIUtils;
+
 /**
- *
+ * Command for executing database migrations.
+ * 
  * @author Ibrahim
  */
-class RunMigrationsCommand extends CLICommand {
-    /**
-     * 
-     * @var MigrationsRunner
-     */
-    private $migrationsRunner;
-    /**
-     * 
-     * @var ConnectionInfo
-     */
-    private $connectionInfo;
+class RunMigrationsCommand extends Command {
+    
+    private const EXIT_SUCCESS = 0;
+    private const EXIT_ERROR = 1;
+    
+    private ?SchemaRunner $runner = null;
+    private ?ConnectionInfo $connection = null;
+    
     public function __construct() {
         parent::__construct('migrations', [
-            new Argument('--ns', 'The namespace that holds the migrations', true),
             new Argument('--connection', 'The name of database connection to be used in executing the migrations.', true),
-            new Argument('--runner', 'A class that extends the class "webfiori\database\migration\MigrationsRunner".', true),
-            new Argument('--ini', 'Creates migrations table in database if not exist.', true),
-            new Argument('--rollback', 'Rollback last applied migration.', true),
-            new Argument('--all', 'If provided with the option --rollback, all migrations will be rolled back.', true),
+            new Argument('--runner', 'A class that extends the class "WebFiori\Database\Schema\SchemaRunner".', true),
+            new Argument('--init', 'Creates migrations table in database if not exist.', true),
+            new Argument('--rollback', 'Rollback migrations.', true),
+            new Argument('--all', 'If provided with --rollback, all migrations will be rolled back.', true),
         ], 'Execute database migrations.');
     }
     
     /**
-     * Checks if the argument '--ini' is provided or not and initialize
-     * migrations table if provided.
-     * 
-     * @param MigrationsRunner|null $runner An optional instance which will be
-     * used to run the migrations. If provided, the table will be created based
-     * on the connection of the runner.
-     * 
-     * @return bool If the argument '--ini' is not provided, true is returned.
-     * Other than that, an attempt to create the migrations table will be made.
-     * If created, true is returned. Other than that, false is returned.
-     */
-    private function checkMigrationsTable(?MigrationsRunner $runner, $conn = null) {
-        if (!$this->isArgProvided('--ini')) {
-            return 0;
-        }
-        if ($conn === null) {
-            $conn = $this->getDBConnection($runner);
-        }
-        if ($conn !== null) {
-            
-            try {
-                $this->println("Initializing migrations table...");
-                $temp = $runner !== null ? $runner : new MigrationsRunner(APP_PATH, '\\'.APP_DIR, $conn);
-                
-                $temp->createMigrationsTable();
-                $this->success("Migrations table succesfully created.");
-            } catch (\Throwable $ex) {
-                $this->error('Unable to create migrations table due to following:');
-                $this->println($ex->getMessage());
-                return -1;
-            }
-            return 0;
-        }
-        return 0;
-    }
-    private function getNS(?MigrationsRunner $runner = null) {
-        if ($this->isArgProvided('--ns')) {
-            return $this->getArgValue('--ns');
-        } else if ($runner !== null) {
-            return $runner->getMigrationsNamespace();
-        } else {
-            $this->info("Using default namespace for migrations.");
-            return '\\'.APP_DIR.'\\database\\migrations';
-        }
-    }
-
-    /**
      * Execute the command.
-     *
-     * @return int 0 in case of success. Other value if failed.
      */
-    public function exec() : int {
-        
-        $runner = $this->getRunnerArg();
-        
-        if (!($runner instanceof MigrationsRunner) && $runner !== null) {
-            return -1;
-        }
-        $ns = $this->getNS($runner);
-        
-        if (!$this->hasMigrations($ns)) {
-            return 0;
-        }
-        
-        $connection = $this->getDBConnection($runner);
-        if (!($connection instanceof ConnectionInfo)) {
-            return -1;
-        }
-        
-        if ($this->checkMigrationsTable($runner, $connection) == -1) {
-            return -1;
-        }
-
-        
+    public function exec(): int {
         try {
-            $runner = new MigrationsRunner(ROOT_PATH.DS. str_replace('\\', DS, $ns), $ns, $connection);
-        } catch (Throwable $ex) {
-            $this->error($ex->getMessage());
-            return -1;
-        }
-        if ($this->isArgProvided("--rollback")) {
-            return $this->rollbackMigration($runner);
-        } else {
-            return $this->executeMigrations($runner);
-        }
-    }
-    private function rollbackMigration(MigrationsRunner $runner) {
-        $isAll = $this->isArgProvided('--all');
-        $rolledCount = 0;
-        if ($isAll) {
-            $this->println("Rolling back migrations...");
-            do {
-                $migration = $this->doRollback($runner);
-                if ($migration === false) {
-                    return -1;
-                }
-                $this->printInfo($migration, $rolledCount);
-            } while ($migration !== null);
-        } else {
-            $this->println("Rolling back last executed migration...");
-            $migration = $this->doRollback($runner);
-            if ($migration === false) {
-                return -1;
+            if (!$this->initializeCommand()) {
+                return self::EXIT_ERROR;
             }
-            $this->printInfo($migration, $rolledCount);
-        }
-        if ($rolledCount == 0) {
-            $this->info("No migration rolled back.");
-        }
-        
-        
-        return 0;
-    }
-    private function doRollback(MigrationsRunner $runner) {
-        try {
-            return $runner->rollback();
             
-        } catch (Throwable $ex) {
-            $this->error('Failed to execute migration due to following:');
-            $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
-            $this->warning('Execution stopped.');
+            if ($this->isArgProvided('--init')) {
+                return $this->initializeMigrationsTable();
+            }
+            
+            if ($this->isArgProvided('--rollback')) {
+                return $this->executeRollback();
+            }
+            
+            return $this->executeMigrations();
+            
+        } catch (Throwable $e) {
+            $this->error('An exception was thrown.');
+            $this->println('Exception Message: ' . $e->getMessage());
+            $this->println('Code: ' . $e->getCode());
+            $this->println('At: ' . $e->getFile());
+            $this->println('Line: ' . $e->getLine());
+            $this->println('Stack Trace: ');
+            $this->println($e->getTraceAsString());
+            return self::EXIT_ERROR;
+        }
+    }
+    
+    /**
+     * Initialize command dependencies.
+     */
+    private function initializeCommand(): bool {
+        $this->connection = $this->resolveConnection();
+        if ($this->connection === null) {
             return false;
         }
-    }
-    private function printInfo(?AbstractMigration $migration, &$rolledCount = 0) {
-        if ($migration !== null) {
-            $rolledCount++;
-            $this->success("Migration '".$migration->getName()."' was successfully rolled back.");
-        }
-    }
-    private function executeMigrations(MigrationsRunner $runner) {
-        $this->println("Starting to execute migrations...");
-        $listOfApplied = [];
-        while ($this->applyNext($runner, $listOfApplied)){};
         
-        if (count($listOfApplied) != 0) {
-            $this->info("Number of applied migrations: ".count($listOfApplied));
-            $this->println("Names of applied migrations:");
-            $this->printList(array_map(function (AbstractMigration $migration) {
-                return $migration->getName();
-            }, $listOfApplied));
-        } else {
-            $this->info("No migrations were executed.");
-        }
-        return 0;
-    }
-    /**
-     * Returns the connection that will be used in running the migrations.
-     * 
-     * The method will first check on the provided runner. If it has connection,
-     * it will be returned. Then it will check if the argument '--connection' is
-     * provided or not. If provided, the method will check if such connection
-     * exist in application configuration. If no connection was found, null
-     * is returned. If the argument '--connection' is not provided, the method will
-     * ask the user to select a connection from the connections which
-     * exist in application configuration.
-     * 
-     * @param MigrationsRunner|null $runner If given and the connection is set
-     * on the instance, it will be returned.
-     * 
-     * @return ConnectionInfo|null
-     */
-    private function getDBConnection(?MigrationsRunner $runner = null) {
-        
-        if ($runner !== null) {
-            if ($runner->getConnectionInfo() !== null) {
-                return $runner->getConnectionInfo();
-            }
-        }
-        if (!$this->hasConnections()) {
-            return -1;
-        }
-        $dbConnections = array_keys(App::getConfig()->getDBConnections());
-        
-        if ($this->isArgProvided('--connection')) {
-            $connection = $this->getArgValue('--connection');
-
-            if (!in_array($connection, $dbConnections)) {
-                $this->error("No connection was found which has the name '$connection'.");
-                return -1;
-            } else {
-                return App::getConfig()->getDBConnection($connection);
-            }
-        } else {
-            return CLIUtils::getConnectionName($this);
-        }
-    }
-    public function getNext(MigrationsRunner $runner) : ?AbstractMigration {
-        foreach ($runner->getMigrations() as $m) {
-            if ($runner->isApplied($m->getName())) {
-                continue;
-            } else {
-                return $m;
-            }
-        }
-        return null;
-    }
-    private function applyNext(MigrationsRunner $runner, &$listOfApplied) : bool {
-        $toBeApplied = $this->getNext($runner);
-        
-        try {
-            //$this->println("Executing migration...");
-            $applied = $runner->applyOne();
-            
-            if ($applied !== null) {
-                $this->success("Migration '".$applied->getName()."' applied successfuly.");
-                $listOfApplied[] = $applied;
-                return true;
-            } else {
+        $this->runner = $this->createRunner();
+        if ($this->runner === null) {
+            $runnerClass = $this->getArgValue('--runner');
+            if ($runnerClass !== null) {
+                // Runner creation failed, return false
                 return false;
             }
-        } catch (Throwable $ex) {
-            $this->error('Failed to execute migration due to following:');
-            $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
-            $this->warning('Execution stopped.');
-            $this->warning('Rolling back changes...');
-            
-            try {
-                $toBeApplied->down($runner);
-            } catch (Throwable $exc) {
-                $this->error('Failed to rollback due to following:');
-                $this->println($ex->getMessage().' (Line '.$ex->getLine().')');
-            }
-
-            return false;
+            // Create default runner with connection
+            $this->runner = new SchemaRunner($this->connection);
         }
-    }
-    /**
-     * 
-     * @return MigrationsRunner|int|null
-     */
-    private function getRunnerArg() {
-        $runner = $this->getArgValue('--runner');
         
-        if ($runner === null) {
+        // Set connection on runner if it doesn't have one
+        if ($this->runner->getConnectionInfo() === null) {
+            $this->runner = new SchemaRunner($this->connection);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Create SchemaRunner instance from --runner argument.
+     */
+    private function createRunner(): ?SchemaRunner {
+        $runnerClass = $this->getArgValue('--runner');
+        
+        if ($runnerClass === null) {
+            return null; // Will be created later with connection
+        }
+        
+        if (!class_exists($runnerClass)) {
+            $this->error("The argument --runner has invalid value: Class \"$runnerClass\" does not exist.");
             return null;
         }
         
-        if (class_exists($runner)) {
-            try {
-                $runnerInst = new $runner();
-            } catch (Throwable $exc) {
-                $this->error('The argument --runner has invalid value: Exception: "'.$exc->getMessage().'".');
-                return -1;
-            }
-
-            if (!($runnerInst instanceof MigrationsRunner)) {
-                $this->error('The argument --runner has invalid value: "'.$runner.'" is not an instance of "MigrationsRunner".');
-                return -1;
-            } else {
-                return $runnerInst;
-            }
-        } else {
-            $this->error('The argument --runner has invalid value: Class "'.$runner.'" does not exist.');
-            return -1;
+        try {
+            $runner = new $runnerClass();
+        } catch (Throwable $e) {
+            $this->error("The argument --runner has invalid value: Exception: \"{$e->getMessage()}\".");
+            return null;
         }
+        
+        if (!($runner instanceof SchemaRunner)) {
+            $this->error("The argument --runner has invalid value: \"$runnerClass\" is not an instance of \"SchemaRunner\".");
+            return null;
+        }
+        
+        return $runner;
     }
-    private function hasConnections() : bool {
-        $dbConnections = App::getConfig()->getDBConnections();
-        if (count($dbConnections) == 0) {
+    
+    /**
+     * Resolve database connection.
+     */
+    private function resolveConnection(): ?ConnectionInfo {
+        // Check if runner already has a connection
+        if ($this->runner !== null && $this->runner->getConnectionInfo() !== null) {
+            return $this->runner->getConnectionInfo();
+        }
+        
+        $connections = App::getConfig()->getDBConnections();
+        if (empty($connections)) {
             $this->info('No connections were found in application configuration.');
-            return false;
+            return null;
         }
-        return true;
+        
+        $connectionName = $this->getArgValue('--connection');
+        
+        if ($connectionName !== null) {
+            $connection = App::getConfig()->getDBConnection($connectionName);
+            if ($connection === null) {
+                $this->error("No connection was found which has the name '$connectionName'.");
+                return null;
+            }
+            return $connection;
+        }
+        
+        return CLIUtils::getConnectionName($this);
     }
-    private function hasMigrations(string $namespace) : bool {
-        $tmpRunner = new MigrationsRunner(ROOT_PATH.DS.str_replace('\\', DS, $namespace), $namespace, null);
-        $this->println("Checking namespace '$namespace' for migrations...");
-        $count = count($tmpRunner->getMigrations());
-        if ($count == 0) {
-            $this->info("No migrations found in the namespace '$namespace'.");
-            return false;
+    
+    /**
+     * Initialize migrations table.
+     */
+    private function initializeMigrationsTable(): int {
+        try {
+            $this->println("Initializing migrations table...");
+            $this->runner->createSchemaTable();
+            $this->success("Migrations table successfully created.");
+            return self::EXIT_SUCCESS;
+        } catch (Throwable $e) {
+            $this->error('Unable to create migrations table due to following:');
+            $this->println($e->getMessage());
+            return self::EXIT_ERROR;
         }
-        $this->info("Found $count migration(s) in the namespace '$namespace'.");
-        return true;
+    }
+    
+    /**
+     * Execute migrations rollback.
+     */
+    private function executeRollback(): int {
+        $migrations = $this->runner->getChanges();
+        if (empty($migrations)) {
+            $this->info("No migrations found.");
+            return self::EXIT_SUCCESS;
+        }
+        
+        $this->println("Rolling back migrations...");
+        
+        try {
+            if ($this->isArgProvided('--all')) {
+                $rolledBack = $this->runner->rollbackUpTo(null);
+            } else {
+                $rolledBack = $this->rollbackLast();
+            }
+            
+            if (empty($rolledBack)) {
+                $this->info("No migrations were rolled back.");
+            } else {
+                foreach ($rolledBack as $migration) {
+                    $this->success("Migration '{$migration->getName()}' was successfully rolled back.");
+                }
+            }
+            
+            return self::EXIT_SUCCESS;
+            
+        } catch (Throwable $e) {
+            $this->error('Failed to execute migration due to following:');
+            $this->println($e->getMessage() . ' (Line ' . $e->getLine() . ')');
+            $this->warning('Execution stopped.');
+            return self::EXIT_ERROR;
+        }
+    }
+    
+    /**
+     * Rollback the last applied migration.
+     */
+    private function rollbackLast(): array {
+        $changes = $this->runner->getChanges();
+        $lastApplied = null;
+        
+        // Find the last applied migration
+        foreach ($changes as $change) {
+            if ($this->runner->isApplied($change->getName())) {
+                $lastApplied = $change;
+            }
+        }
+        
+        if ($lastApplied === null) {
+            return [];
+        }
+        
+        return $this->runner->rollbackUpTo($lastApplied->getName());
+    }
+    
+    /**
+     * Execute migrations.
+     */
+    private function executeMigrations(): int {
+        $migrations = $this->runner->getChanges();
+        if (empty($migrations)) {
+            $this->info("No migrations found.");
+            return self::EXIT_SUCCESS;
+        }
+        
+        $this->println("Starting to execute migrations...");
+        $appliedMigrations = [];
+        
+        try {
+            while (($migration = $this->getNextMigration()) !== null) {
+                $applied = $this->runner->applyOne();
+                if ($applied !== null) {
+                    $this->success("Migration '{$applied->getName()}' applied successfully.");
+                    $appliedMigrations[] = $applied;
+                } else {
+                    break;
+                }
+            }
+            
+            if (empty($appliedMigrations)) {
+                $this->info("No migrations were executed.");
+            } else {
+                $this->info("Number of applied migrations: " . count($appliedMigrations));
+                $this->println("Names of applied migrations:");
+                $names = array_map(fn($m) => $m->getName(), $appliedMigrations);
+                $this->printList($names);
+            }
+            
+            return self::EXIT_SUCCESS;
+            
+        } catch (Throwable $e) {
+            $this->error('Failed to execute migration due to following:');
+            $this->println($e->getMessage() . ' (Line ' . $e->getLine() . ')');
+            $this->warning('Execution stopped.');
+            return self::EXIT_ERROR;
+        }
+    }
+    
+    /**
+     * Get the next migration to apply.
+     */
+    private function getNextMigration(): ?AbstractMigration {
+        foreach ($this->runner->getChanges() as $migration) {
+            if (!$this->runner->isApplied($migration->getName())) {
+                return $migration;
+            }
+        }
+        return null;
     }
 }

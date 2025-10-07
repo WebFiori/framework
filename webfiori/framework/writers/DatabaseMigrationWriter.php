@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\database\Database;
-use webfiori\database\migration\AbstractMigration;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+use WebFiori\Database\Schema\SchemaRunner;
 
 /**
  * A writer class which is used to create new database migration.
@@ -20,28 +20,20 @@ use webfiori\database\migration\MigrationsRunner;
  * @author Ibrahim
  */
 class DatabaseMigrationWriter extends ClassWriter {
-    private $order;
-    private $name;
+    private $runner;
+    private $environments = [];
+    private $dependencies = [];
+    private static $migrationCounter = 0;
+    
     /**
      * Creates new instance of the class.
      *
      */
-    public function __construct(?MigrationsRunner $runner) {
-        $name = 'Migration';
+    public function __construct(?SchemaRunner $runner) {
+        $this->runner = $runner;
+        $name = $this->generateMigrationName();
         
-        if ($runner !== null) {
-            $count = count($runner->getMigrations());
-            $this->setMigrationOrder($count);
-            if ($count < 10) {
-                $name = 'Migration00'.$count;
-            } else if ($count < 100) {
-                $name = 'Migration0'.$count;
-            } else {
-                $name = 'Migration'.$count;
-            }
-        }
-        
-        $this->setMigrationName($name);
+        $this->setClassName($name);
         
         parent::__construct($name, APP_PATH.'database'.DS.'migrations', APP_DIR.'\\database\\migrations');
         $this->addUseStatement([
@@ -50,17 +42,37 @@ class DatabaseMigrationWriter extends ClassWriter {
         ]);
         
     }
-    public function getMigrationName() : string {
-        return $this->name;
+    
+    private function generateMigrationName() {
+        $name = 'Migration' . str_pad(self::$migrationCounter, 3, '0', STR_PAD_LEFT);
+        self::$migrationCounter++;
+        return $name;
     }
-    public function getMigrationOrder() : int {
-        return $this->order;
+    
+    /**
+     * Add an environment where this migration should run.
+     */
+    public function addEnv(string $env) {
+        $this->environments[] = $env;
     }
-    public function setMigrationName(string $name) {
-        $this->name = $name;
+    
+    /**
+     * Add a dependency migration class name.
+     */
+    public function addDependency(string $dependency) : bool {
+        if (class_exists($dependency)) {
+            $this->dependencies[] = $dependency;
+            $this->addUseStatement($dependency);
+            return true;
+        }
+        return false;
     }
-    public function setMigrationOrder(int $order) {
-        $this->order = $order;
+    
+    /**
+     * Reset the migration counter for testing purposes.
+     */
+    public static function resetCounter() {
+        self::$migrationCounter = 0;
     }
 
     public function writeClassBody() {
@@ -71,22 +83,58 @@ class DatabaseMigrationWriter extends ClassWriter {
             $this->f('__construct'),
 
         ], 1);
-        $this->append("parent::__construct('".$this->getMigrationName()."', ".$this->getMigrationOrder().");", 2);
+        $this->append("parent::__construct();", 2);
         $this->append('}', 1);
+        
+        $this->append('/**', 1);
+        $this->append(' * Get the list of migrations this migration depends on.', 1);
+        $this->append(' * ', 1);
+        $this->append(' * @return array Array of migration class names that must be executed before this one.', 1);
+        $this->append(' */', 1);
+        $this->append($this->f('getDependencies', [], 'array'), 1);
+        if (empty($this->dependencies)) {
+            $this->append('return [];', 2);
+        } else {
+            $this->append('return [', 2);
+            foreach ($this->dependencies as $dep) {
+                $this->append("    $dep::class,", 2);
+            }
+            $this->append('];', 2);
+        }
+        $this->append('}', 1);
+        
+        $this->append('/**', 1);
+        $this->append(' * Get the environments where this migration should be executed.', 1);
+        $this->append(' * ', 1);
+        $this->append(' * @return array Empty array means all environments.', 1);
+        $this->append(' */', 1);
+        $this->append($this->f('getEnvironments', [], 'array'), 1);
+        if (empty($this->environments)) {
+            $this->append('return [];', 2);
+        } else {
+            $this->append('return [', 2);
+            foreach ($this->environments as $env) {
+                $this->append("    '$env',", 2);
+            }
+            $this->append('];', 2);
+        }
+        $this->append('}', 1);
+        
         $this->append('/**', 1);
         $this->append(' * Performs the action that will apply the migration.', 1);
         $this->append(' * ', 1);
-        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('up', ['schema' => 'Database']), 1);
+        $this->append($this->f('up', ['db' => 'Database'], 'void'), 1);
         $this->append('//TODO: Implement the action which will apply the migration to database.', 2);
         $this->append('}', 1);
+        
         $this->append('/**', 1);
         $this->append(' * Performs the action that will revert back the migration.', 1);
         $this->append(' * ', 1);
-        $this->append(' * @param Database $schema The database at which the migration will be applied to.', 1);
+        $this->append(' * @param Database $db The database at which the migration will be applied to.', 1);
         $this->append(' */', 1);
-        $this->append($this->f('down', ['schema' => 'Database']), 1);
+        $this->append($this->f('down', ['db' => 'Database'], 'void'), 1);
         $this->append('//TODO: Implement the action which will revert back the migration.', 2);
         $this->append('}', 1);
         $this->append('}');

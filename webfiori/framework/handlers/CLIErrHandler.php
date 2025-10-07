@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\handlers;
 
-use webfiori\cli\Formatter;
-use webfiori\cli\Runner;
-use webfiori\error\AbstractHandler;
+use WebFiori\Cli\Formatter;
+use WebFiori\Cli\Runner;
+use WebFiori\Error\AbstractHandler;
 use webfiori\framework\App;
 use webfiori\framework\scheduler\TasksManager;
 /**
@@ -38,7 +38,7 @@ class CLIErrHandler extends AbstractHandler {
     /**
      * Handles the exception
      */
-    public function handle() {
+    public function handle() : void {
         $stream = App::getRunner()->getOutputStream();
         $stream->prints(Formatter::format("Uncaught Exception\n", [
             'color' => 'red',

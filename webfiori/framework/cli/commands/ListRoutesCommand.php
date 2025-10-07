@@ -10,14 +10,14 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\cli\CLICommand;
+use WebFiori\Cli\Command;
 use webfiori\framework\router\Router;
 /**
  * A CLI command which is used to show a list of all added routes.
  *
  * @author Ibrahim
  */
-class ListRoutesCommand extends CLICommand {
+class ListRoutesCommand extends Command {
     /**
      * Creates new instance of the class.
      * The command will have name '--list-routes'. This command

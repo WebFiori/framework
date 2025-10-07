@@ -12,8 +12,8 @@ namespace webfiori\framework\writers;
 
 use webfiori\framework\middleware\AbstractMiddleware;
 use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Http\Request;
+use WebFiori\Http\Response;
 /**
  * A class which is used to write middleware classes.
  *

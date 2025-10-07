@@ -1,7 +1,7 @@
 <?php
 namespace app\apis;
 
-use webfiori\http\Response;
+use WebFiori\Http\Response;
 
 class RoutingTestClass {
     public function __construct(?string $param = null, ?string $second = null) {

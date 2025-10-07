@@ -12,10 +12,10 @@ namespace webfiori\framework\session;
 
 use webfiori\framework\App;
 use webfiori\framework\exceptions\SessionException;
-use webfiori\http\HttpCookie;
-use webfiori\http\Request;
-use webfiori\json\Json;
-use webfiori\json\JsonI;
+use WebFiori\Http\HttpCookie;
+use WebFiori\Http\Request;
+use WebFiori\Json\Json;
+use WebFiori\Json\JsonI;
 /**
  * A class that represents a session.
  *

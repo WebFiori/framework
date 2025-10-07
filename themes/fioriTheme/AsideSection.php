@@ -1,7 +1,7 @@
 <?php
 namespace themes\fioriTheme;
 
-use webfiori\ui\HTMLNode;
+use WebFiori\UI\HTMLNode;
 
 /**
  * A class that represents aside area of the theme.

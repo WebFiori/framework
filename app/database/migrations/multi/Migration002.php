@@ -1,8 +1,8 @@
 <?php
 namespace app\database\migrations\multi;
 
-use webfiori\database\Database;
-use webfiori\database\migration\AbstractMigration;
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
 /**
  * A database migration class.
  */
@@ -18,7 +18,7 @@ class Migration002 extends AbstractMigration {
      * 
      * @param Database $schema The database at which the migration will be applied to.
      */
-    public function up(Database $schema) {
+    public function up(Database $schema) : void {
         //TODO: Implement the action which will apply the migration to database.
     }
     /**
@@ -26,7 +26,8 @@ class Migration002 extends AbstractMigration {
      * 
      * @param Database $schema The database at which the migration will be applied to.
      */
-    public function down(Database $schema) {
+    public function down(Database $schema) : void {
         //TODO: Implement the action which will revert back the migration.
     }
+    
 }

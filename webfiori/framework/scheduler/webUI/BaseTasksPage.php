@@ -12,9 +12,9 @@ namespace webfiori\framework\scheduler\webUI;
 
 use webfiori\framework\App;
 use webfiori\framework\ui\WebPage;
-use webfiori\json\Json;
-use webfiori\ui\HTMLNode;
-use webfiori\ui\JsCode;
+use WebFiori\Json\Json;
+use WebFiori\UI\HTMLNode;
+use WebFiori\UI\JsCode;
 /**
  * A generic view for scheduler related operations.
  *

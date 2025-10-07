@@ -10,9 +10,9 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\cli\CLICommand;
-use webfiori\cli\CommandTestCase;
-use webfiori\file\File;
+use WebFiori\Cli\Command;
+use WebFiori\Cli\CommandTestCase;
+use WebFiori\File\File;
 use webfiori\framework\App;
 
 /**
@@ -21,8 +21,8 @@ use webfiori\framework\App;
  * @author Ibrahim
  */
 class CLITestCase extends CommandTestCase {
-    public function __construct() {
-        parent::__construct();
+    public function __construct($name = null, array $data = [], $dataName = "") {
+        parent::__construct($name, $data, $dataName);
         $this->setRunner(App::getRunner());
     }
     /**
@@ -39,7 +39,7 @@ class CLITestCase extends CommandTestCase {
      * @param array $userInputs An array that holds user inputs. Each index
      * should hold one line that represent an input to specific prompt.
      * 
-     * @param array $commands An array that holds objects of type 'CLICommand'.
+     * @param array $commands An array that holds objects of type 'Command'.
      * Each object represents the registered command.
      * 
      * @param string $default A string that represents the name of the command
@@ -53,7 +53,7 @@ class CLITestCase extends CommandTestCase {
         if (count($argv) != 0) {
             if (class_exists($argv[0])) {
                 $c = new $argv[0];
-                if ($c instanceof CLICommand) {
+                if ($c instanceof Command) {
                     $argv[0] = $c->getName();
                 }
             }

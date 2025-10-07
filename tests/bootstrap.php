@@ -1,24 +1,31 @@
 <?php
+if (function_exists('xdebug_break')) {
+    xdebug_break(); // Pause here so VS Code can catch up and bind other breakpoints
+}
 
 //Bootstrap file which is used to boot testing process.
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
-use webfiori\database\ConnectionInfo;
-use webfiori\database\migration\MigrationsRunner;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Schema\SchemaRunner;
 use webfiori\framework\App;
 use webfiori\framework\autoload\ClassLoader;
 use webfiori\framework\config\JsonDriver;
+use webfiori\framework\ThemeManager;
+use themes\fioriTheme\NewFTestTheme;
+use themes\fioriTheme2\NewTestTheme2;
 
 $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
-define('SQL_SERVER_HOST', 'localhost');
-define('SQL_SERVER_USER', 'sa');
-define('SQL_SERVER_PASS', '1234567890@Eu');
-define('SQL_SERVER_DB', 'testing_db');
-define('ODBC_VERSION', 18);
+define('MYSQL_ROOT_PASSWORD', getenv('MYSQL_ROOT_PASSWORD') ?: '123456');
+define('SQL_SERVER_HOST', getenv('SQL_SERVER_HOST') ?: 'localhost');
+define('SQL_SERVER_USER', getenv('SQL_SERVER_USER') ?: 'sa');
+define('SQL_SERVER_PASS', getenv('SA_SQL_SERVER_PASSWORD') ?: '1234567890@Eu');
+define('SQL_SERVER_DB', getenv('SQL_SERVER_DB') ?: 'testing_db');
+define('ODBC_VERSION', 17);
 //an array that contains possible locations at which
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
@@ -109,15 +116,23 @@ register_shutdown_function(function()
     $conn = new ConnectionInfo('mssql',SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
         'TrustServerCertificate' => 'true'
     ]);
-    $runner = new MigrationsRunner(APP_PATH, '', $conn);
+    
     try {
-        $runner->dropMigrationsTable();
-    } catch (\Exception $exc) {
+      //  $runner = new SchemaRunner($conn);
+      //  $runner->dropChangesTable();
         
+    } catch (\Throwable $exc) {
+        fprintf(STDOUT,'Error on register_shutdown_function:'."\n\n");
+        fprintf(STDOUT, $exc->getMessage()."\n");
     }
 
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
+fprintf(STDOUT,"---------------------------------\n");
+fprintf(STDOUT,"Adding themes...\n");
+ThemeManager::register(new NewFTestTheme());
+ThemeManager::register(new NewTestTheme2());
+fprintf(STDOUT,"Done\n");
 fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Starting to run tests...\n");
 fprintf(STDOUT,"---------------------------------\n");

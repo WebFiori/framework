@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework\writers;
 
-use webfiori\database\Column;
-use webfiori\database\EntityMapper;
-use webfiori\database\mssql\MSSQLColumn;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\Table;
+use WebFiori\Database\Column;
+use WebFiori\Database\EntityMapper;
+use WebFiori\Database\MsSql\MSSQLColumn;
+use WebFiori\Database\MsSql\MSSQLTable;
+use WebFiori\Database\Table;
 use webfiori\framework\DB;
 /**
  * A class which is used to create a database access controller.

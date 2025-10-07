@@ -17,7 +17,7 @@ class HelpCommandTest extends CLITestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:                Display CLI Help. To display help for specific command, use the argument \"--command-name\" with this command.\n",
+            "    help:                Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    v:                   Display framework version info.\n",
             "    show-settings:       Display application configuration.\n",
             "    scheduler:           Run tasks scheduler.\n",

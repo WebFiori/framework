@@ -26,6 +26,7 @@ class DBClassWritterTest extends CLITestCase {
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
+    
     /**
      * @test
      */
@@ -39,6 +40,7 @@ class DBClassWritterTest extends CLITestCase {
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
+    
     /**
      * @test
      */
@@ -52,6 +54,7 @@ class DBClassWritterTest extends CLITestCase {
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
+    
     /**
      * @test
      */

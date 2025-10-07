@@ -1,9 +1,10 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\database\ConnectionInfo;
+use WebFiori\Database\ConnectionInfo;
 use webfiori\framework\App;
 use webfiori\framework\cli\CLITestCase;
+use webfiori\framework\cli\commands\CreateCommand;
 
 /**
  * Description of CreateDBAccessTest
@@ -15,23 +16,22 @@ class CreateDBAccessTest extends CLITestCase {
      * @test
      */
     public function test00() {
-        $runner = App::getRunner();
         App::getConfig()->removeAllDBConnections();
-        $runner->setArgsVector([
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'db'
-        ]);
-        $runner->setInputs([
+        ], [
             'tables\\EmployeeInfoTable',
             'EmployeeOperations',
-            '',
+            "\n", // Hit Enter to pick default value (app\database)
             'SuperUser',
-            '',
+            "\n", // Hit Enter to pick default value (app\entity)
             'n'
         ]);
-        $runner->start();
-        //$this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
@@ -43,22 +43,21 @@ class CreateDBAccessTest extends CLITestCase {
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
-        ], $runner->getOutput());
+        ], $output);
         $clazz = '\\app\\database\\EmployeeOperationsDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
+    
     /**
      * @test
      */
     public function test01() {
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'db'
-        ]);
-        $runner->setInputs([
+        ], [
             'tables\\EmployeeInfoTable',
             'EmployeeS',
             'app\\database\\empl',
@@ -66,7 +65,8 @@ class CreateDBAccessTest extends CLITestCase {
             'app\\entity\\subs',
             'y'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
@@ -78,11 +78,12 @@ class CreateDBAccessTest extends CLITestCase {
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database".DS."empl\".\n"
-        ], $runner->getOutput());
+        ], $output);
         $clazz = '\\app\\database\\empl\\EmployeeSDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
+    
     /**
      * @test
      */
@@ -92,13 +93,11 @@ class CreateDBAccessTest extends CLITestCase {
         App::getConfig()->removeAllDBConnections();
         App::getConfig()->addOrUpdateDBConnection($conn);
 
-        $runner = App::getRunner();
-        $runner->setArgsVector([
+        $output = $this->executeSingleCommand(new CreateCommand(), [
             'webfiori',
             'create',
             '--c' => 'db'
-        ]);
-        $runner->setInputs([
+        ], [
             'tables\\PositionInfoTable',
             'Position2x',
             'app\\database',
@@ -107,7 +106,8 @@ class CreateDBAccessTest extends CLITestCase {
             'app\\entity\\subs',
             'y'
         ]);
-        $this->assertEquals(0, $runner->start());
+
+        $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
@@ -121,7 +121,7 @@ class CreateDBAccessTest extends CLITestCase {
             "Entity namespace: Enter = 'app\\entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
-        ], $runner->getOutput());
+        ], $output);
         $clazz = '\\app\\database\\Position2xDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);

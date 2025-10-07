@@ -6,8 +6,8 @@ use webfiori\framework\router\RouteOption;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\Util;
-use webfiori\http\RequestMethod;
-use webfiori\http\Response;
+use WebFiori\Http\RequestMethod;
+use WebFiori\Http\Response;
 /**
  * Description of RouterTest
  *

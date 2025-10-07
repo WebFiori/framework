@@ -1,7 +1,7 @@
 <?php
-namespace webfiori\benchmark;
+namespace WebFiori\Benchmark;
 
-use webfiori\framework\router\Router;
+use WebFiori\Framework\Router\Router;
 
 /**
  * Description of RouterBench

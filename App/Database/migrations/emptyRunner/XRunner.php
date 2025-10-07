@@ -1,8 +1,8 @@
 <?php
-namespace app\database\migrations\emptyRunner;
+namespace App\Database\Migrations\EmptyRunner;
 
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\App;
+use WebFiori\Framework\App;
 
 class XRunner extends SchemaRunner {
     

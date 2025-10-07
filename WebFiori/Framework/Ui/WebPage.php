@@ -8,24 +8,24 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui;
+namespace WebFiori\Framework\UI;
 
 use Error;
 use Exception;
 use TypeError;
 use WebFiori\Collections\LinkedList;
-use webfiori\framework\App;
-use webfiori\framework\exceptions\InitializationException;
-use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\exceptions\SessionException;
-use webfiori\framework\exceptions\UIException;
-use webfiori\framework\Lang;
-use webfiori\framework\router\Router;
-use webfiori\framework\session\Session;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Theme;
-use webfiori\framework\ThemeManager;
-use webfiori\framework\Util;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Exceptions\InitializationException;
+use WebFiori\Framework\Exceptions\MissingLangException;
+use WebFiori\Framework\Exceptions\SessionException;
+use WebFiori\Framework\Exceptions\UIException;
+use WebFiori\Framework\Lang;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Session\Session;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\Framework\Theme;
+use WebFiori\Framework\ThemeManager;
+use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 use WebFiori\Json\Json;
@@ -1174,7 +1174,7 @@ class WebPage {
         }
 
         throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
-                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
+                    .'an instance of the class "WebFiori\\ui\\HTMLNode".');
     }
     /**
      * Sets the language of the page based on session language or
@@ -1235,7 +1235,7 @@ class WebPage {
 
             if (!($headNode instanceof HeadNode)) {
                 throw new UIException('The method "'.get_class($loadedTheme).'::getHeadNode()" did not return '
-                        .'an instance of the class "webfiori\\ui\\HeadNode".');
+                        .'an instance of the class "WebFiori\\ui\\HeadNode".');
             }
         }
         $headNode->addMeta('charset','UTF-8',true);

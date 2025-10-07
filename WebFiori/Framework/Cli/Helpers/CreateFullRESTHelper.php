@@ -8,20 +8,20 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
 use WebFiori\Database\Table;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\writers\DBClassWriter;
-use webfiori\framework\writers\ServiceHolder;
-use webfiori\framework\writers\TableClassWriter;
-use webfiori\framework\writers\WebServiceWriter;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\Writers\DBClassWriter;
+use WebFiori\Framework\Writers\ServiceHolder;
+use WebFiori\Framework\Writers\TableClassWriter;
+use WebFiori\Framework\Writers\WebServiceWriter;
 use WebFiori\Json\Json;
 /**
- * A helper class for creating database tables classes.
+ * A helper class for creating database Tables classes.
  *
  * @author Ibrahim
  */

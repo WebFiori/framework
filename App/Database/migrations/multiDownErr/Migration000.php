@@ -1,5 +1,5 @@
 <?php
-namespace app\database\migrations\multiDownErr;
+namespace App\Database\Migrations\MultiDownErr;
 
 use WebFiori\Database\Database;
 use WebFiori\Database\migration\AbstractMigration;

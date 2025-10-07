@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
 use const APP_DIR;
 use const APP_PATH;
@@ -57,7 +57,7 @@ class TableClassWriter extends ClassWriter {
      * <li><b>name</b>: The name of the class that will be created. If not provided, the
      * string 'NewClass' is used.</li>
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided,
-     * the namespace 'webfiori' is used.</li>
+     * the namespace 'WebFiori' is used.</li>
      * <li><b>path</b>: The location at which the query will be created on. If not
      * provided, the constant ROOT_PATH is used. </li>
      * <li><b>entity-info</b>: A sub associative array that contains information about the entity

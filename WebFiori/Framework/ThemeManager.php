@@ -8,15 +8,15 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use Error;
 use Exception;
-use webfiori\file\File;
-use webfiori\framework\exceptions\NoSuchThemeException;
-use webfiori\framework\router\RouteOption;
-use webfiori\framework\router\Router;
-use webfiori\http\Response;
+use WebFiori\file\File;
+use WebFiori\Framework\Exceptions\NoSuchThemeException;
+use WebFiori\Framework\Router\RouteOption;
+use WebFiori\Framework\Router\Router;
+use WebFiori\http\Response;
 
 /**
  * A class which manages theme registration and loading.

@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webServices;
+namespace WebFiori\Framework\Scheduler\WebServices;
 
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Json\Json;
 /**
  * A web service which is used to fetch a list of all scheduled tasks.

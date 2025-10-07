@@ -8,17 +8,17 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\router;
+namespace WebFiori\Framework\Router;
 
 use Error;
 use Exception;
 use WebFiori\Cli\Runner;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
-use webfiori\framework\exceptions\RoutingException;
-use webfiori\framework\ui\HTTPCodeView;
-use webfiori\framework\ui\StarterPage;
-use webfiori\framework\ui\WebPage;
+use WebFiori\Framework\Exceptions\RoutingException;
+use WebFiori\Framework\UI\HTTPCodeView;
+use WebFiori\Framework\UI\StarterPage;
+use WebFiori\Framework\UI\WebPage;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 use WebFiori\Http\Uri;

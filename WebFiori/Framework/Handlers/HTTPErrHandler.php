@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\handlers;
+namespace WebFiori\Framework\Handlers;
 
 use WebFiori\Error\AbstractHandler;
-use webfiori\framework\App;
-use webfiori\framework\router\Router;
-use webfiori\framework\ui\serverErrPage\ServerErrPage;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\UI\ServerErrPage\ServerErrPage;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**

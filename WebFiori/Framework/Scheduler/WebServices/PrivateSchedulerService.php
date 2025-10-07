@@ -1,7 +1,7 @@
 <?php
-namespace webfiori\framework\scheduler\webServices;
+namespace WebFiori\Framework\Scheduler\WebServices;
 
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\AbstractWebService;
 
 /**

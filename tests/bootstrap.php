@@ -9,12 +9,12 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIREC
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\App;
-use webfiori\framework\autoload\ClassLoader;
-use webfiori\framework\config\JsonDriver;
-use webfiori\framework\ThemeManager;
-use themes\fioriTheme\NewFTestTheme;
-use themes\fioriTheme2\NewTestTheme2;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Autoload\ClassLoader;
+use WebFiori\Framework\Config\JsonDriver;
+use WebFiori\Framework\ThemeManager;
+use Themes\FioriTheme\NewFTestTheme;
+use Themes\FioriTheme2\NewTestTheme2;
 
 $DS = DIRECTORY_SEPARATOR;
 
@@ -30,8 +30,8 @@ define('ODBC_VERSION', 17);
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
-    __DIR__.$DS.'..'.$DS.'webfiori',
-    __DIR__.$DS.'..'.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
+    __DIR__.$DS.'..'.$DS.'WebFiori',
+    __DIR__.$DS.'..'.$DS.'vendor'.$DS.'WebFiori'.$DS.'WebFiori'
 ];
 fprintf(STDOUT, "PHP Version: '".PHP_VERSION."'\n");
 fprintf(STDOUT, "Version ID: '".PHP_VERSION_ID."'\n");
@@ -48,7 +48,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //linux
-        $file = $DS.$dir.'framework'.$DS.'autoload'.$DS.'ClassLoader.php';
+        $file = $DS.$dir.$DS.'Framework'.$DS.'Autoload'.$DS.'ClassLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {
@@ -62,7 +62,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //other
-        $file = $dir.$DS.'framework'.$DS.'autoload'.$DS.'ClassLoader.php';
+        $file = $dir.$DS.'Framework'.$DS.'Autoload'.$DS.'ClassLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {
@@ -83,9 +83,10 @@ fprintf(STDOUT,"Initializing autoload directories...\n");
 ClassLoader::get([
     'search-folders' => [
         'tests',
-        'webfiori',
+        'WebFiori',
         'vendor',
-        'app'
+        'app',
+        'Themes'
     ],
     'define-root' => true,
     'root' => $ROOT,

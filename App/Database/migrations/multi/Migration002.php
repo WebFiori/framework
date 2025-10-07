@@ -1,5 +1,5 @@
 <?php
-namespace app\database\migrations\multi;
+namespace App\Database\Migrations\Multi;
 
 use WebFiori\Database\Database;
 use WebFiori\Database\Schema\AbstractMigration;

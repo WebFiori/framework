@@ -9,9 +9,9 @@
  *
  */
 
-use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\Lang;
-use webfiori\framework\ui\WebPage;
+use WebFiori\Framework\Exceptions\MissingLangException;
+use WebFiori\Framework\Lang;
+use WebFiori\Framework\UI\WebPage;
 use WebFiori\Http\Response;
 use WebFiori\Json\JsonI;
 use WebFiori\UI\HTMLNode;

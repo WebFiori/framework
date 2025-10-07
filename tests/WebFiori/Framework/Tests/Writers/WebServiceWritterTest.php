@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\writers\WebServiceWriter;
+use WebFiori\Framework\Writers\WebServiceWriter;
 use WebFiori\Http\AbstractWebService;
 /**
  * @author Ibrahim
@@ -14,7 +14,7 @@ class WebServiceWritterTest extends TestCase {
     public function test00() {
         $writter = new WebServiceWriter();
         $this->assertEquals('NewWebService', $writter->getName());
-        $this->assertEquals('app\\apis', $writter->getNamespace());
+        $this->assertEquals('App\\Apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\Http\AbstractWebService",
@@ -30,7 +30,7 @@ class WebServiceWritterTest extends TestCase {
         $writter = new WebServiceWriter();
         $writter->setClassName('SuperService');
         $this->assertEquals('SuperService', $writter->getName());
-        $this->assertEquals('app\\apis', $writter->getNamespace());
+        $this->assertEquals('App\\Apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\Http\AbstractWebService",
@@ -58,7 +58,7 @@ class WebServiceWritterTest extends TestCase {
         $writter = new WebServiceWriter();
         $writter->setClassName('Super2Service');
         $this->assertEquals('Super2Service', $writter->getName());
-        $this->assertEquals('app\\apis', $writter->getNamespace());
+        $this->assertEquals('App\\Apis', $writter->getNamespace());
         $this->assertEquals('Service', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\Http\AbstractWebService",

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui;
+namespace WebFiori\Framework\UI;
 
 use WebFiori\Collections\Comparable;
 /**

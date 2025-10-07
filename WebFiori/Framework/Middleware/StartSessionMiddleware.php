@@ -1,9 +1,9 @@
 <?php
 
-namespace webfiori\framework\middleware;
+namespace WebFiori\Framework\Middleware;
 
 use Error;
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**

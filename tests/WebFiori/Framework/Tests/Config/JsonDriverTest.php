@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\config;
+namespace WebFiori\Framework\Test\Config;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Mail\SMTPAccount;
 use WebFiori\File\File;
-use webfiori\framework\config\JsonDriver;
+use WebFiori\Framework\Config\JsonDriver;
 use const DS;
 /**
  *

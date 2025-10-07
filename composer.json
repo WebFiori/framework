@@ -42,12 +42,12 @@
     },
     "autoload": {
         "psr-4": {
-            "webfiori\\framework\\": "webfiori/framework/"
+            "WebFiori\\Framework\\": "WebFiori/Framework/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "webfiori\\tests\\": "tests/"
+            "WebFiori\\Tests\\": "tests/"
         }
     },
     "keywords": [

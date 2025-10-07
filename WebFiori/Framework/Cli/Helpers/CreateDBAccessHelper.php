@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use WebFiori\Database\Table;
-use webfiori\framework\App;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\DBClassWriter;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\DBClassWriter;
 
 /**
  * Description of CreateDBAccessHelper

@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
-use webfiori\framework\config\ClassDriver;
+use WebFiori\Framework\Config\ClassDriver;
 use WebFiori\Json\Json;
 /**
  * A class which is used to create application initialization classes.
@@ -123,7 +123,7 @@ class Ini {
         ClassDriver::a($cFile, "");
         ClassDriver::a($cFile, "namespace ".APP_DIR."\\ini\\routes;");
         ClassDriver::a($cFile, "");
-        ClassDriver::a($cFile, "use webfiori\\framework\\router\\Router;");
+        ClassDriver::a($cFile, "use WebFiori\\Framework\\Router\\Router;");
         ClassDriver::a($cFile, "");
         ClassDriver::a($cFile, "class $className {");
         ClassDriver::a($cFile, $this->docStart, 1);

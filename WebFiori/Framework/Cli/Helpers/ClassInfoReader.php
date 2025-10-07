@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use InvalidArgumentException;
 use WebFiori\Cli\Command;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\Util;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\Util;
 /**
  * A class which is used to read class information as prompt from any input stream
  * which is set by the class 'Runner'.

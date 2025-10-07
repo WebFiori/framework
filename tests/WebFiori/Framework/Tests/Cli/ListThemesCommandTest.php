@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\App;
+use WebFiori\Framework\App;
 
 /**
  * Description of ListRoutesCommandTest
@@ -17,7 +17,7 @@ class ListThemesCommandTest extends TestCase {
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'list-themes'
         ]);
         $runner->start();
@@ -33,7 +33,7 @@ class ListThemesCommandTest extends TestCase {
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'list-themes',
             '--theme-name' => "New Super Theme"
         ]);
@@ -54,7 +54,7 @@ class ListThemesCommandTest extends TestCase {
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'list-themes',
             '--theme-name="Not Exist"'
         ]);

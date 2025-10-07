@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
-use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**
@@ -32,7 +32,7 @@ class MiddlewareClassWriter extends ClassWriter {
      * <li><b>name</b>: The name of the class that will be created. If not provided, the
      * string 'NewClass' is used.</li>
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided,
-     * the namespace 'webfiori' is used.</li>
+     * the namespace 'WebFiori' is used.</li>
      * <li><b>path</b>: The location at which the class will be created on. If not
      * provided, the constant ROOT_PATH is used. </li>
      *

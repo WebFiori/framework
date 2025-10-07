@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLColumn;
 use WebFiori\Database\MySql\MySQLTable;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\writers\TableClassWriter;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Writers\TableClassWriter;
 /**
  *
  * @author Ibrahim
@@ -17,7 +17,7 @@ class TableWritterTest extends CLITestCase {
     public function test00() {
         $writter = new TableClassWriter();
         $this->assertEquals('NewTable', $writter->getName());
-        $this->assertEquals('app\\database', $writter->getNamespace());
+        $this->assertEquals('App\\Database', $writter->getNamespace());
         $this->assertEquals('Table', $writter->getSuffix());
         $this->assertEquals([
 
@@ -34,15 +34,15 @@ class TableWritterTest extends CLITestCase {
     public function test01() {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT');
-        $writter->setEntityInfo('MyEntity', 'app\\entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
+        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
         $this->assertEquals('CoolTTable', $writter->getName());
-        $this->assertEquals('app\\database', $writter->getNamespace());
+        $this->assertEquals('App\\Database', $writter->getNamespace());
         $this->assertEquals('Table', $writter->getSuffix());
         $this->assertEquals([
 
         ], $writter->getUseStatements());
         $this->assertEquals('MyEntity', $writter->getEntityName());
-        $this->assertEquals('app\\entity', $writter->getEntityNamespace());
+        $this->assertEquals('App\\Entity', $writter->getEntityNamespace());
         $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'entity', $writter->getEntityPath());
         $this->assertTrue($writter->getTable() instanceof MySQLTable);
         $this->assertFalse($writter->getTable() instanceof MSSQLTable);
@@ -54,7 +54,7 @@ class TableWritterTest extends CLITestCase {
         $this->assertTrue($clazzObj instanceof MySQLTable);
         $this->assertEquals('`new_table`', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
-        $this->removeClass('app\\entity\\MyEntity');
+        $this->removeClass('App\\Entity\\MyEntity');
     }
     /**
      * @test
@@ -63,7 +63,7 @@ class TableWritterTest extends CLITestCase {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT2Table');
         $writter->setTableType('mssql');
-        $writter->setEntityInfo('MyEntity', 'app\\entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
+        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
         $this->assertEquals('CoolT2Table', $writter->getName());
 
         $this->assertFalse($writter->getTable() instanceof MySQLTable);
@@ -76,7 +76,7 @@ class TableWritterTest extends CLITestCase {
         $this->assertTrue($clazzObj instanceof MSSQLTable);
         $this->assertEquals('[new_table]', $clazzObj->getName());
         $this->assertEquals(0, $clazzObj->getColsCount());
-        $this->removeClass('app\\entity\\MyEntity');
+        $this->removeClass('App\\Entity\\MyEntity');
     }
     /**
      * @test

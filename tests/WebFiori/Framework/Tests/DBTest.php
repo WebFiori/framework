@@ -1,12 +1,12 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
-use app\database\TestTable;
+use App\Database\TestTable;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
-use webfiori\framework\App;
-use webfiori\framework\DB;
+use WebFiori\Framework\App;
+use WebFiori\Framework\DB;
 
 /**
  * Description of DBTest

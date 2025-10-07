@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\AbstractWebService;
 use WebFiori\Http\Request;
 use WebFiori\Http\WebServicesManager;
@@ -180,7 +180,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         return $this->translation;
     }
     /**
-     * Auto-register services tables which exist on a specific directory.
+     * Auto-register services Tables which exist on a specific directory.
      *
      * The classes which represents web services must be suffixed
      * with the word 'Service' in order to register them (e.g. RegisterUserService).

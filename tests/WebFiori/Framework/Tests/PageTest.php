@@ -1,16 +1,16 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use themes\fioriTheme\NewFTestTheme;
-use webfiori\framework\Access;
-use webfiori\framework\App;
-use webfiori\framework\Lang;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\ThemeManager;
-use webfiori\framework\ui\WebPage;
-use webfiori\framework\User;
+use Themes\FioriTheme\NewFTestTheme;
+use WebFiori\Framework\Access;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Lang;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\Framework\ThemeManager;
+use WebFiori\Framework\UI\WebPage;
+use WebFiori\Framework\User;
 use WebFiori\UI\HTMLNode;
 /**
  * Description of PageTest
@@ -764,7 +764,7 @@ class PageTest extends TestCase {
         $page->setTheme('      New Super Theme      ');
         $theme3 = $page->getTheme();
         
-        $this->assertTrue($theme3 instanceof \webfiori\framework\Theme);
+        $this->assertTrue($theme3 instanceof \WebFiori\framework\Theme);
     }
     /**
      * @test

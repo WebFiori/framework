@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 use WebFiori\Http\AbstractWebService;
 use WebFiori\Http\ParamOption;
 use WebFiori\Http\ParamType;
@@ -19,7 +19,7 @@ class CreateWebServiceTest extends CLITestCase {
      */
     public function test00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '2',
@@ -55,7 +55,7 @@ class CreateWebServiceTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\apis'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Apis'\n",
             "Enter a name for the new web service:\n",
             "Description:\n",
             "Request method:\n",
@@ -91,9 +91,9 @@ class CreateWebServiceTest extends CLITestCase {
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         
-        $clazz = '\\app\\apis\\NewWebService';
+        $clazz = '\\App\\Apis\\NewWebService';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass('\\app\\apis\\NewWebService');
+        $this->removeClass('\\App\\Apis\\NewWebService');
         $instance = new $clazz();
         $instance instanceof AbstractWebService;
         $this->assertEquals('get-hello', $instance->getName());
@@ -120,7 +120,7 @@ class CreateWebServiceTest extends CLITestCase {
      */
     public function test01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'web-service'
         ], [
@@ -144,7 +144,7 @@ class CreateWebServiceTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\apis'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Apis'\n",
             "Enter a name for the new web service:\n",
             "Description:\n",
             "Request method:\n",
@@ -190,9 +190,9 @@ class CreateWebServiceTest extends CLITestCase {
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         
-        $clazz = '\\app\\apis\\NewWeb2Service';
+        $clazz = '\\App\\Apis\\NewWeb2Service';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass('\\app\\apis\\NewWeb2Service');
+        $this->removeClass('\\App\\Apis\\NewWeb2Service');
         $instance = new $clazz();
         $instance instanceof AbstractWebService;
         $this->assertEquals('get-hello-2', $instance->getName());
@@ -219,7 +219,7 @@ class CreateWebServiceTest extends CLITestCase {
      */
     public function test02() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'web-service'
         ], [
@@ -243,7 +243,7 @@ class CreateWebServiceTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\apis'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Apis'\n",
             "Enter a name for the new web service:\n",
             "Description:\n",
             "Request method:\n",
@@ -289,7 +289,7 @@ class CreateWebServiceTest extends CLITestCase {
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         
-        $clazz = '\\app\\apis\\NewWeb3Service';
+        $clazz = '\\App\\Apis\\NewWeb3Service';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $instance = new $clazz();

@@ -1,13 +1,13 @@
 <?php
-namespace webfiori\framework\test\theme;
+namespace WebFiori\Framework\Test\Theme;
 
 use const DS;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use themes\fioriTheme\NewFTestTheme;
-use webfiori\framework\App;
-use webfiori\framework\Theme;
-use webfiori\framework\ThemeManager;
+use Themes\FioriTheme\NewFTestTheme;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Theme;
+use WebFiori\Framework\ThemeManager;
 /**
  * Description of ThemeTest
  *

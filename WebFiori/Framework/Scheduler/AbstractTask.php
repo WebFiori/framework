@@ -8,16 +8,16 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler;
+namespace WebFiori\Framework\Scheduler;
 
 use Exception;
 use InvalidArgumentException;
 use Throwable;
 use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
-use webfiori\framework\cli\commands\SchedulerCommand;
-use webfiori\framework\exceptions\InvalidCRONExprException;
-use webfiori\framework\Util;
+use WebFiori\Framework\Cli\Commands\SchedulerCommand;
+use WebFiori\Framework\Exceptions\InvalidCRONExprException;
+use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;

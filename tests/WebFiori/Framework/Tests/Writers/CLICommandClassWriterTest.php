@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Cli\Command;
-use webfiori\framework\writers\CommandClassWriter;
+use WebFiori\Framework\Writers\CommandClassWriter;
 
 class CLICommandClassWriterTest extends TestCase {
     /**

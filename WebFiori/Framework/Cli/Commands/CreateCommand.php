@@ -8,22 +8,22 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\cli\helpers\ClassInfoReader;
-use webfiori\framework\cli\helpers\CreateAPITestCase;
-use webfiori\framework\cli\helpers\CreateBackgroundTask;
-use webfiori\framework\cli\helpers\CreateCLIClassHelper;
-use webfiori\framework\cli\helpers\CreateDBAccessHelper;
-use webfiori\framework\cli\helpers\CreateFullRESTHelper;
-use webfiori\framework\cli\helpers\CreateMiddleware;
-use webfiori\framework\cli\helpers\CreateMigration;
-use webfiori\framework\cli\helpers\CreateTableObj;
-use webfiori\framework\cli\helpers\CreateThemeHelper;
-use webfiori\framework\cli\helpers\CreateWebService;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\Cli\Helpers\ClassInfoReader;
+use WebFiori\Framework\Cli\Helpers\CreateAPITestCase;
+use WebFiori\Framework\Cli\Helpers\CreateBackgroundTask;
+use WebFiori\Framework\Cli\Helpers\CreateCLIClassHelper;
+use WebFiori\Framework\Cli\Helpers\CreateDBAccessHelper;
+use WebFiori\Framework\Cli\Helpers\CreateFullRESTHelper;
+use WebFiori\Framework\Cli\Helpers\CreateMiddleware;
+use WebFiori\Framework\Cli\Helpers\CreateMigration;
+use WebFiori\Framework\Cli\Helpers\CreateTableObj;
+use WebFiori\Framework\Cli\Helpers\CreateThemeHelper;
+use WebFiori\Framework\Cli\Helpers\CreateWebService;
 /**
  * A command which is used to automate some common tasks such as
  * creating table classes or controllers.

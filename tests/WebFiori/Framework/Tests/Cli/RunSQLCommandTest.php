@@ -1,14 +1,14 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use tables\Schema;
-use tables\Schema2;
+use Tables\Schema;
+use Tables\Schema2;
 use WebFiori\Database\ConnectionInfo;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\RunSQLQueryCommand;
-use webfiori\framework\config\Controller;
-use webfiori\framework\config\JsonDriver;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\RunSQLQueryCommand;
+use WebFiori\Framework\Config\Controller;
+use WebFiori\Framework\Config\JsonDriver;
 
 class RunSQLCommandTest extends CLITestCase {
     /**
@@ -83,7 +83,7 @@ class RunSQLCommandTest extends CLITestCase {
         App::getConfig()->removeAllDBConnections();
         
         $output = $this->executeSingleCommand(new RunSQLQueryCommand(), [
-            'webfiori',
+            'WebFiori',
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
@@ -105,7 +105,7 @@ class RunSQLCommandTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
 
         $output = $this->executeSingleCommand(new RunSQLQueryCommand(), [
-            'webfiori',
+            'WebFiori',
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
@@ -130,7 +130,7 @@ class RunSQLCommandTest extends CLITestCase {
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
-            '--file' => 'app\\database\\Test2Table.php'
+            '--file' => 'App\\Database\\Test2Table.php'
         ], []);
 
         $this->assertEquals(-1, $this->getExitCode());
@@ -151,7 +151,7 @@ class RunSQLCommandTest extends CLITestCase {
             'run-query',
             '--connection' => 'testing-connection',
             '--no-confirm',
-            '--file' => 'app\\database\\sql-file.sql'
+            '--file' => 'App\\Database\\sql-file.sql'
         ], []);
         
         $this->assertEquals(0, $this->getExitCode());

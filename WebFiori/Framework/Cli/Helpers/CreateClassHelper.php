@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\ClassWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\ClassWriter;
 /**
  * A wrapper class which helps in creating classes using CLI.
  *

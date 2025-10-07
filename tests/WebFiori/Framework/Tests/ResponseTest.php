@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Http\Response;

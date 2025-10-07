@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\writers\MiddlewareClassWriter;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
+use WebFiori\Framework\Writers\MiddlewareClassWriter;
 /**
  *
  * @author Ibrahim
@@ -15,11 +15,11 @@ class MiddlewareWritterTest extends CLITestCase {
     public function test00() {
         $writter = new MiddlewareClassWriter();
         $this->assertEquals('NewMiddleware', $writter->getName());
-        $this->assertEquals('app\\middleware', $writter->getNamespace());
+        $this->assertEquals('App\\Middleware', $writter->getNamespace());
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\session\\SessionsManager",
+            "WebFiori\\Framework\\Middleware\\AbstractMiddleware",
+            "WebFiori\\Framework\\Session\\SessionsManager",
             "WebFiori\\Http\\Request",
             "WebFiori\\Http\\Response",
         ], $writter->getUseStatements());
@@ -39,11 +39,11 @@ class MiddlewareWritterTest extends CLITestCase {
         $writter->addGroup('two-group');
         $writter->addGroup('global');
         $this->assertEquals('XMdMiddleware', $writter->getName());
-        $this->assertEquals('app\\middleware', $writter->getNamespace());
+        $this->assertEquals('App\\Middleware', $writter->getNamespace());
         $this->assertEquals('Middleware', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\middleware\\AbstractMiddleware",
-            "webfiori\\framework\\session\\SessionsManager",
+            "WebFiori\\Framework\\Middleware\\AbstractMiddleware",
+            "WebFiori\\Framework\\Session\\SessionsManager",
             "WebFiori\\Http\\Request",
             "WebFiori\\Http\\Response",
         ], $writter->getUseStatements());

@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\App;
-use webfiori\framework\config\Controller;
-use webfiori\framework\config\JsonDriver;
-use webfiori\framework\router\Router;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Config\Controller;
+use WebFiori\Framework\Config\JsonDriver;
+use WebFiori\Framework\Router\Router;
 
 /**
  * Description of TestUpdateSettingsCommand
@@ -22,7 +22,7 @@ class UpdateSettingsCommandTest extends TestCase {
         App::getConfig()->initialize(true);
         $runner = App::getRunner();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'q'
         ]);
@@ -44,7 +44,7 @@ class UpdateSettingsCommandTest extends TestCase {
             'Super App',
         ]);
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'app-name'
         ]);
@@ -73,7 +73,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'app-name'
         ]);
@@ -109,7 +109,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'app-name'
         ]);
@@ -137,7 +137,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInputs();
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'home-page'
         ]);
@@ -161,7 +161,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'home-page'
         ]);
@@ -185,7 +185,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'page-description'
         ]);
@@ -211,7 +211,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'page-title'
         ]);
@@ -229,7 +229,7 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryLang() {
         $runner = App::getRunner();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'primary-lang'
         ]);
@@ -254,7 +254,7 @@ class UpdateSettingsCommandTest extends TestCase {
             'NEW PAGE DESCRIPTION'
         ]);
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'page-description'
         ]);
@@ -275,11 +275,11 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryTheme00() {
         $runner = App::getRunner();
         $runner->setInputs([
-            'themes\\fioriTheme2\\NewTestTheme2'
+            'Themes\\FioriTheme2\\NewTestTheme2'
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'theme'
         ]);
@@ -290,7 +290,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Theme successfully updated.\n"
         ], $runner->getOutput());
 
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+        $this->assertEquals('Themes\\FioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
     }
     /**
      * @test
@@ -300,10 +300,10 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInputs([
             'themes\\greeny\\NotATheme',
             '',
-            'themes\\fioriTheme2\\NewTestTheme2'
+            'Themes\\FioriTheme2\\NewTestTheme2'
         ]);
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'theme'
         ]);
@@ -318,7 +318,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Theme successfully updated.\n"
         ], $runner->getOutput());
 
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+        $this->assertEquals('Themes\\FioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
     }
     /**
      * @test
@@ -326,11 +326,11 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryTheme02() {
         $runner = App::getRunner();
         $runner->setInputs([
-            'webfiori\\framework\\Privilege',
-            'themes\\fioriTheme2\\NewTestTheme2'
+            'WebFiori\\Framework\\Privilege',
+            'Themes\\FioriTheme2\\NewTestTheme2'
         ]);
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'theme'
         ]);
@@ -343,7 +343,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Theme successfully updated.\n"
         ], $runner->getOutput());
 
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+        $this->assertEquals('Themes\\FioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
     }
     /**
      * @test
@@ -351,11 +351,11 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryTheme03() {
         $runner = App::getRunner();
         $runner->setInputs([
-            'webfiori\\framework\\App',
-            'themes\\fioriTheme2\\NewTestTheme2'
+            'WebFiori\\Framework\\App',
+            'Themes\\FioriTheme2\\NewTestTheme2'
         ]);
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'theme'
         ]);
@@ -368,7 +368,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Theme successfully updated.\n"
         ], $runner->getOutput());
 
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
+        $this->assertEquals('Themes\\FioriTheme2\\NewTestTheme2', App::getConfig()->getTheme());
     }
     /**
      * @test
@@ -380,7 +380,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'scheduler-pass',
         ]);
@@ -403,7 +403,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'scheduler-pass',
         ]);
@@ -428,7 +428,7 @@ class UpdateSettingsCommandTest extends TestCase {
         ]);
 
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'xyz'
         ]);
@@ -458,7 +458,7 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdateVersion00() {
         $runner = App::getRunner();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'update-settings',
             '--w' => 'version'
         ]);

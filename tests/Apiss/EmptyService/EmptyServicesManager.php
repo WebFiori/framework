@@ -1,5 +1,5 @@
 <?php
-namespace tests\apis\emptyService;
+namespace Tests\Apis\EmptyService;
 
 use WebFiori\Http\WebServicesManager;
 /**

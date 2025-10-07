@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\ui\serverErrPage;
+namespace WebFiori\Framework\UI\ServerErrPage;
 
 if (!defined('WF_VERBOSE') || WF_VERBOSE === false) {
     return;

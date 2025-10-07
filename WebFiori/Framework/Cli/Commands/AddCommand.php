@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
@@ -16,9 +16,9 @@ use WebFiori\Database\DatabaseException;
 use WebFiori\Mail\Exceptions\SMTPException;
 use WebFiori\Mail\SMTPAccount;
 use WebFiori\Mail\SMTPServer;
-use webfiori\framework\App;
-use webfiori\framework\DB;
-use webfiori\framework\writers\LangClassWriter;
+use WebFiori\Framework\App;
+use WebFiori\Framework\DB;
+use WebFiori\Framework\Writers\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.

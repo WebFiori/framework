@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli;
+namespace WebFiori\Framework\Cli;
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\CommandTestCase;
 use WebFiori\File\File;
-use webfiori\framework\App;
+use WebFiori\Framework\App;
 
 /**
  * A base test case class that can be used to write command line commands test cases.

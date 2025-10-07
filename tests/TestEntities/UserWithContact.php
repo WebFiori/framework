@@ -1,7 +1,7 @@
 <?php
-namespace webfiori\tests\testEntity;
+namespace WebFiori\Tests\TestEntity;
 
-use webfiori\framework\User;
+use WebFiori\Framework\User;
 
 /**
  * Description of UserWithContact

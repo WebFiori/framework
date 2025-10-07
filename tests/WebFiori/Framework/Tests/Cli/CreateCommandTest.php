@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 
 /**
  * Description of CreateCommandTest
@@ -15,7 +15,7 @@ class CreateCommandTest extends CLITestCase {
      */
     public function testCreate00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '11',
@@ -44,7 +44,7 @@ class CreateCommandTest extends CLITestCase {
      */
     public function testCreate01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             "\n", // Hit Enter to pick default value (quit)

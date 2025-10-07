@@ -1,13 +1,13 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\DataType;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
 use WebFiori\Database\Table;
 use WebFiori\File\File;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 
 /**
  * Description of CreateTableTest
@@ -66,7 +66,7 @@ class CreateTableTest extends CLITestCase {
      */
     public function testCreateTable00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'table'
         ], [
@@ -87,8 +87,8 @@ class CreateTableTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
-        $clazz = '\\app\\database\\Cool00Table';
+        $this->assertTrue(class_exists('\\App\\Database\\Cool00Table'));
+        $clazz = '\\App\\Database\\Cool00Table';
         $this->removeClass($clazz);
         $testObj = new $clazz();
         $this->assertTrue($testObj instanceof MySQLTable);
@@ -107,7 +107,7 @@ class CreateTableTest extends CLITestCase {
             "0: mysql\n",
             "1: mssql\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Enter database table name: Enter = 'cool_00_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
@@ -129,7 +129,7 @@ class CreateTableTest extends CLITestCase {
      */
     public function testCreateTable01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'table'
         ], [
@@ -149,7 +149,7 @@ class CreateTableTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\app\\database\\Cool01Table';
+        $clazz = '\\App\\Database\\Cool01Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $testObj = new $clazz();
@@ -172,7 +172,7 @@ class CreateTableTest extends CLITestCase {
             "0: mysql\n",
             "1: mssql\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Enter database table name: Enter = 'cool_01_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
@@ -193,7 +193,7 @@ class CreateTableTest extends CLITestCase {
      */
     public function testCreateTable02() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'table'
         ], [
@@ -225,8 +225,8 @@ class CreateTableTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
-        $clazz = '\\app\\database\\Cool02Table';
+        $this->assertTrue(class_exists('\\App\\Database\\Cool02Table'));
+        $clazz = '\\App\\Database\\Cool02Table';
         $this->removeClass($clazz);
         $testObj = new $clazz();
         $this->assertTrue($testObj instanceof MySQLTable);
@@ -247,7 +247,7 @@ class CreateTableTest extends CLITestCase {
             "0: mysql\n",
             "1: mssql\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Enter database table name: Enter = 'cool_02_table'\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",

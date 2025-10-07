@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui;
+namespace WebFiori\Framework\UI;
 
 /**
  * A page which is shown to the framework users when the developer has not
@@ -36,7 +36,7 @@ class StarterPage extends WebPage {
         $this->setTitle('Welcome to WebFiori');
         $div = $this->insert('div');
         $div->addChild('img', [
-            'src' => 'https://webfiori.com/assets/images/WFLogo512.png',
+            'src' => 'https://WebFiori.com/assets/images/WFLogo512.png',
             'style' => 'width:250px;height:250px;border-radius:250px;background-color:black'
         ]);
         $div->setStyle([
@@ -56,7 +56,7 @@ class StarterPage extends WebPage {
         $cardsRow = $row->addChild('v-col', [
             'cols' => 12,
         ])->addChild('v-row');
-        $this->createCard('https://webfiori.com/learn',
+        $this->createCard('https://WebFiori.com/learn',
             'mdi-book-open-variant',
             'Learn',
             'Documentation is always the first place where developers can find what they need.'
@@ -66,7 +66,7 @@ class StarterPage extends WebPage {
             .'experience with it, we recommend the '
             .'documentation as they will help in a way or another.',
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
-        $this->createCard('https://webfiori.com/docs/webfiori',
+        $this->createCard('https://WebFiori.com/docs/WebFiori',
             'mdi-book-check-outline',
             'API Reference',
             'This reference has all information about core framework classes that a developer '
@@ -74,7 +74,7 @@ class StarterPage extends WebPage {
             .'uses of every public class attribute and method. It can be handy when developers starts '
             .'using advanced features of the framework.',
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
-        $this->createCard('https://webfiori.com/contribute',
+        $this->createCard('https://WebFiori.com/contribute',
             'mdi-comment-plus-outline',
             'Support The Project',
             'Want to help in development of the framework or contribute? This place is for you. It holds '

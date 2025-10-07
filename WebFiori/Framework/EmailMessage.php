@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use WebFiori\Mail\Email;
 use WebFiori\Mail\Exceptions\SMTPException;
 use WebFiori\Mail\SMTPAccount;
-use webfiori\framework\exceptions\MissingLangException;
+use WebFiori\Framework\Exceptions\MissingLangException;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *

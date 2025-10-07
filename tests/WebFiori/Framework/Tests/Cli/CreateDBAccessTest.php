@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\ConnectionInfo;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 
 /**
  * Description of CreateDBAccessTest
@@ -19,11 +19,11 @@ class CreateDBAccessTest extends CLITestCase {
         App::getConfig()->removeAllDBConnections();
         
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'db'
         ], [
-            'tables\\EmployeeInfoTable',
+            'Tables\\EmployeeInfoTable',
             'EmployeeOperations',
             "\n", // Hit Enter to pick default value (app\database)
             'SuperUser',
@@ -36,15 +36,15 @@ class CreateDBAccessTest extends CLITestCase {
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Warning: No database connections were found. Make sure to specify connection later inside the class.\n",
             "We need from you to give us entity class information.\n",
             "Entity class name:\n",
-            "Entity namespace: Enter = 'app\\entity'\n",
+            "Entity namespace: Enter = 'App\\Entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
         ], $output);
-        $clazz = '\\app\\database\\EmployeeOperationsDB';
+        $clazz = '\\App\\Database\\EmployeeOperationsDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -54,15 +54,15 @@ class CreateDBAccessTest extends CLITestCase {
      */
     public function test01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'db'
         ], [
-            'tables\\EmployeeInfoTable',
+            'Tables\\EmployeeInfoTable',
             'EmployeeS',
-            'app\\database\\empl',
+            'App\\Database\\empl',
             'SuperHero',
-            'app\\entity\\subs',
+            'App\\Entity\\subs',
             'y'
         ]);
 
@@ -71,15 +71,15 @@ class CreateDBAccessTest extends CLITestCase {
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Warning: No database connections were found. Make sure to specify connection later inside the class.\n",
             "We need from you to give us entity class information.\n",
             "Entity class name:\n",
-            "Entity namespace: Enter = 'app\\entity'\n",
+            "Entity namespace: Enter = 'App\\Entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database".DS."empl\".\n"
         ], $output);
-        $clazz = '\\app\\database\\empl\\EmployeeSDB';
+        $clazz = '\\App\\Database\\empl\\EmployeeSDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -94,16 +94,16 @@ class CreateDBAccessTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
 
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'db'
         ], [
-            'tables\\PositionInfoTable',
+            'Tables\\PositionInfoTable',
             'Position2x',
-            'app\\database',
+            'App\\Database',
             '0',
             'SuperPosition',
-            'app\\entity\\subs',
+            'App\\Entity\\subs',
             'y'
         ]);
 
@@ -112,17 +112,17 @@ class CreateDBAccessTest extends CLITestCase {
             "Enter database table class name (include namespace):\n",
             "We need from you to give us class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Select database connecion to use with the class:\n",
             "0: Test Connection\n",
             "1: None <--\n",
             "We need from you to give us entity class information.\n",
             "Entity class name:\n",
-            "Entity namespace: Enter = 'app\\entity'\n",
+            "Entity namespace: Enter = 'App\\Entity'\n",
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database\".\n"
         ], $output);
-        $clazz = '\\app\\database\\Position2xDB';
+        $clazz = '\\App\\Database\\Position2xDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

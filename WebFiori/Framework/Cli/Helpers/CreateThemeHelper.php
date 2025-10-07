@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\ThemeClassWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\ThemeClassWriter;
 /**
  * Description of CreateTheme
  *

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
 /**
  * An interface which can be used to implement different types of sessions storage.

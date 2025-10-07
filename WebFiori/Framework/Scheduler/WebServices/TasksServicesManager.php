@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webServices;
+namespace WebFiori\Framework\Scheduler\WebServices;
 
 use WebFiori\Http\WebServicesManager;
 /**

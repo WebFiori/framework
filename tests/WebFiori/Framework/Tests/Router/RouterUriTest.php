@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\router;
+namespace WebFiori\Framework\Test\Router;
 
 use PHPUnit\Framework\TestCase;
 use TestMiddleware;
-use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\framework\router\Router;
-use webfiori\framework\router\RouterUri;
+use WebFiori\Framework\Middleware\MiddlewareManager;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Router\RouterUri;
 /**
  * Description of TestRouterUri
  *

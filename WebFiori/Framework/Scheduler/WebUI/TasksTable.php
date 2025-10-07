@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webUI;
+namespace WebFiori\Framework\Scheduler\WebUI;
 
 use WebFiori\UI\exceptions\InvalidNodeNameException;
 use WebFiori\UI\HTMLNode;

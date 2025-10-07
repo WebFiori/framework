@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Access;
-use webfiori\framework\User;
+use WebFiori\Framework\Access;
+use WebFiori\Framework\User;
 /**
- * A test class for testing the class 'webfiori\framework\User'.
+ * A test class for testing the class 'WebFiori\framework\User'.
  *
  * @author Ibrahim
  */

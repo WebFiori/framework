@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use Throwable;
 use WebFiori\Cli\Argument;
@@ -17,8 +17,8 @@ use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Database;
 use WebFiori\Database\migration\AbstractMigration;
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLIUtils;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLIUtils;
 
 /**
  * Command for executing database migrations.

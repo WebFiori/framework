@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\File\File;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\AddCommand;
-use webfiori\framework\config\Controller;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\AddCommand;
+use WebFiori\Framework\Config\Controller;
 
 /**
  * Description of TestAddCommand
@@ -75,7 +75,7 @@ class AddCommandTest extends CLITestCase {
         $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
         
         $output = $this->executeSingleCommand(new AddCommand(), [
-            'webfiori',
+            'WebFiori',
             'add'
         ], [
             '0',
@@ -121,7 +121,7 @@ class AddCommandTest extends CLITestCase {
         $connName = 'db-connection-'.($count + 1);
         
         $output = $this->executeSingleCommand(new AddCommand(), [
-            'webfiori',
+            'WebFiori',
             'add'
         ], [
             '0',
@@ -169,8 +169,8 @@ class AddCommandTest extends CLITestCase {
         $langCode = chr(65 + ($langCode[0] % 26)) . chr(65 + ($langCode[1] % 26));
         
         // Clean up if it exists from previous runs
-        if (class_exists('\\app\\langs\\Lang' . $langCode)) {
-            $this->removeClass('\\app\\langs\\Lang' . $langCode);
+        if (class_exists('\\App\\Langs\\Lang' . $langCode)) {
+            $this->removeClass('\\App\\Langs\\Lang' . $langCode);
         }
         
         $output = $this->executeSingleCommand(new AddCommand(), [], [
@@ -198,8 +198,8 @@ class AddCommandTest extends CLITestCase {
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
         ], $output);
-        $this->assertTrue(class_exists('\\app\\langs\\Lang' . $langCode));
-        $this->removeClass('\\app\\langs\\Lang' . $langCode);
+        $this->assertTrue(class_exists('\\App\\Langs\\Lang' . $langCode));
+        $this->removeClass('\\App\\Langs\\Lang' . $langCode);
         Controller::getDriver()->initialize();
     }
     /**
@@ -242,7 +242,7 @@ class AddCommandTest extends CLITestCase {
             "Language code:\n",
             "Error: Invalid language code.\n",
         ], $output);
-        $this->removeClass('\\app\\langs\\LanguageFK');
+        $this->removeClass('\\App\\Langs\\LanguageFK');
     }
     /**
      * @test
@@ -251,7 +251,7 @@ class AddCommandTest extends CLITestCase {
         $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
         
         $output = $this->executeSingleCommand(new AddCommand(), [
-            'webfiori',
+            'WebFiori',
             'add'
         ], [
             '1',

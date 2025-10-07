@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\ThemeManager;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\ThemeManager;
 
 /**
  * Description of CreateThemeTest
@@ -17,7 +17,7 @@ class CreateThemeTest extends CLITestCase {
      */
     public function testCreateTheme00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '6',
@@ -60,14 +60,14 @@ class CreateThemeTest extends CLITestCase {
      */
     public function testCreateThemeWithExistingName() {
         $runner = App::getRunner();
-        $ns = '\\themes\\fioriTheme';
+        $ns = '\\Themes\\FioriTheme';
         $name = 'NewFTestTheme';
 
         $ns2 = '\\themes\\cool';
         $name2 = 'NewFTestTheme';
         
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '6',

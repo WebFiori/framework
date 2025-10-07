@@ -1,5 +1,5 @@
 <?php
-namespace tables;
+namespace Tables;
 
 use WebFiori\Database\MySql\MySQLTable;
 

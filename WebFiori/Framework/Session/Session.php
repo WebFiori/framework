@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
-use webfiori\framework\App;
-use webfiori\framework\exceptions\SessionException;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Http\HttpCookie;
 use WebFiori\Http\Request;
 use WebFiori\Json\Json;

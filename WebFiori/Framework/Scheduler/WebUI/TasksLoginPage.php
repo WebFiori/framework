@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webUI;
+namespace WebFiori\Framework\Scheduler\WebUI;
 
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Response;
 /**
  * A page which is used to show login form to enter login information to

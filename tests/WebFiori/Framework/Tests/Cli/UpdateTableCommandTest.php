@@ -1,20 +1,20 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\Table;
 use WebFiori\File\File;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\UpdateTableCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\UpdateTableCommand;
 
 class UpdateTableCommandTest extends CLITestCase {
     public function test00() {
         $output = $this->executeSingleCommand(new UpdateTableCommand(), [
-            'webfiori',
+            'WebFiori',
             'update-table',
         ], [
             '   ', // Invalid class name
             'ok\\y\\Super', // Invalid class name
-            'app\\database\\TestTable',
+            'App\\Database\\TestTable',
             '0',
             'new-col',
             '1',
@@ -70,11 +70,11 @@ class UpdateTableCommandTest extends CLITestCase {
             "Enter your optional comment about the column:\n",
             "Would you like to update same class or create a copy with the update?(y/N)\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Success: Column added.\n",
         ], $output);
 
-        $clazz = '\\app\\database\\ModifiedOTable';
+        $clazz = '\\App\\Database\\ModifiedOTable';
         $this->assertTrue(class_exists($clazz));
         $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
@@ -91,10 +91,10 @@ class UpdateTableCommandTest extends CLITestCase {
      */
     public function test01() {
         $output = $this->executeSingleCommand(new UpdateTableCommand(), [
-            'webfiori',
+            'WebFiori',
             'update-table',
         ], [
-            'app\\database\\TestTable',
+            'App\\Database\\TestTable',
             '2',
             'id',
             'user-id',
@@ -149,11 +149,11 @@ class UpdateTableCommandTest extends CLITestCase {
             "Enter your optional comment about the column:\n",
             "Would you like to update same class or create a copy with the update?(y/N)\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Success: Column updated.\n",
         ], $output);
         
-        $clazz = '\\app\\database\\ModifiedTable';
+        $clazz = '\\App\\Database\\ModifiedTable';
         $this->assertTrue(class_exists($clazz));
         $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();
@@ -167,10 +167,10 @@ class UpdateTableCommandTest extends CLITestCase {
 
     public function test02() {
         $output = $this->executeSingleCommand(new UpdateTableCommand(), [
-            'webfiori',
+            'WebFiori',
             'update-table',
         ], [
-            'app\\database\\Test2Table',
+            'App\\Database\\Test2Table',
             '4',
             '0',
             'y',
@@ -191,11 +191,11 @@ class UpdateTableCommandTest extends CLITestCase {
             "0: user_id_fk\n",
             "Would you like to update same class or create a copy with the update?(y/N)\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\database'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Database'\n",
             "Success: Table updated.\n",
         ], $output);
         
-        $clazz = '\\app\\database\\Modified2Table';
+        $clazz = '\\App\\Database\\Modified2Table';
         $this->assertTrue(class_exists($clazz));
         $file = new File(ROOT_PATH.$clazz.'.php');
         $file->remove();

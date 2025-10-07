@@ -1,5 +1,5 @@
 <?php
-namespace app\ini;
+namespace App\Ini;
 
 class InitAutoLoad {
     /**

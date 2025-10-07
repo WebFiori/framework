@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\tests\database;
+namespace WebFiori\Tests\Database;
 
 use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
-use webfiori\framework\User;
+use WebFiori\Framework\User;
 /**
  * Description of UsersQuery
  *

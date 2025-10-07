@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\App;
-use webfiori\framework\config\ClassDriver;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Config\ClassDriver;
 
 class SettingsCommandTest extends TestCase {
     /**
@@ -16,7 +16,7 @@ class SettingsCommandTest extends TestCase {
         $runner = App::getRunner();
         $runner->setInputs();
         $runner->setArgsVector([
-            'webfiori',
+            'WebFiori',
             'show-settings'
         ]);
         $runner->start();

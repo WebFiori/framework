@@ -1,7 +1,7 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
+use WebFiori\Framework\Cli\CLITestCase;
 /**
  * @author Ibrahim
  */

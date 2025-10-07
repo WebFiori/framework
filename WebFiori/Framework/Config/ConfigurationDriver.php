@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\config;
+namespace WebFiori\Framework\Config;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Mail\SMTPAccount;

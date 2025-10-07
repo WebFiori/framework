@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\File\File;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 
 /**
  * Description of CreateRESTTest
@@ -20,16 +20,16 @@ class CreateRESTTest extends CLITestCase {
         App::getConfig()->removeAllDBConnections();
         
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'rest'
         ], [
             '0',
             'SuperUser',
-            'app\\entity\\super',
+            'App\\Entity\\super',
             'y',
             'n',
-            "app\\database\\super",
+            "App\\Database\\super",
             "super_users",
             "A table to hold super users information.",
             "id",
@@ -57,7 +57,7 @@ class CreateRESTTest extends CLITestCase {
             "n",
             'n',
             "y",
-            "app\\apis\\super"
+            "App\\Apis\\super"
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
@@ -69,11 +69,11 @@ class CreateRESTTest extends CLITestCase {
             "1: mssql\n",
             "First thing, we need entity class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Entity'\n",
             "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
             "Now, time to collect database table information.\n",
-            "Provide us with a namespace for table class: Enter = 'app\database'\n",
+            "Provide us with a namespace for table class: Enter = 'App\Database'\n",
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
@@ -108,7 +108,7 @@ class CreateRESTTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
+            "Last thing needed is to provide us with namespace for web services: Enter = 'App\\Apis'\n",
             "Creating entity class...\n",
             "Creating database table class...\n",
             "Creating database access class...\n",
@@ -116,17 +116,17 @@ class CreateRESTTest extends CLITestCase {
             "Done.\n"
         ]), $output);
         
-        $tableClazz = '\\app\\database\\super\\SuperUserTable';
-        $entityClazz = '\\app\\entity\\super\\SuperUser';
-        $dbClazz = "\\app\\database\\super\\SuperUserDB";
+        $tableClazz = '\\App\\Database\\super\\SuperUserTable';
+        $entityClazz = '\\App\\Entity\\super\\SuperUser';
+        $dbClazz = "\\App\\Database\\super\\SuperUserDB";
         $apiClazzes = [
-            '\\app\\apis\\super\\AddSuperUserService',
-            '\\app\\apis\\super\\DeleteSuperUserService',
-            '\\app\\apis\\super\\GetAllSuperUsersService',
-            '\\app\\apis\\super\\GetSuperUserService',
-            '\\app\\apis\\super\\UpdateSuperUserService',
-            '\\app\\apis\\super\\UpdateFirstNameOfSuperUserService',
-            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserService'
+            '\\App\\Apis\\super\\AddSuperUserService',
+            '\\App\\Apis\\super\\DeleteSuperUserService',
+            '\\App\\Apis\\super\\GetAllSuperUsersService',
+            '\\App\\Apis\\super\\GetSuperUserService',
+            '\\App\\Apis\\super\\UpdateSuperUserService',
+            '\\App\\Apis\\super\\UpdateFirstNameOfSuperUserService',
+            '\\App\\Apis\\super\\UpdateIsHappyOfSuperUserService'
         ];
 
         foreach ($apiClazzes as $clazz) {
@@ -152,16 +152,16 @@ class CreateRESTTest extends CLITestCase {
         App::getConfig()->removeAllDBConnections();
         
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'rest'
         ], [
             '0',
             'SuperUserX',
-            'app\\entity\\super',
+            'App\\Entity\\super',
             'y',
             'n',
-            "app\\database\\super",
+            "App\\Database\\super",
             "super_users",
             "A table to hold super users information.",
             "id",
@@ -191,7 +191,7 @@ class CreateRESTTest extends CLITestCase {
             "n",
             'n',
             "y",
-            "app\\apis\\super"
+            "App\\Apis\\super"
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
@@ -202,11 +202,11 @@ class CreateRESTTest extends CLITestCase {
             "1: mssql\n",
             "First thing, we need entity class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Entity'\n",
             "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
             "Now, time to collect database table information.\n",
-            "Provide us with a namespace for table class: Enter = 'app\database'\n",
+            "Provide us with a namespace for table class: Enter = 'App\Database'\n",
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
@@ -243,7 +243,7 @@ class CreateRESTTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
+            "Last thing needed is to provide us with namespace for web services: Enter = 'App\\Apis'\n",
             "Creating entity class...\n",
             "Creating database table class...\n",
             "Creating database access class...\n",
@@ -251,18 +251,18 @@ class CreateRESTTest extends CLITestCase {
             "Done.\n"
         ]), $output);
         
-        $tableClazz = '\\app\\database\\super\\SuperUserXTable';
-        $entityClazz = '\\app\\entity\\super\\SuperUserX';
-        $dbClazz = "\\app\\database\\super\\SuperUserXDB";
+        $tableClazz = '\\App\\Database\\super\\SuperUserXTable';
+        $entityClazz = '\\App\\Entity\\super\\SuperUserX';
+        $dbClazz = "\\App\\Database\\super\\SuperUserXDB";
         $apiClazzes = [
-            '\\app\\apis\\super\\AddSuperUserXService',
-            '\\app\\apis\\super\\DeleteSuperUserXService',
-            '\\app\\apis\\super\\GetAllSuperUserXsService',
-            '\\app\\apis\\super\\GetSuperUserXService',
-            '\\app\\apis\\super\\UpdateSuperUserXService',
-            '\\app\\apis\\super\\UpdateFirstNameOfSuperUserXService',
-            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserXService',
-            '\\app\\apis\\super\\UpdateIdOfSuperUserXService'
+            '\\App\\Apis\\super\\AddSuperUserXService',
+            '\\App\\Apis\\super\\DeleteSuperUserXService',
+            '\\App\\Apis\\super\\GetAllSuperUserXsService',
+            '\\App\\Apis\\super\\GetSuperUserXService',
+            '\\App\\Apis\\super\\UpdateSuperUserXService',
+            '\\App\\Apis\\super\\UpdateFirstNameOfSuperUserXService',
+            '\\App\\Apis\\super\\UpdateIsHappyOfSuperUserXService',
+            '\\App\\Apis\\super\\UpdateIdOfSuperUserXService'
         ];
 
         foreach ($apiClazzes as $clazz) {
@@ -291,16 +291,16 @@ class CreateRESTTest extends CLITestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'rest',
         ], [
             'Super Connection',
             'SuperUserX9',
-            'app\\entity\\super',
+            'App\\Entity\\super',
             'y',
             'n',
-            "app\\database\\super",
+            "App\\Database\\super",
             "super_users",
             "A table to hold super users information.",
             "id",
@@ -330,7 +330,7 @@ class CreateRESTTest extends CLITestCase {
             "n",
             'n',
             "y",
-            "app\\apis\\super"
+            "App\\Apis\\super"
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
@@ -339,11 +339,11 @@ class CreateRESTTest extends CLITestCase {
             "0: Super Connection <--\n",
             "First thing, we need entity class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Entity'\n",
             "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
             "Now, time to collect database table information.\n",
-            "Provide us with a namespace for table class: Enter = 'app\database'\n",
+            "Provide us with a namespace for table class: Enter = 'App\Database'\n",
             "Enter database table name:\n",
             "Enter your optional comment about the table:\n",
             "Now you have to add columns to the table.\n",
@@ -378,7 +378,7 @@ class CreateRESTTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to have update methods for every single column?(y/N)\n",
-            "Last thing needed is to provide us with namespace for web services: Enter = 'app\\apis'\n",
+            "Last thing needed is to provide us with namespace for web services: Enter = 'App\\Apis'\n",
             "Creating entity class...\n",
             "Creating database table class...\n",
             "Creating database access class...\n",
@@ -386,19 +386,19 @@ class CreateRESTTest extends CLITestCase {
             "Done.\n"
         ]), $output);
         
-        $tableClazz = '\\app\\database\\super\\SuperUserX9Table';
-        $entityClazz = '\\app\\entity\\super\\SuperUserX9';
-        $dbClazz = "\\app\\database\\super\\SuperUserX9DB";
+        $tableClazz = '\\App\\Database\\super\\SuperUserX9Table';
+        $entityClazz = '\\App\\Entity\\super\\SuperUserX9';
+        $dbClazz = "\\App\\Database\\super\\SuperUserX9DB";
         $apiClazzes = [
-            '\\app\\apis\\super\\AddSuperUserX9Service',
-            '\\app\\apis\\super\\DeleteSuperUserX9Service',
-            '\\app\\apis\\super\\GetAllSuperUserX9sService',
-            '\\app\\apis\\super\\GetSuperUserX9Service',
-            '\\app\\apis\\super\\UpdateSuperUserX9Service',
-            '\\app\\apis\\super\\UpdateFirstNameOfSuperUserX9Service',
-            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service',
-            '\\app\\apis\\super\\UpdateIdOfSuperUserX9Service',
-            '\\app\\apis\\super\\UpdateIsHappyOfSuperUserX9Service'
+            '\\App\\Apis\\super\\AddSuperUserX9Service',
+            '\\App\\Apis\\super\\DeleteSuperUserX9Service',
+            '\\App\\Apis\\super\\GetAllSuperUserX9sService',
+            '\\App\\Apis\\super\\GetSuperUserX9Service',
+            '\\App\\Apis\\super\\UpdateSuperUserX9Service',
+            '\\App\\Apis\\super\\UpdateFirstNameOfSuperUserX9Service',
+            '\\App\\Apis\\super\\UpdateIsHappyOfSuperUserX9Service',
+            '\\App\\Apis\\super\\UpdateIdOfSuperUserX9Service',
+            '\\App\\Apis\\super\\UpdateIsHappyOfSuperUserX9Service'
         ];
 
         foreach ($apiClazzes as $clazz) {

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui;
+namespace WebFiori\Framework\UI;
 
 use WebFiori\UI\HTMLNode;
 /**
@@ -138,13 +138,13 @@ class MessageBox extends HTMLNode {
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',
-                'href' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/message-box.css'
+                'href' => 'https://cdn.jsdelivr.net/gh/WebFiori/app@'.WF_VERSION.'/public/assets/css/message-box.css'
             ]);
             $this->addChild($css);
             $js = new HTMLNode('script');
             $js->setAttributes([
                 'type' => 'text/javascript',
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/message-box.js'
+                'src' => 'https://cdn.jsdelivr.net/gh/WebFiori/app@'.WF_VERSION.'/public/assets/js/message-box.js'
             ]);
             $this->addChild($js);
         }

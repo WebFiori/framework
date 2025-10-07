@@ -1,7 +1,7 @@
 <?php
-namespace app\middleware;
+namespace App\Middleware;
 
-use webfiori\framework\middleware\AbstractMiddleware;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\middleware;
+namespace WebFiori\Framework\Middleware;
 
 use WebFiori\Collections\Comparable;
 use WebFiori\Http\Request;

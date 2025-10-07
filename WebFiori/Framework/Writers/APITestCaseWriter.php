@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
 use WebFiori\Http\AbstractWebService;
 use WebFiori\Http\APITestCase;

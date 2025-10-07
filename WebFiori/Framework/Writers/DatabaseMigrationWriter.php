@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
 use WebFiori\Database\Database;
 use WebFiori\Database\Schema\AbstractMigration;

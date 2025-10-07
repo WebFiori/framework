@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\cli;
+namespace WebFiori\Framework\Cli;
 
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Table;
-use webfiori\framework\App;
-use webfiori\framework\writers\ClassWriter;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Writers\ClassWriter;
 /**
  * A class which is used to hold common CLI methods for reading inputs.
  *

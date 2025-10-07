@@ -1,7 +1,7 @@
 <?php
-namespace app\langs;
+namespace App\Langs;
 
-use webfiori\framework\Lang;
+use WebFiori\Framework\Lang;
 /**
  * A class which holds language information for the language which has code 'EN'.
  */

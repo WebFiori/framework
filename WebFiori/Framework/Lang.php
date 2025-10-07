@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
-use webfiori\framework\exceptions\MissingLangException;
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Exceptions\MissingLangException;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
 
 /**

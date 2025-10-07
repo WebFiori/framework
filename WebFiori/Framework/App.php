@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use Error;
 use Exception;
@@ -17,19 +17,19 @@ use WebFiori\Cli\Runner;
 use WebFiori\Error\Handler;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
-use webfiori\framework\autoload\ClassLoader;
-use webfiori\framework\config\ConfigurationDriver;
-use webfiori\framework\config\Controller;
-use webfiori\framework\exceptions\InitializationException;
-use webfiori\framework\handlers\APICallErrHandler;
-use webfiori\framework\handlers\CLIErrHandler;
-use webfiori\framework\handlers\HTTPErrHandler;
-use webfiori\framework\middleware\AbstractMiddleware;
-use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\framework\middleware\StartSessionMiddleware;
-use webfiori\framework\router\Router;
-use webfiori\framework\router\RouterUri;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Autoload\ClassLoader;
+use WebFiori\Framework\Config\ConfigurationDriver;
+use WebFiori\Framework\Config\Controller;
+use WebFiori\Framework\Exceptions\InitializationException;
+use WebFiori\Framework\Handlers\APICallErrHandler;
+use WebFiori\Framework\Handlers\CLIErrHandler;
+use WebFiori\Framework\Handlers\HTTPErrHandler;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
+use WebFiori\Framework\Middleware\MiddlewareManager;
+use WebFiori\Framework\Middleware\StartSessionMiddleware;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Router\RouterUri;
+use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 /**
@@ -91,7 +91,7 @@ class App {
      *
      * @var string
      */
-    private static $ConfigDriver = 'webfiori\\framework\\config\\JsonDriver';
+    private static $ConfigDriver = 'WebFiori\\Framework\\Config\\JsonDriver';
     /**
      * A single instance of the class.
      *
@@ -274,10 +274,10 @@ class App {
     }
     private static function getRoot() {
         //Following lines of code assumes that the class exist on the folder: 
-        //\vendor\webfiori\framework\webfiori\framework
+        //\vendor\WebFiori\framework\WebFiori\framework
         //Its used to construct the folder at which index file will exist at
         $DS = DIRECTORY_SEPARATOR;
-        $vendorPath = $DS.'vendor'.$DS.'webfiori'.$DS.'framework'.$DS.'webfiori'.$DS.'framework';
+        $vendorPath = $DS.'vendor'.$DS.'WebFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'framework';
         $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
         return $rootPath;
     }
@@ -368,7 +368,7 @@ class App {
             /**
              * Path to WebFiori's core library.
              */
-            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'webfiori'.DS.'framework');
+            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'WebFiori'.DS.'framework'.DS.'WebFiori'.DS.'framework');
         }
         self::initAutoLoader();
         self::checkStandardLibs();
@@ -417,18 +417,18 @@ class App {
             self::$CliRunner->setBeforeStart(function (Runner $r)
             {
                 $commands = [
-                    '\\webfiori\\framework\\cli\commands\\WHelpCommand',
-                    '\\webfiori\\framework\\cli\\commands\\VersionCommand',
-                    '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
-                    '\\webfiori\\framework\\cli\\commands\\SchedulerCommand',
-                    '\\webfiori\\framework\\cli\\commands\\CreateCommand',
-                    '\\webfiori\\framework\\cli\\commands\\AddCommand',
-                    '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
-                    '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
-                    '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
-                    '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
-                    '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
-                    '\\webfiori\\framework\\cli\\commands\\RunMigrationsCommand',
+                    '\\WebFiori\\Framework\\Cli\commands\\WHelpCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\SettingsCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\ListRoutesCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\ListThemesCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateSettingsCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',
                 ];
 
                 foreach ($commands as $c) {
@@ -548,16 +548,16 @@ class App {
      */
     private static function checkStandardLibs() {
         $standardLibsClasses = [
-            'webfiori/collections' => 'WebFiori\\Collections\\Node',
-            'webfiori/ui' => 'WebFiori\\UI\\HTMLNode',
-            'webfiori/jsonx' => 'WebFiori\\Json\\Json',
-            'webfiori/database' => 'WebFiori\\Database\\ResultSet',
-            'webfiori/http' => 'WebFiori\\Http\\Response',
-            'webfiori/file' => 'WebFiori\\File\\File',
-            'webfiori/mailer' => 'WebFiori\\Mail\\SMTPAccount',
-            'webfiori/cli' => 'WebFiori\\Cli\\Command',
+            'WebFiori/collections' => 'WebFiori\\Collections\\Node',
+            'WebFiori/ui' => 'WebFiori\\UI\\HTMLNode',
+            'WebFiori/jsonx' => 'WebFiori\\Json\\Json',
+            'WebFiori/database' => 'WebFiori\\Database\\ResultSet',
+            'WebFiori/http' => 'WebFiori\\Http\\Response',
+            'WebFiori/file' => 'WebFiori\\File\\File',
+            'WebFiori/mailer' => 'WebFiori\\Mail\\SMTPAccount',
+            'WebFiori/cli' => 'WebFiori\\Cli\\Command',
 
-            'webfiori/cache' => 'WebFiori\\Cache\\Cache'
+            'WebFiori/cache' => 'WebFiori\\Cache\\Cache'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {
@@ -615,7 +615,7 @@ class App {
         /**
          * Initialize autoloader.
          */
-        if (!class_exists('webfiori\framework\autoload\ClassLoader',false)) {
+        if (!class_exists('WebFiori\framework\autoload\ClassLoader',false)) {
             $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
             require_once $autoloader;
         }

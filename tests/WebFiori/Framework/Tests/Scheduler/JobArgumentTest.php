@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\scheduler;
+namespace WebFiori\Framework\Test\Scheduler;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\TaskArgument;
+use WebFiori\Framework\Scheduler\TaskArgument;
 /**
  *
  * @author Ibrahim

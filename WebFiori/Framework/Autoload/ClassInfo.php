@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\autoload;
+namespace WebFiori\Framework\Autoload;
 
 /**
  * A class that contains the names of indices that are used by loaded class info array.

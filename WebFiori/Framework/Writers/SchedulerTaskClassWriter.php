@@ -8,13 +8,13 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
-use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\BaseTask;
-use webfiori\framework\scheduler\TaskArgument;
-use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\scheduler\TaskStatusEmail;
+use WebFiori\Framework\Scheduler\AbstractTask;
+use WebFiori\Framework\Scheduler\BaseTask;
+use WebFiori\Framework\Scheduler\TaskArgument;
+use WebFiori\Framework\Scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\TaskStatusEmail;
 /**
  * A class which is used to write scheduler tasks classes.
  *
@@ -158,7 +158,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
 
         $this->append('//TODO: Implement the action to perform when the task finishes to execute.', 2);
         $this->append("//\$email = new TaskStatusEmail('no-reply', [", 2);
-        $this->append("//    'webfiori@example.com' => 'Ibrahim Ali'", 2);
+        $this->append("//    'WebFiori@example.com' => 'Ibrahim Ali'", 2);
         $this->append('//]);', 2);
         $this->append('}', 1);
 

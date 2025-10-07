@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
 use WebFiori\Database\DatabaseException;
-use webfiori\framework\DB;
+use WebFiori\Framework\DB;
 /**
  * A class which includes all database related operations to add, update,
  * and delete sessions from a database.
@@ -155,7 +155,7 @@ class SessionDB extends DB {
         $this->table('sessions')->delete()->where('s-id', $sId)->execute();
     }
     /**
-     * Removes database tables which are used to store session information.
+     * Removes database Tables which are used to store session information.
      */
     public function removeTables() {
         $this->transaction(function (DB $db)

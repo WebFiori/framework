@@ -1,10 +1,10 @@
 <?php
 
-namespace webfiori\framework\middleware;
+namespace WebFiori\Framework\Middleware;
 
 use WebFiori\Cache\Cache;
-use webfiori\framework\router\Router;
-use webfiori\framework\session\SessionsManager;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 

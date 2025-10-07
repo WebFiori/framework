@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Privilege;
-use webfiori\framework\PrivilegesGroup;
+use WebFiori\Framework\Privilege;
+use WebFiori\Framework\PrivilegesGroup;
 
 /**
  *

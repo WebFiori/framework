@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use tables\EmployeeInfoTable;
-use tables\PositionInfoTable;
-use tables\UserInfoTable;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\writers\DBClassWriter;
+use Tables\EmployeeInfoTable;
+use Tables\PositionInfoTable;
+use Tables\UserInfoTable;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Writers\DBClassWriter;
 
 /**
  * Description of DBClassWritterTest
@@ -20,8 +20,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new UserInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('CoolUser');
-        $mapper->setNamespace('webfiori\\entity');
-        $writter = new DBClassWriter('UserDBClass', 'webfiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\entity');
+        $writter = new DBClassWriter('UserDBClass', 'WebFiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -34,8 +34,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new EmployeeInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('Employee');
-        $mapper->setNamespace('webfiori\\entity');
-        $writter = new DBClassWriter('EmployeeDB', 'webfiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\entity');
+        $writter = new DBClassWriter('EmployeeDB', 'WebFiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -48,8 +48,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new PositionInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('Position');
-        $mapper->setNamespace('webfiori\\entity');
-        $writter = new DBClassWriter('PositionDB', 'webfiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\entity');
+        $writter = new DBClassWriter('PositionDB', 'WebFiori\\db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -60,7 +60,7 @@ class DBClassWritterTest extends CLITestCase {
      */
     public function test03() {
         $table = new PositionInfoTable();
-        $writter = new DBClassWriter('PositionDB2', 'webfiori\\db', $table);
+        $writter = new DBClassWriter('PositionDB2', 'WebFiori\\db', $table);
         $writter->setConnection('  ');
         $this->assertNull($writter->getConnectionName());
         $writter->setConnection('ok-connection');

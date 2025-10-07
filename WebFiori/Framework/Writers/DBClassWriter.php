@@ -8,14 +8,14 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
 use WebFiori\Database\Column;
 use WebFiori\Database\EntityMapper;
 use WebFiori\Database\MsSql\MSSQLColumn;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\Table;
-use webfiori\framework\DB;
+use WebFiori\Framework\DB;
 /**
  * A class which is used to create a database access controller.
  *

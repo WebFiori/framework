@@ -1,7 +1,7 @@
 <?php
-namespace webfiori\framework\scheduler\webUI;
+namespace WebFiori\Framework\Scheduler\WebUI;
 
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Response;
 
 /**

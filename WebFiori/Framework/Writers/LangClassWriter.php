@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
-use webfiori\framework\Lang;
+use WebFiori\Framework\Lang;
 /**
  * A writer which is used to write any class that represents a language class.
  *

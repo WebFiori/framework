@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui\serverErrPage;
+namespace WebFiori\Framework\UI\ServerErrPage;
 
 use WebFiori\Error\AbstractHandler;
-use webfiori\framework\ui\WebPage;
+use WebFiori\Framework\UI\WebPage;
 use WebFiori\UI\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or
@@ -41,7 +41,7 @@ class ServerErrPage extends WebPage {
         $this->addBeforeRender(function (WebPage $p)
         {
             $p->getDocument()->getBody()->addChild('script', [
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/framework@'.WF_VERSION.'/assets/js/server-err.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/WebFiori/framework@'.WF_VERSION.'/assets/js/server-err.js',
                 'type' => 'text/javascript'
             ]);
         });

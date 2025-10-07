@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\APITestCaseWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\APITestCaseWriter;
 use WebFiori\Http\WebServicesManager;
 /**
  * A helper class which is used to help in creating test cases for web APIs classes using CLI.

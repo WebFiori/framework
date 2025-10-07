@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\DatabaseMigrationWriter;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\DatabaseMigrationWriter;
 /**
  * A helper class which is used to help in creating scheduler tasks classes using CLI.
  *

@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use Throwable;
 use WebFiori\Cli\Command;
@@ -18,9 +18,9 @@ use WebFiori\Database\MsSql\MSSQLColumn;
 use WebFiori\Database\MySql\MySQLColumn;
 use WebFiori\Database\MySql\MySQLTable;
 use WebFiori\Database\Table;
-use webfiori\framework\App;
-use webfiori\framework\cli\commands\UpdateTableCommand;
-use webfiori\framework\DB;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\Commands\UpdateTableCommand;
+use WebFiori\Framework\DB;
 
 /**
  * A CLI class helper which has methods to help in creating and

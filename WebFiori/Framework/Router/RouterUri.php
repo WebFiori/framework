@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\router;
+namespace WebFiori\Framework\Router;
 
 use Closure;
 use InvalidArgumentException;
-use webfiori\framework\middleware\MiddlewareManager;
+use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Http\Uri;
 use WebFiori\UI\HTMLNode;
 /**

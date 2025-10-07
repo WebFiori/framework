@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\config;
+namespace WebFiori\Framework\Config;
 
 use Exception;
-use webfiori\framework\App;
-use webfiori\framework\exceptions\InitializationException;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Exceptions\InitializationException;
 
 /**
  * A class which acts as an interface between the application and configuration

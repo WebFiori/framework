@@ -8,17 +8,17 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\TableClassWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\TableClassWriter;
 use WebFiori\Json\CaseConverter;
 /**
- * A helper class for creating database tables classes.
+ * A helper class for creating database Tables classes.
  *
  * @author Ibrahim
  */

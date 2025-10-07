@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler;
+namespace WebFiori\Framework\Scheduler;
 
 use InvalidArgumentException;
 use WebFiori\Json\Json;

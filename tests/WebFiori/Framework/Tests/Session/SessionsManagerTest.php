@@ -1,14 +1,14 @@
 <?php
-namespace webfiori\framework\test\session;
+namespace WebFiori\Framework\Test\Session;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
-use webfiori\framework\App;
-use webfiori\framework\exceptions\SessionException;
-use webfiori\framework\session\DatabaseSessionStorage;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\session\SessionStatus;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Exceptions\SessionException;
+use WebFiori\Framework\Session\DatabaseSessionStorage;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\Framework\Session\SessionStatus;
 
 /**
  * Description of SessionsManagerTest

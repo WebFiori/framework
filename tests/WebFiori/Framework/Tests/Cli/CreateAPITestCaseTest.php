@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
 use WebFiori\Http\WebServicesManager;
 /**
  * @author Ibrahim
@@ -27,7 +27,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase01() {
-        $path = ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices";
+        $path = ROOT_PATH.DS."tests".DS."WebFiori".DS."framework".DS."scheduler".DS."webServices";
         $this->assertEquals([
             "Info: Selected services manager has no service with name 'c'.\n",
             "Which service you would like to have a test case for?\n",
@@ -38,7 +38,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             "4: set-password\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
+            'Name: tests\WebFiori\\Framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "Info: New class was created at \"".$path."\".\n"
@@ -53,7 +53,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\TasksLoginServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\TasksLoginServiceTest';
         $this->assertTrue(file_exists($path.DS.'TasksLoginServiceTest.php'));
         require_once $path.DS.'TasksLoginServiceTest.php';
         $this->assertTrue(class_exists($clazz));
@@ -63,7 +63,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase02() {
-        $path = ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices";
+        $path = ROOT_PATH.DS."tests".DS."WebFiori".DS."framework".DS."scheduler".DS."webServices";
         $this->assertEquals([
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
@@ -74,7 +74,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--defaults'
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest';
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
@@ -84,24 +84,24 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase03() {
-        $path = ROOT_PATH.DS."tests".DS."webfiori".DS."framework".DS."scheduler".DS."webServices";
+        $path = ROOT_PATH.DS."tests".DS."WebFiori".DS."framework".DS."scheduler".DS."webServices";
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest'."\n",
+            'Name: tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\webfiori\\framework\scheduler\webServices'\n",
+            "Enter an optional namespace for the class: Enter = 'tests\WebFiori\\Framework\scheduler\webServices'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
             '--service' => 'get-tasks',
         ], [
-            '\webfiori\\framework\scheduler\webServices\\TasksServicesManager',
+            '\WebFiori\\Framework\scheduler\webServices\\TasksServicesManager',
             'n',
             '10',
             '',
@@ -109,7 +109,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
 
-        $clazz = '\\tests\webfiori\\framework\scheduler\webServices\\GetTasksServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest';
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
@@ -136,7 +136,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--c' => 'api-test',
             '--service' => 'say-hi-service',
         ], [
-            '\\tests\\apis\\multiple\\ServicesManager00',
+            '\\Tests\\Apis\\Multiple\\ServicesManager00',
             'n',
             '10',
             '',
@@ -144,7 +144,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
 
-        $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
+        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService00Test';
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
         require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
@@ -160,7 +160,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
-            '--manager' => '\\tests\\apis\\emptyService\\EmptyServicesManager',
+            '--manager' => '\\Tests\\Apis\\EmptyService\\EmptyServicesManager',
         ]));
         $this->assertEquals(-1, $this->getExitCode());
     }
@@ -187,15 +187,15 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--c' => 'api-test',
             '--service' => 'say-hi-service',
         ], [
-            '\\tests\\apis\\multiple\\WebService00',
-            '\\tests\\apis\\multiple\\ServicesManager00',
+            '\\Tests\\Apis\\Multiple\\WebService00',
+            '\\Tests\\Apis\\Multiple\\ServicesManager00',
             'n',
             '10',
             '',
             '',
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\\tests\\apis\\multiple\\WebService00Test';
+        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService00Test';
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
         require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
@@ -206,11 +206,11 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase07() {
         $this->assertEquals([
-            "Error: The argument --manager has invalid value: Not a class: \\tests\\apis\\emptyService\\Xyz\n",
+            "Error: The argument --manager has invalid value: Not a class: \\Tests\\Apis\\EmptyService\\Xyz\n",
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
-            '--manager' => '\\tests\\apis\\emptyService\\Xyz',
+            '--manager' => '\\Tests\\Apis\\EmptyService\\Xyz',
         ]));
         $this->assertEquals(-1, $this->getExitCode());
     }
@@ -225,11 +225,11 @@ class CreateAPITestCaseTest extends CLITestCase {
             CreateCommand::class,
             '--c' => 'api-test',
             '--service' => 'say-hi-service-2',
-            '--manager' => '\\tests\\apis\\multiple\\ServicesManager00',
+            '--manager' => '\\Tests\\Apis\\Multiple\\ServicesManager00',
             '--defaults'
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\\tests\\apis\\multiple\\WebService01Test';
+        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService01Test';
         $this->assertTrue(file_exists($path.DS.'WebService01Test.php'));
         require_once $path.DS.'WebService01Test.php';
         $this->assertTrue(class_exists($clazz));

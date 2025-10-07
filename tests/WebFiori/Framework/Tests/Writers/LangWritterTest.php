@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Lang;
-use webfiori\framework\writers\LangClassWriter;
+use WebFiori\Framework\Lang;
+use WebFiori\Framework\Writers\LangClassWriter;
 /**
  *
  * @author Ibrahim
@@ -15,7 +15,7 @@ class LangWritterTest extends TestCase {
     public function test00() {
         $writter = new LangClassWriter('EN', 'ltr');
         $this->assertEquals('LangEN', $writter->getName());
-        $this->assertEquals('app\\langs', $writter->getNamespace());
+        $this->assertEquals('App\\Langs', $writter->getNamespace());
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
                 Lang::class

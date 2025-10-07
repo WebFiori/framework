@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Database;
@@ -66,7 +66,7 @@ class DB extends Database {
      * @param bool $updateOwnerDb If the owner database of the table is already
      * set and this parameter is set to true, the owner database will be
      * updated to the database specified in the instance. This parameter
-     * is used to maintain foreign key relationships between tables which
+     * is used to maintain foreign key relationships between Tables which
      * belongs to different databases.
      *
      * @return boolean If the table is added, the method will return true. False
@@ -89,16 +89,16 @@ class DB extends Database {
         return false;
     }
     /**
-     * Auto-register database tables which exist on a specific directory.
+     * Auto-register database Tables which exist on a specific directory.
      *
-     * Note that the classes which represents tables must be suffixed
+     * Note that the classes which represents Tables must be suffixed
      * with the word 'Table' (e.g. UsersTable). Also, the registration will depend
      * on the database that the connection is for. For example, if the connection
-     * is for MySQL database, then only tables of type 'MySQLTable'.
+     * is for MySQL database, then only Tables of type 'MySQLTable'.
      *
      * @param string $pathToScan A path which is relative to application source
      * code. For example, If your application folder name is 'app'
-     * and if tables classes exist in the folder 'app\database', then the value of this
+     * and if Tables classes exist in the folder 'App\Database', then the value of this
      * argument must be 'database'.
      *
      * @since 1.0.1

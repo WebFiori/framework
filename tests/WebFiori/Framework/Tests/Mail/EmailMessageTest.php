@@ -1,14 +1,14 @@
 <?php
-namespace webfiori\framework\test\mail;
+namespace WebFiori\Framework\Test\Mail;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Mail\SMTPAccount;
-use webfiori\framework\App;
-use webfiori\framework\EmailMessage;
-use webfiori\framework\exceptions\MissingLangException;
+use WebFiori\Framework\App;
+use WebFiori\Framework\EmailMessage;
+use WebFiori\Framework\Exceptions\MissingLangException;
 /**
- * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
+ * A test class for testing the class 'WebFiori\framework\mail\EmailMessage'.
  *
  * @author Ibrahim
  */

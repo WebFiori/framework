@@ -8,14 +8,14 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
 use InvalidArgumentException;
 use WebFiori\Cli\InputValidator;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\scheduler\BaseTask;
-use webfiori\framework\scheduler\TaskArgument;
-use webfiori\framework\writers\SchedulerTaskClassWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Scheduler\BaseTask;
+use WebFiori\Framework\Scheduler\TaskArgument;
+use WebFiori\Framework\Writers\SchedulerTaskClassWriter;
 /**
  * A helper class which is used to help in creating scheduler tasks classes using CLI.
  *

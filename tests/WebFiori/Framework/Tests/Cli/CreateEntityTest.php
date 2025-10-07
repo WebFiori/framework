@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use app\database\TestTable;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use App\Database\TestTable;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 
 class CreateEntityTest extends CLITestCase {
     /**
@@ -11,7 +11,7 @@ class CreateEntityTest extends CLITestCase {
      */
     public function testCreateEntity00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'entity',
             '--table' => TestTable::class
@@ -32,7 +32,7 @@ class CreateEntityTest extends CLITestCase {
         $this->assertEquals([
             "We need from you to give us entity class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Entity'\n",
             "Would you like from your class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
             "Enter attribute name:\n",
@@ -48,8 +48,8 @@ class CreateEntityTest extends CLITestCase {
             "Generating your entity...\n",
             "Success: Entity class created.\n"
         ], $output);
-        $this->assertTrue(class_exists('\\app\\entity\\NeEntity'));
-        $this->removeClass('\\app\\entity\\NeEntity');
+        $this->assertTrue(class_exists('\\App\\Entity\\NeEntity'));
+        $this->removeClass('\\App\\Entity\\NeEntity');
     }
     
     /**
@@ -57,7 +57,7 @@ class CreateEntityTest extends CLITestCase {
      */
     public function testCreateEntity01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'entiy', // Invalid command value
             '--table' => TestTable::class
@@ -93,7 +93,7 @@ class CreateEntityTest extends CLITestCase {
             "11: Quit. <--\n",
             "We need from you to give us entity class information.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\entity'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Entity'\n",
             "Would you like from your class to implement the interface JsonI?(Y/n)\n",
             "Would you like to add extra attributes to the entity?(y/N)\n",
             "Enter attribute name:\n",
@@ -109,7 +109,7 @@ class CreateEntityTest extends CLITestCase {
             "Generating your entity...\n",
             "Success: Entity class created.\n"
         ], $output);
-        $this->assertTrue(class_exists('\\app\\entity\\NewEntity'));
-        $this->removeClass('\\app\\entity\\NewEntity');
+        $this->assertTrue(class_exists('\\App\\Entity\\NewEntity'));
+        $this->removeClass('\\App\\Entity\\NewEntity');
     }
 }

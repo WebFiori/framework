@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
-use webfiori\framework\session\SessionUser;
+use WebFiori\Framework\Session\SessionUser;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
 /**

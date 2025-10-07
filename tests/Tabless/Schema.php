@@ -1,7 +1,7 @@
 <?php
-namespace tables;
+namespace Tables;
 
-use webfiori\framework\DB;
+use WebFiori\Framework\DB;
 /**
  * Description of Schema
  *

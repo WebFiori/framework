@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\router;
+namespace WebFiori\Framework\Test\Router;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\router\RouteOption;
-use webfiori\framework\router\Router;
-use webfiori\framework\router\RouterUri;
-use webfiori\framework\Util;
+use WebFiori\Framework\Router\RouteOption;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Router\RouterUri;
+use WebFiori\Framework\Util;
 use WebFiori\Http\RequestMethod;
 use WebFiori\Http\Response;
 /**

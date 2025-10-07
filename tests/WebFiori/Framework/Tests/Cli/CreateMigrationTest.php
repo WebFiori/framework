@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
 /**
  * @author Ibrahim
  */
@@ -36,7 +36,7 @@ class CreateMigrationTest extends CLITestCase {
     public function testCreateMigration01() {
         $name = 'CoolMigration';
         
-        $clazz = '\\app\\database\\migrations\\'.$name;
+        $clazz = '\\App\\Database\\migrations\\'.$name;
         
         $this->assertEquals([
             "Migration namespace: Enter = 'app\database\migrations'\n",

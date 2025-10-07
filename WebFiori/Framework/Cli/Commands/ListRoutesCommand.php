@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Command;
-use webfiori\framework\router\Router;
+use WebFiori\Framework\Router\Router;
 /**
  * A CLI command which is used to show a list of all added routes.
  *

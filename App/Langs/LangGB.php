@@ -1,2 +1,2 @@
 <?php
-namespace app\langs;
+namespace App\Langs;

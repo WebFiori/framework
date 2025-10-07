@@ -8,16 +8,16 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use Throwable;
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
-use webfiori\framework\App;
-use webfiori\framework\config\Controller;
-use webfiori\framework\router\Router;
-use webfiori\framework\Theme;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Config\Controller;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Theme;
 /**
  * This class implements a CLI command which is used to update the settings which are
  * stored in the class 'AppConfing' of the application.

@@ -1,12 +1,12 @@
 <?php
-namespace webfiori\framework\test\scheduler;
+namespace WebFiori\Framework\Test\Scheduler;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\router\Router;
-use webfiori\framework\scheduler\TasksManager;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\scheduler\webUI\ListTasksPage;
-use webfiori\framework\scheduler\webUI\TasksLoginPage;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
+use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
+use WebFiori\Framework\Scheduler\WebUI\TasksLoginPage;
 /**
  *
  * @author Ibrahim

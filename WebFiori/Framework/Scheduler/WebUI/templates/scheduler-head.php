@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\scheduler\webUI\templates;
+namespace WebFiori\Framework\Scheduler\WebUI\Templates;
 
 ?>
 <head>

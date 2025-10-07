@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\config;
+namespace WebFiori\Framework\Config;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Mail\SMTPAccount;
 use WebFiori\File\File;
-use webfiori\framework\exceptions\InitializationException;
+use WebFiori\Framework\Exceptions\InitializationException;
 use WebFiori\Http\Uri;
 use WebFiori\Json\Json;
 

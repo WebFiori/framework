@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\helpers;
+namespace WebFiori\Framework\Cli\Helpers;
 
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\writers\ServiceHolder;
-use webfiori\framework\writers\WebServiceWriter;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Writers\ServiceHolder;
+use WebFiori\Framework\Writers\WebServiceWriter;
 use WebFiori\Http\ParamType;
 use WebFiori\Http\RequestMethod;
 use WebFiori\Http\RequestParameter;

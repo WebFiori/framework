@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
 use WebFiori\Database\MsSql\MSSQLTable;
 

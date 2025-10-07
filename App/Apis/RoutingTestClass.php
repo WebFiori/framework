@@ -1,5 +1,5 @@
 <?php
-namespace app\apis;
+namespace App\Apis;
 
 use WebFiori\Http\Response;
 

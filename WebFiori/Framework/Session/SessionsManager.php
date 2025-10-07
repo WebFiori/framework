@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
-use webfiori\framework\exceptions\SessionException;
+use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Http\Request;
 /**
  * A class which is used to manage user sessions.
@@ -65,10 +65,10 @@ class SessionsManager {
             $constructor = WF_SESSION_STORAGE.'';
             $classObj = new $constructor();
 
-            if (is_subclass_of($classObj, '\webfiori\framework\session\SessionStorage')) {
+            if (is_subclass_of($classObj, '\WebFiori\framework\session\SessionStorage')) {
                 $this->sessionStorage = $classObj;
             } else {
-                throw new SessionException('The class "'.WF_SESSION_STORAGE.'" does not implement "\webfiori\framework\session\SessionStorage".');
+                throw new SessionException('The class "'.WF_SESSION_STORAGE.'" does not implement "\WebFiori\framework\session\SessionStorage".');
             }
         }
 

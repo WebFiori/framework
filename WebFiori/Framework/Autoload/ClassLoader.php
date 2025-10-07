@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\autoload;
+namespace WebFiori\Framework\Autoload;
 
 use Exception;
 /**
@@ -237,7 +237,7 @@ class ClassLoader {
             $appFolder = APP_DIR;
             $frameworkSearchFolders = [
                 '',
-                $DS.'webfiori'.$DS.'framework',
+                $DS.'WebFiori'.$DS.'framework',
                 $DS.'framework'.$DS.'exceptions',
                 $DS.'framework'.$DS.'cli',
                 $DS.'framework'.$DS.'ui',

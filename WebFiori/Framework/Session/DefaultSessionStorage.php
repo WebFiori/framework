@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
 use WebFiori\Cli\Runner;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
-use webfiori\framework\exceptions\SessionException;
+use WebFiori\Framework\Exceptions\SessionException;
 /**
  * The default sessions storage engine.
  *

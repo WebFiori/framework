@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webServices;
+namespace WebFiori\Framework\Scheduler\WebServices;
 
-use webfiori\framework\App;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\AbstractWebService;
 use WebFiori\Http\RequestParameter;
 /**

@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\session;
+namespace WebFiori\Framework\Session;
 
 use WebFiori\Database\DatabaseException;
-use webfiori\framework\exceptions\SessionException;
+use WebFiori\Framework\Exceptions\SessionException;
 
 /**
  * A session storage engine which uses database to store session state.
@@ -47,9 +47,9 @@ class DatabaseSessionStorage implements SessionStorage {
         }
     }
     /**
-     * Drop the tables which are used to store session information.
+     * Drop the Tables which are used to store session information.
      *
-     * The method will drop two tables, the table 'session_data' and the
+     * The method will drop two Tables, the table 'session_data' and the
      * table 'sessions'.
      */
     public function dropTables() {

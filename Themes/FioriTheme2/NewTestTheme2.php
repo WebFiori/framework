@@ -1,7 +1,7 @@
 <?php
-namespace themes\fioriTheme2;
+namespace Themes\FioriTheme2;
 
-use webfiori\framework\Theme;
+use WebFiori\Framework\Theme;
 use WebFiori\UI\HeadNode;
 use WebFiori\UI\HTMLNode;
 class NewTestTheme2 extends Theme {

@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\handlers;
+namespace WebFiori\Framework\Handlers;
 
 use WebFiori\Error\AbstractHandler;
-use webfiori\framework\App;
-use webfiori\framework\router\Router;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Router\Router;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 use WebFiori\Json\Json;

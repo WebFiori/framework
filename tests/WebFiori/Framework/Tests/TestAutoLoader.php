@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\autoload\ClassLoader;
+use WebFiori\Framework\Autoload\ClassLoader;
 /**
  * Description of TestAutoLoader
  *
@@ -19,7 +19,7 @@ class TestAutoLoader extends TestCase {
      * @test
      */
     public function test01() {
-        $cArr = explode('\\', 'webfiori\\framework\\autoload\\ClassLoader');
+        $cArr = explode('\\', 'WebFiori\\Framework\\Autoload\\ClassLoader');
         $className = $cArr[count($cArr) - 1];
         $classNs = implode('\\', array_slice($cArr, 0, count($cArr) - 1));
 

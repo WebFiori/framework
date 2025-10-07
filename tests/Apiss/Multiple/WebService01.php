@@ -1,5 +1,5 @@
 <?php
-namespace tests\apis\multiple;
+namespace Tests\Apis\Multiple;
 
 use WebFiori\Http\AbstractWebService;
 use WebFiori\Http\RequestMethod;

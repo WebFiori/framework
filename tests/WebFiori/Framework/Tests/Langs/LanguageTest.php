@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\tests\entity;
+namespace WebFiori\Tests\Entity;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Lang;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\session\DefaultSessionStorage;
+use WebFiori\Framework\Lang;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\Framework\Session\DefaultSessionStorage;
 /**
  * Description of LanguageTest
  *
@@ -210,7 +210,7 @@ class LanguageTest extends TestCase {
      */
     public function testLoadTranslation02() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'webfiori\framework\Lang\'.');
+        $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'WebFiori\framework\Lang\'.');
         Lang::loadTranslation('fr');
     }
     /**
@@ -221,7 +221,7 @@ class LanguageTest extends TestCase {
      */
     public function testLoadTranslation03() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The translation file was found. But no object of type \'webfiori\framework\Lang\' is stored. Make sure that the parameter '
+        $this->expectExceptionMessage('The translation file was found. But no object of type \'WebFiori\framework\Lang\' is stored. Make sure that the parameter '
                                 .'$addtoLoadedAfterCreate is set to true when creating the language object.');
         Lang::loadTranslation('Jp');
     }

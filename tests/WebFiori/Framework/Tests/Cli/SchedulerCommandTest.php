@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\SchedulerCommand;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\SchedulerCommand;
+use WebFiori\Framework\Scheduler\TasksManager;
 
 /**
  * Description of SchedulerCommandTest
@@ -22,7 +22,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testRunWithoutRequiredOptions() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
         ], []);
 
@@ -39,7 +39,7 @@ class SchedulerCommandTest extends CLITestCase {
         TasksManager::setPassword('123456');
         
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--check',
             'p' => '123456'
@@ -63,7 +63,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testCheckWithoutPassword() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--check',
         ], []);
@@ -80,7 +80,7 @@ class SchedulerCommandTest extends CLITestCase {
     public function testForceTaskExecution() {
         
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             'p' => '123456'
@@ -111,7 +111,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testForceTaskWithLogging() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--show-log',
@@ -132,11 +132,11 @@ class SchedulerCommandTest extends CLITestCase {
             "Running task(s) check...\n",
             "Forcing task 'Fail 1' to execute...\n",
             "Active task: \"Fail 1\" ...\n",
-            "Calling the method app\\tasks\Fail1TestTask::execute()\n",
+            "Calling the method App\\Tasks\Fail1TestTask::execute()\n",
             "Info: Task Fail 1 Is executing...\n",
-            "Calling the method app\\tasks\Fail1TestTask::onFail()\n",
+            "Calling the method App\\Tasks\Fail1TestTask::onFail()\n",
             "Error: Task Fail 1 Failed.\n",
-            "Calling the method app\\tasks\Fail1TestTask::afterExec()\n",
+            "Calling the method App\\Tasks\Fail1TestTask::afterExec()\n",
             "Check finished.\n",
             "Total number of tasks: 5\n",
             "Executed Tasks: 1\n",
@@ -152,7 +152,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testForceTaskWithExceptionLogging() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--show-log',
@@ -173,20 +173,20 @@ class SchedulerCommandTest extends CLITestCase {
             "Running task(s) check...\n",
             "Forcing task 'Fail 2' to execute...\n",
             "Active task: \"Fail 2\" ...\n",
-            "Calling the method app\\tasks\Fail2TestTask::execute()\n",
-            "WARNING: An exception was thrown while performing the operation app\\tasks\Fail2TestTask::execute. The output of the task might be not as expected.\n",
+            "Calling the method App\\Tasks\Fail2TestTask::execute()\n",
+            "WARNING: An exception was thrown while performing the operation App\\Tasks\Fail2TestTask::execute. The output of the task might be not as expected.\n",
             "Exception class: Error\n",
-            "Exception message: Call to undefined method app\\tasks\Fail2TestTask::undefined()\n",
+            "Exception message: Call to undefined method App\\Tasks\Fail2TestTask::undefined()\n",
             "Thrown in: Fail2TestTask",
             "Line: 44",
             "Stack Trace:",
-            "#0 At class webfiori\\framework\\scheduler\\AbstractTask Line:",
-            "#1 At class webfiori\\framework\\scheduler\\AbstractTask Line:",
-            "#2 At class webfiori\\framework\\scheduler\\AbstractTask Line:",
-            "#3 At class webfiori\\framework\\scheduler\\TasksManager Line:",
-            "#4 At class webfiori\\framework\\scheduler\\TasksManager Line:",
-            "#5 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line:",
-            "#6 At class webfiori\\framework\\cli\\commands\\SchedulerCommand Line:",
+            "#0 At class WebFiori\\Framework\\Scheduler\\AbstractTask Line:",
+            "#1 At class WebFiori\\Framework\\Scheduler\\AbstractTask Line:",
+            "#2 At class WebFiori\\Framework\\Scheduler\\AbstractTask Line:",
+            "#3 At class WebFiori\\Framework\\Scheduler\\TasksManager Line:",
+            "#4 At class WebFiori\\Framework\\Scheduler\\TasksManager Line:",
+            "#5 At class WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand Line:",
+            "#6 At class WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand Line:",
             "#7 At class WebFiori\\Cli\\Command Line:",
             "#8 At class WebFiori\\Cli\\Runner Line:",
             "#9 At class WebFiori\\Cli\\Runner Line:",
@@ -210,7 +210,7 @@ class SchedulerCommandTest extends CLITestCase {
     public function testForceSpecificTaskByName() {
         $this->getRunner(true);
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--show-log',
@@ -226,12 +226,12 @@ class SchedulerCommandTest extends CLITestCase {
             "Running task(s) check...\n",
             "Forcing task 'Success 1' to execute...\n",
             "Active task: \"Success 1\" ...\n",
-            "Calling the method app\\tasks\SuccessTestTask::execute()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::execute()\n",
             "Start: 2021-07-08\n",
             "End: \n",
             "The task was forced.\n",
-            "Calling the method app\\tasks\SuccessTestTask::onSuccess()\n",
-            "Calling the method app\\tasks\SuccessTestTask::afterExec()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::onSuccess()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::afterExec()\n",
             "Check finished.\n",
             "Total number of tasks: 5\n",
             "Executed Tasks: 1\n",
@@ -249,7 +249,7 @@ class SchedulerCommandTest extends CLITestCase {
         TasksManager::execLog(true);
         $this->getRunner(true);
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--show-log',
@@ -267,12 +267,12 @@ class SchedulerCommandTest extends CLITestCase {
             "Running task(s) check...\n",
             "Forcing task 'Success 1' to execute...\n",
             "Active task: \"Success 1\" ...\n",
-            "Calling the method app\\tasks\SuccessTestTask::execute()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::execute()\n",
             "Start: 2021\n",
             "End: 2022\n",
             "The task was forced.\n",
-            "Calling the method app\\tasks\SuccessTestTask::onSuccess()\n",
-            "Calling the method app\\tasks\SuccessTestTask::afterExec()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::onSuccess()\n",
+            "Calling the method App\\Tasks\SuccessTestTask::afterExec()\n",
             "Check finished.\n",
             "Total number of tasks: 5\n",
             "Executed Tasks: 1\n",
@@ -293,7 +293,7 @@ class SchedulerCommandTest extends CLITestCase {
         TasksManager::registerTasks();
 
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--task-name' => 'Success 1',
@@ -318,7 +318,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testShowTaskArguments() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--task-name' => 'Success 1',
             '--show-task-args',
@@ -338,7 +338,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testShowTaskArgumentsWithSelection() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--show-task-args',
             'p' => '123456'
@@ -364,7 +364,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testListAllScheduledTasks() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--list'
         ], []);
@@ -396,7 +396,7 @@ class SchedulerCommandTest extends CLITestCase {
     public function testCheckWithValidPassword() {
         TasksManager::setPassword('123456');
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--check',
             'p' => '123456'
@@ -425,7 +425,7 @@ class SchedulerCommandTest extends CLITestCase {
         TasksManager::registerTasks();
 
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--task-name' => 'Success 1',
@@ -454,9 +454,9 @@ class SchedulerCommandTest extends CLITestCase {
             'Running task(s) check...',
             "Forcing task 'Success 1' to execute...",
             "Active task: \"Success 1\" ...",
-            "Calling the method app\\tasks\SuccessTestTask::execute()",
-            "Calling the method app\\tasks\SuccessTestTask::onSuccess()",
-            "Calling the method app\\tasks\SuccessTestTask::afterExec()",
+            "Calling the method App\\Tasks\SuccessTestTask::execute()",
+            "Calling the method App\\Tasks\SuccessTestTask::onSuccess()",
+            "Calling the method App\\Tasks\SuccessTestTask::afterExec()",
             "Check finished.",
         ], TasksManager::getLogArray());
     }
@@ -466,7 +466,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testCancelTaskSelection() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             'p' => '123456'
@@ -491,7 +491,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testForceNonExistentTask() {
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
-            'webfiori',
+            'WebFiori',
             'scheduler',
             '--force',
             '--task-name="Rand"',

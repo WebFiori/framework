@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\writers;
+namespace WebFiori\Framework\Writers;
 
 use WebFiori\File\File;
-use webfiori\framework\Theme;
+use WebFiori\Framework\Theme;
 use WebFiori\UI\HeadNode;
 use WebFiori\UI\HTMLNode;
 

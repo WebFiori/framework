@@ -8,12 +8,12 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
-use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Scheduler\AbstractTask;
+use WebFiori\Framework\Scheduler\TasksManager;
 /**
  * A CLI command which is related to executing
  * background tasks or performing operations on them.

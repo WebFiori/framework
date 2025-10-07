@@ -8,9 +8,9 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\ui;
+namespace WebFiori\Framework\UI;
 
-use webfiori\framework\App;
+use WebFiori\Framework\App;
 use WebFiori\UI\HTMLNode;
 /**
  * A basic view which is used to display HTTP error codes taken from

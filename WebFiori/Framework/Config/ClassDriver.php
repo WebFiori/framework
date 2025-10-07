@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\config;
+namespace WebFiori\Framework\Config;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Mail\SMTPAccount;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
-use webfiori\framework\writers\LangClassWriter;
+use WebFiori\Framework\Writers\LangClassWriter;
 use WebFiori\Http\Uri;
 
 /**
@@ -960,9 +960,9 @@ class ClassDriver implements ConfigurationDriver {
         self::a($cFile, "");
         self::a($cFile, "namespace ".APP_DIR."\\config;");
         self::a($cFile, "");
-        self::a($cFile, "use webfiori\\database\\ConnectionInfo;");
-        self::a($cFile, "use webfiori\\email\\SMTPAccount;");
-        self::a($cFile, "use webfiori\\http\\Uri;");
+        self::a($cFile, "use WebFiori\\database\\ConnectionInfo;");
+        self::a($cFile, "use WebFiori\\email\\SMTPAccount;");
+        self::a($cFile, "use WebFiori\\http\\Uri;");
         self::a($cFile, "/**");
         self::a($cFile, " * Configuration class of the application");
         self::a($cFile, " *");

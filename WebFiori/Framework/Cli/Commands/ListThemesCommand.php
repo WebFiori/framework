@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
-use webfiori\framework\ThemeManager;
+use WebFiori\Framework\ThemeManager;
 
 /**
  * A CLI command which is used to list all registered themes.

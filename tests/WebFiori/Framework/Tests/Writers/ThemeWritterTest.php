@@ -1,9 +1,9 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Theme;
-use webfiori\framework\writers\ThemeClassWriter;
+use WebFiori\Framework\Theme;
+use WebFiori\Framework\Writers\ThemeClassWriter;
 /**
  *
  * @author Ibrahim

@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Command;
-use webfiori\framework\App;
+use WebFiori\Framework\App;
 /**
  * A CLI command which is used to show framework configuration.
  *

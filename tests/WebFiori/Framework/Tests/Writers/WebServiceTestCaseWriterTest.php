@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\scheduler\webServices\ForceTaskExecutionService;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\writers\APITestCaseWriter;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Scheduler\WebServices\ForceTaskExecutionService;
+use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
+use WebFiori\Framework\Writers\APITestCaseWriter;
 /**
  *
  * @author Ibrahim

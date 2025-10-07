@@ -8,13 +8,13 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\handlers;
+namespace WebFiori\Framework\Handlers;
 
 use WebFiori\Cli\Formatter;
 use WebFiori\Cli\Runner;
 use WebFiori\Error\AbstractHandler;
-use webfiori\framework\App;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Scheduler\TasksManager;
 /**
  * Exceptions handler which is used to handle exceptions in case of running
  * CLI applications.

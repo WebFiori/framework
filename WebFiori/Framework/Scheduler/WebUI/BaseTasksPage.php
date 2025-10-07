@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler\webUI;
+namespace WebFiori\Framework\Scheduler\WebUI;
 
-use webfiori\framework\App;
-use webfiori\framework\ui\WebPage;
+use WebFiori\Framework\App;
+use WebFiori\Framework\UI\WebPage;
 use WebFiori\Json\Json;
 use WebFiori\UI\HTMLNode;
 use WebFiori\UI\JsCode;
@@ -112,7 +112,7 @@ class BaseTasksPage extends WebPage {
         {
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
-                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/framework@'.WF_VERSION.'/assets/js/scheduler-logic.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/WebFiori/framework@'.WF_VERSION.'/assets/js/scheduler-logic.js',
             ]);
         });
     }

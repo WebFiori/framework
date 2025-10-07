@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
@@ -16,9 +16,9 @@ use WebFiori\Database\Database;
 use WebFiori\Database\DatabaseException;
 use WebFiori\Database\Table;
 use WebFiori\File\File;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\DB;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\DB;
 /**
  * A command which can be used to execute SQL queries on
  * specific database.
@@ -31,7 +31,7 @@ class RunSQLQueryCommand extends Command {
     public function __construct() {
         parent::__construct('run-query', [
             new Argument('--connection', 'Database connection that the query will be executed on.', true),
-            new Argument('--schema', 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents database schema.', true),
+            new Argument('--schema', 'The namespace of a class that extends the class "WebFiori\\Framework\\DB" which represents database schema.', true),
             new Argument('--create', 'This option is used alongside the option --table and --schema. If it is provided, this means initiate the process of creating the database or the Table.', true),
             new Argument('--table', 'Table class to run query on.', true),
             new Argument('--file', 'The path to SQL file that holds SQL query.', true),
@@ -267,7 +267,7 @@ class RunSQLQueryCommand extends Command {
         if ($schemaInst instanceof DB) {
             return $this->queryOnSchema($schemaInst);
         } else {
-            $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
+            $this->error('Given class is not an instance of "WebFiori\\Framework\\DB"!');
 
             return -1;
         }

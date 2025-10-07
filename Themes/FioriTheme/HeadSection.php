@@ -1,5 +1,5 @@
 <?php
-namespace themes\fioriTheme;
+namespace Themes\FioriTheme;
 
 use WebFiori\UI\HeadNode;
 

@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
 use ReflectionClass;
-use webfiori\framework\ui\WebPage;
+use WebFiori\Framework\UI\WebPage;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
 use WebFiori\UI\exceptions\InvalidNodeNameException;

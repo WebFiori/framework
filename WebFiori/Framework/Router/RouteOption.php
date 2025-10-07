@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\router;
+namespace WebFiori\Framework\Router;
 
 /**
  * A class which is used to hold route options as constants.

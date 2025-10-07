@@ -1,5 +1,5 @@
 <?php
-namespace app\ini\routes;
+namespace App\Ini\Routes;
 
 class APIsRoutes {
     /**

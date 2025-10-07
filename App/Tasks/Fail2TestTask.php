@@ -1,8 +1,8 @@
 <?php
-namespace app\tasks;
+namespace App\Tasks;
 
-use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\TaskStatusEmail;
+use WebFiori\Framework\Scheduler\AbstractTask;
+use WebFiori\Framework\Scheduler\TaskStatusEmail;
 /**
  * A background process which was created using the command "create".
  *
@@ -34,7 +34,7 @@ class Fail2TestTask extends AbstractTask {
     public function afterExec() {
         //TODO: Implement the action to perform when the job finishes to execute.
         //$email = new TaskStatusEmail('no-reply', [
-        //    'webfiori@example.com' => 'Ibrahim Ali'
+        //    'WebFiori@example.com' => 'Ibrahim Ali'
         //]);
     }
     /**

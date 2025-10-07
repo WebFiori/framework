@@ -1,14 +1,14 @@
 <?php
-namespace webfiori\framework\test\scheduler;
+namespace WebFiori\Framework\Test\Scheduler;
 
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\exceptions\InvalidCRONExprException;
-use webfiori\framework\Privilege;
-use webfiori\framework\scheduler\BaseTask;
-use webfiori\framework\scheduler\TaskArgument;
-use webfiori\framework\scheduler\TasksManager;
+use WebFiori\Framework\Exceptions\InvalidCRONExprException;
+use WebFiori\Framework\Privilege;
+use WebFiori\Framework\Scheduler\BaseTask;
+use WebFiori\Framework\Scheduler\TaskArgument;
+use WebFiori\Framework\Scheduler\TasksManager;
 /**
  *
  * @author Ibrahim
@@ -79,7 +79,7 @@ class SchedulerTaskTest extends TestCase {
      */
     public function testAttributes06() {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Invalid argument type. Expected 'string' or 'webfiori\\framework\\scheduler\\TaskArgument'");
+        $this->expectExceptionMessage("Invalid argument type. Expected 'string' or 'WebFiori\\Framework\\Scheduler\\TaskArgument'");
         $job = new BaseTask();
         $job->addExecutionArg(new Privilege());
     }

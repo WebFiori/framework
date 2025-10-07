@@ -1,12 +1,12 @@
 <?php
-namespace webfiori;
+namespace WebFiori;
 
 use Exception;
-use webfiori\framework\App;
-use webfiori\framework\router\Router;
-use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
-use webfiori\http\Response;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\http\Request;
+use WebFiori\http\Response;
 /**
  * The name of the directory at which the developer will have his own application
  * code.
@@ -71,7 +71,7 @@ class Index {
      */
     private function loadAppClass() {
         $DS = DIRECTORY_SEPARATOR;
-        $frameworkPath = ROOT_PATH.$DS.'webfiori'.$DS.'framework';
+        $frameworkPath = ROOT_PATH.$DS.'WebFiori'.$DS.'framework';
         $corePath = $frameworkPath;
         $rootClass = $DS.'App.php';
 

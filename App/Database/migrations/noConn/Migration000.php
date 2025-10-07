@@ -1,5 +1,5 @@
 <?php
-namespace app\database\migrations\noConn;
+namespace App\Database\Migrations\NoConn;
 
 use WebFiori\Database\Database;
 use WebFiori\Database\migration\AbstractMigration;

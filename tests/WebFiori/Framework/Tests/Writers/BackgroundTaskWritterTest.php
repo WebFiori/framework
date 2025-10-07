@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\writers;
+namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\scheduler\AbstractTask;
-use webfiori\framework\scheduler\TaskArgument;
-use webfiori\framework\writers\SchedulerTaskClassWriter;
+use WebFiori\Framework\Scheduler\AbstractTask;
+use WebFiori\Framework\Scheduler\TaskArgument;
+use WebFiori\Framework\Writers\SchedulerTaskClassWriter;
 /**
  *
  * @author Ibrahim
@@ -16,12 +16,12 @@ class BackgroundTaskWritterTest extends TestCase {
     public function test00() {
         $writter = new SchedulerTaskClassWriter();
         $this->assertEquals('NewTask', $writter->getName());
-        $this->assertEquals('app\\tasks', $writter->getNamespace());
+        $this->assertEquals('App\\Tasks', $writter->getNamespace());
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\scheduler\\AbstractTask",
-            "webfiori\\framework\\scheduler\\TaskStatusEmail",
-            "webfiori\\framework\\scheduler\\TasksManager",
+            "WebFiori\\Framework\\Scheduler\\AbstractTask",
+            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
+            "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getTaskDescription());
         $this->assertEquals(0, count($writter->getTask()->getArguments()));
@@ -33,12 +33,12 @@ class BackgroundTaskWritterTest extends TestCase {
         $writter = new SchedulerTaskClassWriter();
         $writter->setClassName('NewOk');
         $this->assertEquals('NewOkTask', $writter->getName());
-        $this->assertEquals('app\\tasks', $writter->getNamespace());
+        $this->assertEquals('App\\Tasks', $writter->getNamespace());
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\scheduler\\AbstractTask",
-            "webfiori\\framework\\scheduler\\TaskStatusEmail",
-            "webfiori\\framework\\scheduler\\TasksManager",
+            "WebFiori\\Framework\\Scheduler\\AbstractTask",
+            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
+            "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getTaskDescription());
         $this->assertEquals(0, count($writter->getTask()->getArguments()));
@@ -63,12 +63,12 @@ class BackgroundTaskWritterTest extends TestCase {
 
         $this->assertEquals('NewOk2BTask', $writter->getName());
         
-        $this->assertEquals('app\\tasks', $writter->getNamespace());
+        $this->assertEquals('App\\Tasks', $writter->getNamespace());
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\scheduler\\AbstractTask",
-            "webfiori\\framework\\scheduler\\TaskStatusEmail",
-            "webfiori\\framework\\scheduler\\TasksManager",
+            "WebFiori\\Framework\\Scheduler\\AbstractTask",
+            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
+            "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('A test Task', $writter->getTaskDescription());
         $this->assertEquals(1, count($writter->getTask()->getArguments()));

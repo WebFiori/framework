@@ -8,10 +8,10 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework;
+namespace WebFiori\Framework;
 
-use webfiori\framework\cli\Runner;
-use webfiori\framework\ui\MessageBox;
+use WebFiori\Framework\Cli\Runner;
+use WebFiori\Framework\UI\MessageBox;
 use WebFiori\Http\Response;
 /**
  * Framework utility class.

@@ -1,5 +1,5 @@
 <?php
-namespace app\database\migrations\multiDownErr;
+namespace App\Database\Migrations\MultiDownErr;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;

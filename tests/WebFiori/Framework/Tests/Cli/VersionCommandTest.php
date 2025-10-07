@@ -1,8 +1,8 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\VersionCommand;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\VersionCommand;
 
 /**
  * Description of VersionCommandTest

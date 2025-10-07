@@ -8,7 +8,7 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler;
+namespace WebFiori\Framework\Scheduler;
 
 use const DS;
 use Exception;
@@ -16,22 +16,22 @@ use WebFiori\Cli\Command;
 use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
 use WebFiori\File\File;
-use webfiori\framework\App;
-use webfiori\framework\cli\commands\SchedulerCommand;
-use webfiori\framework\router\Router;
-use webfiori\framework\scheduler\webServices\TasksServicesManager;
-use webfiori\framework\scheduler\webUI\ListTasksPage;
-use webfiori\framework\scheduler\webUI\SetPasswordPage;
-use webfiori\framework\scheduler\webUI\TasksLoginPage;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Util;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\Commands\SchedulerCommand;
+use WebFiori\Framework\Router\Router;
+use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
+use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
+use WebFiori\Framework\Scheduler\WebUI\SetPasswordPage;
+use WebFiori\Framework\Scheduler\WebUI\TasksLoginPage;
+use WebFiori\Framework\Session\SessionsManager;
+use WebFiori\Framework\Util;
 /**
  * A class that is used to manage scheduled background tasks.
  *
  * It is used to create tasks, schedule them and execute them. In order to run
  * the tasks automatically, the developer must add an entry in the following
  * format in crontab:
- * <p><code>* * * * *  /usr/bin/php path/to/webfiori --scheduler check p=&lt;password&gt;</code></p>
+ * <p><code>* * * * *  /usr/bin/php path/to/WebFiori --scheduler check p=&lt;password&gt;</code></p>
  * Where &lt;password&gt; is the password
  * that was set by the developer to protect the tasks from unauthorized access.
  * If no password is set, then it can be removed from the command.

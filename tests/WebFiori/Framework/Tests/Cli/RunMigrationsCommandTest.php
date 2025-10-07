@@ -1,11 +1,11 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\RunMigrationsCommand;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\RunMigrationsCommand;
 
 /**
  * Test cases for RunMigrationsCommand.

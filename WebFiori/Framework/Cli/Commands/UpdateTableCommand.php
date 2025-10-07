@@ -8,13 +8,13 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\cli\commands;
+namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
-use webfiori\framework\cli\CLIUtils;
-use webfiori\framework\cli\helpers\CreateTableObj;
-use webfiori\framework\cli\helpers\TableObjHelper;
+use WebFiori\Framework\Cli\CLIUtils;
+use WebFiori\Framework\Cli\Helpers\CreateTableObj;
+use WebFiori\Framework\Cli\Helpers\TableObjHelper;
 /**
  * A command which is used to update the properties of database table class.
  *

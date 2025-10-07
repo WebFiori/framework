@@ -8,11 +8,11 @@
  * https://github.com/WebFiori/.github/blob/main/LICENSE
  *
  */
-namespace webfiori\framework\scheduler;
+namespace WebFiori\Framework\Scheduler;
 
 use WebFiori\File\File;
-use webfiori\framework\App;
-use webfiori\framework\EmailMessage;
+use WebFiori\Framework\App;
+use WebFiori\Framework\EmailMessage;
 use WebFiori\UI\HTMLNode;
 use WebFiori\UI\TableRow;
 /**

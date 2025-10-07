@@ -1,5 +1,5 @@
 <?php
-namespace app\database\migrations\multi;
+namespace App\Database\Migrations\Multi;
 
 use PHPUnit\TextUI\XmlConfiguration\Migration;
 use WebFiori\Database\ConnectionInfo;

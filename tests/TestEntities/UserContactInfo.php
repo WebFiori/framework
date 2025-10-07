@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\tests\database;
+namespace WebFiori\Tests\Database;
 
 use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
@@ -29,7 +29,7 @@ class UserContactInfo extends MySQLQuery {
         $this->getCol('contact-type')->setIsUnique(false);
         $this->getCol('contact-type')->setIsPrimary(true);
         $this->table->addColumn('contact-info', new MySQLColumn('contact_info', 'varchar',320));
-        $this->table->addReference('webfiori\tests\database\UsersQuery', [
+        $this->table->addReference('WebFiori\tests\database\UsersQuery', [
             'user-id' => 'user-id'
         ], 'user_contact_info_fk', 'cadcade', 'cascade');
         $this->setTable($this->table);

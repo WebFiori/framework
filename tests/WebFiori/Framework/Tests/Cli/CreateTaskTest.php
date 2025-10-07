@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\scheduler\AbstractTask;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Scheduler\AbstractTask;
 
 /**
  * Description of CreateTaskTest
@@ -17,12 +17,12 @@ class CreateTaskTest extends CLITestCase {
      */
     public function test00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '3',
             'SuperCoolTask',
-            'app\tasks',
+            'App\Tasks',
             'The Greatest task',
             'The task will do nothing.',
             'N',
@@ -45,13 +45,13 @@ class CreateTaskTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Tasks'\n",
             "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $output);
-        $clazz = '\\app\\tasks\\SuperCoolTask';
+        $clazz = '\\App\\Tasks\\SuperCoolTask';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -61,14 +61,14 @@ class CreateTaskTest extends CLITestCase {
      */
     public function test01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '3',
             'SuperCoolTask',
-            'app\tasks',
+            'App\Tasks',
             'SuperCool2',
-            'app\tasks',
+            'App\Tasks',
             'The Greatest task',
             'The task will do nothing.',
             'N',
@@ -91,18 +91,18 @@ class CreateTaskTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Tasks'\n",
             "Error: A class in the given namespace which has the given name was found.\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Tasks'\n",
             "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $output);
-        $clazz = '\\app\\tasks\\SuperCool2Task';
+        $clazz = '\\App\\Tasks\\SuperCool2Task';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass('\\app\\tasks\\SuperCoolTask');
+        $this->removeClass('\\App\\Tasks\\SuperCoolTask');
         $this->removeClass($clazz);
     }
 
@@ -111,12 +111,12 @@ class CreateTaskTest extends CLITestCase {
      */
     public function test02() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '3',
             'NewRound',
-            'app\tasks',
+            'App\Tasks',
             '', // Invalid empty name
             'Invalid#', // Invalid name with special character
             'Create Round task',
@@ -142,7 +142,7 @@ class CreateTaskTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Tasks'\n",
             "Enter a name for the task:\n",
             "Error: Provided name is invalid!\n",
             "Enter a name for the task:\n",
@@ -154,7 +154,7 @@ class CreateTaskTest extends CLITestCase {
             "Would you like to add arguments to the task?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $output);
-        $clazz = '\\app\\tasks\\NewRoundTask';
+        $clazz = '\\App\\Tasks\\NewRoundTask';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }
@@ -164,12 +164,12 @@ class CreateTaskTest extends CLITestCase {
      */
     public function test03() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'task'
         ], [
             'SendDailyReport',
-            'app\tasks',
+            'App\Tasks',
             'Send Sales Report',
             'The task will execute every day to send sales report to management.',
             'y',
@@ -190,7 +190,7 @@ class CreateTaskTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\\tasks'\n",
+            "Enter an optional namespace for the class: Enter = 'App\\Tasks'\n",
             "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
@@ -210,7 +210,7 @@ class CreateTaskTest extends CLITestCase {
             "Would you like to add more arguments?(y/N)\n",
             "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
         ], $output);
-        $clazz = '\\app\\tasks\\SendDailyReportTask';
+        $clazz = '\\App\\Tasks\\SendDailyReportTask';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
         $task = new $clazz();

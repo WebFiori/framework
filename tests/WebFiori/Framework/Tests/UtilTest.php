@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test;
+namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Util;
+use WebFiori\Framework\Util;
 /**
- * A test class for testing the class 'webfiori\framework\Util'.
+ * A test class for testing the class 'WebFiori\framework\Util'.
  *
  * @author Ibrahim
  */

@@ -1,10 +1,10 @@
 <?php
-namespace webfiori\framework\test\cli;
+namespace WebFiori\Framework\Test\Cli;
 
-use webfiori\framework\App;
-use webfiori\framework\cli\CLITestCase;
-use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\middleware\AbstractMiddleware;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
 
 /**
  * Description of CreateMiddlewareTest
@@ -17,12 +17,12 @@ class CreateMiddlewareTest extends CLITestCase {
      */
     public function testCreateMiddleware00() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create'
         ], [
             '4',
             'NewCoolMd',
-            'app\middleware',
+            'App\Middleware',
             'Check is authorized',
             '22',
             "\n", // Hit Enter to pick default value (no group)
@@ -44,14 +44,14 @@ class CreateMiddlewareTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Middleware'\n",
             "Enter a name for the middleware:\n",
             "Enter middleware priority: Enter = '0'\n",
             "Would you like to add the middleware to a group?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."middleware\".\n",
         ], $output);
-        $this->assertTrue(class_exists('\\app\\middleware\\NewCoolMdMiddleware'));
-        $this->removeClass('\\app\\middleware\\NewCoolMdMiddleware');
+        $this->assertTrue(class_exists('\\App\\Middleware\\NewCoolMdMiddleware'));
+        $this->removeClass('\\App\\Middleware\\NewCoolMdMiddleware');
     }
     
     /**
@@ -59,12 +59,12 @@ class CreateMiddlewareTest extends CLITestCase {
      */
     public function testCreateMiddleware01() {
         $output = $this->executeSingleCommand(new CreateCommand(), [
-            'webfiori',
+            'WebFiori',
             'create',
             '--c' => 'middleware'
         ], [
             'NewCool',
-            'app\middleware',
+            'App\Middleware',
             '  ', // Invalid input (spaces only)
             'Check is cool',
             '22',
@@ -76,7 +76,7 @@ class CreateMiddlewareTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\middleware'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Middleware'\n",
             "Enter a name for the middleware:\n",
             "Error: Invalid input is given. Try again.\n",
             "Enter a name for the middleware:\n",
@@ -87,7 +87,7 @@ class CreateMiddlewareTest extends CLITestCase {
             'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."middleware\".\n",
         ], $output);
         
-        $clazz = '\\app\\middleware\\NewCoolMiddleware';
+        $clazz = '\\App\\Middleware\\NewCoolMiddleware';
         $this->assertTrue(class_exists($clazz));
         $clazzObj = new $clazz();
         $this->assertTrue($clazzObj instanceof AbstractMiddleware);

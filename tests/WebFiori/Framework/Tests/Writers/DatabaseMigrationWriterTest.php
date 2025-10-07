@@ -14,7 +14,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     
     protected function tearDown(): void {
         // Clean up only the Migration files created by this test (Migration000, Migration001, etc.)
-        $migrationsDir = APP_PATH . DS . 'database' . DS . 'migrations';
+        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'migrations';
         if (is_dir($migrationsDir)) {
             // Only remove Migration files directly in the migrations directory, not in subdirectories
             $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
@@ -31,7 +31,7 @@ class DatabaseMigrationWriterTest extends TestCase {
      */
     public function test00() {
         DatabaseMigrationWriter::resetCounter();
-        $path = APP_PATH.DS.'database'.DS.'migrations';
+        $path = APP_PATH.DS.'Database'.DS.'migrations';
         $ns = '\\App\\Database\\migrations';
         $clazz = "\\App\\Database\\migrations\\Migration000";
         $this->removeClass($clazz);
@@ -63,7 +63,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test01() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'database'.DS.'migrations';
+        $path = APP_PATH.DS.'Database'.DS.'migrations';
         $ns = '\\App\\Database\\migrations';
         $writter = new DatabaseMigrationWriter($runner);
         $writter->setClassName('MyMigration');
@@ -89,7 +89,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test02() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'database'.DS.'migrations';
+        $path = APP_PATH.DS.'Database'.DS.'migrations';
         $ns = '\\App\\Database\\migrations';
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
@@ -131,7 +131,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test03() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'database'.DS.'migrations';
+        $path = APP_PATH.DS.'Database'.DS.'migrations';
         $ns = '\\App\\Database\\migrations';
         $allClasses = [];
         for ($x = 0 ; $x < 110 ; $x++) {

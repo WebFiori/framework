@@ -15,7 +15,7 @@ class ThemeWritterTest extends TestCase {
     public function test00() {
         $writter = new ThemeClassWriter();
         $this->assertEquals('NewTheme', $writter->getName());
-        $this->assertEquals('app\\themes\\new', $writter->getNamespace());
+        $this->assertEquals('App\\Themes\\new', $writter->getNamespace());
         $this->assertEquals('Theme', $writter->getSuffix());
         $this->assertEquals([
         ], $writter->getUseStatements());
@@ -29,9 +29,9 @@ class ThemeWritterTest extends TestCase {
         $writter->setClassName('SuperHotNew');
         $writter->setThemeName('Cool Theme');
         $this->assertEquals('SuperHotNewTheme', $writter->getName());
-        $writter->setNamespace('app\\themes\\cool');
-        $writter->setPath(ROOT_PATH.DS.APP_DIR.DS.'themes'.DS.'cool');
-        $this->assertEquals('app\\themes\\cool', $writter->getNamespace());
+        $writter->setNamespace('App\\Themes\\cool');
+        $writter->setPath(ROOT_PATH.DS.APP_DIR.DS.'Themes'.DS.'cool');
+        $this->assertEquals('App\\Themes\\cool', $writter->getNamespace());
         $this->assertEquals('Theme', $writter->getSuffix());
         $this->assertEquals([
         ], $writter->getUseStatements());

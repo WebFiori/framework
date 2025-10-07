@@ -61,7 +61,7 @@ class CreateMiddlewareTest extends CLITestCase {
         $output = $this->executeSingleCommand(new CreateCommand(), [
             'WebFiori',
             'create',
-            '--c' => 'middleware'
+            '--c' => 'Middleware'
         ], [
             'NewCool',
             'App\Middleware',

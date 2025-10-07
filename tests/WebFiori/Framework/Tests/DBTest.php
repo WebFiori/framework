@@ -52,7 +52,7 @@ class DBTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
         $db = new DB($conn);
         $this->assertEquals(0, count($db->getTables()));
-        $db->register('database');
+        $db->register('Database');
         $this->assertEquals(2, count($db->getTables()));
     }
     /**
@@ -64,7 +64,7 @@ class DBTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         $db = new DB('default-conn');
         $this->assertEquals(0, count($db->getTables()));
-        $db->register('database');
+        $db->register('Database');
         $this->assertEquals(2, count($db->getTables()));
         App::getConfig()->removeAllDBConnections();
     }

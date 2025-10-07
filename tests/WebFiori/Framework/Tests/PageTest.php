@@ -31,7 +31,7 @@ class PageTest extends TestCase {
         }
         
         if (!in_array('New Super Theme', $themeNames)) {
-            ThemeManager::register(new \themes\fioriTheme\NewFTestTheme());
+            ThemeManager::register(new \Themes\FioriTheme\NewFTestTheme());
         }
     }
     

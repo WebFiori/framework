@@ -500,7 +500,7 @@ class RouterTest extends TestCase {
         Response::clear();
         Router::addRoute([
                 RouteOption::PATH => 'home',
-                RouteOption::TO => \app\apis\RoutingTestClass::class
+                RouteOption::TO => \App\Apis\RoutingTestClass::class
         ]);
         Router::route('https://127.0.0.1/home');
         
@@ -514,7 +514,7 @@ class RouterTest extends TestCase {
         Router::removeAll();
         Router::addRoute([
                 RouteOption::PATH => 'home',
-                RouteOption::TO => \app\apis\RoutingTestClass::class,
+                RouteOption::TO => \App\Apis\RoutingTestClass::class,
                 RouteOption::ACTION => 'doSomething'
         ]);
         Router::route('https://127.0.0.1/home');

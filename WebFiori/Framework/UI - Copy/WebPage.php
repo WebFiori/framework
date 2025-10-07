@@ -29,9 +29,9 @@ use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 use WebFiori\Json\Json;
-use WebFiori\UI\HeadNode;
-use WebFiori\UI\HTMLDoc;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HeadNode;
+use WebFiori\Ui\HTMLDoc;
+use WebFiori\Ui\HTMLNode;
 require_once 'ui-functions.php';
 /**
  * A base class that can be used to implement web pages.

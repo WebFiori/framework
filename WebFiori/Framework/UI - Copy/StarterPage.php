@@ -81,7 +81,7 @@ class StarterPage extends WebPage {
             .'basic instructions on how you may help in supporting the framework in many ways.',
             $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
     }
-    private function createCard($link, $icon, $cardTitle, $paragraph, \WebFiori\UI\HTMLNode $el) {
+    private function createCard($link, $icon, $cardTitle, $paragraph, \WebFiori\Ui\HTMLNode $el) {
         $card = $el->addChild('v-card', [
             'hover',
             'height' => '220px',

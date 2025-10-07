@@ -12,7 +12,7 @@ namespace WebFiori\Framework\UI\ServerErrPage;
 
 use WebFiori\Error\AbstractHandler;
 use WebFiori\Framework\UI\WebPage;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or
  * any other errors.

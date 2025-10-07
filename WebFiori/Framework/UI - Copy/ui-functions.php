@@ -14,7 +14,7 @@ use WebFiori\Framework\Lang;
 use WebFiori\Framework\UI\WebPage;
 use WebFiori\Http\Response;
 use WebFiori\Json\JsonI;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 
 /**
  * This file contains functions that can be used inside PHP templates. The

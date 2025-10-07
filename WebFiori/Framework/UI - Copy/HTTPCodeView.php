@@ -11,7 +11,7 @@
 namespace WebFiori\Framework\UI;
 
 use WebFiori\Framework\App;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 /**
  * A basic view which is used to display HTTP error codes taken from
  * language file.

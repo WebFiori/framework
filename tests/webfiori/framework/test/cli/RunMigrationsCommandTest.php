@@ -27,7 +27,7 @@ class RunMigrationsCommandTest extends CLITestCase {
     }
     
     private function setupTestConnection(): void {
-        $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 'localhost', 3306);
+        $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', '127.0.0.1', 3306);
         $this->testConnection->setName('test-connection');
         App::getConfig()->addOrUpdateDBConnection($this->testConnection);
     }
@@ -97,14 +97,11 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--init'
         ]);
         
-        // Debug: Print actual output
-        echo "DEBUG testInitializeMigrationsTable output: " . json_encode($output) . "\n";
-        
         $this->assertContains("Initializing migrations table...\n", $output);
         $this->assertEquals(0, $this->getExitCode());
         
         // Verify table was actually created using mysqli
-        $mysqli = new \mysqli('localhost', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 3306);
+        $mysqli = new \mysqli('127.0.0.1', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 3306);
         $result = $mysqli->query("SHOW TABLES LIKE 'schema_changes'");
         $this->assertEquals(1, $result->num_rows, 'Migrations table should be created');
         $mysqli->close();
@@ -118,9 +115,6 @@ class RunMigrationsCommandTest extends CLITestCase {
             RunMigrationsCommand::class,
             '--connection' => 'test-connection'
         ]);
-        
-        // Debug: Print actual output
-        echo "DEBUG testExecuteMigrationsWithNoMigrations output: " . json_encode($output) . "\n";
         
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
@@ -137,8 +131,6 @@ class RunMigrationsCommandTest extends CLITestCase {
         ]);
         
         // Debug: Print actual output
-        echo "DEBUG testRollbackWithNoMigrations output: " . json_encode($output) . "\n";
-        $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
     
@@ -154,8 +146,6 @@ class RunMigrationsCommandTest extends CLITestCase {
         ]);
         
         // Debug: Print actual output
-        echo "DEBUG testRollbackAllWithNoMigrations output: " . json_encode($output) . "\n";
-        $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
     
@@ -171,8 +161,6 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--runner' => 'TestMigrationRunner'
         ]);
         // Debug: Print actual output
-        echo "DEBUG testExecuteMigrationsWithValidRunner output: " . json_encode($output) . "\n";
-        
         // The test runner has no migrations, so it should report no migrations found
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());

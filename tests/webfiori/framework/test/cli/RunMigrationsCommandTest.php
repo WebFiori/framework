@@ -101,7 +101,7 @@ class RunMigrationsCommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         
         // Verify table was actually created using mysqli
-        $mysqli = new \mysqli('localhost', 'root', '123456', 'testing_db', 3306);
+        $mysqli = new \mysqli('localhost', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 3306);
         $result = $mysqli->query("SHOW TABLES LIKE 'schema_changes'");
         $this->assertEquals(1, $result->num_rows, 'Migrations table should be created');
         $mysqli->close();

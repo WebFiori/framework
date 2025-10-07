@@ -1,7 +1,7 @@
 <?php
 namespace Themes\FioriTheme;
 
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 
 /**
  * A class that represents the top section of the theme.

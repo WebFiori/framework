@@ -549,7 +549,7 @@ class App {
     private static function checkStandardLibs() {
         $standardLibsClasses = [
             'WebFiori/collections' => 'WebFiori\\Collections\\Node',
-            'WebFiori/ui' => 'WebFiori\\UI\\HTMLNode',
+            'WebFiori/ui' => 'WebFiori\\Ui\\HTMLNode',
             'WebFiori/jsonx' => 'WebFiori\\Json\\Json',
             'WebFiori/database' => 'WebFiori\\Database\\ResultSet',
             'WebFiori/http' => 'WebFiori\\Http\\Response',

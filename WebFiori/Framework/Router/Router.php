@@ -24,7 +24,7 @@ use WebFiori\Http\Response;
 use WebFiori\Http\Uri;
 use WebFiori\Http\WebServicesManager;
 use WebFiori\Json\Json;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HTMLNode;
 /**
  * The basic class that is used to route user requests to the correct
  * location.

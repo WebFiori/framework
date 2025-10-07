@@ -14,9 +14,9 @@ use ReflectionClass;
 use WebFiori\Framework\UI\WebPage;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
-use WebFiori\UI\exceptions\InvalidNodeNameException;
-use WebFiori\UI\HeadNode;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\exceptions\InvalidNodeNameException;
+use WebFiori\Ui\HeadNode;
+use WebFiori\Ui\HTMLNode;
 /**
  * A base class that is used to construct website UI.
  *

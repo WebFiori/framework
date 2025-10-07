@@ -13,8 +13,8 @@ namespace WebFiori\Framework\Scheduler;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
 use WebFiori\Framework\EmailMessage;
-use WebFiori\UI\HTMLNode;
-use WebFiori\UI\TableRow;
+use WebFiori\Ui\HTMLNode;
+use WebFiori\Ui\TableRow;
 /**
  * A class which can be used to send an email regarding the status of
  * background task execution.

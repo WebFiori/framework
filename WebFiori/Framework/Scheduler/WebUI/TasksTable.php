@@ -10,8 +10,8 @@
  */
 namespace WebFiori\Framework\Scheduler\WebUI;
 
-use WebFiori\UI\exceptions\InvalidNodeNameException;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\exceptions\InvalidNodeNameException;
+use WebFiori\Ui\HTMLNode;
 
 /**
  * A table which is used to list all scheduled background tasks.

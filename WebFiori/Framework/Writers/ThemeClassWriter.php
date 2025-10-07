@@ -12,8 +12,8 @@ namespace WebFiori\Framework\Writers;
 
 use WebFiori\File\File;
 use WebFiori\Framework\Theme;
-use WebFiori\UI\HeadNode;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HeadNode;
+use WebFiori\Ui\HTMLNode;
 
 /**
  * A class which is used to create basic theme skeleton.

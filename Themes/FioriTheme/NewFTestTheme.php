@@ -2,8 +2,8 @@
 namespace Themes\FioriTheme;
 
 use WebFiori\Framework\Theme;
-use WebFiori\UI\HeadNode;
-use WebFiori\UI\HTMLNode;
+use WebFiori\Ui\HeadNode;
+use WebFiori\Ui\HTMLNode;
 class NewFTestTheme extends Theme {
     /**
      * Creates new instance of the class.

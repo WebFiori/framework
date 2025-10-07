@@ -13,7 +13,7 @@ use WebFiori\http\Response;
  *
  * @since 2.3.0
  */
-define('APP_DIR', 'app');
+define('APP_DIR', 'App');
 
 
 /**

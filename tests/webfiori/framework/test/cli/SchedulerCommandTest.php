@@ -436,6 +436,8 @@ class SchedulerCommandTest extends CLITestCase {
             '2020-01-01'
         ]);
 
+        // Debug: Print actual output for GitHub Actions
+        echo "DEBUG Interactive test output: " . json_encode($output) . "\n";
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Would you like to customize execution arguments?(y/N)\n",

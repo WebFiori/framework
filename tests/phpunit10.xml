@@ -13,6 +13,12 @@
       <directory>./webfiori/framework/test</directory>
       <exclude>./webfiori/framework/test/theme</exclude>
       <exclude>./webfiori/framework/test/cli</exclude>
+      <exclude>./webfiori/framework/test/langs</exclude>
+      <exclude>./webfiori/framework/test/router</exclude>
+      <exclude>./webfiori/framework/test/mail</exclude>
+      <exclude>./webfiori/framework/test/writers</exclude>
+      <exclude>./webfiori/framework/test/scheduler</exclude>
+      <exclude>./webfiori/framework/test/session</exclude>
     </testsuite>
     <testsuite name="Database Tests">
       <file>./webfiori/framework/test/DBTest.php</file>

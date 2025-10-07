@@ -85,7 +85,7 @@ ClassLoader::get([
         'tests',
         'WebFiori',
         'vendor',
-        'app',
+        'App',
         'Themes'
     ],
     'define-root' => true,

@@ -49,7 +49,7 @@ class CreateTaskTest extends CLITestCase {
             "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'App'.DS."tasks\".\n",
         ], $output);
         $clazz = '\\App\\Tasks\\SuperCoolTask';
         $this->assertTrue(class_exists($clazz));
@@ -98,7 +98,7 @@ class CreateTaskTest extends CLITestCase {
             "Enter a name for the task:\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'App'.DS."tasks\".\n",
         ], $output);
         $clazz = '\\App\\Tasks\\SuperCool2Task';
         $this->assertTrue(class_exists($clazz));
@@ -152,7 +152,7 @@ class CreateTaskTest extends CLITestCase {
             "Error: Invalid input is given. Try again.\n",
             "Provide short description of what does the task will do:\n",
             "Would you like to add arguments to the task?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'App'.DS."tasks\".\n",
         ], $output);
         $clazz = '\\App\\Tasks\\NewRoundTask';
         $this->assertTrue(class_exists($clazz));
@@ -208,7 +208,7 @@ class CreateTaskTest extends CLITestCase {
             "Enter argument name:\n",
             "Error: Invalid argument name: <empty string>\n",
             "Would you like to add more arguments?(y/N)\n",
-            "Info: New class was created at \"".ROOT_PATH.DS.'app'.DS."tasks\".\n",
+            "Info: New class was created at \"".ROOT_PATH.DS.'App'.DS."tasks\".\n",
         ], $output);
         $clazz = '\\App\\Tasks\\SendDailyReportTask';
         $this->assertTrue(class_exists($clazz));

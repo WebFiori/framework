@@ -120,7 +120,7 @@ class CreateTableTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."database\".\n",
         ]), $output);
     }
     
@@ -184,7 +184,7 @@ class CreateTableTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."database\".\n",
         ]), $output);
     }
     
@@ -272,7 +272,7 @@ class CreateTableTest extends CLITestCase {
             "Would you like to add another column?(y/N)\n",
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'app'.DS."database\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."database\".\n",
         ]), $output);
     }
     

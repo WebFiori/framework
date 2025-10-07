@@ -13,7 +13,7 @@ class CreateEntityTest extends CLITestCase {
         $output = $this->executeSingleCommand(new CreateCommand(), [
             'WebFiori',
             'create',
-            '--c' => 'entity',
+            '--c' => 'Entity',
             '--table' => TestTable::class
         ], [
             'NeEntity',

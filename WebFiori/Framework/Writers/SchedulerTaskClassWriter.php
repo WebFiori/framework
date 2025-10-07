@@ -37,7 +37,7 @@ class SchedulerTaskClassWriter extends ClassWriter {
      * the task needs.
      */
     public function __construct(string $className = 'NewTask', $taskName = '', $taskDesc = '', array $argsArr = []) {
-        parent::__construct($className, APP_PATH.'tasks', APP_DIR.'\\tasks');
+        parent::__construct($className, APP_PATH.'Tasks', APP_DIR.'\\Tasks');
         $this->task = new BaseTask();
 
         if (!$this->setTaskName($taskName)) {

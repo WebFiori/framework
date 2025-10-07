@@ -26,7 +26,7 @@ class SessionTest extends TestCase {
      */
     public function testClose00($session) {
         $session->close();
-        $filePath = ROOT_PATH.DS.'app'.DS.'sto'.DS.'sessions'.DS.$session->getId();
+        $filePath = ROOT_PATH.DS.'App'.DS.'sto'.DS.'sessions'.DS.$session->getId();
         $this->assertTrue(File::isFileExist($filePath));
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0,$session->getStartedAt());

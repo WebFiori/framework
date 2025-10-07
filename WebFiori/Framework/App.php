@@ -291,7 +291,7 @@ class App {
         
         if (self::$ClassStatus == self::STATUS_NONE) {
             $publicFolderName = 'public';
-            self::initiate('app', $publicFolderName, self::getRoot().DIRECTORY_SEPARATOR.$publicFolderName);
+            self::initiate('App', $publicFolderName, self::getRoot().DIRECTORY_SEPARATOR.$publicFolderName);
         }
         if (self::$ClassStatus == self::STATUS_INITIATED) {
             self::start();
@@ -321,7 +321,7 @@ class App {
      * @param string $indexDir The directory at which index file exist at.
      * Usually, its the value of the constant __DIR__.
      */
-    public static function initiate(string $appFolder = 'app', string $publicFolder = 'public', string $indexDir = __DIR__) {
+    public static function initiate(string $appFolder = 'App', string $publicFolder = 'public', string $indexDir = __DIR__) {
         /**
          * Change encoding of mb_ functions to UTF-8
          */

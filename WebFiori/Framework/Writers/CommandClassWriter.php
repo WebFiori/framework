@@ -41,12 +41,12 @@ class CommandClassWriter extends ClassWriter {
      * the command will have.
      */
     public function __construct() {
-        parent::__construct('NewCommand', APP_PATH.'commands', APP_DIR.'\\commands');
+        parent::__construct('NewCommand', APP_PATH.'Commands', APP_DIR.'\\Commands');
         $this->name = 'new-command';
         $this->args = [];
         $this->desc = '';
         $this->setSuffix('Command');
-        $this->setNamespace(APP_DIR.'\\commands');
+        $this->setNamespace(APP_DIR.'\\Commands');
         $this->addUseStatement([
             'WebFiori\\Cli\\Command'
         ]);

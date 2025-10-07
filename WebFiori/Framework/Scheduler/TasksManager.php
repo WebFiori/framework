@@ -586,7 +586,7 @@ class TasksManager {
      */
     public static function registerTasks() {
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP === true)) {
-            App::autoRegister('tasks', function (AbstractTask $task)
+            App::autoRegister('Tasks', function (AbstractTask $task)
             {
                 TasksManager::scheduleTask($task);
             });

@@ -34,7 +34,7 @@ class TableWritterTest extends CLITestCase {
     public function test01() {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT');
-        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
+        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'Entity', true);
         $this->assertEquals('CoolTTable', $writter->getName());
         $this->assertEquals('App\\Database', $writter->getNamespace());
         $this->assertEquals('Table', $writter->getSuffix());
@@ -43,7 +43,7 @@ class TableWritterTest extends CLITestCase {
         ], $writter->getUseStatements());
         $this->assertEquals('MyEntity', $writter->getEntityName());
         $this->assertEquals('App\\Entity', $writter->getEntityNamespace());
-        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'entity', $writter->getEntityPath());
+        $this->assertEquals(ROOT_PATH.DS.APP_DIR.DS.'Entity', $writter->getEntityPath());
         $this->assertTrue($writter->getTable() instanceof MySQLTable);
         $this->assertFalse($writter->getTable() instanceof MSSQLTable);
         $writter->writeClass();
@@ -63,7 +63,7 @@ class TableWritterTest extends CLITestCase {
         $writter = new TableClassWriter();
         $writter->setClassName('CoolT2Table');
         $writter->setTableType('mssql');
-        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'entity', true);
+        $writter->setEntityInfo('MyEntity', 'App\\Entity', ROOT_PATH.DS.APP_DIR.DS.'Entity', true);
         $this->assertEquals('CoolT2Table', $writter->getName());
 
         $this->assertFalse($writter->getTable() instanceof MySQLTable);

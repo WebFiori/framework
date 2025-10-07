@@ -208,6 +208,7 @@ class SchedulerCommandTest extends CLITestCase {
      * @test
      */
     public function testForceSpecificTaskByName() {
+        $this->getRunner(true);
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',
@@ -246,7 +247,7 @@ class SchedulerCommandTest extends CLITestCase {
      */
     public function testForceTaskWithCustomArguments() {
         TasksManager::execLog(true);
-        
+        $this->getRunner(true);
         $output = $this->executeSingleCommand(new SchedulerCommand(), [
             'webfiori',
             'scheduler',

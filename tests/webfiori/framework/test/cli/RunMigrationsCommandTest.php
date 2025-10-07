@@ -97,6 +97,9 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--init'
         ]);
         
+        // Debug: Print actual output
+        echo "DEBUG testInitializeMigrationsTable output: " . json_encode($output) . "\n";
+        
         $this->assertContains("Initializing migrations table...\n", $output);
         $this->assertEquals(0, $this->getExitCode());
         
@@ -116,6 +119,9 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--connection' => 'test-connection'
         ]);
         
+        // Debug: Print actual output
+        echo "DEBUG testExecuteMigrationsWithNoMigrations output: " . json_encode($output) . "\n";
+        
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -130,6 +136,8 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--rollback'
         ]);
         
+        // Debug: Print actual output
+        echo "DEBUG testRollbackWithNoMigrations output: " . json_encode($output) . "\n";
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -145,6 +153,8 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--all'
         ]);
         
+        // Debug: Print actual output
+        echo "DEBUG testRollbackAllWithNoMigrations output: " . json_encode($output) . "\n";
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -160,6 +170,8 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--connection' => 'test-connection',
             '--runner' => 'TestMigrationRunner'
         ]);
+        // Debug: Print actual output
+        echo "DEBUG testExecuteMigrationsWithValidRunner output: " . json_encode($output) . "\n";
         
         // The test runner has no migrations, so it should report no migrations found
         $this->assertContains("Info: No migrations found.\n", $output);

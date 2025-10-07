@@ -48,15 +48,15 @@ class Ini {
     public static function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
         self::mkdir(ROOT_PATH.$DS.APP_DIR);
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'ini'.$DS.'routes');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'pages');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'commands');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'tasks');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'middleware');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'langs');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'apis');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'config');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Init');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Init'.$DS.'Routes');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Pages');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Commands');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Tasks');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Middleware');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Langs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Apis');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Config');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
@@ -79,13 +79,13 @@ class Ini {
      * @throws FileException
      */
     public function createIniClass(string $className, string $comment) {
-        $cFile = new File("$className.php", APP_PATH.'ini');
+        $cFile = new File("$className.php", APP_PATH.'Init');
         $cFile->remove();
         $cFile->create();
         ClassDriver::a($cFile, [
             "<?php",
             '',
-            "namespace ".APP_DIR."\\ini;",
+            "namespace ".APP_DIR."\\Init;",
             '',
             "class $className {",
 
@@ -102,7 +102,7 @@ class Ini {
         ClassDriver::a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
-        require_once APP_PATH.'ini'.DS."$className.php";
+        require_once APP_PATH.'Init'.DS."$className.php";
     }
 
     /**
@@ -117,11 +117,11 @@ class Ini {
      * @throws FileException
      */
     public function createRoutesClass(string $className) {
-        $cFile = new File("$className.php", APP_PATH.'ini'.DS.'routes');
+        $cFile = new File("$className.php", APP_PATH.'Init'.DS.'Routes');
         $cFile->remove();
         ClassDriver::a($cFile, "<?php");
         ClassDriver::a($cFile, "");
-        ClassDriver::a($cFile, "namespace ".APP_DIR."\\ini\\routes;");
+        ClassDriver::a($cFile, "namespace ".APP_DIR."\\Init\\Routes;");
         ClassDriver::a($cFile, "");
         ClassDriver::a($cFile, "use WebFiori\\Framework\\Router\\Router;");
         ClassDriver::a($cFile, "");

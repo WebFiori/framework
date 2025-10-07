@@ -417,7 +417,7 @@ class App {
             self::$CliRunner->setBeforeStart(function (Runner $r)
             {
                 $commands = [
-                    '\\WebFiori\\Framework\\Cli\commands\\WHelpCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SettingsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
@@ -519,7 +519,7 @@ class App {
              *
              * @since 2.2.1
              */
-            define('APP_DIR','app');
+            define('APP_DIR','App');
         }
 
         if (strpos(APP_DIR, ' ') !== false || strpos(APP_DIR, '-')) {

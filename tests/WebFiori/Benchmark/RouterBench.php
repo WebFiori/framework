@@ -16,7 +16,7 @@ class RouterBench {
     public function benchAddRoute() {
         if (!defined('DS')) {
             define('DS', DIRECTORY_SEPARATOR);
-            define('APP_DIR','app');
+            define('APP_DIR','App');
         }
         Router::closure([
             'path' => 'hello',

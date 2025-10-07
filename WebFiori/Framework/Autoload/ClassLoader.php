@@ -232,23 +232,22 @@ class ClassLoader {
 
         if (self::$loader === null) {
             if (!defined('APP_DIR')) {
-                define('APP_DIR', 'app');
+                define('APP_DIR', 'App');
             }
             $appFolder = APP_DIR;
             $frameworkSearchFolders = [
                 '',
-                $DS.'WebFiori'.$DS.'framework',
-                $DS.'framework'.$DS.'exceptions',
-                $DS.'framework'.$DS.'cli',
-                $DS.'framework'.$DS.'ui',
-                $DS.'framework',
-                $DS.'themes',
-                $DS.'logic',
-                $DS.'apis',
-                $DS.'pages',
-                $DS.'ini',
-                $DS.'libs',
-                $DS.'config',
+                $DS.'WebFiori'.$DS.'Framework',
+                $DS.'Framework'.$DS.'Exceptions',
+                $DS.'Framework'.$DS.'Cli',
+                $DS.'Framework'.$DS.'Ui',
+                $DS.'Framework',
+                $DS.'Themes',
+                $DS.'Apis',
+                $DS.'Pages',
+                $DS.'Ini',
+                $DS.'Libs',
+                $DS.'Config',
                 $DS.$appFolder
             ];
 

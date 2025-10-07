@@ -27,7 +27,7 @@ class PageTest extends TestCase {
         $themeNames = array_keys($registeredThemes);
         
         if (!in_array('New Theme 2', $themeNames)) {
-            ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
+            ThemeManager::register(new \Themes\FioriTheme2\NewTestTheme2());
         }
         
         if (!in_array('New Super Theme', $themeNames)) {
@@ -40,7 +40,7 @@ class PageTest extends TestCase {
         $assetsPath = ROOT_PATH . DS . PUBLIC_FOLDER . DS . 'assets';
         if (is_dir($assetsPath)) {
             // Only remove theme directories, not the entire assets folder
-            $themeDirs = ['fioriTheme', 'fioriTheme2', 'NewTestTheme2', 'NewFTestTheme'];
+            $themeDirs = ['FioriTheme', 'FioriTheme2', 'NewTestTheme2', 'NewFTestTheme'];
             foreach ($themeDirs as $themeDir) {
                 $themePath = $assetsPath . DS . $themeDir;
                 if (is_dir($themePath)) {

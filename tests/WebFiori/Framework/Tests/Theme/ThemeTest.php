@@ -60,7 +60,7 @@ class ThemeTest extends TestCase {
     public function testUseTheme00() {
         $themeName = 'New Theme 2';
         ThemeManager::resetRegistered();
-        ThemeManager::register(new \themes\fioriTheme2\NewTestTheme2());
+        ThemeManager::register(new \Themes\FioriTheme2\NewTestTheme2());
         //$this->assertFalse(Theme::isThemeLoaded($themeName));
         $theme = ThemeManager::usingTheme($themeName);
         $this->assertTrue($theme instanceof Theme);
@@ -71,9 +71,9 @@ class ThemeTest extends TestCase {
         $this->assertEquals('https://opensource.org/licenses/MIT',$theme->getLicenseUrl());
         $this->assertEquals('MIT',$theme->getLicenseName());
         $this->assertEquals(1,count(ThemeManager::getRegisteredThemes()));
-        $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
+        $this->assertEquals('FioriTheme2', $theme->getDirectoryName());
         $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
-        $this->assertEquals(ROOT_PATH.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
+        $this->assertEquals(ROOT_PATH.DS.'themes'.DS.'FioriTheme2'.DS, $theme->getAbsolutePath());
         $this->assertEquals('css', $theme->getCssDirName());
         $this->assertEquals('js', $theme->getJsDirName());
         $this->assertEquals('images', $theme->getImagesDirName());

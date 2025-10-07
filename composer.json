@@ -26,11 +26,11 @@
         "webfiori/http": "v4.0.*",
         "webfiori/file": "v2.0.*",
         "webfiori/jsonx": "v4.0.*",
-        "webfiori/ui": "v3.0.*",
+        "webfiori/ui": "v4.0.*",
         "webfiori/collections": "v2.0.*",
         "webfiori/database": "v1.1.*",
         "webfiori/cli": "v2.0.*",
-        "webfiori/mailer": "v2.0.*",
+        "webfiori/mailer": "v2.1.*",
         "webfiori/err": "v2.0.*"
     },
     "scripts": {

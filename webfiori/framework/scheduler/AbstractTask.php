@@ -13,6 +13,7 @@ namespace webfiori\framework\scheduler;
 use Exception;
 use InvalidArgumentException;
 use Throwable;
+use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
 use webfiori\framework\cli\commands\SchedulerCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
@@ -1388,6 +1389,9 @@ abstract class AbstractTask implements JsonI {
     }
 
     private function getArgValFromRequest($name) {
+        if (Runner::isCLI()) {
+            return null;
+        }
         $uName = str_replace(' ', '_', $name);
         $retVal = Request::getParam($name);
 

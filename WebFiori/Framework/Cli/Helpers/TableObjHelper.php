@@ -189,7 +189,7 @@ class TableObjHelper {
         $helper = $this->getCreateHelper();
 
         if ($helper->confirm('Would you like to update same class or create a copy with the update?', false)) {
-            $info = $helper->getClassInfo(APP_DIR.'\\database', 'Table');
+            $info = $helper->getClassInfo(APP_DIR.'\\Database', 'Table');
             $helper->setClassName($info['name']);
             $helper->setNamespace($info['namespace']);
             $helper->setPath($info['path']);
@@ -203,7 +203,7 @@ class TableObjHelper {
      */
     public function createEntity() {
         $helper = $this->getCreateHelper();
-        $entityInfo = $helper->getClassInfo(APP_DIR.'\\entity');
+        $entityInfo = $helper->getClassInfo(APP_DIR.'\\Entity');
         $entityInfo['implement-jsoni'] = $helper->confirm('Would you like from your entity class to implement the interface JsonI?', true);
         $helper->getWriter()->setEntityInfo($entityInfo['name'], $entityInfo['namespace'], $entityInfo['path'], $entityInfo['implement-jsoni']);
 

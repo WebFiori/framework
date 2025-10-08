@@ -138,7 +138,7 @@ class CreateCommand extends Command {
         $options['api-test'] = 'Web service test case.';
         $options['migration'] = 'Database migration.';
         $options['q'] = 'Quit.';
-        $what = $this->getArgValue('--c');
+        $what = strtolower($this->getArgValue('--c'));
         $answer = null;
 
         if ($what !== null) {

@@ -38,7 +38,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             "4: set-password\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\WebFiori\\Framework\scheduler\webServices\\TasksLoginServiceTest'."\n",
+            'Name: tests\WebFiori\\Framework\Scheduler\WebServices\\TasksLoginServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "Info: New class was created at \"".$path."\".\n"
@@ -53,7 +53,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\TasksLoginServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\Scheduler\WebServices\\TasksLoginServiceTest';
         $this->assertTrue(file_exists($path.DS.'TasksLoginServiceTest.php'));
         require_once $path.DS.'TasksLoginServiceTest.php';
         $this->assertTrue(class_exists($clazz));
@@ -74,7 +74,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--defaults'
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\Scheduler\WebServices\\GetTasksServiceTest';
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
@@ -89,19 +89,19 @@ class CreateAPITestCaseTest extends CLITestCase {
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest'."\n",
+            'Name: tests\WebFiori\\Framework\Scheduler\WebServices\\GetTasksServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\WebFiori\\Framework\scheduler\webServices'\n",
+            "Enter an optional namespace for the class: Enter = 'tests\WebFiori\\Framework\Scheduler\WebServices'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
             '--service' => 'get-tasks',
         ], [
-            '\WebFiori\\Framework\scheduler\webServices\\TasksServicesManager',
+            '\WebFiori\\Framework\Scheduler\WebServices\\TasksServicesManager',
             'n',
             '10',
             '',
@@ -109,7 +109,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
 
-        $clazz = '\\tests\WebFiori\\Framework\scheduler\webServices\\GetTasksServiceTest';
+        $clazz = '\\tests\WebFiori\\Framework\Scheduler\WebServices\\GetTasksServiceTest';
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));

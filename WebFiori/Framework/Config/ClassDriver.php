@@ -1302,7 +1302,7 @@ class ClassDriver implements ConfigurationDriver {
             $title = str_replace("'", "\'", $title);
             self::a($cFile, "            '$langCode' => '$title',");
 
-            if (!class_exists(APP_DIR.'\\langs\\Lang'.$langCode)) {
+            if (!class_exists(APP_DIR.'\\Langs\\Lang'.$langCode)) {
                 //This requires a fix in the future
                 $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
 

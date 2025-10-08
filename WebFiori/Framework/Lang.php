@@ -310,7 +310,7 @@ class Lang {
 
             return self::getActive();
         }
-        $langClassName = APP_DIR.'\\langs\\Lang'.$uLangCode;
+        $langClassName = APP_DIR.'\\Langs\\Lang'.$uLangCode;
 
         if (!class_exists($langClassName)) {
             throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');

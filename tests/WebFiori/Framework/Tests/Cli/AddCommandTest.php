@@ -196,7 +196,7 @@ class AddCommandTest extends CLITestCase {
             "Select writing direction:\n",
             "0: ltr\n",
             "1: rtl\n",
-            "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\langs\" for that language.\n"
+            "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\Langs\" for that language.\n"
         ], $output);
         $this->assertTrue(class_exists('\\App\\Langs\\Lang' . $langCode));
         $this->removeClass('\\App\\Langs\\Lang' . $langCode);

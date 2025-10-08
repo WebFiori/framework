@@ -128,7 +128,7 @@ class AddCommand extends Command {
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
-                .'is created at "'.APP_DIR.'\langs" for that language.');
+                .'is created at "'.APP_DIR.'\Langs" for that language.');
 
         return 0;
     }

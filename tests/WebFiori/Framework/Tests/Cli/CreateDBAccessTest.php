@@ -25,9 +25,9 @@ class CreateDBAccessTest extends CLITestCase {
         ], [
             'Tables\\EmployeeInfoTable',
             'EmployeeOperations',
-            "\n", // Hit Enter to pick default value (App\database)
+            "\n", // Hit Enter to pick default value (App\Database)
             'SuperUser',
-            "\n", // Hit Enter to pick default value (App\entity)
+            "\n", // Hit Enter to pick default value (App\Entity)
             'n'
         ]);
 

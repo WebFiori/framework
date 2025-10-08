@@ -20,8 +20,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new UserInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('CoolUser');
-        $mapper->setNamespace('WebFiori\\entity');
-        $writter = new DBClassWriter('UserDBClass', 'WebFiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\Entity');
+        $writter = new DBClassWriter('UserDBClass', 'WebFiori\\Db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -34,8 +34,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new EmployeeInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('Employee');
-        $mapper->setNamespace('WebFiori\\entity');
-        $writter = new DBClassWriter('EmployeeDB', 'WebFiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\Entity');
+        $writter = new DBClassWriter('EmployeeDB', 'WebFiori\\Db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -48,8 +48,8 @@ class DBClassWritterTest extends CLITestCase {
         $table = new PositionInfoTable();
         $mapper = $table->getEntityMapper();
         $mapper->setEntityName('Position');
-        $mapper->setNamespace('WebFiori\\entity');
-        $writter = new DBClassWriter('PositionDB', 'WebFiori\\db', $table);
+        $mapper->setNamespace('WebFiori\\Entity');
+        $writter = new DBClassWriter('PositionDB', 'WebFiori\\Db', $table);
         $writter->writeClass();
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
@@ -60,7 +60,7 @@ class DBClassWritterTest extends CLITestCase {
      */
     public function test03() {
         $table = new PositionInfoTable();
-        $writter = new DBClassWriter('PositionDB2', 'WebFiori\\db', $table);
+        $writter = new DBClassWriter('PositionDB2', 'WebFiori\\Db', $table);
         $writter->setConnection('  ');
         $this->assertNull($writter->getConnectionName());
         $writter->setConnection('ok-connection');

@@ -44,7 +44,7 @@ class CreateCommand extends Command {
     }
     public function createEntityFromQuery(): int {
         $tableObj = CLIUtils::readTable($this);
-        $defaultNs = APP_DIR.'\\entity';
+        $defaultNs = APP_DIR.'\\Entity';
         $this->println('We need from you to give us entity class information.');
         $infoReader = new ClassInfoReader($this);
         $classInfo = $infoReader->readClassInfo($defaultNs);

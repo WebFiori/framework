@@ -68,10 +68,10 @@ class DatabaseMigrationWriterTest extends TestCase {
         $writter = new DatabaseMigrationWriter($runner);
         $writter->setClassName('MyMigration');
         $this->assertEquals('MyMigration', $writter->getName());
-        $this->assertEquals('App\\Database\\migrations', $writter->getNamespace());
+        $this->assertEquals('App\\Database\\Migrations', $writter->getNamespace());
 
         $writter->writeClass();
-        $clazz = "\\App\\Database\\migrations\\MyMigration";
+        $clazz = "\\App\\Database\\Migrations\\MyMigration";
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
@@ -94,7 +94,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $writter->writeClass();
-        $clazz = "\\App\\Database\\migrations\\Migration000";
+        $clazz = "\\App\\Database\\Migrations\\Migration000";
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;

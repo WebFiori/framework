@@ -257,7 +257,7 @@ class ClassLoader {
                 }
             }
             $defineRoot = isset($options['define-root']) && $options['define-root'] === true;
-            $root = isset($options['root']) ? trim($options['root'],'\\/') : trim(substr(__DIR__, 0, strlen(__DIR__) - strlen('\entity')),'\\/');
+            $root = isset($options['root']) ? trim($options['root'],'\\/') : trim(substr(__DIR__, 0, strlen(__DIR__) - strlen('\Entity')),'\\/');
 
             if (strlen($root) != 0 && explode($DS, $root)[0] == 'home') {
                 //linux

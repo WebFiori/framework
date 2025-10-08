@@ -17,7 +17,7 @@ class CreateEntityTest extends CLITestCase {
             '--table' => TestTable::class
         ], [
             'NeEntity',
-            "\n", // Hit Enter to pick default value (app\entity)
+            "\n", // Hit Enter to pick default value (App\Entity)
             'y',
             'y',
             'superNewAttr',

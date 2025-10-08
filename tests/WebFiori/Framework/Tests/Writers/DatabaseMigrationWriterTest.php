@@ -14,7 +14,7 @@ class DatabaseMigrationWriterTest extends TestCase {
     
     protected function tearDown(): void {
         // Clean up only the Migration files created by this test (Migration000, Migration001, etc.)
-        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'migrations';
+        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'Migrations';
         if (is_dir($migrationsDir)) {
             // Only remove Migration files directly in the migrations directory, not in subdirectories
             $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
@@ -31,14 +31,14 @@ class DatabaseMigrationWriterTest extends TestCase {
      */
     public function test00() {
         DatabaseMigrationWriter::resetCounter();
-        $path = APP_PATH.DS.'Database'.DS.'migrations';
-        $ns = '\\App\\Database\\migrations';
-        $clazz = "\\App\\Database\\migrations\\Migration000";
+        $path = APP_PATH.DS.'Database'.DS.'Migrations';
+        $ns = '\\App\\Database\\Migrations';
+        $clazz = "\\App\\Database\\Migrations\\Migration000";
         $this->removeClass($clazz);
         $runner = new SchemaRunner(null);
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
-        $this->assertEquals('App\\Database\\migrations', $writter->getNamespace());
+        $this->assertEquals('App\\Database\\Migrations', $writter->getNamespace());
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\Database\Database",
@@ -53,7 +53,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('App\\Database\\migrations\\Migration000', $m00->getName());
+        $this->assertEquals('App\\Database\\Migrations\\Migration000', $m00->getName());
         $this->removeClass($clazz);
         $runner = new SchemaRunner(null);
     }
@@ -63,8 +63,8 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test01() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'Database'.DS.'migrations';
-        $ns = '\\App\\Database\\migrations';
+        $path = APP_PATH.DS.'Database'.DS.'Migrations';
+        $ns = '\\App\\Database\\Migrations';
         $writter = new DatabaseMigrationWriter($runner);
         $writter->setClassName('MyMigration');
         $this->assertEquals('MyMigration', $writter->getName());
@@ -79,7 +79,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('App\\Database\\migrations\\MyMigration', $m00->getName());
+        $this->assertEquals('App\\Database\\Migrations\\MyMigration', $m00->getName());
         $this->removeClass($clazz);
         $runner = new SchemaRunner(null);
     }
@@ -89,8 +89,8 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test02() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'Database'.DS.'migrations';
-        $ns = '\\App\\Database\\migrations';
+        $path = APP_PATH.DS.'Database'.DS.'Migrations';
+        $ns = '\\App\\Database\\Migrations';
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $writter->writeClass();
@@ -104,12 +104,12 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals(1, count($migrations));
         $m00 = $migrations[0];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('App\\Database\\migrations\\Migration000', $m00->getName());
+        $this->assertEquals('App\\Database\\Migrations\\Migration000', $m00->getName());
         
         $writter2 = new DatabaseMigrationWriter($runner2);
         $this->assertEquals('Migration001', $writter2->getName());
         $writter2->writeClass();
-        $clazz2 = "\\App\\Database\\migrations\\Migration001";
+        $clazz2 = "\\App\\Database\\Migrations\\Migration001";
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
@@ -120,7 +120,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals(2, count($migrations2));
         $m01 = $migrations2[1];
         $this->assertTrue($m00 instanceof AbstractMigration);
-        $this->assertEquals('App\\Database\\migrations\\Migration001', $m01->getName());
+        $this->assertEquals('App\\Database\\Migrations\\Migration001', $m01->getName());
         $this->removeClass($clazz);
         $runner = new SchemaRunner(null);
         $this->removeClass($clazz2);
@@ -131,8 +131,8 @@ class DatabaseMigrationWriterTest extends TestCase {
     public function test03() {
         DatabaseMigrationWriter::resetCounter();
         $runner = new SchemaRunner(null);
-        $path = APP_PATH.DS.'Database'.DS.'migrations';
-        $ns = '\\App\\Database\\migrations';
+        $path = APP_PATH.DS.'Database'.DS.'Migrations';
+        $ns = '\\App\\Database\\Migrations';
         $allClasses = [];
         for ($x = 0 ; $x < 110 ; $x++) {
             $writter = new DatabaseMigrationWriter($runner);
@@ -145,7 +145,7 @@ class DatabaseMigrationWriterTest extends TestCase {
             }
             $this->assertEquals($name, $writter->getName());
             $writter->writeClass();
-            $clazz = "\\App\\Database\\migrations\\".$name;
+            $clazz = "\\App\\Database\\Migrations\\".$name;
             $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
@@ -158,10 +158,10 @@ class DatabaseMigrationWriterTest extends TestCase {
             $this->assertEquals($x + 1, count($migrations));
             $m = $migrations[$x];
             $this->assertTrue($m instanceof AbstractMigration);
-            $this->assertEquals("App\\Database\\migrations\\" . $name, $m->getName());
+            $this->assertEquals("App\\Database\\Migrations\\" . $name, $m->getName());
         }
         foreach ($migrations as $m) {
-            $this->removeClass("\\App\\Database\\migrations\\".$m->getName());
+            $this->removeClass("\\App\\Database\\Migrations\\".$m->getName());
         }
     }
     private function removeClass($classPath) {

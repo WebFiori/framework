@@ -27,7 +27,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase01() {
-        $path = ROOT_PATH.DS."tests".DS."WebFiori".DS."Framework".DS."Scheduler".DS."WebServices";
+        $path = ROOT_PATH.DS.'tests'.DS."WebFiori".DS."Framework".DS."Scheduler".DS."WebServices";
         $this->assertEquals([
             "Info: Selected services manager has no service with name 'c'.\n",
             "Which service you would like to have a test case for?\n",
@@ -38,7 +38,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             "4: set-password\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\WebFiori\\Framework\Scheduler\WebServices\\TasksLoginServiceTest'."\n",
+            'Name: WebFiori\\Framework\Scheduler\WebServices\\TasksLoginServiceTest'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "Info: New class was created at \"".$path."\".\n"
@@ -85,16 +85,17 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase03() {
         $path = ROOT_PATH.DS."tests".DS."WebFiori".DS."Framework".DS."Scheduler".DS."WebServices";
+        $name = 'GetTasksServiceTest';
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\WebFiori\\Framework\Scheduler\WebServices\\GetTasksServiceTest'."\n",
+            'Name: WebFiori\\Framework\Scheduler\WebServices\\'.$name."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\WebFiori\\Framework\Scheduler\WebServices'\n",
+            "Enter an optional namespace for the class: Enter = 'WebFiori\\Framework\Scheduler\WebServices'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
@@ -113,7 +114,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass($path.DS.$name);
     }
     /**
      * @test

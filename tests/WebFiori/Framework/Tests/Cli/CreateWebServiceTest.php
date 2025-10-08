@@ -24,7 +24,7 @@ class CreateWebServiceTest extends CLITestCase {
         ], [
             '2',
             'NewWeb',
-            "\n", // Hit Enter to pick default value (app\apis)
+            "\n", // Hit Enter to pick default value (App\Apis)
             'get-hello',
             'Service Desc',
             "\n", // Hit Enter to pick default value (GET method)
@@ -125,7 +125,7 @@ class CreateWebServiceTest extends CLITestCase {
             '--c' => 'web-service'
         ], [
             'NewWeb2',
-            "\n", // Hit Enter to pick default value (app\apis)
+            "\n", // Hit Enter to pick default value (App\Apis)
             'get-hello-2',
             'Service\'s Desc',
             "\n", // Hit Enter to pick default value (GET method)
@@ -224,7 +224,7 @@ class CreateWebServiceTest extends CLITestCase {
             '--c' => 'web-service'
         ], [
             'NewWeb3',
-            "\n", // Hit Enter to pick default value (app\apis)
+            "\n", // Hit Enter to pick default value (App\Apis)
             'get-hello-3',
             'Service\'s Desc',
             "\n", // Hit Enter to pick default value (GET method)

@@ -25,9 +25,9 @@ class CreateDBAccessTest extends CLITestCase {
         ], [
             'Tables\\EmployeeInfoTable',
             'EmployeeOperations',
-            "\n", // Hit Enter to pick default value (app\database)
+            "\n", // Hit Enter to pick default value (App\database)
             'SuperUser',
-            "\n", // Hit Enter to pick default value (app\entity)
+            "\n", // Hit Enter to pick default value (App\entity)
             'n'
         ]);
 
@@ -60,9 +60,9 @@ class CreateDBAccessTest extends CLITestCase {
         ], [
             'Tables\\EmployeeInfoTable',
             'EmployeeS',
-            'App\\Database\\empl',
+            'App\\Database\\Empl',
             'SuperHero',
-            'App\\Entity\\subs',
+            'App\\Entity\\Subs',
             'y'
         ]);
 
@@ -79,7 +79,7 @@ class CreateDBAccessTest extends CLITestCase {
             "Would you like to have update methods for every single column?(y/N)\n",
             "Info: New class was created at \"". ROOT_PATH.DS."app".DS."database".DS."empl\".\n"
         ], $output);
-        $clazz = '\\App\\Database\\empl\\EmployeeSDB';
+        $clazz = '\\App\\Database\\Empl\\EmployeeSDB';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

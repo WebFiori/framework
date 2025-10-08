@@ -26,7 +26,7 @@ class UpdateTableCommandTest extends CLITestCase {
             'Cool new column.',
             'y',
             'ModifiedO',
-            "\n" // Hit Enter to pick default value (app\database)
+            "\n" // Hit Enter to pick default value (App\database)
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
@@ -107,7 +107,7 @@ class UpdateTableCommandTest extends CLITestCase {
             'Cool modifiyed column.',
             'y',
             'Modified',
-            "\n" // Hit Enter to pick default value (app\database)
+            "\n" // Hit Enter to pick default value (App\database)
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
@@ -175,7 +175,7 @@ class UpdateTableCommandTest extends CLITestCase {
             '0',
             'y',
             'Modified2',
-            "\n" // Hit Enter to pick default value (app\database)
+            "\n" // Hit Enter to pick default value (App\database)
         ]);
 
         $this->assertEquals(0, $this->getExitCode());

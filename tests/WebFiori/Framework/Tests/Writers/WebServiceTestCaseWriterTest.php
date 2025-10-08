@@ -15,7 +15,7 @@ class WebServiceTestCaseWriterTest extends CLITestCase {
      */
     public function test00() {
         $w = new APITestCaseWriter(new TasksServicesManager(), ForceTaskExecutionService::class);
-        $this->assertEquals('tests\\apis\\WebServiceTest', $w->getName(true));
+        $this->assertEquals('tests\\Apis\\WebServiceTest', $w->getName(true));
         $this->assertEquals(9, $w->getPhpUnitVersion());
         $this->assertEquals(ROOT_PATH.DS.'Tests'.DS.'Apis'.DS.'WebServiceTest.php', $w->getAbsolutePath());
         $w->writeClass();

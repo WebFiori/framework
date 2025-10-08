@@ -72,7 +72,7 @@ class CreateTableTest extends CLITestCase {
         ], [
             'mysql',
             'Cool00Table',
-            "\n", // Hit Enter to pick default value (app\database)
+            "\n", // Hit Enter to pick default value (App\database)
             'cool_table_00',
             'This is the first cool table that was created using CLI.',
             'id',
@@ -135,7 +135,7 @@ class CreateTableTest extends CLITestCase {
         ], [
             'mssql',
             'Cool01Table',
-            "\n", // Hit Enter to pick default value (app\database)
+            "\n", // Hit Enter to pick default value (App\database)
             'cool_table_01',
             'This is the first cool table that was created using CLI.',
             'id',
@@ -199,7 +199,7 @@ class CreateTableTest extends CLITestCase {
         ], [
             'mysql',
             'Cool02Table',
-            "\n", // Hit Enter to pick default value (app\database)
+            "\n", // Hit Enter to pick default value (App\database)
             'cool_table_02',
             "\n", // Hit Enter to pick default value (empty comment)
             'id',

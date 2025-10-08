@@ -11,7 +11,7 @@ class CreateMigrationTest extends CLITestCase {
     
     protected function tearDown(): void {
         // Clean up only specific migration files created by this test
-        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'migrations';
+        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'Migrations';
         if (is_dir($migrationsDir)) {
             // Only remove Migration files directly in the migrations directory
             $files = glob($migrationsDir . DS . 'Migration[0-9][0-9][0-9].php');
@@ -36,10 +36,10 @@ class CreateMigrationTest extends CLITestCase {
     public function testCreateMigration01() {
         $name = 'CoolMigration';
         
-        $clazz = '\\App\\Database\\migrations\\'.$name;
+        $clazz = '\\App\\Database\\Migrations\\'.$name;
         
         $this->assertEquals([
-            "Migration namespace: Enter = 'app\database\migrations'\n",
+            "Migration namespace: Enter = 'App\Database\Migrations'\n",
             "Provide a name for the class that will have migration logic:\n",
             'Info: New class was created at "'. APP_PATH .'Database'.DS.'migrations".'."\n",
         ], $this->executeMultiCommand([

@@ -119,17 +119,17 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase04() {
-        $path = ROOT_PATH.DS."tests".DS."tests".DS."apis".DS."multiple";
+        $path = ROOT_PATH.DS."tests".DS."tests".DS."Apis".DS."Multiple";
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\tests\apis\multiple\WebService00Test'."\n",
+            'Name: tests\tests\Apis\Multiple\WebService00Test'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\\tests\apis\multiple'\n",
+            "Enter an optional namespace for the class: Enter = 'tests\\tests\Apis\Multiple'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
@@ -175,12 +175,12 @@ class CreateAPITestCaseTest extends CLITestCase {
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\tests\apis\multiple\WebService00Test'."\n",
+            'Name: tests\tests\Apis\Multiple\WebService00Test'."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\\tests\apis\multiple'\n",
+            "Enter an optional namespace for the class: Enter = 'tests\\tests\Apis\Multiple'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
@@ -218,7 +218,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase08() {
-        $path = ROOT_PATH.DS."tests".DS."tests".DS."apis".DS."multiple";
+        $path = ROOT_PATH.DS."tests".DS."tests".DS."Apis".DS."Multiple";
         $this->assertEquals([
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([

@@ -19,7 +19,7 @@ class CreateCLICommandTest extends CLITestCase {
         ], [
             '5',
             'NewCLI',
-            'app\commands',
+            'App\Commands',
             'print-hello',
             'Prints \'Hello World\' in the console.',
             'N',
@@ -42,21 +42,21 @@ class CreateCLICommandTest extends CLITestCase {
             "10: Database migration.\n",
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\commands'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Commands'\n",
             "Enter a name for the command:\n",
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",
             'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."commands\".\n",
         ], $output);
-        $this->assertTrue(class_exists('\\app\\commands\\NewCLICommand'));
-        $this->removeClass('\\app\\commands\\NewCLICommand');
+        $this->assertTrue(class_exists('\\App\\Commands\\NewCLICommand'));
+        $this->removeClass('\\App\\Commands\\NewCLICommand');
     }
     
     /**
      * @test
      */
     public function testCreateCommand01() {
-        $clazz = '\\app\\commands\\DoItCommand';
+        $clazz = '\\App\\Commands\\DoItCommand';
         if (class_exists($clazz)) {
             $this->removeClass($clazz);
         }
@@ -67,7 +67,7 @@ class CreateCLICommandTest extends CLITestCase {
             '--c' => 'command'
         ], [
             'DoIt',
-            'app\commands',
+            'App\Commands',
             'do-it',
             'Do something amazing.',
             'y',
@@ -88,7 +88,7 @@ class CreateCLICommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $this->assertEquals([
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'app\commands'\n",
+            "Enter an optional namespace for the class: Enter = 'App\Commands'\n",
             "Enter a name for the command:\n",
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",

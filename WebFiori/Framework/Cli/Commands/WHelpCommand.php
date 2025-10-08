@@ -10,7 +10,7 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
-use WebFiori\Cli\commands\HelpCommand;
+use WebFiori\Cli\Commands\HelpCommand;
 /**
  * Description of WHelpCommand
  *

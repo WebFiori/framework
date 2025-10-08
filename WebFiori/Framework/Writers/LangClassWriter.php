@@ -34,7 +34,7 @@ class LangClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function __construct($langCode, $writingDir) {
-        parent::__construct('Lang'.$langCode, APP_PATH.'langs', APP_DIR."\\langs");
+        parent::__construct('Lang'.$langCode, APP_PATH.'Langs', APP_DIR."\\Langs");
         $this->code = $langCode;
         $this->dir = $writingDir;
         $this->addUseStatement(Lang::class);

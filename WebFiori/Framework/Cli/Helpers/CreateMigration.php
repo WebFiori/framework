@@ -29,7 +29,7 @@ class CreateMigration extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        $ns = APP_DIR.'\\database\\migrations';
+        $ns = APP_DIR.'\\Database\\migrations';
         if (!$command->isArgProvided('--defaults')) {
             $ns = CLIUtils::readNamespace($command, $ns , 'Migration namespace:');
         }

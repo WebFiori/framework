@@ -38,7 +38,7 @@ class CreateBackgroundTask extends CreateClassHelper {
         $this->taskWriter = $this->getWriter();
     }
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR.'\\tasks', 'Task');
+        $this->setClassInfo(APP_DIR.'\\Tasks', 'Task');
         $taskName = $this->getTaskName();
         $taskDesc = $this->getTaskDesc();
 

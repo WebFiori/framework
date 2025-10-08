@@ -49,7 +49,7 @@ class CreateWebService extends CreateClassHelper {
         }
     }
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR.'\\apis', 'Service');
+        $this->setClassInfo(APP_DIR.'\\Apis', 'Service');
 
         $this->setServiceName();
         $this->serviceObj->setDescription($this->getInput('Description:'));

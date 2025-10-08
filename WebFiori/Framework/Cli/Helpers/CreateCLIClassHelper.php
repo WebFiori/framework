@@ -35,7 +35,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
         $this->cliWriter = $this->getWriter();
     }
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR.'\\commands', 'Command');
+        $this->setClassInfo(APP_DIR.'\\Commands', 'Command');
         $commandName = $this->getCommandName();
         $commandDesc = $this->getInput('Give a short description of the command:');
 

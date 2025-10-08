@@ -35,7 +35,7 @@ class CreateMiddleware extends CreateClassHelper {
         $this->mdWriter = $this->getWriter();
     }
     public function readClassInfo() {
-        $this->setClassInfo(APP_DIR.'\\middleware', 'Middleware');
+        $this->setClassInfo(APP_DIR.'\\Middleware', 'Middleware');
 
         $middlewareName = $this->getMiddlewareName();
         $priority = $this->getCommand()->readInteger('Enter middleware priority:', 0);

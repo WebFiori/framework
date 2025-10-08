@@ -207,11 +207,11 @@ class CreateFullRESTHelper extends CreateClassHelper {
     }
 
     private function readAPIInfo() {
-        $this->apisNs = CLIUtils::readNamespace($this->getCommand(), APP_DIR.'\\apis',"Last thing needed is to provide us with namespace for web services:");
+        $this->apisNs = CLIUtils::readNamespace($this->getCommand(), APP_DIR.'\\Apis',"Last thing needed is to provide us with namespace for web services:");
     }
     private function readEntityInfo() {
         $this->println("First thing, we need entity class information.");
-        $entityInfo = $this->getClassInfo(APP_DIR.'\\entity');
+        $entityInfo = $this->getClassInfo(APP_DIR.'\\Entity');
         $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
         $this->tableObjWriter->setEntityInfo($entityInfo['name'], $entityInfo['namespace'], $entityInfo['path'], $entityInfo['implement-jsoni']);
 
@@ -230,7 +230,7 @@ class CreateFullRESTHelper extends CreateClassHelper {
     }
     private function readTableInfo() {
         $this->println("Now, time to collect database table information.");
-        $ns = CLIUtils::readNamespace($this->getCommand(), APP_DIR.'\\database', 'Provide us with a namespace for table class:');
+        $ns = CLIUtils::readNamespace($this->getCommand(), APP_DIR.'\\Database', 'Provide us with a namespace for table class:');
         $this->tableObjWriter->setNamespace($ns);
         $this->tableObjWriter->setPath(ROOT_PATH.DS.$ns);
 

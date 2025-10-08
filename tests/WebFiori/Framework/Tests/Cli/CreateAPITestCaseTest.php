@@ -168,7 +168,7 @@ class CreateAPITestCaseTest extends CLITestCase {
      * @test
      */
     public function testCreateAPITestCase06() {
-        $path = ROOT_PATH.DS."tests".DS."apis".DS."multiple";
+        $path = ROOT_PATH.DS."tests".DS."Apis".DS."Multiple";
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Error: Provided class is not an instance of ".WebServicesManager::class."\n",

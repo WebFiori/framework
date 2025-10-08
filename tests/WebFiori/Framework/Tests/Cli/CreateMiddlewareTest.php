@@ -48,7 +48,7 @@ class CreateMiddlewareTest extends CLITestCase {
             "Enter a name for the middleware:\n",
             "Enter middleware priority: Enter = '0'\n",
             "Would you like to add the middleware to a group?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."middleware\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Middleware\".\n",
         ], $output);
         $this->assertTrue(class_exists('\\App\\Middleware\\NewCoolMdMiddleware'));
         $this->removeClass('\\App\\Middleware\\NewCoolMdMiddleware');
@@ -84,7 +84,7 @@ class CreateMiddlewareTest extends CLITestCase {
             "Would you like to add the middleware to a group?(y/N)\n",
             "Enter group name:\n",
             "Would you like to add the middleware to another group?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."middleware\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Middleware\".\n",
         ], $output);
         
         $clazz = '\\App\\Middleware\\NewCoolMiddleware';

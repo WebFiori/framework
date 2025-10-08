@@ -41,7 +41,7 @@ class CreateMigrationTest extends CLITestCase {
         $this->assertEquals([
             "Migration namespace: Enter = 'App\Database\Migrations'\n",
             "Provide a name for the class that will have migration logic:\n",
-            'Info: New class was created at "'. APP_PATH .'Database'.DS.'migrations".'."\n",
+            'Info: New class was created at "'. APP_PATH .'Database'.DS.'Migrations".'."\n",
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'migration',

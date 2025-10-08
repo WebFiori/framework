@@ -87,7 +87,7 @@ class CreateWebServiceTest extends CLITestCase {
             "Success: New parameter added.\n",
             "Would you like to add another parameter?(y/N)\n",
             "Creating the class...\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."apis\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         
@@ -186,7 +186,7 @@ class CreateWebServiceTest extends CLITestCase {
             "Success: New parameter added.\n",
             "Would you like to add another parameter?(y/N)\n",
             "Creating the class...\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."apis\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         
@@ -285,7 +285,7 @@ class CreateWebServiceTest extends CLITestCase {
             "Success: New parameter added.\n",
             "Would you like to add another parameter?(y/N)\n",
             "Creating the class...\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."apis\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
         ], $output);
         

@@ -46,7 +46,7 @@ class CreateCLICommandTest extends CLITestCase {
             "Enter a name for the command:\n",
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."commands\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Commands\".\n",
         ], $output);
         $this->assertTrue(class_exists('\\App\\Commands\\NewCLICommand'));
         $this->removeClass('\\App\\Commands\\NewCLICommand');
@@ -105,7 +105,7 @@ class CreateCLICommandTest extends CLITestCase {
             "Is this argument optional or not?(Y/n)\n",
             "Enter default value:\n",
             "Would you like to add more arguments?(y/N)\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."commands\".\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Commands\".\n",
         ], $output);
         
         $this->assertTrue(class_exists($clazz));

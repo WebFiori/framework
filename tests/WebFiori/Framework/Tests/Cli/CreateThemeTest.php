@@ -42,8 +42,8 @@ class CreateThemeTest extends CLITestCase {
             "11: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'Themes'\n",
-            'Creating theme at "'.ROOT_PATH.DS.'Themes'.DS."fiori\"...\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'Themes'.DS."fiori\".\n",
+            'Creating theme at "'.ROOT_PATH.DS.'Themes'.DS."Fiori\"...\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'Themes'.DS."Fiori\".\n",
         ], $output);
 
         $this->assertTrue(class_exists('\\Themes\\Fiori\\NewTestTheme'));
@@ -98,8 +98,8 @@ class CreateThemeTest extends CLITestCase {
             "Error: A class in the given namespace which has the given name was found.\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = 'Themes'\n",
-            'Creating theme at "'.ROOT_PATH.DS.'Themes'.DS."cool\"...\n",
-            'Info: New class was created at "'.ROOT_PATH.DS.'Themes'.DS."cool\".\n",
+            'Creating theme at "'.ROOT_PATH.DS.'Themes'.DS."Cool\"...\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'Themes'.DS."Cool\".\n",
         ], $output);
         $this->assertEquals(0, $this->getExitCode());
         $this->removeClass($ns2.'\\'.$name2);

@@ -4,7 +4,7 @@ namespace WebFiori\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Util;
 /**
- * A test class for testing the class 'WebFiori\framework\Util'.
+ * A test class for testing the class 'WebFiori\Framework\Util'.
  *
  * @author Ibrahim
  */

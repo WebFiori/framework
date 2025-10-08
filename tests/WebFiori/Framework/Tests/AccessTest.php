@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Access;
 use WebFiori\Framework\User;
 /**
- * A test class for testing the class 'WebFiori\framework\Access'.
+ * A test class for testing the class 'WebFiori\Framework\Access'.
  *
  * @author Ibrahim
  */

@@ -65,10 +65,10 @@ class SessionsManager {
             $constructor = WF_SESSION_STORAGE.'';
             $classObj = new $constructor();
 
-            if (is_subclass_of($classObj, '\WebFiori\framework\session\SessionStorage')) {
+            if (is_subclass_of($classObj, '\WebFiori\Framework\Session\SessionStorage')) {
                 $this->sessionStorage = $classObj;
             } else {
-                throw new SessionException('The class "'.WF_SESSION_STORAGE.'" does not implement "\WebFiori\framework\session\SessionStorage".');
+                throw new SessionException('The class "'.WF_SESSION_STORAGE.'" does not implement "\WebFiori\Framework\Session\SessionStorage".');
             }
         }
 

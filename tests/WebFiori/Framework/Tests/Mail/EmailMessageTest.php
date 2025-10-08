@@ -8,7 +8,7 @@ use WebFiori\Framework\App;
 use WebFiori\Framework\EmailMessage;
 use WebFiori\Framework\Exceptions\MissingLangException;
 /**
- * A test class for testing the class 'WebFiori\framework\mail\EmailMessage'.
+ * A test class for testing the class 'WebFiori\Framework\Mail\EmailMessage'.
  *
  * @author Ibrahim
  */

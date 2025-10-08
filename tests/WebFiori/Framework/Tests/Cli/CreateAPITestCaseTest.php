@@ -136,7 +136,7 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--c' => 'api-test',
             '--service' => 'say-hi-service',
         ], [
-            '\\Tests\\Apis\\Multiple\\ServicesManager00',
+            '\\tests\\Apis\\Multiple\\ServicesManager00',
             'n',
             '10',
             '',
@@ -144,7 +144,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
 
-        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService00Test';
+        $clazz = '\\tests\\tests\\Apis\\Multiple\\WebService00Test';
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
         require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
@@ -160,7 +160,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
-            '--manager' => '\\Tests\\Apis\\EmptyService\\EmptyServicesManager',
+            '--manager' => '\\tests\\Apis\\EmptyService\\EmptyServicesManager',
         ]));
         $this->assertEquals(-1, $this->getExitCode());
     }
@@ -187,15 +187,15 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--c' => 'api-test',
             '--service' => 'say-hi-service',
         ], [
-            '\\Tests\\Apis\\Multiple\\WebService00',
-            '\\Tests\\Apis\\Multiple\\ServicesManager00',
+            '\\tests\\Apis\\Multiple\\WebService00',
+            '\\tests\\Apis\\Multiple\\ServicesManager00',
             'n',
             '10',
             '',
             '',
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService00Test';
+        $clazz = '\\tests\\tests\\Apis\\Multiple\\WebService00Test';
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
         require_once $path.DS.'WebService00Test.php';
         $this->assertTrue(class_exists($clazz));
@@ -206,11 +206,11 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase07() {
         $this->assertEquals([
-            "Error: The argument --manager has invalid value: Not a class: \\Tests\\Apis\\EmptyService\\Xyz\n",
+            "Error: The argument --manager has invalid value: Not a class: \\tests\\Apis\\EmptyService\\Xyz\n",
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
-            '--manager' => '\\Tests\\Apis\\EmptyService\\Xyz',
+            '--manager' => '\\tests\\Apis\\EmptyService\\Xyz',
         ]));
         $this->assertEquals(-1, $this->getExitCode());
     }
@@ -225,11 +225,11 @@ class CreateAPITestCaseTest extends CLITestCase {
             CreateCommand::class,
             '--c' => 'api-test',
             '--service' => 'say-hi-service-2',
-            '--manager' => '\\Tests\\Apis\\Multiple\\ServicesManager00',
+            '--manager' => '\\tests\\Apis\\Multiple\\ServicesManager00',
             '--defaults'
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\\Tests\\Apis\\Multiple\\WebService01Test';
+        $clazz = '\\tests\\tests\\Apis\\Multiple\\WebService01Test';
         $this->assertTrue(file_exists($path.DS.'WebService01Test.php'));
         require_once $path.DS.'WebService01Test.php';
         $this->assertTrue(class_exists($clazz));

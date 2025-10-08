@@ -210,7 +210,7 @@ class LanguageTest extends TestCase {
      */
     public function testLoadTranslation02() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'WebFiori\framework\Lang\'.');
+        $this->expectExceptionMessage('A language class for the language \'FR\' was found. But it is not a sub class of \'WebFiori\Framework\Lang\'.');
         Lang::loadTranslation('fr');
     }
     /**
@@ -221,7 +221,7 @@ class LanguageTest extends TestCase {
      */
     public function testLoadTranslation03() {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The translation file was found. But no object of type \'WebFiori\framework\Lang\' is stored. Make sure that the parameter '
+        $this->expectExceptionMessage('The translation file was found. But no object of type \'WebFiori\Framework\Lang\' is stored. Make sure that the parameter '
                                 .'$addtoLoadedAfterCreate is set to true when creating the language object.');
         Lang::loadTranslation('Jp');
     }

@@ -273,10 +273,10 @@ class App {
     }
     private static function getRoot() {
         //Following lines of code assumes that the class exist on the folder: 
-        //\vendor\WebFiori\framework\WebFiori\framework
+        //\vendor\WebFiori\framework\WebFiori\Framework
         //Its used to construct the folder at which index file will exist at
         $DS = DIRECTORY_SEPARATOR;
-        $vendorPath = $DS.'vendor'.$DS.'WebFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'framework';
+        $vendorPath = $DS.'vendor'.$DS.'webFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'Framework';
         $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
         return $rootPath;
     }
@@ -614,8 +614,8 @@ class App {
         /**
          * Initialize autoloader.
          */
-        if (!class_exists('WebFiori\framework\autoload\ClassLoader',false)) {
-            $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
+        if (!class_exists('WebFiori\Framework\Autoload\ClassLoader',false)) {
+            $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
             require_once $autoloader;
         }
         self::$AU = ClassLoader::get();
@@ -721,7 +721,7 @@ class App {
     }
     private function initThemesPath() {
         if (!defined('THEMES_PATH')) {
-            $themesDirName = 'themes';
+            $themesDirName = 'Themes';
             $themesPath = ROOT_PATH.DS.$themesDirName;
             /**
              * This constant represents the directory at which themes exist.

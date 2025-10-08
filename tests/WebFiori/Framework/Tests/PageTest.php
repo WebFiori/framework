@@ -764,7 +764,7 @@ class PageTest extends TestCase {
         $page->setTheme('      New Super Theme      ');
         $theme3 = $page->getTheme();
         
-        $this->assertTrue($theme3 instanceof \WebFiori\framework\Theme);
+        $this->assertTrue($theme3 instanceof \WebFiori\Framework\Theme);
     }
     /**
      * @test

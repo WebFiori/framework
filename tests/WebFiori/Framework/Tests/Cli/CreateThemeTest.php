@@ -22,7 +22,7 @@ class CreateThemeTest extends CLITestCase {
         ], [
             '6',
             'NewTest',
-            'themes\\fiori',
+            'Themes\\Fiori',
             "\n", // Hit Enter to pick default value
         ]);
         $this->assertEquals(0, $this->getExitCode());
@@ -46,13 +46,13 @@ class CreateThemeTest extends CLITestCase {
             'Info: New class was created at "'.ROOT_PATH.DS.'Themes'.DS."fiori\".\n",
         ], $output);
 
-        $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));
+        $this->assertTrue(class_exists('\\Themes\\Fiori\\NewTestTheme'));
         
-        $this->removeClass('\\themes\\fiori\\NewTestTheme');
-        $this->removeClass('\\themes\\fiori\\AsideSection');
-        $this->removeClass('\\themes\\fiori\\FooterSection');
-        $this->removeClass('\\themes\\fiori\\HeadSection');
-        $this->removeClass('\\themes\\fiori\\HeaderSection');
+        $this->removeClass('\\Themes\\Fiori\\NewTestTheme');
+        $this->removeClass('\\Themes\\Fiori\\AsideSection');
+        $this->removeClass('\\Themes\\Fiori\\FooterSection');
+        $this->removeClass('\\Themes\\Fiori\\HeadSection');
+        $this->removeClass('\\Themes\\Fiori\\HeaderSection');
     }
     
     /**
@@ -63,7 +63,7 @@ class CreateThemeTest extends CLITestCase {
         $ns = '\\Themes\\FioriTheme';
         $name = 'NewFTestTheme';
 
-        $ns2 = '\\themes\\cool';
+        $ns2 = '\\Themes\\Cool';
         $name2 = 'NewFTestTheme';
         
         $output = $this->executeSingleCommand(new CreateCommand(), [

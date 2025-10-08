@@ -27,7 +27,7 @@ class CreateThemeHelper extends CreateClassHelper {
         parent::__construct($command, new ThemeClassWriter('New Theme'));
     }
     public function readClassInfo() {
-        $this->setClassInfo('themes', 'Theme');
+        $this->setClassInfo('Themes', 'Theme');
 
         $this->println('Creating theme at "'.$this->getWriter()->getPath().'"...');
         $this->writeClass();

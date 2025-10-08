@@ -44,7 +44,7 @@ class CreateAPITestCase extends CreateClassHelper {
         array_pop($nsArr);
         $ns = implode('\\', $nsArr);
         $this->setClassName($this->writer->getServiceName().'Test');
-        $this->setNamespace('tests\\'.$ns);
+        $this->setNamespace($ns);
         $this->setPath(ROOT_PATH.DS.'tests'.DS.implode(DS, $nsArr));
 
 
@@ -67,7 +67,8 @@ class CreateAPITestCase extends CreateClassHelper {
             $this->writeClass();
         } else {
             $this->writer->setPhpUnitVersion($this->getCommand()->readInteger('PHPUnit Version:', 11));
-            $this->setClassInfo('tests\\'.$ns, 'Test');
+            $this->setClassInfo($ns, 'Test');
+            $this->setPath(ROOT_PATH.DS.'tests'.DS.$this->writer->getNamespace());    
             $this->writeClass();
         }
     }

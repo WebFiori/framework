@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Apis\Multiple;
+namespace Apis\Multiple;
 
 use WebFiori\Http\WebServicesManager;
 /**

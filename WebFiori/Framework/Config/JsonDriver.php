@@ -12,7 +12,7 @@ use WebFiori\Json\Json;
  * Application configuration driver which is used to read and write application
  * configuration from JSON file.
  *
- * The driver will create a JSON file in the path 'APP_PATH/config' with
+ * The driver will create a JSON file in the path 'APP_PATH/Config' with
  * the name 'app-config.json'. The developer can use the file to
  * modify application configuration. The name of the file can be changed as needed.
  *
@@ -24,7 +24,7 @@ class JsonDriver implements ConfigurationDriver {
      * Returns the path to JSON configuration files.
      */
     public static function getConfigPath(): string {
-        return APP_PATH.'config'.DIRECTORY_SEPARATOR;
+        return APP_PATH.'Config'.DIRECTORY_SEPARATOR;
     }
     /**
      * The name of JSON configuration file.
@@ -597,7 +597,7 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Sets the name of the file that configuration values will be taken from.
      *
-     * The file must exist on the directory [APP_PATH]/config/ .
+     * The file must exist on the directory [APP_PATH]/Config/ .
      *
      * @param string $name
      */

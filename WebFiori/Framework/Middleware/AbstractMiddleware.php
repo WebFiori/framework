@@ -17,7 +17,7 @@ use WebFiori\Http\Response;
 /**
  * An abstract class that can be used to implement custom middleware.
  *
- * Every middleware the developer write must be placed in the folder 'app/middleware'
+ * Every middleware the developer write must be placed in the folder '[APP_DIR]/Middleware'
  * of the framework in order for the framework to auto-register the middleware.
  * If the middleware is placed in another place, then the developer must register
  * it manually using the method MiddlewareManager::register() before adding

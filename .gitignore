@@ -7,14 +7,12 @@ composer.lock
 *.cache
 cs-fixer.phar
 *.log
-src/app/storage
-app/storage
 /release/
 php-cs-fixer-v2.phar
-app/sto
-app/config/*
+App/sto
+App/Config/*
 .idea/*
-!/app/config/config-with-err-00.json
+!/App/Config/config-with-err-00.json
 *.Identifier
 tests/clover.xml
 /.vscode

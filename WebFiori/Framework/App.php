@@ -671,7 +671,7 @@ class App {
         });
 
         if (!class_exists(APP_DIR.'\Init\InitMiddleware')) {
-            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/middleware\'.');
+            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/Middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
         self::call(APP_DIR.'\Init\InitMiddleware::init');
@@ -683,10 +683,10 @@ class App {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
-            if (!class_exists(APP_DIR.'\\Init\\routes\\'.$className)) {
+            if (!class_exists(APP_DIR.'\\Init\\Routes\\'.$className)) {
                 Ini::get()->createRoutesClass($className);
             }
-            self::call(APP_DIR.'\Init\routes\\'.$className.'::create');
+            self::call(APP_DIR.'\Init\Routes\\'.$className.'::create');
         }
 
         if (Router::routesCount() != 0) {

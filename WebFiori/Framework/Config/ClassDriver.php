@@ -12,14 +12,14 @@ use WebFiori\Http\Uri;
  * A configuration driver which is used to store configuration on PHP class.
  *
  * This driver will
- * create a class called 'AppConfig' on the directory APP_DIR/config and
+ * create a class called 'AppConfig' on the directory APP_DIR/Config and
  * use it to read and write configurations.
  *
  * @author Ibrahim
  */
 class ClassDriver implements ConfigurationDriver {
-    const CONFIG_FILE_PATH = APP_PATH.'config'.DIRECTORY_SEPARATOR.'AppConfig.php';
-    const CONFIG_NS = APP_DIR.'\\config\\AppConfig';
+    const CONFIG_FILE_PATH = APP_PATH.'Config'.DIRECTORY_SEPARATOR.'AppConfig.php';
+    const CONFIG_NS = APP_DIR.'\\Config\\AppConfig';
     const NL = "\n";
     private $blockEnd;
     private $configVars;

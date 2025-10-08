@@ -168,8 +168,7 @@ class App {
      * Register CLI commands or background tasks.
      *
      * @param string $folder The name of the folder that contains the jobs or
-     * commands. It must be a folder inside 'app' folder or the folder which is defined
-     * by the constant 'APP_DIR'.
+     * commands. It must be a folder inside [APP_DIR].
      *
      * @param callable $regCallback A callback which is used to register the
      * classes of the folder.

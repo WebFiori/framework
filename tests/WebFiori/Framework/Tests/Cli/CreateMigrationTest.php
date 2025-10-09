@@ -61,6 +61,11 @@ class CreateMigrationTest extends CLITestCase {
             "11"
         ]));
         $this->assertEquals(0, $this->getExitCode());
+        
+        // Check if file was written and require it
+        $filePath = APP_PATH . 'Database' . DS . 'Migrations' . DS . $name . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
     }

@@ -35,7 +35,7 @@ class DatabaseMigrationWriter extends ClassWriter {
         
         $this->setClassName($name);
         
-        parent::__construct($name, APP_PATH.'Database'.DS.'migrations', APP_DIR.'\\Database\\migrations');
+        parent::__construct($name, APP_PATH.'Database'.DS.'Migrations', APP_DIR.'\\Database\\Migrations');
         $this->addUseStatement([
             Database::class,
             AbstractMigration::class,

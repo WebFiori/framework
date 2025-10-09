@@ -113,6 +113,11 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals('Migration000', $writter->getName());
         $writter->writeClass();
         $clazz = "\\App\\Database\\Migrations\\Migration000";
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
@@ -128,7 +133,12 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertEquals('Migration001', $writter2->getName());
         $writter2->writeClass();
         $clazz2 = "\\App\\Database\\Migrations\\Migration001";
-        $this->assertTrue(class_exists($clazz));
+        
+        // Check if file was written and require it
+        $filePath2 = $writter2->getPath() . DS . $writter2->getName() . '.php';
+        $this->assertTrue(file_exists($filePath2), "Class file was not created: $filePath2");
+        require_once $filePath2;
+        $this->assertTrue(class_exists($clazz2));
         $runner->register($clazz);
             $allClasses[] = $clazz;
         $runner3 = new SchemaRunner(null);

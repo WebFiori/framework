@@ -12,7 +12,33 @@ use WebFiori\Framework\ThemeManager;
  * @author Ibrahim
  */
 class CreateThemeTest extends CLITestCase {
-    /**
+    
+    protected function tearDown(): void {
+        // Clean up theme assets from public directory
+        $assetsPath = ROOT_PATH . DS . PUBLIC_FOLDER . DS . 'assets';
+        if (is_dir($assetsPath)) {
+            $themeDirs = ['FioriTheme', 'FioriTheme2', 'Cool'];
+            foreach ($themeDirs as $themeDir) {
+                $themePath = $assetsPath . DS . $themeDir;
+                if (is_dir($themePath)) {
+                    $this->removeDirectory($themePath);
+                }
+            }
+        }
+        parent::tearDown();
+    }
+    
+    private function removeDirectory($dir) {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . DS . $file;
+            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
+    }    /**
      * @test
      */
     public function testCreateTheme00() {

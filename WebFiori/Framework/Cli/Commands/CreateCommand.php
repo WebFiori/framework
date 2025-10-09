@@ -138,11 +138,11 @@ class CreateCommand extends Command {
         $options['api-test'] = 'Web service test case.';
         $options['migration'] = 'Database migration.';
         $options['q'] = 'Quit.';
-        $what = strtolower($this->getArgValue('--c'));
+        $what = $this->getArgValue('--c');
         $answer = null;
 
         if ($what !== null) {
-            $answer = $options[$what] ?? null;
+            $answer = $options[strtolower($what)] ?? null;
 
             if ($answer === null) {
                 $this->warning('The argument --c has invalid value.');

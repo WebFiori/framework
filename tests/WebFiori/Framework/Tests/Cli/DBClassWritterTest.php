@@ -37,6 +37,11 @@ class DBClassWritterTest extends CLITestCase {
         $mapper->setNamespace('WebFiori\\Entity');
         $writter = new DBClassWriter('UserDBClass', 'WebFiori\\Db', $table);
         $writter->writeClass();
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
@@ -51,6 +56,11 @@ class DBClassWritterTest extends CLITestCase {
         $mapper->setNamespace('WebFiori\\Entity');
         $writter = new DBClassWriter('EmployeeDB', 'WebFiori\\Db', $table);
         $writter->writeClass();
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
@@ -65,6 +75,11 @@ class DBClassWritterTest extends CLITestCase {
         $mapper->setNamespace('WebFiori\\Entity');
         $writter = new DBClassWriter('PositionDB', 'WebFiori\\Db', $table);
         $writter->writeClass();
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }
@@ -81,6 +96,11 @@ class DBClassWritterTest extends CLITestCase {
         $this->assertEquals('ok-connection', $writter->getConnectionName());
         $writter->includeColumnsUpdate();
         $writter->writeClass();
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($writter->getName(true)));
         $this->removeClass($writter->getName(true));
     }

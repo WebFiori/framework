@@ -121,16 +121,17 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase04() {
         $path = ROOT_PATH.DS."tests".DS."Apis".DS."Multiple";
+        $name = 'WebService00Test';
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\Apis\Multiple\WebService00Test'."\n",
+            'Name: Apis\Multiple\\'.$name."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\Apis\Multiple'\n",
+            "Enter an optional namespace for the class: Enter = 'Apis\Multiple'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
@@ -145,11 +146,11 @@ class CreateAPITestCaseTest extends CLITestCase {
         ]));
         $this->assertEquals(0, $this->getExitCode());
 
-        $clazz = '\\Apis\\Multiple\\WebService00Test';
-        $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
-        require_once $path.DS.'WebService00Test.php';
+        $clazz = '\\Apis\\Multiple\\'.$name;
+        $this->assertTrue(file_exists($path.DS.$name.'.php'));
+        require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass($path.DS.$name);
     }
     
     /**
@@ -170,18 +171,19 @@ class CreateAPITestCaseTest extends CLITestCase {
      */
     public function testCreateAPITestCase06() {
         $path = ROOT_PATH.DS."tests".DS."Apis".DS."Multiple";
+        $name = 'WebService00Test'; 
         $this->assertEquals([
             "Please enter services manager information:\n",
             "Error: Provided class is not an instance of ".WebServicesManager::class."\n",
             "Please enter services manager information:\n",
             "Test case will be created with following parameters:\n",
             "PHPUnit Version: 9\n",
-            'Name: tests\Apis\Multiple\WebService00Test'."\n",
+            'Name: Apis\Multiple\\'.$name."\n",
             "Path: ".$path."\n",
             "Would you like to use default parameters?(Y/n)\n",
             "PHPUnit Version: Enter = '11'\n",
             "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = 'tests\Apis\Multiple'\n",
+            "Enter an optional namespace for the class: Enter = 'Apis\Multiple'\n",
             "Info: New class was created at \"".$path."\".\n"
         ], $this->executeMultiCommand([
             CreateCommand::class,
@@ -196,11 +198,11 @@ class CreateAPITestCaseTest extends CLITestCase {
             '',
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\Apis\\Multiple\\WebService00Test';
+        $clazz = '\\Apis\\Multiple\\'.$name;
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
-        require_once $path.DS.'WebService00Test.php';
+        require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass($path.DS.$name);
     }
     /**
      * @test
@@ -211,7 +213,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         ], $this->executeMultiCommand([
             CreateCommand::class,
             '--c' => 'api-test',
-            '--manager' => '\\Apis\\EmptyService\\Xyz',
+            '--manager' => '\\tests\\Apis\\EmptyService\\Xyz',
         ]));
         $this->assertEquals(-1, $this->getExitCode());
     }
@@ -230,10 +232,11 @@ class CreateAPITestCaseTest extends CLITestCase {
             '--defaults'
         ]));
         $this->assertEquals(0, $this->getExitCode());
-        $clazz = '\\tests\\Apis\\Multiple\\WebService01Test';
-        $this->assertTrue(file_exists($path.DS.'WebService01Test.php'));
-        require_once $path.DS.'WebService01Test.php';
+        $name = 'WebService01Test';
+        $clazz = '\\Apis\\Multiple\\'.$name;
+        $this->assertTrue(file_exists($path.DS.$name.'.php'));
+        require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass($path.DS.$name);
     }
 }

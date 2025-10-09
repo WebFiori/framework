@@ -1,5 +1,38 @@
 # Changelog
 
+## [3.0.0-Beta.29](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.28...v3.0.0-Beta.29) (2025-10-09)
+
+
+### Bug Fixes
+
+* API Creation ([d3c384f](https://github.com/WebFiori/framework/commit/d3c384f48f61c828cf9358cbb1675e26be25b0ee))
+* Command Writer ([338e8d2](https://github.com/WebFiori/framework/commit/338e8d2d7e72e66463bb8d57a6b34f20aa38ff3b))
+* Fix Test Case ([6b26e2f](https://github.com/WebFiori/framework/commit/6b26e2f023cea94eb7fdf2a665f1a721e5e190eb))
+* Fix Test Cases ([1086336](https://github.com/WebFiori/framework/commit/108633622e1938699360b45d65d3565bcf611e85))
+* Fix Test Cases ([0c914de](https://github.com/WebFiori/framework/commit/0c914de97f37eef1bf862c4b37f323470dfcf5ef))
+* Fixes and Tests Refactoring ([5ff31ab](https://github.com/WebFiori/framework/commit/5ff31ab5dc2c33b8a9389f3bf33001a525f57a7d))
+* Getting Arg Value in CLI ([c56b9bf](https://github.com/WebFiori/framework/commit/c56b9bf6f34617336ad1f750943f705d84357ba0))
+* Migrations Command ([ce54748](https://github.com/WebFiori/framework/commit/ce5474803a26352b75eaea66604b630378b98aa9))
+* Namespaces ([e51d354](https://github.com/WebFiori/framework/commit/e51d354a2be0843f55e70ced529c45341988ba2e))
+* References to Classes ([a140646](https://github.com/WebFiori/framework/commit/a1406462197a32a8bd16a6d12168c8c2a4fda016))
+* Tasks Names Check ([3c80893](https://github.com/WebFiori/framework/commit/3c80893d4c793e330f571205a702b853540d9a36))
+* Test Cases ([f78c6d5](https://github.com/WebFiori/framework/commit/f78c6d5a2b9fa10baa98ce9c229295d95f5b0fef))
+* Test Classes ([cd68b49](https://github.com/WebFiori/framework/commit/cd68b49acbc7dab3d8abc25fa3df21b129d19bf4))
+* Theme Creation ([6864c23](https://github.com/WebFiori/framework/commit/6864c236e7174113a4b4dc26e8289ed2645bb278))
+* Theme Resources Creation ([e9f1025](https://github.com/WebFiori/framework/commit/e9f10258f4433982e922cac494dec69b06f34e8b))
+* Writing Classes ([2fcb0c5](https://github.com/WebFiori/framework/commit/2fcb0c5993d7eb47c270d8113f58a2cf13f76046))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#266](https://github.com/WebFiori/framework/issues/266) from WebFiori/dev ([19fc94a](https://github.com/WebFiori/framework/commit/19fc94a9166ecafb2572e0926f9992b93a170341))
+* Merge pull request [#268](https://github.com/WebFiori/framework/issues/268) from WebFiori/dev ([fb1e6a3](https://github.com/WebFiori/framework/commit/fb1e6a3bb3d5b69642641fd323e82785f28c72f9))
+* Updated Database Library ([7f853fd](https://github.com/WebFiori/framework/commit/7f853fd25fd9f0b1211fb18fc807a2436f403946))
+* Updated Database to v1.0.0 ([c35b109](https://github.com/WebFiori/framework/commit/c35b109d292df38b32965ceed0bd7e0a90c8cc08))
+* Updated Dependencies ([ff05d95](https://github.com/WebFiori/framework/commit/ff05d95b8923ee631649c4610bf7dd348dcd4869))
+* Updated HTTP to v4 ([ab525fc](https://github.com/WebFiori/framework/commit/ab525fc9a37db07ae454b53e961cddba628b82e3))
+* Updated Version Number ([c2bac79](https://github.com/WebFiori/framework/commit/c2bac791aa6aca1bd9e8742c017d75e8574fd38d))
+
 ## [3.0.0-Beta.26](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.26...v3.0.0-Beta.26) (2025-04-07)
 
 

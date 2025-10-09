@@ -57,7 +57,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.'TasksLoginServiceTest.php'));
         require_once $path.DS.'TasksLoginServiceTest.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass('tests\\WebFiori\\Framework\\Scheduler\\WebServices\\TasksLoginServiceTest');
     }
     /**
      * @test
@@ -78,7 +78,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($clazz);
+        $this->removeClass('tests\\WebFiori\\Framework\\Scheduler\\WebServices\\GetTasksServiceTest');
     }
     /**
      * @test
@@ -114,7 +114,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.'GetTasksServiceTest.php'));
         require_once $path.DS.'GetTasksServiceTest.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($path.DS.$name);
+        $this->removeClass('tests\\WebFiori\\Framework\\Scheduler\\WebServices\\GetTasksServiceTest');
     }
     /**
      * @test
@@ -150,7 +150,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.$name.'.php'));
         require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($path.DS.$name);
+        $this->removeClass('tests\\Apis\\Multiple\\'.$name);
     }
     
     /**
@@ -202,7 +202,7 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.'WebService00Test.php'));
         require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($path.DS.$name);
+        $this->removeClass('tests\\Apis\\Multiple\\'.$name);
     }
     /**
      * @test
@@ -237,6 +237,6 @@ class CreateAPITestCaseTest extends CLITestCase {
         $this->assertTrue(file_exists($path.DS.$name.'.php'));
         require_once $path.DS.$name.'.php';
         $this->assertTrue(class_exists($clazz));
-        $this->removeClass($path.DS.$name);
+        $this->removeClass('tests\\Apis\\Multiple\\'.$name);
     }
 }

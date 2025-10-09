@@ -85,6 +85,11 @@ class DatabaseMigrationWriterTest extends TestCase {
 
         $writter->writeClass();
         $clazz = "\\App\\Database\\Migrations\\MyMigration";
+        
+        // Check if file was written and require it
+        $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+        $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+        require_once $filePath;
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
@@ -159,6 +164,11 @@ class DatabaseMigrationWriterTest extends TestCase {
             $this->assertEquals($name, $writter->getName());
             $writter->writeClass();
             $clazz = "\\App\\Database\\Migrations\\".$name;
+            
+            // Check if file was written and require it
+            $filePath = $writter->getPath() . DS . $writter->getName() . '.php';
+            $this->assertTrue(file_exists($filePath), "Class file was not created: $filePath");
+            require_once $filePath;
             $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;

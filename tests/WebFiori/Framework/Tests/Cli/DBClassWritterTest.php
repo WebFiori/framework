@@ -13,6 +13,20 @@ use WebFiori\Framework\Writers\DBClassWriter;
  * @author Ibrahim
  */
 class DBClassWritterTest extends CLITestCase {
+    
+    protected function setUp(): void {
+        parent::setUp();
+        // Ensure directories exist for DB classes
+        $dirs = [
+            ROOT_PATH . DS . 'WebFiori' . DS . 'Db',
+            ROOT_PATH . DS . 'WebFiori' . DS . 'Entity'
+        ];
+        foreach ($dirs as $dir) {
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+        }
+    }
     /**
      * @test
      */

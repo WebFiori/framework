@@ -9,6 +9,15 @@ use WebFiori\Framework\Cli\Commands\CreateCommand;
  */
 class CreateMigrationTest extends CLITestCase {
     
+    protected function setUp(): void {
+        parent::setUp();
+        // Ensure migrations directory exists
+        $migrationsDir = APP_PATH . DS . 'Database' . DS . 'Migrations';
+        if (!is_dir($migrationsDir)) {
+            mkdir($migrationsDir, 0755, true);
+        }
+    }
+    
     protected function tearDown(): void {
         // Clean up only specific migration files created by this test
         $migrationsDir = APP_PATH . DS . 'Database' . DS . 'Migrations';

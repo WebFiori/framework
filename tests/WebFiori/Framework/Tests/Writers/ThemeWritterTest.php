@@ -1,0 +1,49 @@
+<?php
+namespace WebFiori\Framework\Test\Writers;
+
+use PHPUnit\Framework\TestCase;
+use WebFiori\Framework\Theme;
+use WebFiori\Framework\Writers\ThemeClassWriter;
+/**
+ *
+ * @author Ibrahim
+ */
+class ThemeWritterTest extends TestCase {
+    /**
+     * @test
+     */
+    public function test00() {
+        $writter = new ThemeClassWriter();
+        $this->assertEquals('NewTheme', $writter->getName());
+        $this->assertEquals('App\\Themes\\new', $writter->getNamespace());
+        $this->assertEquals('Theme', $writter->getSuffix());
+        $this->assertEquals([
+        ], $writter->getUseStatements());
+        $this->assertEquals('New Theme', $writter->getThemeName());
+    }
+    /**
+     * @test
+     */
+    public function test01() {
+        $writter = new ThemeClassWriter();
+        $writter->setClassName('SuperHotNew');
+        $writter->setThemeName('Cool Theme');
+        $this->assertEquals('SuperHotNewTheme', $writter->getName());
+        $writter->setNamespace('App\\Themes\\cool');
+        $writter->setPath(ROOT_PATH.DS.APP_DIR.DS.'Themes'.DS.'cool');
+        $this->assertEquals('App\\Themes\\cool', $writter->getNamespace());
+        $this->assertEquals('Theme', $writter->getSuffix());
+        $this->assertEquals([
+        ], $writter->getUseStatements());
+        $this->assertEquals('Cool Theme', $writter->getThemeName());
+        $writter->writeClass();
+        $clazz = $writter->getName(true);
+        $this->assertTrue(class_exists($clazz));
+        $writter->removeClass();
+        $clazzObj = new $clazz();
+        $this->assertTrue($clazzObj instanceof Theme);
+        $this->assertEquals('Cool Theme', $clazzObj->getName());
+        $writter->removeClass();
+        $writter->removeComponents();
+    }
+}

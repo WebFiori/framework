@@ -1,0 +1,125 @@
+<?php
+namespace WebFiori\Framework\Test\Cli;
+
+use WebFiori\Cli\Command;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\CreateCommand;
+
+/**
+ * @author Ibrahim
+ */
+class CreateCLICommandTest extends CLITestCase {
+    /**
+     * @test
+     */
+    public function testCreateCommand00() {
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'WebFiori',
+            'create'
+        ], [
+            '5',
+            'NewCLI',
+            'App\Commands',
+            'print-hello',
+            'Prints \'Hello World\' in the console.',
+            'N',
+            "\n", // Hit Enter to pick default value
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background Task.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Database access class based on table.\n",
+            "8: Complete REST backend (Database table, entity, database access and web services).\n",
+            "9: Web service test case.\n",
+            "10: Database migration.\n",
+            "11: Quit. <--\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'App\Commands'\n",
+            "Enter a name for the command:\n",
+            "Give a short description of the command:\n",
+            "Would you like to add arguments to the command?(y/N)\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Commands\".\n",
+        ], $output);
+        $this->assertTrue(class_exists('\\App\\Commands\\NewCLICommand'));
+        $this->removeClass('\\App\\Commands\\NewCLICommand');
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateCommand01() {
+        $clazz = '\\App\\Commands\\DoItCommand';
+        if (class_exists($clazz)) {
+            $this->removeClass($clazz);
+        }
+        
+        $output = $this->executeSingleCommand(new CreateCommand(), [
+            'WebFiori',
+            'create',
+            '--c' => 'command'
+        ], [
+            'DoIt',
+            'App\Commands',
+            'do-it',
+            'Do something amazing.',
+            'y',
+            '--what-to-do',
+            "The thing that the command will do.",
+            "y",
+            "Say Hi",
+            "y",
+            "Say No",
+            "y",
+            "Say No", // Duplicate value to test validation
+            'n',
+            'y',
+            "\n", // Hit Enter to pick default value (empty default)
+            'n'
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals([
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = 'App\Commands'\n",
+            "Enter a name for the command:\n",
+            "Give a short description of the command:\n",
+            "Would you like to add arguments to the command?(y/N)\n",
+            "Enter argument name:\n",
+            "Describe this argument and how to use it: Enter = ''\n",
+            "Does this argument have a fixed set of values?(y/N)\n",
+            "Enter the value:\n",
+            "Would you like to add more values?(y/N)\n",
+            "Enter the value:\n",
+            "Would you like to add more values?(y/N)\n",
+            "Enter the value:\n",
+            "Info: Given value was already added.\n",
+            "Would you like to add more values?(y/N)\n",
+            "Is this argument optional or not?(Y/n)\n",
+            "Enter default value:\n",
+            "Would you like to add more arguments?(y/N)\n",
+            'Info: New class was created at "'.ROOT_PATH.DS.'App'.DS."Commands\".\n",
+        ], $output);
+        
+        $this->assertTrue(class_exists($clazz));
+        $clazzObj = new $clazz();
+        $this->assertTrue($clazzObj instanceof Command);
+        $this->assertEquals('do-it', $clazzObj->getName());
+        $arg = $clazzObj->getArg('--what-to-do');
+        $this->assertNotNull($arg);
+        $this->assertEquals([
+            'Say Hi', 'Say No'
+        ], $arg->getAllowedValues());
+        $this->assertTrue($arg->isOptional());
+        $this->assertEquals('The thing that the command will do.', $arg->getDescription());
+        $this->assertEquals('', $arg->getDefault());
+        $this->removeClass($clazz);
+    }
+}

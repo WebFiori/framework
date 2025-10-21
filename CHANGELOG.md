@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0-Beta.30](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.29...v3.0.0-Beta.30) (2025-10-21)
+
+
+### Features
+
+* Added a Script to Update Version ([e998c47](https://github.com/WebFiori/framework/commit/e998c476b2629b6b8307d6ad52813cdc1a63eb05))
+
+
+### Bug Fixes
+
+* Metadata ([84facc3](https://github.com/WebFiori/framework/commit/84facc3638ce6989d9b3efcf6dc05f9b7f87944b))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#269](https://github.com/WebFiori/framework/issues/269) from WebFiori/dev ([8ffb523](https://github.com/WebFiori/framework/commit/8ffb523559ab609095da446b2d592607dac1f20e))
+
 ## [3.0.0-Beta.29](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.28...v3.0.0-Beta.29) (2025-10-09)
 
 

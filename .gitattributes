@@ -1,9 +1,9 @@
 # Files and folders here will be not included when creating package
 /tests export-ignore
-/app export-ignore
+/App export-ignore
 /public export-ignore
-/themes export-ignore
-/webfiori/framework/db export-ignore
+/Themes export-ignore
+/Webfiori/Framework/Db export-ignore
 /.github export-ignore
 /.gitignore export-ignore
 /.travis.yml export-ignore

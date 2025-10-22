@@ -57,11 +57,12 @@ class Ini {
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Langs');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Apis');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Config');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Uploads');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Logs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Sessions');
         self::mkdir(ROOT_PATH.$DS.'public');
+        self::mkdir(ROOT_PATH.$DS.'tests');
     }
 
 

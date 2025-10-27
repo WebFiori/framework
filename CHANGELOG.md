@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.0.0-beta.31](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.30...v3.0.0-beta.31) (2025-10-27)
+
+
+### Bug Fixes
+
+* Bug in Finding Class Loader Path ([6831a96](https://github.com/WebFiori/framework/commit/6831a96d91962480b097561b559e2ecf07af1c0b))
+* Show Framework Logo ([e47f1a5](https://github.com/WebFiori/framework/commit/e47f1a5d70b5d5982ff87247de3feb98ce75d558))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#271](https://github.com/WebFiori/framework/issues/271) from WebFiori/dev ([6bf9c26](https://github.com/WebFiori/framework/commit/6bf9c26ab448e60bcdfee5f6f91b2cdc97304006))
+* Updated Framework Version ([3d719ea](https://github.com/WebFiori/framework/commit/3d719ea32aea00d973dbb61e5ddf98194a5e7e0f))
+* Updated Index ([0b128ec](https://github.com/WebFiori/framework/commit/0b128ec53339304b351df9d1953e192dc233a24a))
+
 ## [3.0.0-Beta.30](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.29...v3.0.0-Beta.30) (2025-10-21)
 
 

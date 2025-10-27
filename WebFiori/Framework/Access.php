@@ -198,6 +198,7 @@ class Access {
      * @param string $groupId The ID of the group. The ID must not contain
      * any of the following characters: ';','-',',' or a space. If the name contains
      * any of the given characters, the group will not be created.
+     * @param string|null $parentGroupId Optional parent group ID for creating nested groups.
      *
      * @return bool If the group is created, the method will return true.
      * If not, the method will return false.
@@ -356,6 +357,14 @@ class Access {
         return $bool;
     }
 
+    /**
+     * Private helper that validates and creates a new privileges group.
+     * 
+     * @param string $groupId The group ID to create.
+     * @param string|null $parentGroupID Optional parent group ID for nested groups.
+     * 
+     * @return bool True if group is created, false otherwise.
+     */
     private function createGroupHelper($groupId, ?string $parentGroupID = null): bool {
         $trimmedId = trim($groupId);
 
@@ -715,6 +724,15 @@ class Access {
         return $retVal;
     }
 
+    /**
+     * Private helper that validates an ID string.
+     * 
+     * Checks that ID doesn't contain forbidden characters (';', ' ', '-', ',').
+     * 
+     * @param string $id The ID string to validate.
+     * 
+     * @return bool True if ID is valid, false otherwise.
+     */
     private function validateId($id): bool {
         $len = strlen($id);
 

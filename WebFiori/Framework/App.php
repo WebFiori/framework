@@ -271,6 +271,11 @@ class App {
     public static function getConfigDriver() : string {
         return self::$ConfigDriver;
     }
+    /**
+     * Calculates application root path by removing vendor framework path from current directory.
+     * 
+     * @return string The application root path.
+     */
     private static function getRoot() {
         //Following lines of code assumes that the class exist on the folder: 
         //\vendor\WebFiori\framework\WebFiori\Framework
@@ -367,7 +372,7 @@ class App {
             /**
              * Path to WebFiori's core library.
              */
-            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'WebFiori'.DS.'framework'.DS.'WebFiori'.DS.'framework');
+            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework');
         }
         self::initAutoLoader();
         self::checkStandardLibs();
@@ -472,6 +477,11 @@ class App {
 
         return self::$LC;
     }
+    /**
+     * Helper for automatic class registration using reflection with configuration options.
+     * 
+     * @param array $options Configuration array with dir, php-file, folder, class-name, params, callback, constructor-params.
+     */
     private static function autoRegisterHelper($options) {
         $dir = $options['dir'];
         $phpFile = $options['php-file'];
@@ -498,6 +508,11 @@ class App {
         } catch (Error $ex) {
         }
     }
+    /**
+     * Safe function caller with CLI/web-aware exception handling.
+     * 
+     * @param callable $func The function to call.
+     */
     private static function call($func) {
         try {
             call_user_func($func);
@@ -509,6 +524,9 @@ class App {
             }
         }
     }
+    /**
+     * Validates and defines APP_DIR constant, checking for invalid characters.
+     */
     private function checkAppDir() {
         
         if (!defined('APP_DIR')) {
@@ -616,6 +634,10 @@ class App {
          */
         if (!class_exists('WebFiori\Framework\Autoload\ClassLoader',false)) {
             $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
+            
+            if (!file_exists($autoloader)) {
+                throw new \Exception('Unable to locate the autoloader class.');
+            }
             require_once $autoloader;
         }
         self::$AU = ClassLoader::get();
@@ -642,7 +664,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', '3.0.0-Beta.30');
+        define('WF_VERSION', '3.0.0-beta.31');
         /**
          * A constant that tells the type of framework version.
          *
@@ -658,7 +680,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2025-10-22');
+        define('WF_RELEASE_DATE', '2025-10-28');
     }
 
     /**
@@ -719,6 +741,9 @@ class App {
             TasksManager::registerTasks();
         }
     }
+    /**
+     * Defines THEMES_PATH constant pointing to the themes directory.
+     */
     private function initThemesPath() {
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'Themes';

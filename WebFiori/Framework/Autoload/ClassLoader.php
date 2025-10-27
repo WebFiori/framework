@@ -218,6 +218,7 @@ class ClassLoader {
      * </li>
      * </ul>
      *
+     * @param array $options Array of configuration options (define-root, search-folders, root, on-load-failure).     *
      * @return ClassLoader
      *
      * @throws Exception
@@ -560,6 +561,12 @@ class ClassLoader {
             }
         }
     }
+    /**
+     * Private helper that recursively processes directories using a stack-based approach.
+     * 
+     * @param string $cleanDir The directory path to process.
+     * @param bool $appendRoot Whether to append root path to directory.
+     */
     private function addSearchDirectoryHelper($cleanDir, $appendRoot) {
         $dirsStack = [$cleanDir];
         $root = $this->getRoot();
@@ -576,6 +583,16 @@ class ClassLoader {
             }
         }
     }
+    /**
+     * Private helper that scans subdirectories and adds them to the processing stack.
+     * 
+     * @param string $xDir The current directory being processed.
+     * @param string $fullPath The full path to the directory.
+     * @param array $dirsStack The stack of directories to process.
+     * @param bool $appendRoot Whether to append root path.
+     * 
+     * @return array Updated directories stack.
+     */
     private function addSearchDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot) {
         $subDirs = scandir($fullPath);
 
@@ -590,6 +607,12 @@ class ClassLoader {
 
         return $dirsStack;
     }
+    /**
+     * Private helper that attempts to create the cache directory if it doesn't exist.
+     * 
+     * @param string $autoloadCachePath The path where cache should be created.
+     * @param mixed $autoloadCache The cache data.
+     */
     private function attemptCreateCache($autoloadCachePath, $autoloadCache) {
         if (!file_exists($autoloadCachePath)) {
             mkdir($autoloadCachePath, 0777, true);

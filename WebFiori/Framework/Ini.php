@@ -34,6 +34,9 @@ class Ini {
      *
      */
     private static $singleton;
+    /**
+     * Private constructor that initializes documentation formatting properties.
+     */
     private function __construct() {
         $this->docStart = '/**';
         $this->docEnd = ' **/';
@@ -57,11 +60,12 @@ class Ini {
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Langs');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Apis');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Config');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'uploads');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'logs');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'sto'.$DS.'sessions');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Uploads');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Logs');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Sessions');
         self::mkdir(ROOT_PATH.$DS.'public');
+        self::mkdir(ROOT_PATH.$DS.'tests');
     }
 
 
@@ -151,6 +155,13 @@ class Ini {
 
         return self::$singleton;
     }
+    /**
+     * Attempts to create a directory if it does not exist.
+     * 
+     * If directory creation fails, code execution stops and outputs JSON with error details.
+     *
+     * @param string $dir The directory path to create.
+     */
     public static function mkdir($dir) {
         self::$DIR_TO_CREATE = $dir;
         if (!is_dir($dir)) {

@@ -1249,10 +1249,18 @@ class WebPage {
 
         return $headNode;
     }
+    /**
+     * Prepares for rendering by sorting and invoking before-render callbacks.
+     */
     public function beforeRender() {
         $this->beforeRenderCallbacks->insertionSort(false);
         $this->invokeBeforeRender();
     }
+    /**
+     * Recursively executes before-render callbacks with dynamic callback handling.
+     * 
+     * @param int $current The current callback index being processed.
+     */
     private function invokeBeforeRender(int $current = 0) {
         $currentCount = count($this->beforeRenderCallbacks);
 

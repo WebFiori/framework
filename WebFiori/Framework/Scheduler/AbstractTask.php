@@ -1037,6 +1037,11 @@ abstract class AbstractTask implements JsonI {
 
         return false;
     }
+    /**
+     * Converts task to JSON with all task properties and time information.
+     * 
+     * @return Json JSON object containing task data.
+     */
     public function toJSON() : Json {
         $json = new Json([
             'name' => $this->getTaskName(),
@@ -1330,6 +1335,13 @@ abstract class AbstractTask implements JsonI {
 
         return $monthAttrs;
     }
+    /**
+     * Creates standard time attributes structure for scheduling.
+     * 
+     * @param string $suffix The suffix for attribute names (e.g., 'hour', 'minute').
+     * 
+     * @return array Standard attributes array with every, every-x, at-every-x, and at-range keys.
+     */
     private function createAttrs($suffix): array {
         return [
             // *
@@ -1388,6 +1400,13 @@ abstract class AbstractTask implements JsonI {
         return $monthDaysAttrs;
     }
 
+    /**
+     * Gets argument value from HTTP request parameters.
+     * 
+     * @param string $name The argument name to retrieve.
+     * 
+     * @return mixed|null The argument value or null if not found.
+     */
     private function getArgValFromRequest($name) {
         if (Runner::isCLI()) {
             return null;
@@ -1401,6 +1420,13 @@ abstract class AbstractTask implements JsonI {
 
         return $retVal;
     }
+    /**
+     * Gets argument value from CLI command.
+     * 
+     * @param string $name The argument name to retrieve.
+     * 
+     * @return mixed|null The argument value or null if not found.
+     */
     private function getArgValFromTerminal($name) {
         $c = $this->getCommand();
 
@@ -1454,6 +1480,14 @@ abstract class AbstractTask implements JsonI {
 
         return $retVal;
     }
+    /**
+     * Checks if current hour matches scheduling rules (exact or interval-based).
+     * 
+     * @param array $hoursArr Array containing hour scheduling configuration.
+     * @param int $current The current hour to check.
+     * 
+     * @return bool True if hour matches scheduling rules.
+     */
     private function isHourHelper($hoursArr, $current) {
         $hours = $hoursArr['at-every-x-hour'];
         $retVal = in_array($current, $hours);
@@ -1471,6 +1505,14 @@ abstract class AbstractTask implements JsonI {
 
         return $retVal;
     }
+    /**
+     * Checks if current minute matches scheduling rules (exact or interval-based).
+     * 
+     * @param array $minuteArr Array containing minute scheduling configuration.
+     * @param int $current The current minute to check.
+     * 
+     * @return bool True if minute matches scheduling rules.
+     */
     private function isMinuteHelper($minuteArr, $current) {
         $minutes = $minuteArr['at-every-x-minute'];
         $retVal = in_array($current, $minutes);

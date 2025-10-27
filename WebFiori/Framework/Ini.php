@@ -34,6 +34,9 @@ class Ini {
      *
      */
     private static $singleton;
+    /**
+     * Private constructor that initializes documentation formatting properties.
+     */
     private function __construct() {
         $this->docStart = '/**';
         $this->docEnd = ' **/';
@@ -152,6 +155,13 @@ class Ini {
 
         return self::$singleton;
     }
+    /**
+     * Attempts to create a directory if it does not exist.
+     * 
+     * If directory creation fails, code execution stops and outputs JSON with error details.
+     *
+     * @param string $dir The directory path to create.
+     */
     public static function mkdir($dir) {
         self::$DIR_TO_CREATE = $dir;
         if (!is_dir($dir)) {

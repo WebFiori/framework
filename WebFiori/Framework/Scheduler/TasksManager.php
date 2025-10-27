@@ -350,6 +350,11 @@ class TasksManager {
     public static function getPassword() : string {
         return self::get()->getPasswordHelper();
     }
+    /**
+     * Returns all scheduled tasks as an array from the tasks queue.
+     * 
+     * @return array Array of all scheduled tasks.
+     */
     public static function getTasks() : array {
         return self::get()->tasksQueue()->toArray();
     }
@@ -490,6 +495,12 @@ class TasksManager {
      * Default is 'none'.
      *
      * @since 1.0.8
+     */
+    /**
+     * Logs messages with optional CLI display formatting based on type.
+     * 
+     * @param string $message The message to log.
+     * @param string $type The message type (success, error, info, none).
      */
     public static function log(string $message, string $type = 'none') {
         self::get()->logsArray[] = $message;
@@ -896,6 +907,13 @@ class TasksManager {
     private function isLogEnabledHelper(): bool {
         return $this->isLogEnabled;
     }
+    /**
+     * Helper that writes task execution details to log file.
+     * 
+     * @param bool $forced Whether the task was forced to execute.
+     * @param AbstractTask $task The task that was executed.
+     * @param File $file The log file to write to.
+     */
     private function logExecHelper($forced, $task, File $file) {
         if ($forced) {
             $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
@@ -911,6 +929,12 @@ class TasksManager {
         $file->write();
     }
 
+    /**
+     * Handles task execution logging by creating log file and calling helper.
+     * 
+     * @param AbstractTask $task The task that was executed.
+     * @param bool $forced Whether the task was forced to execute.
+     */
     private function logTaskExecution($task,$forced = false) {
         if ($this->isLogEnabled) {
             $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';

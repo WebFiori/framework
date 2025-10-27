@@ -271,6 +271,11 @@ class App {
     public static function getConfigDriver() : string {
         return self::$ConfigDriver;
     }
+    /**
+     * Calculates application root path by removing vendor framework path from current directory.
+     * 
+     * @return string The application root path.
+     */
     private static function getRoot() {
         //Following lines of code assumes that the class exist on the folder: 
         //\vendor\WebFiori\framework\WebFiori\Framework
@@ -472,6 +477,11 @@ class App {
 
         return self::$LC;
     }
+    /**
+     * Helper for automatic class registration using reflection with configuration options.
+     * 
+     * @param array $options Configuration array with dir, php-file, folder, class-name, params, callback, constructor-params.
+     */
     private static function autoRegisterHelper($options) {
         $dir = $options['dir'];
         $phpFile = $options['php-file'];
@@ -498,6 +508,11 @@ class App {
         } catch (Error $ex) {
         }
     }
+    /**
+     * Safe function caller with CLI/web-aware exception handling.
+     * 
+     * @param callable $func The function to call.
+     */
     private static function call($func) {
         try {
             call_user_func($func);
@@ -509,6 +524,9 @@ class App {
             }
         }
     }
+    /**
+     * Validates and defines APP_DIR constant, checking for invalid characters.
+     */
     private function checkAppDir() {
         
         if (!defined('APP_DIR')) {
@@ -723,6 +741,9 @@ class App {
             TasksManager::registerTasks();
         }
     }
+    /**
+     * Defines THEMES_PATH constant pointing to the themes directory.
+     */
     private function initThemesPath() {
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'Themes';

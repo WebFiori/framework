@@ -168,6 +168,15 @@ class Util {
 
         return false;
     }
+    /**
+     * Extracts and formats a class name from a file path.
+     * 
+     * Takes the filename, capitalizes the first letter, and removes the file extension.
+     *
+     * @param string $filePath The file path to extract class name from.
+     * 
+     * @return string The formatted class name.
+     */
     public static function extractClassName($filePath) {
         $expl = explode(DS, $filePath);
         $classFile = $expl[count($expl) - 1];
@@ -602,6 +611,17 @@ class Util {
 
         return false;
     }
+    /**
+     * Private helper that builds an array of 7 consecutive date strings.
+     * 
+     * Handles month and year rollovers when days exceed month limits.
+     *
+     * @param int $startDay The starting day of the month.
+     * @param int $daysInMonth The number of days in the current month.
+     * @param int $startMonth The starting month.
+     * 
+     * @return array Array of date strings in 'YYYY-MM-DD' format.
+     */
     private static function _buildGdatesArr($startDay, $daysInMonth, $startMonth) {
         $datesArr = [];
 

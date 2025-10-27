@@ -406,6 +406,11 @@ class PrivilegesGroup implements JsonI {
         return $hasPr;
     }
 
+    /**
+     * Private helper that removes a child group by ID from the current group's children array.
+     * 
+     * @param string $gId The ID of the child group to remove.
+     */
     private function removeChildGroupHelper($gId) {
         for ($x = 0 ; $x < count($this->childGroups()) ; $x++) {
             $xG = $this->childGroups[$x];

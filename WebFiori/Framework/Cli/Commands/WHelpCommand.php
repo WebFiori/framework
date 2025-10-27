@@ -20,7 +20,7 @@ class WHelpCommand extends HelpCommand {
     public function exec() : int {
         $argV = $this->getOwner()->getArgsVector();
 
-        if (count($argV) == 0) {
+        if (count(array_diff($argV, ['--ansi'])) == 0) {
             $this->printLogo();
         }
         $formattingOptions = [

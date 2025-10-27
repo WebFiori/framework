@@ -367,7 +367,7 @@ class App {
             /**
              * Path to WebFiori's core library.
              */
-            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'WebFiori'.DS.'framework'.DS.'WebFiori'.DS.'framework');
+            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework');
         }
         self::initAutoLoader();
         self::checkStandardLibs();
@@ -616,6 +616,10 @@ class App {
          */
         if (!class_exists('WebFiori\Framework\Autoload\ClassLoader',false)) {
             $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
+            
+            if (!file_exists($autoloader)) {
+                throw new \Exception('Unable to locate the autoloader class.');
+            }
             require_once $autoloader;
         }
         self::$AU = ClassLoader::get();

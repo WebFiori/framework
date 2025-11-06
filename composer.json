@@ -28,7 +28,7 @@
         "webfiori/jsonx": "v4.0.*",
         "webfiori/ui": "v4.0.*",
         "webfiori/collections": "v2.0.*",
-        "webfiori/database": "v1.1.*",
+        "webfiori/database": "v1.2.*",
         "webfiori/cli": "v2.0.*",
         "webfiori/mailer": "v2.1.*",
         "webfiori/err": "v2.0.*"

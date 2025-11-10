@@ -431,7 +431,7 @@ class App {
 
 
 
-                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',
                 ];
 

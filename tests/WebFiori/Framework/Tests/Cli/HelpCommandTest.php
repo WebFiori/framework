@@ -17,18 +17,18 @@ class HelpCommandTest extends CLITestCase {
             "Global Arguments:\n",
             "    --ansi:[Optional] Force the use of ANSI output.\n",
             "Available Commands:\n",
-            "    help:             Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
-            "    v:                Display framework version info.\n",
+            "    help:           Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
+            "    v:              Display framework version info.\n",
 
-            "    scheduler:        Run tasks scheduler.\n",
-            "    create:           Creates a system entity (middleware, web service, background process ...).\n",
-            "    add:              Add a database connection or SMTP account.\n",
-
-
+            "    scheduler:      Run tasks scheduler.\n",
+            "    create:         Creates a system entity (middleware, web service, background process ...).\n",
+            "    add:            Add a database connection or SMTP account.\n",
 
 
-            "    update-table:     Update a database table.\n",
-            "    migrations:       Execute database migrations.\n",
+
+
+
+            "    migrations:     Execute database migrations.\n",
         ], $this->executeMultiCommand([
             'help',
         ]));

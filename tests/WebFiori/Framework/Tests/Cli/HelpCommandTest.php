@@ -23,7 +23,7 @@ class HelpCommandTest extends CLITestCase {
             "    scheduler:        Run tasks scheduler.\n",
             "    create:           Creates a system entity (middleware, web service, background process ...).\n",
             "    add:              Add a database connection or SMTP account.\n",
-            "    list-routes:      List all created routes and which resource they point to.\n",
+
             "    list-themes:      List all registered themes.\n",
             "    run-query:        Execute SQL query on specific database.\n",
 

@@ -427,7 +427,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\ListRoutesCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\ListThemesCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
 

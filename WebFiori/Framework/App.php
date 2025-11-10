@@ -428,7 +428,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
 
-                    '\\WebFiori\\Framework\\Cli\\Commands\\ListThemesCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',

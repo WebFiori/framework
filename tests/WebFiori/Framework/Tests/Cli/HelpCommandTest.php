@@ -24,7 +24,7 @@ class HelpCommandTest extends CLITestCase {
             "    create:           Creates a system entity (middleware, web service, background process ...).\n",
             "    add:              Add a database connection or SMTP account.\n",
 
-            "    list-themes:      List all registered themes.\n",
+
             "    run-query:        Execute SQL query on specific database.\n",
 
             "    update-table:     Update a database table.\n",

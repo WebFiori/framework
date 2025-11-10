@@ -25,7 +25,7 @@ class HelpCommandTest extends CLITestCase {
             "    add:              Add a database connection or SMTP account.\n",
 
 
-            "    run-query:        Execute SQL query on specific database.\n",
+
 
             "    update-table:     Update a database table.\n",
             "    migrations:       Execute database migrations.\n",

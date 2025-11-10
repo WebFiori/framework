@@ -429,7 +429,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
 
 
-                    '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
+
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',

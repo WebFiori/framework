@@ -423,14 +423,14 @@ class App {
                 $commands = [
                     '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\SettingsCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\ListRoutesCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\ListThemesCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateSettingsCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',
                 ];

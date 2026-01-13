@@ -13,7 +13,7 @@ namespace WebFiori\Framework\Router;
 use Closure;
 use InvalidArgumentException;
 use WebFiori\Framework\Middleware\MiddlewareManager;
-use WebFiori\Http\Uri;
+use WebFiori\Http\RequestUri;
 use WebFiori\Ui\HTMLNode;
 /**
  * A class that is used to split URIs and get their parameters.
@@ -35,7 +35,7 @@ use WebFiori\Ui\HTMLNode;
  *
  * @version 1.5.0
  */
-class RouterUri extends Uri {
+class RouterUri extends RequestUri {
     /**
      * The action (class method) that will be performed.
      *
@@ -522,7 +522,7 @@ class RouterUri extends Uri {
 
     private function _($originalUriWithVars, $uriVars, $varIndex, &$nodesArr) {
         $varName = $uriVars[$varIndex];
-        $varValues = $this->getParameterValues($varName);
+        $varValues = $this->getAllowedParameterValues($varName);
 
         foreach ($varValues as $varValue) {
             $uriWithVarsReplaced = str_replace('{'.$varName.'}', $varValue, $originalUriWithVars);

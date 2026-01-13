@@ -781,7 +781,7 @@ class Router {
             }
 
             foreach ($options[RouteOption::VALUES] as $varName => $varValues) {
-                $routeUri->addVarValues($varName, $varValues);
+                $routeUri->addAllowedParameterValues($varName, $varValues);
             }
             $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
 

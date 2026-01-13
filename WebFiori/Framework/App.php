@@ -740,7 +740,7 @@ class App {
      * @throws FileException
      */
     private function initScheduler() {
-        $uriObj = new RouterUri(Request::getRequestedURI(), '');
+        $uriObj = new RouterUri(self::getRequest()->getUri()->getUri(true, true), '');
         $pathArr = $uriObj->getPathArray();
 
         if (!class_exists(APP_DIR.'\Init\InitTasks')) {

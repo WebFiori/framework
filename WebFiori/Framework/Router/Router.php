@@ -157,7 +157,7 @@ class Router {
         !defined('DS') ? define('DS', DIRECTORY_SEPARATOR) : '';
         $this->onNotFound = function ()
         {
-            Response::setCode(404);
+            App::getResponse()->setCode(404);
 
             if (!defined('API_CALL')) {
                 $notFoundView = new HTTPCodeView(404);
@@ -167,7 +167,7 @@ class Router {
                     'message' => 'Requested resource was not found.',
                     'type' => 'error'
                 ]);
-                Response::write($json);
+                App::getResponse()->write($json);
             }
         };
 
@@ -505,8 +505,8 @@ class Router {
             }
             $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
             $retVal .= $urlSet->toHTML();
-            Response::write($retVal);
-            Response::addHeader('content-type','text/xml');
+            App::getResponse()->write($retVal);
+            App::getResponse()->addHeader('content-type','text/xml');
         };
         self::closure([
             RouteOption::PATH => '/sitemap.xml',
@@ -607,11 +607,11 @@ class Router {
                 if (!in_array($httpCode, $allowedCodes)) {
                     $httpCode = 301;
                 }
-                Response::addHeader('location', $to);
-                Response::setCode($httpCode);
+                App::getResponse()->addHeader('location', $to);
+                App::getResponse()->setCode($httpCode);
 
                 if (!Runner::isCLI()) {
-                    Response::send();
+                    App::getResponse()->send();
                 }
             },
             'closure-params' => [
@@ -1295,7 +1295,7 @@ class Router {
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW(RouterUri $uriObj) {
-        Response::setCode(301);
+        App::getResponse()->setCode(301);
         $path = '';
 
         $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));
@@ -1318,8 +1318,8 @@ class Router {
         if (strlen($uriObj->getPort()) > 0) {
             $port = ':'.$uriObj->getPort();
         }
-        Response::addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
-        Response::send();
+        App::getResponse()->addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
+        App::getResponse()->send();
     }
     /**
      * Route a given URI to its specified resource.
@@ -1439,7 +1439,7 @@ class Router {
                 }
             }
         } else {
-            Response::setCode(405);
+            App::getResponse()->setCode(405);
 
             if (!defined('API_CALL')) {
                 $notFoundView = new HTTPCodeView(405);
@@ -1449,7 +1449,7 @@ class Router {
                     'message' => 'Request method not allowed.',
                     'type' => 'error'
                 ]);
-                Response::write($json);
+                App::getResponse()->write($json);
             }
         }
     }

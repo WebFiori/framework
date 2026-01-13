@@ -20,6 +20,7 @@ use WebFiori\Framework\Ui\HTTPCodeView;
 use WebFiori\Framework\Ui\StarterPage;
 use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Http\Request;
+use WebFiori\Http\RequestMethod;
 use WebFiori\Http\Response;
 use WebFiori\Http\Uri;
 use WebFiori\Http\WebServicesManager;
@@ -1162,7 +1163,7 @@ class Router {
                 foreach ($options[RouteOption::REQUEST_METHODS] as $reqMethod) {
                     $upper = strtoupper(trim($reqMethod));
 
-                    if (in_array($upper, Request::METHODS)) {
+                    if (in_array($upper, RequestMethod::getAll())) {
                         $requestMethodsArr[] = $upper;
                     }
                 }
@@ -1170,7 +1171,7 @@ class Router {
                 if ($methTypes == 'string') {
                     $upper = strtoupper(trim($options[RouteOption::REQUEST_METHODS]));
 
-                    if (in_array($upper, Request::METHODS)) {
+                    if (in_array($upper, RequestMethod::getAll())) {
                         $requestMethodsArr[] = $upper;
                     }
                 }

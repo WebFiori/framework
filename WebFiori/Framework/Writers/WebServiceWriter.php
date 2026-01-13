@@ -288,14 +288,15 @@ class WebServiceWriter extends ClassWriter {
             " *",
             " * @return boolean If the client is authorized, the method will return true.",
             " */",
-            $this->f('isAuthorized'),
+            $this->f('isAuthorized', [], 'bool'),
         ], 1);
         $this->append([
             '// TODO: Check if the client is authorized to call the service \''.$name.'\'.',
             '// You can ignore this method or remove it.',
             '//$authHeader = $this->getAuthHeader();',
             '//$authType = $authHeader[\'type\'];',
-            '//$token = $authHeader[\'credentials\'];'
+            '//$token = $authHeader[\'credentials\'];',
+            'return true;'
         ], 2);
         $this->append('}', 1);
 

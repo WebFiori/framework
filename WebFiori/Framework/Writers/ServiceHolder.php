@@ -30,7 +30,7 @@ class ServiceHolder extends AbstractWebService {
      *
      * @return boolean Always return false.
      */
-    public function isAuthorized() {
+    public function isAuthorized(): bool {
         return false;
     }
     /**

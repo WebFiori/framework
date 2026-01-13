@@ -15,6 +15,7 @@ use Exception;
 use WebFiori\Cli\Runner;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
+use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\RoutingException;
 use WebFiori\Framework\Ui\HTTPCodeView;
 use WebFiori\Framework\Ui\StarterPage;
@@ -1381,7 +1382,7 @@ class Router {
             $this->uriObj = $route;
 
             foreach ($route->getMiddleware() as $mw) {
-                $mw->before(Request::get(), Response::get());
+                $mw->before(App::getRequest(), App::getResponse());
             }
 
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
@@ -1423,12 +1424,12 @@ class Router {
                         }
                     } else {
                         if ($loadResource === true) {
-                            $message = 'The resource "'.Request::getRequestedURI().'" was available. '
+                            $message = 'The resource "'.App::getRequest()->getRequestedURI().'" was available. '
                             .'but its route is not configured correctly. '
                             .'The resource which the route is pointing to was not found.';
 
                             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                $message = 'The resource "'.Request::getRequestedURI().'" was available. '
+                                $message = 'The resource "'.App::getRequest()->getRequestedURI().'" was available. '
                                 .'but its route is not configured correctly. '
                                 .'The resource which the route is pointing to was not found ('.$file.').';
                             }
@@ -1465,7 +1466,7 @@ class Router {
     private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
         
         $pathArray = $routeUri->getPathArray();
-        $requestMethod = Request::getMethod();
+        $requestMethod = App::getRequest()->getMethod();
         $indexToSearch = 'static';
 
         if ($withVars) {

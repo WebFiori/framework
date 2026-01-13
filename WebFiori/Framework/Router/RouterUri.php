@@ -14,6 +14,7 @@ use Closure;
 use InvalidArgumentException;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Http\RequestUri;
+use WebFiori\Http\Uri;
 use WebFiori\Ui\HTMLNode;
 /**
  * A class that is used to split URIs and get their parameters.

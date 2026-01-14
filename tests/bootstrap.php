@@ -97,6 +97,7 @@ fprintf(STDOUT,"---------------------------------\n");
 fprintf(STDOUT,"Initializing application...\n");
 App::initiate('App', 'public', $ROOT);
 App::start();
+putenv('REQUEST_METHOD=GET');
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Autoload Root Directory: \''.ClassLoader::get()->root().'\'.'."\n");
 define('TESTS_PATH', ClassLoader::get()->root().$DS.TESTS_DIRECTORY);

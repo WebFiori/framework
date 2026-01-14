@@ -3,6 +3,7 @@ namespace WebFiori\Framework\Test\Session;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\File\File;
+use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Framework\Session\Session;
 use WebFiori\Framework\Session\SessionStatus;
@@ -199,7 +200,7 @@ class SessionTest extends TestCase {
      */
     public function testStart00() {
         $_POST['lang'] = 'EN';
-        putenv('REQUEST_METHOD=POST');
+        App::getRequest()->setRequestMethod('POST');
         $session = new Session(['name' => 'new']);
         $this->assertEquals(SessionStatus::INACTIVE,$session->getStatus());
         $this->assertEquals(0,$session->getStartedAt());
@@ -212,7 +213,7 @@ class SessionTest extends TestCase {
         $this->assertEquals('EN', $session->getLangCode());
         $this->assertEquals('EN', $session->getLangCode(true));
         $_POST['lang'] = 'AR';
-        putenv('REQUEST_METHOD=POST');
+        App::getRequest()->setRequestMethod('POST');
         $this->assertEquals('EN', $session->getLangCode());
         $this->assertEquals('AR', $session->getLangCode(true));
         $this->assertEquals(0,$session->getPassedTime());
@@ -247,7 +248,7 @@ class SessionTest extends TestCase {
      */
     public function testToJsonTest00() {
         $_POST['lang'] = 'fr';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        App::getRequest()->setRequestMethod('POST');
         $s = new Session(['name' => 'session','duration' => 1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');
@@ -286,7 +287,7 @@ class SessionTest extends TestCase {
      */
     public function testToJsonTest01() {
         $_POST['lang'] = 'fr';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        App::getRequest()->setRequestMethod('POST');
         $s = new Session(['name' => 'session','duration' => 1]);
         $j = $s->toJSON();
         $j->setPropsStyle('snake');

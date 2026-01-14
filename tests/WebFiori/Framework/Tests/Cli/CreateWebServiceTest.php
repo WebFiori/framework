@@ -206,9 +206,9 @@ class CreateWebServiceTest extends CLITestCase {
                 ParamOption::DESCRIPTION => 'Random\'s desc',
                 ParamOption::DEFAULT => null,
                 ParamOption::EMPTY => false,
-                ParamOption::MAX => 999999999.99,
+                ParamOption::MAX => null,
                 ParamOption::MAX_LENGTH => null,
-                ParamOption::MIN => -999999999.99,
+                ParamOption::MIN => null,
                 ParamOption::MIN_LENGTH => null,
                 ParamOption::OPTIONAL => false,
         ]);

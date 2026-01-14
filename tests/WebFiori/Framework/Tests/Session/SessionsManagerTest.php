@@ -323,7 +323,7 @@ class SessionsManagerTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables()->execute();
+        $sto->getController()->createTables();
         $sto->getController()->clear();
         $sto->getController()->table('session_data')->selectCount()->execute();
         $sto->getController()->table('sessions')->selectCount()->execute();

@@ -206,9 +206,9 @@ class CreateWebServiceTest extends CLITestCase {
                 ParamOption::DESCRIPTION => 'Random\'s desc',
                 ParamOption::DEFAULT => null,
                 ParamOption::EMPTY => false,
-                ParamOption::MAX => null,
+                ParamOption::MAX => 1e50,
                 ParamOption::MAX_LENGTH => null,
-                ParamOption::MIN => null,
+                ParamOption::MIN => -1e50,
                 ParamOption::MIN_LENGTH => null,
                 ParamOption::OPTIONAL => false,
         ]);
@@ -319,8 +319,16 @@ class CreateWebServiceTest extends CLITestCase {
         $this->assertEquals($expected[ParamOption::DESCRIPTION], $param->getDescription());
         $this->assertEquals($expected[ParamOption::MIN_LENGTH], $param->getMinLength());
         $this->assertEquals($expected[ParamOption::MAX_LENGTH], $param->getMaxLength());
-        $this->assertEquals($expected[ParamOption::MIN], $param->getMinValue());
-        $this->assertEquals($expected[ParamOption::MAX], $param->getMaxValue());
+        
+        // Compare MIN/MAX as strings for DOUBLE to avoid PHPUnit Exporter issues with large floats
+        if ($param->getType() == ParamType::DOUBLE) {
+            $this->assertEquals((string)$expected[ParamOption::MIN], (string)$param->getMinValue());
+            $this->assertEquals((string)$expected[ParamOption::MAX], (string)$param->getMaxValue());
+        } else {
+            $this->assertEquals($expected[ParamOption::MIN], $param->getMinValue());
+            $this->assertEquals($expected[ParamOption::MAX], $param->getMaxValue());
+        }
+        
         $this->assertEquals($expected[ParamOption::EMPTY], $param->isEmptyStringAllowed());
         $this->assertEquals($expected[ParamOption::OPTIONAL], $param->isOptional());
         $this->assertEquals($expected[ParamOption::DEFAULT], $param->getDefault());

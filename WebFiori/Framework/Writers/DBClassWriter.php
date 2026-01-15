@@ -11,7 +11,7 @@
 namespace WebFiori\Framework\Writers;
 
 use WebFiori\Database\Column;
-use WebFiori\Database\EntityMapper;
+use WebFiori\Database\Entity\EntityMapper;
 use WebFiori\Database\MsSql\MSSQLColumn;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\Table;

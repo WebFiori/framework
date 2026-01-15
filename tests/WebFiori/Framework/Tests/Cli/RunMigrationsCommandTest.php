@@ -160,7 +160,6 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--connection' => 'test-connection',
             '--runner' => 'TestMigrationRunner'
         ]);
-        // Debug: Print actual output
         // The test runner has no migrations, so it should report no migrations found
         $this->assertContains("Info: No migrations found.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
@@ -191,7 +190,8 @@ class RunMigrationsCommandTest extends CLITestCase {
         $code = '<?php
 class TestMigrationRunner extends \WebFiori\Database\Schema\SchemaRunner {
     public function __construct() {
-        parent::__construct(null);
+        $conn = \WebFiori\Framework\App::getConfig()->getDBConnection("test-connection");
+        parent::__construct($conn);
     }
 }';
         file_put_contents(APP_PATH . 'TestMigrationRunner.php', $code);
@@ -208,7 +208,8 @@ class TestMigrationRunner extends \WebFiori\Database\Schema\SchemaRunner {
         $code = '<?php
 class FaultyMigrationRunner extends \WebFiori\Database\Schema\SchemaRunner {
     public function __construct() {
-        parent::__construct(null);
+        $conn = \WebFiori\Framework\App::getConfig()->getDBConnection("test-connection");
+        parent::__construct($conn);
         throw new \Exception("Test exception");
     }
 }';

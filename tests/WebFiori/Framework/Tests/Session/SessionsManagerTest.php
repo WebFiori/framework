@@ -144,7 +144,7 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::start('hello');
         $sessions = SessionsManager::getSessions();
         $this->assertEquals([
-            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; domain=127.0.0.1; path=/; Secure; HttpOnly; SameSite=Lax'
+            'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; path=/; Secure; HttpOnly; SameSite=Lax'
             ], SessionsManager::getCookiesHeaders());
     }
     /**
@@ -303,12 +303,12 @@ class SessionsManagerTest extends TestCase {
     public function testGetSessionIDFromRequest() {
         unset($_POST["my-s"]);
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
-        putenv('REQUEST_METHOD=GET');
+        App::getRequest()->setRequestMethod('GET');
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
 
         $_POST['my-s'] = 'xyz';
-        putenv('REQUEST_METHOD=POST');
+        App::getRequest()->setRequestMethod('POST');
         $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
     }
     /**
@@ -323,7 +323,7 @@ class SessionsManagerTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables()->execute();
+        $sto->getController()->createTables();
         $sto->getController()->clear();
         $sto->getController()->table('session_data')->selectCount()->execute();
         $sto->getController()->table('sessions')->selectCount()->execute();

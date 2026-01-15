@@ -2,6 +2,7 @@
 namespace WebFiori\Framework\Test\Writers;
 
 use PHPUnit\Framework\TestCase;
+use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\AbstractMigration;
 use WebFiori\Database\Schema\SchemaRunner;
 use WebFiori\File\File;
@@ -44,7 +45,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $ns = '\\App\\Database\\Migrations';
         $clazz = "\\App\\Database\\Migrations\\Migration000";
         $this->removeClass($clazz);
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $writter = new DatabaseMigrationWriter($runner);
         $this->assertEquals('Migration000', $writter->getName());
         $this->assertEquals('App\\Database\\Migrations', $writter->getNamespace());
@@ -68,14 +69,14 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertTrue($m00 instanceof AbstractMigration);
         $this->assertEquals('App\\Database\\Migrations\\Migration000', $m00->getName());
         $this->removeClass($clazz);
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
     }
     /**
      * @test
      */
     public function test01() {
         DatabaseMigrationWriter::resetCounter();
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $path = APP_PATH.DS.'Database'.DS.'Migrations';
         $ns = '\\App\\Database\\Migrations';
         $writter = new DatabaseMigrationWriter($runner);
@@ -99,14 +100,14 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertTrue($m00 instanceof AbstractMigration);
         $this->assertEquals('App\\Database\\Migrations\\MyMigration', $m00->getName());
         $this->removeClass($clazz);
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
     }
     /**
      * @test
      */
     public function test02() {
         DatabaseMigrationWriter::resetCounter();
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $path = APP_PATH.DS.'Database'.DS.'Migrations';
         $ns = '\\App\\Database\\Migrations';
         $writter = new DatabaseMigrationWriter($runner);
@@ -121,7 +122,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
-        $runner2 = new SchemaRunner(null);
+        $runner2 = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $runner2->register($clazz);
         $migrations = $runner2->getChanges();
         $this->assertEquals(1, count($migrations));
@@ -141,7 +142,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertTrue(class_exists($clazz2));
         $runner->register($clazz);
             $allClasses[] = $clazz;
-        $runner3 = new SchemaRunner(null);
+        $runner3 = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $runner3->register($clazz);
         $runner3->register($clazz2);
         $migrations2 = $runner3->getChanges();
@@ -150,7 +151,7 @@ class DatabaseMigrationWriterTest extends TestCase {
         $this->assertTrue($m00 instanceof AbstractMigration);
         $this->assertEquals('App\\Database\\Migrations\\Migration001', $m01->getName());
         $this->removeClass($clazz);
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $this->removeClass($clazz2);
     }
     /**
@@ -158,7 +159,7 @@ class DatabaseMigrationWriterTest extends TestCase {
      */
     public function test03() {
         DatabaseMigrationWriter::resetCounter();
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
         $path = APP_PATH.DS.'Database'.DS.'Migrations';
         $ns = '\\App\\Database\\Migrations';
         $allClasses = [];
@@ -182,7 +183,7 @@ class DatabaseMigrationWriterTest extends TestCase {
             $this->assertTrue(class_exists($clazz));
         $runner->register($clazz);
             $allClasses[] = $clazz;
-            $xRunner = new SchemaRunner(null);
+            $xRunner = new SchemaRunner(new ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
             foreach ($allClasses as $cls) {
                 $xRunner->register($cls);
             }

@@ -15,11 +15,13 @@ use Exception;
 use WebFiori\Cli\Runner;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
+use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\RoutingException;
 use WebFiori\Framework\Ui\HTTPCodeView;
 use WebFiori\Framework\Ui\StarterPage;
 use WebFiori\Framework\Ui\WebPage;
 use WebFiori\Http\Request;
+use WebFiori\Http\RequestMethod;
 use WebFiori\Http\Response;
 use WebFiori\Http\Uri;
 use WebFiori\Http\WebServicesManager;
@@ -155,7 +157,7 @@ class Router {
         !defined('DS') ? define('DS', DIRECTORY_SEPARATOR) : '';
         $this->onNotFound = function ()
         {
-            Response::setCode(404);
+            App::getResponse()->setCode(404);
 
             if (!defined('API_CALL')) {
                 $notFoundView = new HTTPCodeView(404);
@@ -165,7 +167,7 @@ class Router {
                     'message' => 'Requested resource was not found.',
                     'type' => 'error'
                 ]);
-                Response::write($json);
+                App::getResponse()->write($json);
             }
         };
 
@@ -503,8 +505,8 @@ class Router {
             }
             $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
             $retVal .= $urlSet->toHTML();
-            Response::write($retVal);
-            Response::addHeader('content-type','text/xml');
+            App::getResponse()->write($retVal);
+            App::getResponse()->addHeader('content-type','text/xml');
         };
         self::closure([
             RouteOption::PATH => '/sitemap.xml',
@@ -605,11 +607,11 @@ class Router {
                 if (!in_array($httpCode, $allowedCodes)) {
                     $httpCode = 301;
                 }
-                Response::addHeader('location', $to);
-                Response::setCode($httpCode);
+                App::getResponse()->addHeader('location', $to);
+                App::getResponse()->setCode($httpCode);
 
                 if (!Runner::isCLI()) {
-                    Response::send();
+                    App::getResponse()->send();
                 }
             },
             'closure-params' => [
@@ -781,7 +783,7 @@ class Router {
             }
 
             foreach ($options[RouteOption::VALUES] as $varName => $varValues) {
-                $routeUri->addVarValues($varName, $varValues);
+                $routeUri->addAllowedParameterValues($varName, $varValues);
             }
             $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
 
@@ -1162,7 +1164,7 @@ class Router {
                 foreach ($options[RouteOption::REQUEST_METHODS] as $reqMethod) {
                     $upper = strtoupper(trim($reqMethod));
 
-                    if (in_array($upper, Request::METHODS)) {
+                    if (in_array($upper, RequestMethod::getAll())) {
                         $requestMethodsArr[] = $upper;
                     }
                 }
@@ -1170,7 +1172,7 @@ class Router {
                 if ($methTypes == 'string') {
                     $upper = strtoupper(trim($options[RouteOption::REQUEST_METHODS]));
 
-                    if (in_array($upper, Request::METHODS)) {
+                    if (in_array($upper, RequestMethod::getAll())) {
                         $requestMethodsArr[] = $upper;
                     }
                 }
@@ -1293,7 +1295,7 @@ class Router {
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW(RouterUri $uriObj) {
-        Response::setCode(301);
+        App::getResponse()->setCode(301);
         $path = '';
 
         $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));
@@ -1316,8 +1318,8 @@ class Router {
         if (strlen($uriObj->getPort()) > 0) {
             $port = ':'.$uriObj->getPort();
         }
-        Response::addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
-        Response::send();
+        App::getResponse()->addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
+        App::getResponse()->send();
     }
     /**
      * Route a given URI to its specified resource.
@@ -1380,7 +1382,7 @@ class Router {
             $this->uriObj = $route;
 
             foreach ($route->getMiddleware() as $mw) {
-                $mw->before(Request::get(), Response::get());
+                $mw->before(App::getRequest(), App::getResponse());
             }
 
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
@@ -1422,12 +1424,12 @@ class Router {
                         }
                     } else {
                         if ($loadResource === true) {
-                            $message = 'The resource "'.Request::getRequestedURI().'" was available. '
+                            $message = 'The resource "'.App::getRequest()->getRequestedURI().'" was available. '
                             .'but its route is not configured correctly. '
                             .'The resource which the route is pointing to was not found.';
 
                             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                $message = 'The resource "'.Request::getRequestedURI().'" was available. '
+                                $message = 'The resource "'.App::getRequest()->getRequestedURI().'" was available. '
                                 .'but its route is not configured correctly. '
                                 .'The resource which the route is pointing to was not found ('.$file.').';
                             }
@@ -1437,7 +1439,7 @@ class Router {
                 }
             }
         } else {
-            Response::setCode(405);
+            App::getResponse()->setCode(405);
 
             if (!defined('API_CALL')) {
                 $notFoundView = new HTTPCodeView(405);
@@ -1447,7 +1449,7 @@ class Router {
                     'message' => 'Request method not allowed.',
                     'type' => 'error'
                 ]);
-                Response::write($json);
+                App::getResponse()->write($json);
             }
         }
     }
@@ -1464,7 +1466,7 @@ class Router {
     private function searchRoute(RouterUri $routeUri, string $uri, bool $loadResource, bool $withVars = false): bool {
         
         $pathArray = $routeUri->getPathArray();
-        $requestMethod = Request::getMethod();
+        $requestMethod = App::getRequest()->getMethod();
         $indexToSearch = 'static';
 
         if ($withVars) {

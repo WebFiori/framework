@@ -100,6 +100,18 @@ class App {
      * @since 1.0
      */
     private static $LC;
+    /**
+     * Current request instance.
+     *
+     * @var Request
+     */
+    private static $Request;
+    /**
+     * Current response instance.
+     *
+     * @var Response
+     */
+    private static $Response;
 
     /**
      * The entry point for initiating the system.
@@ -124,6 +136,10 @@ class App {
 
         //Initialize CLI
         self::getRunner();
+        
+        //Initialize Request and Response
+        self::$Request = Request::createFromGlobals();
+        self::$Response = new Response();
 
         $this->initThemesPath();
         
@@ -137,7 +153,7 @@ class App {
         $this->initMiddleware();
         $this->initRoutes();
         $this->initScheduler();
-        Response::beforeSend(function ()
+        self::getResponse()->beforeSend(function ()
         {
             register_shutdown_function(function()
             {
@@ -146,7 +162,7 @@ class App {
                     $mdArr = $uriObj->getMiddleware();
 
                     for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
-                        $mdArr[$x]->afterSend(Request::get(), Response::get());
+                        $mdArr[$x]->afterSend(self::getRequest(), self::getResponse());
                     }
                 }
             });
@@ -157,7 +173,7 @@ class App {
                 $mdArr = $uriObj->getMiddleware();
 
                 for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
-                    $mdArr[$x]->after(Request::get(), Response::get());
+                    $mdArr[$x]->after(self::getRequest(), self::getResponse());
                 }
             }
         });
@@ -305,8 +321,8 @@ class App {
                 App::getRunner()->start();
             } else {
                //route user request.
-               Router::route(Request::getRequestedURI());
-               Response::send();
+               Router::route(self::getRequest()->getRequestedURI());
+               self::getResponse()->send();
             }
         }
     }
@@ -423,15 +439,15 @@ class App {
                 $commands = [
                     '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\SettingsCommand',
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\ListRoutesCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\ListThemesCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\RunSQLQueryCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateSettingsCommand',
-                    '\\WebFiori\\Framework\\Cli\\Commands\\UpdateTableCommand',
+
+
+
+
+
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',
                 ];
 
@@ -724,7 +740,7 @@ class App {
      * @throws FileException
      */
     private function initScheduler() {
-        $uriObj = new RouterUri(Request::getRequestedURI(), '');
+        $uriObj = new RouterUri(self::getRequest()->getUri()->getUri(true, true), '');
         $pathArr = $uriObj->getPathArray();
 
         if (!class_exists(APP_DIR.'\Init\InitTasks')) {
@@ -763,5 +779,21 @@ class App {
         // Handler::registerHandler(new APICallErrHandler());
         // Handler::registerHandler(new HTTPErrHandler());
         // Handler::unregisterHandler(Handler::getHandler('Default'));
+    }
+    /**
+     * Returns the current request instance.
+     * 
+     * @return Request
+     */
+    public static function getRequest() : Request {
+        return self::$Request;
+    }
+    /**
+     * Returns the current response instance.
+     * 
+     * @return Response
+     */
+    public static function getResponse() : Response {
+        return self::$Response;
     }
 }

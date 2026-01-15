@@ -34,7 +34,7 @@ class CreateMigration extends CreateClassHelper {
             $ns = CLIUtils::readNamespace($command, $ns , 'Migration namespace:');
         }
         
-        $runner = new SchemaRunner(null);
+        $runner = new SchemaRunner(new \WebFiori\Database\ConnectionInfo('mysql', 'test_user', 'test_pass', 'test_db'));
 
         parent::__construct($command, new DatabaseMigrationWriter($runner));
         $this->setNamespace($ns);

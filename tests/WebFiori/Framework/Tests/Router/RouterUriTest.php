@@ -183,7 +183,7 @@ class RouterUriTest extends TestCase {
      */
     public function testGetSitemapNode05() {
         $uri = new RouterUri('https://example.com/{var}', '');
-        $uri->addVarValue('var', 'hello');
+        $uri->addAllowedParameterValue('var', 'hello');
         $this->assertEquals(1, count($uri->getSitemapNodes()));
         $this->assertEquals('<url><loc>https://example.com/hello</loc></url>', $uri->getSitemapNodes()[0]->toHTML());
     }
@@ -192,7 +192,7 @@ class RouterUriTest extends TestCase {
      */
     public function testGetSitemapNode06() {
         $uri = new RouterUri('https://example.com/{var}', '');
-        $uri->addVarValue('var', 'hello');
+        $uri->addAllowedParameterValue('var', 'hello');
         $uri->addLanguage('ar');
         $this->assertEquals(1, count($uri->getSitemapNodes()));
         $this->assertEquals('<url><loc>https://example.com/hello</loc>'
@@ -204,7 +204,7 @@ class RouterUriTest extends TestCase {
      */
     public function testGetSitemapNode07() {
         $uri = new RouterUri('https://example.com/{var}', '');
-        $uri->addVarValues('var', ['hello', 'world']);
+        $uri->addAllowedParameterValues('var', ['hello', 'world']);
         $uri->addLanguage('ar');
         $this->assertEquals(2, count($uri->getSitemapNodes()));
         $this->assertEquals('<url><loc>https://example.com/hello</loc>'
@@ -219,7 +219,7 @@ class RouterUriTest extends TestCase {
      */
     public function testGetSitemapNode08() {
         $uri = new RouterUri('https://example.com/{var}/world/ok/{another-var}', '');
-        $uri->addVarValues('var', ['hello', 'world']);
+        $uri->addAllowedParameterValues('var', ['hello', 'world']);
         $uri->addLanguage('ar');
         $this->assertEquals(0, count($uri->getSitemapNodes()));
     }
@@ -228,8 +228,8 @@ class RouterUriTest extends TestCase {
      */
     public function testGetSitemapNode09() {
         $uri = new RouterUri('https://example.com/{var}/world/ok/{another-var}', '');
-        $uri->addVarValues('var', ['hello', 'world']);
-        $uri->addVarValue('another-var', 'good');
+        $uri->addAllowedParameterValues('var', ['hello', 'world']);
+        $uri->addAllowedParameterValue('another-var', 'good');
         $uri->addLanguage('ar');
         $this->assertEquals(2, count($uri->getSitemapNodes()));
         $this->assertEquals('<url><loc>https://example.com/hello/world/ok/good</loc>'
@@ -304,8 +304,8 @@ class RouterUriTest extends TestCase {
      */
     public function testSetUriPossibleVar00() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
-        $uri->addVarValue('first-var', 'Hello World');
-        $this->assertEquals(['Hello World'], $uri->getParameterValues('first-var'));
+        $uri->addAllowedParameterValue('first-var', 'Hello World');
+        $this->assertEquals(['Hello World'], $uri->getAllowedParameterValues('first-var'));
         $this->assertEquals('/{first-var}', $uri->getPath());
         $this->assertEquals(['{first-var}'], $uri->getPathArray());
     }
@@ -314,28 +314,28 @@ class RouterUriTest extends TestCase {
      */
     public function testSetUriPossibleVar01() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
-        $uri->addVarValue('  first-var  ', '  Hello World  ');
-        $this->assertEquals(['Hello World'], $uri->getParameterValues('first-var'));
+        $uri->addAllowedParameterValue('  first-var  ', '  Hello World  ');
+        $this->assertEquals(['Hello World'], $uri->getAllowedParameterValues('first-var'));
     }
     /**
      * @test
      */
     public function testSetUriPossibleVar02() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
-        $uri->addVarValues('first-var', ['Hello','World']);
-        $this->assertEquals(['Hello','World'], $uri->getParameterValues('first-var'));
+        $uri->addAllowedParameterValues('first-var', ['Hello','World']);
+        $this->assertEquals(['Hello','World'], $uri->getAllowedParameterValues('first-var'));
     }
     /**
      * @test
      */
     public function testSetUriPossibleVar03() {
         $uri = new RouterUri('https://example.com/{first-var}/ok/{second-var}', '');
-        $uri->addVarValues('first-var', ['Hello','World']);
-        $uri->addVarValues('  second-var ', ['hell','is','not','heven']);
-        $uri->addVarValues('  secohhnd-var ', ['hell','is']);
-        $this->assertEquals(['Hello','World'], $uri->getParameterValues('first-var'));
-        $this->assertEquals(['hell','is','not','heven'], $uri->getParameterValues('second-var'));
-        $this->assertEquals([], $uri->getParameterValues('secohhnd-var'));
+        $uri->addAllowedParameterValues('first-var', ['Hello','World']);
+        $uri->addAllowedParameterValues('  second-var ', ['hell','is','not','heven']);
+        $uri->addAllowedParameterValues('  secohhnd-var ', ['hell','is']);
+        $this->assertEquals(['Hello','World'], $uri->getAllowedParameterValues('first-var'));
+        $this->assertEquals(['hell','is','not','heven'], $uri->getAllowedParameterValues('second-var'));
+        $this->assertEquals([], $uri->getAllowedParameterValues('secohhnd-var'));
     }
     /**
      * @test

@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.0.1-beta.31](https://github.com/WebFiori/framework/compare/v3.0.0-beta.31...v3.0.1-beta.31) (2026-01-15)
+
+
+### Bug Fixes
+
+* Fix Session Tables Creation ([f318ba4](https://github.com/WebFiori/framework/commit/f318ba4204c45d49717b7dea85f5fbda5645b070))
+* Getting Requested URI ([79f47a8](https://github.com/WebFiori/framework/commit/79f47a8682a5ffd15c604b6e9138ec912c391c3a))
+* Max/Min Values Issue ([b57b6bc](https://github.com/WebFiori/framework/commit/b57b6bc51de36c579cd9a3dd1ebc065e06be18fe))
+* Multiple Fixes ([bd09605](https://github.com/WebFiori/framework/commit/bd09605110e17c2516200f78040bbcf1aca94a35))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#273](https://github.com/WebFiori/framework/issues/273) from WebFiori/dev ([21b650e](https://github.com/WebFiori/framework/commit/21b650e81178cd6ae3325bf01e1a29a4e6e8d803))
+* Pump-Up Database to V1.2 ([f8af600](https://github.com/WebFiori/framework/commit/f8af600f2fd2e70f3a34f2d0b8614021a84db79f))
+* Update issue templates ([e6a10a8](https://github.com/WebFiori/framework/commit/e6a10a85fddec748a82c6e033574dea434e871b8))
+* Update Sonar Config ([7d230c9](https://github.com/WebFiori/framework/commit/7d230c97f58fc17cd02f723fa6ac361e7a2072ba))
+* Updated Core Libraries ([641c4cf](https://github.com/WebFiori/framework/commit/641c4cf1b134f6ccdcb89b68a37617d7306b8da2))
+
 ## [3.0.0-beta.31](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.30...v3.0.0-beta.31) (2025-10-27)
 
 

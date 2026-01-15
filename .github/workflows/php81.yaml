@@ -1,4 +1,4 @@
-name: Build PHP 8.1
+name: PHP 8.1
 
 on:
   push:
@@ -104,7 +104,7 @@ jobs:
   code-coverage:
     name: Coverage
     needs: test
-    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@main
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
     with:
       php-version: '8.1'
       coverage-file: 'php-8.1-coverage.xml'

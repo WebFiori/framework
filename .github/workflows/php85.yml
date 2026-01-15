@@ -47,7 +47,7 @@ jobs:
         with:
           php-version: 8.5
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:11.5.27, composer
+          tools: phpunit:12.5.4, composer
           
       - name: Install ODBC Driver for SQL Server
         run: |

@@ -384,11 +384,14 @@ class App {
              */
             define('PUBLIC_FOLDER', $publicFolder);
         }
-        if (!defined('WF_CORE_PATH')) {
+        if (!defined('WF_CORE_PATHS')) {
             /**
-             * Path to WebFiori's core library.
+             * Possible Paths to WebFiori's core library.
              */
-            define('WF_CORE_PATH', ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework');
+            define('WF_CORE_PATHS', [
+                ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework',
+                ROOT_PATH.DS.'WebFiori'.DS.'Framework'
+            ]);
         }
         self::initAutoLoader();
         self::checkStandardLibs();
@@ -649,20 +652,22 @@ class App {
          * Initialize autoloader.
          */
         if (!class_exists('WebFiori\Framework\Autoload\ClassLoader',false)) {
-            $autoloader = WF_CORE_PATH.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
-            
-            if (!file_exists($autoloader)) {
-                throw new \Exception('Unable to locate the autoloader class.');
-            }
-            require_once $autoloader;
-        }
-        self::$AU = ClassLoader::get();
+            foreach (WF_CORE_PATHS as $path) {
+                $autoloader = $path.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
 
-        if (!class_exists(APP_DIR.'\\Init\\InitAutoLoad')) {
-            Ini::createAppDirs();
-            Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
+                if (file_exists($autoloader)) {
+                    require_once $autoloader;
+                    self::$AU = ClassLoader::get();
+                }
+                if (!class_exists(APP_DIR.'\\Init\\InitAutoLoad')) {
+                    Ini::createAppDirs();
+                    Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
+                }
+                self::call(APP_DIR.'\\Init\\InitAutoLoad::init');
+                return;
+            }
         }
-        self::call(APP_DIR.'\\Init\\InitAutoLoad::init');
+        throw new \Exception('Unable to locate the autoloader class.');
     }
     /**
      * Initialize global constants which has information about framework version.

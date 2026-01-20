@@ -18,11 +18,14 @@ use WebFiori\Framework\Cli\Helpers\CreateAPITestCase;
 use WebFiori\Framework\Cli\Helpers\CreateAttributeTable;
 use WebFiori\Framework\Cli\Helpers\CreateBackgroundTask;
 use WebFiori\Framework\Cli\Helpers\CreateCLIClassHelper;
+use WebFiori\Framework\Cli\Helpers\CreateCleanArchStack;
 use WebFiori\Framework\Cli\Helpers\CreateDBAccessHelper;
 use WebFiori\Framework\Cli\Helpers\CreateDomainEntity;
 use WebFiori\Framework\Cli\Helpers\CreateFullRESTHelper;
 use WebFiori\Framework\Cli\Helpers\CreateMiddleware;
 use WebFiori\Framework\Cli\Helpers\CreateMigration;
+use WebFiori\Framework\Cli\Helpers\CreateRepository;
+use WebFiori\Framework\Cli\Helpers\CreateRestService;
 use WebFiori\Framework\Cli\Helpers\CreateTableObj;
 use WebFiori\Framework\Cli\Helpers\CreateThemeHelper;
 use WebFiori\Framework\Cli\Helpers\CreateWebService;
@@ -95,6 +98,9 @@ class CreateCommand extends Command {
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
             $create->readClassInfo();
+        } else if ($answer == 'Annotation-based REST service (Clean Architecture).') {
+            $create = new CreateRestService($this);
+            $create->writeClass();
         } else if ($answer == 'Middleware.') {
             $create = new CreateMiddleware($this);
             $create->readClassInfo();
@@ -116,6 +122,12 @@ class CreateCommand extends Command {
             $create->readEntityInfo();
             $create->confirnIncludeColsUpdate();
             $create->writeClass();
+        } else if ($answer == 'Repository class (Clean Architecture).') {
+            $create = new CreateRepository($this);
+            $create->writeClass();
+        } else if ($answer == 'Complete clean architecture stack (Entity + Table + Repository).') {
+            $create = new CreateCleanArchStack($this);
+            return $create->writeClasses();
         } else if ($answer == 'Complete REST backend (Database table, entity, database access and web services).') {
             $create = new CreateFullRESTHelper($this);
             $create->readInfo();
@@ -139,11 +151,14 @@ class CreateCommand extends Command {
         $options['entity'] = 'Entity class from table.';
         $options['domain-entity'] = 'Pure domain entity (Clean Architecture).';
         $options['web-service'] = 'Web service.';
+        $options['rest-service'] = 'Annotation-based REST service (Clean Architecture).';
         $options['task'] = 'Background Task.';
         $options['middleware'] = 'Middleware.';
         $options['command'] = 'CLI Command.';
         $options['theme'] = 'Theme.';
         $options['db'] = 'Database access class based on table.';
+        $options['repository'] = 'Repository class (Clean Architecture).';
+        $options['clean-stack'] = 'Complete clean architecture stack (Entity + Table + Repository).';
         $options['rest'] = 'Complete REST backend (Database table, entity, database access and web services).';
         $options['api-test'] = 'Web service test case.';
         $options['migration'] = 'Database migration.';

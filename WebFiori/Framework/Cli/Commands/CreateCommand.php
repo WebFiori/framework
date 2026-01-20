@@ -15,9 +15,11 @@ use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
 use WebFiori\Framework\Cli\Helpers\ClassInfoReader;
 use WebFiori\Framework\Cli\Helpers\CreateAPITestCase;
+use WebFiori\Framework\Cli\Helpers\CreateAttributeTable;
 use WebFiori\Framework\Cli\Helpers\CreateBackgroundTask;
 use WebFiori\Framework\Cli\Helpers\CreateCLIClassHelper;
 use WebFiori\Framework\Cli\Helpers\CreateDBAccessHelper;
+use WebFiori\Framework\Cli\Helpers\CreateDomainEntity;
 use WebFiori\Framework\Cli\Helpers\CreateFullRESTHelper;
 use WebFiori\Framework\Cli\Helpers\CreateMiddleware;
 use WebFiori\Framework\Cli\Helpers\CreateMigration;
@@ -82,8 +84,14 @@ class CreateCommand extends Command {
         } else if ($answer == 'Database table class.') {
             $create = new CreateTableObj($this);
             $create->readClassInfo();
+        } else if ($answer == 'Attribute-based table schema (Clean Architecture).') {
+            $create = new CreateAttributeTable($this);
+            $create->writeClass();
         } else if ($answer == 'Entity class from table.') {
             $this->createEntityFromQuery();
+        } else if ($answer == 'Pure domain entity (Clean Architecture).') {
+            $create = new CreateDomainEntity($this);
+            $create->writeClass();
         } else if ($answer == 'Web service.') {
             $create = new CreateWebService($this);
             $create->readClassInfo();
@@ -127,7 +135,9 @@ class CreateCommand extends Command {
     private function getWhat() {
         $options = [];
         $options['table'] = 'Database table class.';
+        $options['table-attributes'] = 'Attribute-based table schema (Clean Architecture).';
         $options['entity'] = 'Entity class from table.';
+        $options['domain-entity'] = 'Pure domain entity (Clean Architecture).';
         $options['web-service'] = 'Web service.';
         $options['task'] = 'Background Task.';
         $options['middleware'] = 'Middleware.';

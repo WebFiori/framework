@@ -102,6 +102,8 @@ abstract class ClassWriter {
     }
     /**
      * Appends a string or array of strings to the string that represents the
+        
+        return $this;
      * body of the class.
      *
      * @param string $strOrArr The string that will be appended. At the end of the string
@@ -116,12 +118,13 @@ abstract class ClassWriter {
         if (gettype($strOrArr) != 'array') {
             $this->a($strOrArr, $tabsCount);
 
-            return;
+            return $this;
         }
 
         foreach ($strOrArr as $str) {
             $this->a($str, $tabsCount);
         }
+        return $this;
     }
     /**
      * Adds method definition to the class.
@@ -152,7 +155,7 @@ abstract class ClassWriter {
      * @param bool $isAbstract Is abstract method
      * @param bool $isFinal Is final method
      * 
-     * @return string Method signature
+     * @return $this For chaining
      */
     public function method(
         string $funcName, 
@@ -162,7 +165,7 @@ abstract class ClassWriter {
         bool $isStatic = false,
         bool $isAbstract = false,
         bool $isFinal = false
-    ) : string {
+    ) {
         $modifiers = [];
         
         if ($isFinal) {
@@ -193,7 +196,8 @@ abstract class ClassWriter {
             $argsPart .= ' : ' . $returns;
         }
         
-        return $signature . $argsPart . ($isAbstract ? ';' : ' {');
+        $this->append($signature . $argsPart . ($isAbstract ? ';' : ' {'), 1);
+        return $this;
     }
     /**
      * Generate a property declaration.
@@ -205,7 +209,9 @@ abstract class ClassWriter {
      * @param bool $isStatic Is static property
      * @param bool $isReadonly Is readonly property (PHP 8.1+)
      * 
-     * @return string Property declaration
+     * @param int|null $indent If provided, appends to class and returns $this for chaining
+     * 
+     * @return string|$this Property declaration string, or $this if $indent is provided
      */
     public function property(
         string $name,
@@ -214,7 +220,7 @@ abstract class ClassWriter {
         ?string $defaultValue = null,
         bool $isStatic = false,
         bool $isReadonly = false
-    ) : string {
+    ) {
         $modifiers = [$visibility];
         
         if ($isReadonly) {
@@ -236,7 +242,8 @@ abstract class ClassWriter {
             $declaration .= ' = ' . $defaultValue;
         }
         
-        return $declaration . ';';
+        $this->append($declaration . ';', 1);
+        return $this;
     }
     /**
      * Generate a constant declaration.
@@ -245,14 +252,24 @@ abstract class ClassWriter {
      * @param string $value Constant value as string
      * @param string $visibility Visibility: 'public', 'protected', 'private'
      * 
-     * @return string Constant declaration
+     * @return $this For chaining
      */
     public function constant(
         string $name,
         string $value,
         string $visibility = 'public'
-    ) : string {
-        return $visibility . ' const ' . $name . ' = ' . $value . ';';
+    ) {
+        $this->append($visibility . ' const ' . $name . ' = ' . $value . ';', 1);
+        return $this;
+    }
+    /**
+     * Add an empty line (fluent version).
+     *
+     * @return $this For chaining
+     */
+    public function addEmptyLine() {
+        $this->append('');
+        return $this;
     }
     /**
      * Start building a docblock.
@@ -264,7 +281,6 @@ abstract class ClassWriter {
     public function docblock(string $description = '') : DocblockBuilder {
         return new DocblockBuilder($this, $description);
     }
-    /**
     /**
      * Add an attribute for a class.
      *

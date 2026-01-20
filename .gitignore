@@ -16,3 +16,4 @@ App/Config/*
 *.Identifier
 tests/clover.xml
 /.vscode
+/App

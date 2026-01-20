@@ -27,7 +27,7 @@ abstract class ClassWriter {
      *
      * @since 1.0
      */
-    private $classAsStr;
+    private $classLines;
     /**
      * The name of the class that will be created.
      *
@@ -405,13 +405,13 @@ abstract class ClassWriter {
     public function writeClass() {
         $classFile = new File($this->getName().'.php', $this->getPath());
         $classFile->remove();
-        $this->classAsStr = '';
+        $this->classLines = [];
         $this->writeNsDeclaration();
         $this->writeUseStatements();
         $this->writeClassComment();
         $this->writeClassDeclaration();
         $this->writeClassBody();
-        $classFile->setRawData($this->classAsStr);
+        $classFile->setRawData(implode("\n", $this->classLines));
         $classFile->write(false, true);
     }
     public abstract function writeClassBody();
@@ -446,7 +446,7 @@ abstract class ClassWriter {
     }
     private function a($str, $tapsCount) {
         $tabStr = str_repeat('    ', $tapsCount);
-        $this->classAsStr .= $tabStr.$str."\n";
+        $this->classLines[] = $tabStr.$str;
     }
     private function fixClassName($className) {
         $classSuffix = $this->getSuffix();

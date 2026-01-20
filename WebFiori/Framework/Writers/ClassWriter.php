@@ -411,7 +411,7 @@ abstract class ClassWriter {
         $this->writeClassComment();
         $this->writeClassDeclaration();
         $this->writeClassBody();
-        $classFile->setRawData(implode("\n", $this->classLines));
+        $classFile->setRawData(implode("\n", $this->normalizeCode($this->classLines)));
         $classFile->write(false, true);
     }
     public abstract function writeClassBody();
@@ -448,7 +448,23 @@ abstract class ClassWriter {
         $tabStr = str_repeat('    ', $tapsCount);
         $this->classLines[] = $tabStr.$str;
     }
-    private function fixClassName($className) {
+    private function normalizeCode(array $lines) : array {
+        $normalized = [];
+        $prevLineEmpty = false;
+        
+        foreach ($lines as $line) {
+            $isEmpty = trim($line) === '';
+            
+            if ($isEmpty && $prevLineEmpty) {
+                continue;
+            }
+            
+            $normalized[] = $line;
+            $prevLineEmpty = $isEmpty;
+        }
+        
+        return $normalized;
+    }    private function fixClassName($className) {
         $classSuffix = $this->getSuffix();
 
         if ($classSuffix == '') {

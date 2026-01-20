@@ -194,7 +194,66 @@ abstract class ClassWriter {
         }
         
         return $signature . $argsPart . ($isAbstract ? ';' : ' {');
-    }    /**
+    }
+    /**
+     * Generate a property declaration.
+     *
+     * @param string $name Property name
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * @param string|null $type Property type
+     * @param string|null $defaultValue Default value as string
+     * @param bool $isStatic Is static property
+     * @param bool $isReadonly Is readonly property (PHP 8.1+)
+     * 
+     * @return string Property declaration
+     */
+    public function property(
+        string $name,
+        string $visibility = 'private',
+        ?string $type = null,
+        ?string $defaultValue = null,
+        bool $isStatic = false,
+        bool $isReadonly = false
+    ) : string {
+        $modifiers = [$visibility];
+        
+        if ($isReadonly) {
+            $modifiers[] = 'readonly';
+        }
+        if ($isStatic) {
+            $modifiers[] = 'static';
+        }
+        
+        $declaration = implode(' ', $modifiers);
+        
+        if ($type !== null) {
+            $declaration .= ' ' . $type;
+        }
+        
+        $declaration .= ' $' . $name;
+        
+        if ($defaultValue !== null) {
+            $declaration .= ' = ' . $defaultValue;
+        }
+        
+        return $declaration . ';';
+    }
+    /**
+     * Generate a constant declaration.
+     *
+     * @param string $name Constant name
+     * @param string $value Constant value as string
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * 
+     * @return string Constant declaration
+     */
+    public function constant(
+        string $name,
+        string $value,
+        string $visibility = 'public'
+    ) : string {
+        return $visibility . ' const ' . $name . ' = ' . $value . ';';
+    }/**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.

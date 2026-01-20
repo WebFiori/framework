@@ -66,23 +66,23 @@ class RepositoryWriter extends ClassWriter {
     }
     
     private function writeGetTableName() {
-        $this->append($this->f('getTableName', [], 'string').' {', 1);
-        $this->append("return '{$this->tableName}';", 2);
+        $this->append($this->f('getTableName', [], 'string'), 1);
+        $this->append('return \''.$this->tableName.'\';', 2);
         $this->append('}', 1);
         $this->append('', 1);
     }
     
     private function writeGetIdField() {
-        $this->append($this->f('getIdField', [], 'string').' {', 1);
-        $this->append("return '{$this->idField}';", 2);
+        $this->append($this->f('getIdField', [], 'string'), 1);
+        $this->append('return \''.$this->idField.'\';', 2);
         $this->append('}', 1);
         $this->append('', 1);
     }
     
     private function writeToEntity() {
         $entityShortName = basename(str_replace('\\', '/', $this->entityClass));
-        $this->append($this->f('toEntity', ['row' => 'array'], $entityShortName).' {', 1);
-        $this->append("return new $entityShortName(", 2);
+        $this->append($this->f('toEntity', ['row' => 'array'], $entityShortName), 1);
+        $this->append('return new '.$entityShortName.'(', 2);
         
         $params = [];
         foreach ($this->properties as $prop) {
@@ -97,7 +97,7 @@ class RepositoryWriter extends ClassWriter {
     }
     
     private function writeToArray() {
-        $this->append($this->f('toArray', ['entity' => 'object'], 'array').' {', 1);
+        $this->append($this->f('toArray', ['entity' => 'object'], 'array'), 1);
         $this->append('return [', 2);
         
         foreach ($this->properties as $prop) {

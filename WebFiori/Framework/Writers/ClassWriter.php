@@ -513,16 +513,23 @@ abstract class ClassWriter {
     public function writeClass() {
         $classFile = new File($this->getName().'.php', $this->getPath());
         $classFile->remove();
+        $classFile->setRawData($this->getCode());
+        $classFile->write(false, true);
+    }
+    /**
+     * Generate the class code without writing to disk.
+     *
+     * @return string The generated class code
+     */
+    public function getCode() : string {
         $this->classLines = [];
         $this->writeNsDeclaration();
         $this->writeUseStatements();
         $this->writeClassComment();
         $this->writeClassDeclaration();
         $this->writeClassBody();
-        $classFile->setRawData(implode("\n", $this->normalizeCode($this->classLines)));
-        $classFile->write(false, true);
-    }
-    public abstract function writeClassBody();
+        return implode("\n", $this->normalizeCode($this->classLines));
+    }    public abstract function writeClassBody();
     /**
      * Writes the top section of the class that contains class comment.
      */

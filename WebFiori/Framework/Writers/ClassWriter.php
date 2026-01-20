@@ -265,6 +265,95 @@ abstract class ClassWriter {
         return new DocblockBuilder($this, $description);
     }
     /**
+    /**
+     * Add an attribute for a class.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return $this For chaining
+     */
+    public function classAttribute(string $name, array $params = [], int $indent = 0) {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Add an attribute for a property.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return $this For chaining
+     */
+    public function propertyAttribute(string $name, array $params = [], int $indent = 1) {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Add an attribute for a method.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return $this For chaining
+     */
+    public function methodAttribute(string $name, array $params = [], int $indent = 1) {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Format an attribute string.
+     *
+     * @param string $name Attribute name
+     * @param array $params Attribute parameters
+     * 
+     * @return string Formatted attribute
+     */
+    private function formatAttribute(string $name, array $params = []) : string {
+        $attr = '#[' . $name;
+        
+        if (!empty($params)) {
+            $args = [];
+            foreach ($params as $key => $value) {
+                if (is_int($key)) {
+                    $args[] = $this->formatAttributeValue($value);
+                } else {
+                    $args[] = $key . ': ' . $this->formatAttributeValue($value);
+                }
+            }
+            $attr .= '(' . implode(', ', $args) . ')';
+        }
+        
+        $attr .= ']';
+        return $attr;
+    }
+    /**
+     * Format a value for attribute parameters.
+     *
+     * @param mixed $value The value to format
+     * 
+     * @return string Formatted value
+     */
+    private function formatAttributeValue($value) : string {
+        if (is_string($value)) {
+            return "'" . addslashes($value) . "'";
+        }
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_array($value)) {
+            $items = array_map([$this, 'formatAttributeValue'], $value);
+            return '[' . implode(', ', $items) . ']';
+        }
+        if (is_null($value)) {
+            return 'null';
+        }
+        return (string)$value;
+    }
+    /**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.

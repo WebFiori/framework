@@ -139,24 +139,62 @@ abstract class ClassWriter {
      * it.
      */
     public function f($funcName, $argsArr = [], ?string $returns = null) {
-        $argsPart = '(';
-
-        foreach ($argsArr as $argName => $argType) {
-            if (strlen($argsPart) != 1) {
-                $argsPart .= ', '.$argType.' $'.$argName;
-                continue;
-            }
-            $argsPart .= $argType.' $'.$argName;
-        }
-        $argsPart .= ')';
-
-        if ($returns !== null) {
-            $argsPart .= ' : '.$returns;
-        }
-
-        return 'public function '.$funcName.$argsPart.' {';
+        return $this->method($funcName, $argsArr, $returns);
     }
     /**
+     * Adds method definition with full control over modifiers.
+     *
+     * @param string $funcName Method name
+     * @param array $argsArr Arguments [name => type]
+     * @param string|null $returns Return type
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * @param bool $isStatic Is static method
+     * @param bool $isAbstract Is abstract method
+     * @param bool $isFinal Is final method
+     * 
+     * @return string Method signature
+     */
+    public function method(
+        string $funcName, 
+        array $argsArr = [], 
+        ?string $returns = null,
+        string $visibility = 'public',
+        bool $isStatic = false,
+        bool $isAbstract = false,
+        bool $isFinal = false
+    ) : string {
+        $modifiers = [];
+        
+        if ($isFinal) {
+            $modifiers[] = 'final';
+        }
+        if ($isAbstract) {
+            $modifiers[] = 'abstract';
+        }
+        
+        $modifiers[] = $visibility;
+        
+        if ($isStatic) {
+            $modifiers[] = 'static';
+        }
+        
+        $signature = implode(' ', $modifiers) . ' function ' . $funcName;
+        
+        $argsPart = '(';
+        foreach ($argsArr as $argName => $argType) {
+            if (strlen($argsPart) != 1) {
+                $argsPart .= ', ';
+            }
+            $argsPart .= $argType . ' $' . $argName;
+        }
+        $argsPart .= ')';
+        
+        if ($returns !== null) {
+            $argsPart .= ' : ' . $returns;
+        }
+        
+        return $signature . $argsPart . ($isAbstract ? ';' : ' {');
+    }    /**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.

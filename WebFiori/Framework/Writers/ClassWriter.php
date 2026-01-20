@@ -253,7 +253,18 @@ abstract class ClassWriter {
         string $visibility = 'public'
     ) : string {
         return $visibility . ' const ' . $name . ' = ' . $value . ';';
-    }/**
+    }
+    /**
+     * Start building a docblock.
+     *
+     * @param string $description Main description
+     * 
+     * @return DocblockBuilder
+     */
+    public function docblock(string $description = '') : DocblockBuilder {
+        return new DocblockBuilder($this, $description);
+    }
+    /**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.

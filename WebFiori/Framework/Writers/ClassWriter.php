@@ -525,16 +525,18 @@ abstract class ClassWriter {
      * @return boolean If the name is successfully set, the method will return true.
      * Other than that, false is returned.
      */
-    public function setClassName(string $name) : bool {
+    public function setClassName(string $name) {
         $trimmed = trim($name);
 
-        if (self::isValidClassName($trimmed)) {
-            $this->className = $this->fixClassName($trimmed);
-
-            return true;
+        if (!self::isValidClassName($trimmed)) {
+            throw new \InvalidArgumentException(
+                "Invalid class name '$name'. Class names must start with a letter or underscore, " .
+                "followed by letters, numbers, or underscores."
+            );
         }
 
-        return false;
+        $this->className = $this->fixClassName($trimmed);
+        return $this;
     }
 
     /**
@@ -549,11 +551,14 @@ abstract class ClassWriter {
         $trimmed = trim($namespace, ' ');
 
         if (!self::isValidNamespace($trimmed)) {
-            return false;
+            throw new \InvalidArgumentException(
+                "Invalid namespace '$namespace'. Namespaces must contain valid PHP identifiers " .
+                "separated by backslashes."
+            );
         }
+        
         $this->ns = $trimmed[0] == '\\' ? substr($trimmed, 1) : $trimmed;
-
-        return true;
+        return $this;
     }
     /**
      * Sets the location at which the class will be created on.
@@ -563,15 +568,15 @@ abstract class ClassWriter {
      * @return boolean If the path is successfully set, the method will return true.
      * Other than that, false is returned.
      */
-    public function setPath(string $path) : bool {
+    public function setPath(string $path) {
         $trimmed = trim($path);
 
         if (strlen($trimmed) == 0) {
-            return false;
+            throw new \InvalidArgumentException("Path cannot be empty.");
         }
+        
         $this->path = str_replace('\\', DS, str_replace('/', DS, $trimmed));
-
-        return true;
+        return $this;
     }
     /**
      * Sets a string as a suffix to the class name.
@@ -581,15 +586,16 @@ abstract class ClassWriter {
      *
      * @return bool If set, the method will return true. False otherises.
      */
-    public function setSuffix(string $classNameSuffix) : bool {
-        if (self::isValidClassName($classNameSuffix)) {
-            $this->suffix = $classNameSuffix;
-            $this->className = $this->fixClassName($this->className);
-
-            return true;
+    public function setSuffix(string $classNameSuffix) {
+        if (!self::isValidClassName($classNameSuffix)) {
+            throw new \InvalidArgumentException(
+                "Invalid suffix '$classNameSuffix'. Suffix must be a valid class name."
+            );
         }
 
-        return false;
+        $this->suffix = $classNameSuffix;
+        $this->className = $this->fixClassName($this->className);
+        return $this;
     }
     /**
      * Write the new class to a .php file.

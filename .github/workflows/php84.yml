@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -106,23 +110,9 @@ jobs:
   code-coverage:
     name: Coverage
     needs: test
-    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@main
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
     with:
       php-version: '8.4'
       coverage-file: 'php-8.4-coverage.xml'
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  code-quality:
-    name: Code Quality
-    needs: test
-    uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@main
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  
-  release-prod:
-    name: Prepare Production Release Branch / Publish Release
-    needs: [code-coverage, code-quality]
-    uses: WebFiori/workflows/.github/workflows/release-php.yaml@main
-    with:
-      branch: 'main'

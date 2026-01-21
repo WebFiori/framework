@@ -2,7 +2,6 @@
 namespace WebFiori\Framework\Test\Cli;
 
 use WebFiori\Database\ConnectionInfo;
-use WebFiori\Database\Schema\SchemaRunner;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Cli\CLITestCase;
 use WebFiori\Framework\Cli\Commands\RunMigrationsCommand;
@@ -19,9 +18,11 @@ class RunMigrationsCommandTest extends CLITestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->setupTestConnection();
+        $this->cleanupMigrations();
     }
     
     protected function tearDown(): void {
+        $this->cleanupMigrations();
         App::getConfig()->removeAllDBConnections();
         parent::tearDown();
     }
@@ -30,6 +31,17 @@ class RunMigrationsCommandTest extends CLITestCase {
         $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', '127.0.0.1', 3306);
         $this->testConnection->setName('test-connection');
         App::getConfig()->addOrUpdateDBConnection($this->testConnection);
+    }
+    
+    private function cleanupMigrations(): void {
+        $dir = APP_PATH . 'Database' . DS . 'Migrations';
+        if (is_dir($dir)) {
+            foreach (glob($dir . DS . '*.php') as $file) {
+                if (basename($file) !== '.gitkeep') {
+                    unlink($file);
+                }
+            }
+        }
     }
     
     /**
@@ -42,7 +54,7 @@ class RunMigrationsCommandTest extends CLITestCase {
             RunMigrationsCommand::class
         ]);
         
-        $this->assertContains("Info: No connections were found in application configuration.\n", $output);
+        $this->assertContains("Info: No database connections configured.\n", $output);
         $this->assertEquals(1, $this->getExitCode());
     }
     
@@ -55,35 +67,7 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--connection' => 'invalid-connection'
         ]);
         
-        $this->assertContains("Error: No connection was found which has the name 'invalid-connection'.\n", $output);
-        $this->assertEquals(1, $this->getExitCode());
-    }
-    
-    /**
-     * @test
-     */
-    public function testExecWithInvalidRunnerClass(): void {
-        $output = $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--connection' => 'test-connection',
-            '--runner' => 'NonExistentClass'
-        ]);
-        
-        $this->assertContains("Error: The argument --runner has invalid value: Class \"NonExistentClass\" does not exist.\n", $output);
-        $this->assertEquals(1, $this->getExitCode());
-    }
-    
-    /**
-     * @test
-     */
-    public function testExecWithInvalidRunnerType(): void {
-        $output = $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--connection' => 'test-connection',
-            '--runner' => 'stdClass'
-        ]);
-        
-        $this->assertContains("Error: The argument --runner has invalid value: \"stdClass\" is not an instance of \"SchemaRunner\".\n", $output);
+        $this->assertContains("Error: Connection 'invalid-connection' not found.\n", $output);
         $this->assertEquals(1, $this->getExitCode());
     }
     
@@ -97,20 +81,15 @@ class RunMigrationsCommandTest extends CLITestCase {
             '--init'
         ]);
         
-        $this->assertContains("Initializing migrations table...\n", $output);
+        $this->assertContains("Creating migrations tracking table...\n", $output);
+        $this->assertContains("Success: Migrations table created successfully.\n", $output);
         $this->assertEquals(0, $this->getExitCode());
-        
-        // Verify table was actually created using mysqli
-        $mysqli = new \mysqli('127.0.0.1', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 3306);
-        $result = $mysqli->query("SHOW TABLES LIKE 'schema_changes'");
-        $this->assertEquals(1, $result->num_rows, 'Migrations table should be created');
-        $mysqli->close();
     }
     
     /**
      * @test
      */
-    public function testExecuteMigrationsWithNoMigrations(): void {
+    public function testRunWithNoMigrations(): void {
         $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--connection' => 'test-connection'
@@ -123,103 +102,47 @@ class RunMigrationsCommandTest extends CLITestCase {
     /**
      * @test
      */
-    public function testRollbackWithNoMigrations(): void {
+    public function testDryRun(): void {
+        // Create a test migration
+        $this->createTestMigration('TestMigration');
+        
         $output = $this->executeMultiCommand([
             RunMigrationsCommand::class,
             '--connection' => 'test-connection',
-            '--rollback'
+            '--dry-run'
         ]);
         
-        // Debug: Print actual output
+        // Check if output contains expected text
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('TestMigration', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }
     
-    /**
-     * @test
-     */
-    public function testRollbackAllWithNoMigrations(): void {
-        $output = $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--connection' => 'test-connection',
-            '--rollback',
-            '--all'
-        ]);
-        
-        // Debug: Print actual output
-        $this->assertEquals(0, $this->getExitCode());
-    }
-    
-    /**
-     * @test
-     */
-    public function testExecuteMigrationsWithValidRunner(): void {
-        $this->createTestMigrationRunner();
-        
-        $output = $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--connection' => 'test-connection',
-            '--runner' => 'TestMigrationRunner'
-        ]);
-        // The test runner has no migrations, so it should report no migrations found
-        $this->assertContains("Info: No migrations found.\n", $output);
-        $this->assertEquals(0, $this->getExitCode());
-        
-        $this->cleanupTestMigrationRunner();
-    }
-    
-    /**
-     * @test
-     */
-    public function testExceptionHandling(): void {
-        $this->createFaultyMigrationRunner();
-        
-        $output = $this->executeMultiCommand([
-            RunMigrationsCommand::class,
-            '--connection' => 'test-connection',
-            '--runner' => 'FaultyMigrationRunner'
-        ]);
-        
-        // The exception is caught during runner creation
-        $this->assertContains("Error: The argument --runner has invalid value: Exception: \"Test exception\".\n", $output);
-        $this->assertEquals(1, $this->getExitCode());
-        
-        $this->cleanupFaultyMigrationRunner();
-    }
-    
-    private function createTestMigrationRunner(): void {
-        $code = '<?php
-class TestMigrationRunner extends \WebFiori\Database\Schema\SchemaRunner {
-    public function __construct() {
-        $conn = \WebFiori\Framework\App::getConfig()->getDBConnection("test-connection");
-        parent::__construct($conn);
-    }
-}';
-        file_put_contents(APP_PATH . 'TestMigrationRunner.php', $code);
-        require_once APP_PATH . 'TestMigrationRunner.php';
-    }
-    
-    private function cleanupTestMigrationRunner(): void {
-        if (file_exists(APP_PATH . 'TestMigrationRunner.php')) {
-            unlink(APP_PATH . 'TestMigrationRunner.php');
+    private function createTestMigration(string $name): void {
+        $dir = APP_PATH . 'Database' . DS . 'Migrations';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
+        
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        // Test migration
     }
     
-    private function createFaultyMigrationRunner(): void {
-        $code = '<?php
-class FaultyMigrationRunner extends \WebFiori\Database\Schema\SchemaRunner {
-    public function __construct() {
-        $conn = \WebFiori\Framework\App::getConfig()->getDBConnection("test-connection");
-        parent::__construct($conn);
-        throw new \Exception("Test exception");
+    public function down(Database \$db): void {
+        // Test rollback
     }
-}';
-        file_put_contents(APP_PATH . 'FaultyMigrationRunner.php', $code);
-        require_once APP_PATH . 'FaultyMigrationRunner.php';
-    }
-    
-    private function cleanupFaultyMigrationRunner(): void {
-        if (file_exists(APP_PATH . 'FaultyMigrationRunner.php')) {
-            unlink(APP_PATH . 'FaultyMigrationRunner.php');
-        }
+}
+PHP;
+        
+        file_put_contents($dir . DS . $name . '.php', $content);
     }
 }

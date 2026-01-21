@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2020 Ibrahim BinAlshikh
+ * Copyright (c) 2020 WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -17,7 +17,6 @@ use WebFiori\File\File;
  *
  * @author Ibrahim
  *
- * @version 1.0.1
  */
 abstract class ClassWriter {
     /**
@@ -25,7 +24,6 @@ abstract class ClassWriter {
      *
      * @var string
      *
-     * @since 1.0
      */
     private $classLines;
     /**
@@ -33,7 +31,6 @@ abstract class ClassWriter {
      *
      * @var string
      *
-     * @since 1.0
      */
     private $className;
     /**
@@ -45,11 +42,13 @@ abstract class ClassWriter {
     /**
      * The location at which the entity class will be created on.
      *
-     * @since 1.0
      */
     private $path;
     private $suffix;
     private $useArr;
+    private $extendsClass;
+    private $implementsInterfaces;
+    private $classComment;
     /**
      * Creates new instance of the class.
      *
@@ -102,8 +101,6 @@ abstract class ClassWriter {
     }
     /**
      * Appends a string or array of strings to the string that represents the
-        
-        return $this;
      * body of the class.
      *
      * @param string $strOrArr The string that will be appended. At the end of the string
@@ -112,7 +109,6 @@ abstract class ClassWriter {
      * @param int $tabsCount The number of tabs that will be added to the string.
      * A tab is represented as 4 spaces.
      *
-     * @since 1.0
      */
     public function append($strOrArr, $tabsCount = 0) {
         if (gettype($strOrArr) != 'array') {
@@ -155,7 +151,7 @@ abstract class ClassWriter {
      * @param bool $isAbstract Is abstract method
      * @param bool $isFinal Is final method
      * 
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
     public function method(
         string $funcName, 
@@ -252,7 +248,7 @@ abstract class ClassWriter {
      * @param string $value Constant value as string
      * @param string $visibility Visibility: 'public', 'protected', 'private'
      * 
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
     public function constant(
         string $name,
@@ -265,9 +261,9 @@ abstract class ClassWriter {
     /**
      * Add an empty line (fluent version).
      *
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
-    public function addEmptyLine() {
+    public function addEmptyLine() : ClassWriter {
         $this->append('');
         return $this;
     }
@@ -288,9 +284,9 @@ abstract class ClassWriter {
      * @param array $params Attribute parameters
      * @param int $indent Indentation level
      * 
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
-    public function classAttribute(string $name, array $params = [], int $indent = 0) {
+    public function classAttribute(string $name, array $params = [], int $indent = 0) : ClassWriter {
         $this->append($this->formatAttribute($name, $params), $indent);
         return $this;
     }
@@ -301,9 +297,9 @@ abstract class ClassWriter {
      * @param array $params Attribute parameters
      * @param int $indent Indentation level
      * 
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
-    public function propertyAttribute(string $name, array $params = [], int $indent = 1) {
+    public function propertyAttribute(string $name, array $params = [], int $indent = 1) : ClassWriter {
         $this->append($this->formatAttribute($name, $params), $indent);
         return $this;
     }
@@ -314,9 +310,9 @@ abstract class ClassWriter {
      * @param array $params Attribute parameters
      * @param int $indent Indentation level
      * 
-     * @return $this For chaining
+     * @return ClassWriter For chaining
      */
-    public function methodAttribute(string $name, array $params = [], int $indent = 1) {
+    public function methodAttribute(string $name, array $params = [], int $indent = 1) : ClassWriter {
         $this->append($this->formatAttribute($name, $params), $indent);
         return $this;
     }
@@ -477,12 +473,12 @@ abstract class ClassWriter {
         $this->append($this->method($methodName, $params, $returns), $indent);
         $this->append('//TODO: Implement this method.', $indent + 1);
         $this->append('}', $indent);
-    }    /**
+    } 
+    /**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.
      *
-     * @since 1.0.1
      */
     public function getAbsolutePath() : string {
         return $this->getPath().DS.$this->getName().'.php';
@@ -499,7 +495,6 @@ abstract class ClassWriter {
      * @return string The name of the class that will be created. Default is
      * 'NewClass'
      *
-     * @since 1.0
      */
     public function getName(bool $withNs = false) : string {
         $retVal = $this->className.$this->getSuffix();
@@ -523,7 +518,6 @@ abstract class ClassWriter {
      * @return string The namespace at which the generated class will be added to.
      * default is '\' which is the global namespace.
      *
-     * @since 1.0
      */
     public function getNamespace() : string {
         return $this->ns;
@@ -534,7 +528,6 @@ abstract class ClassWriter {
      * @return string The location at which the class will be created on.
      * default is the value of the contstant ROOT_PATH
      *
-     * @since 1.0
      */
     public function getPath() : string {
         return $this->path;
@@ -646,10 +639,9 @@ abstract class ClassWriter {
      *
      * @param string $name A string that represents class name.
      *
-     * @return boolean If the name is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setClassName(string $name) {
+    public function setClassName(string $name) : ClassWriter {
         $trimmed = trim($name);
 
         if (!self::isValidClassName($trimmed)) {
@@ -668,10 +660,9 @@ abstract class ClassWriter {
      *
      * @param string $namespace
      *
-     * @return boolean If the namespace is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setNamespace(string $namespace) {
+    public function setNamespace(string $namespace) : ClassWriter {
         $trimmed = trim($namespace, ' ');
 
         if (!self::isValidNamespace($trimmed)) {
@@ -689,10 +680,9 @@ abstract class ClassWriter {
      *
      * @param string $path A string that represents folder path.
      *
-     * @return boolean If the path is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setPath(string $path) {
+    public function setPath(string $path) : ClassWriter {
         $trimmed = trim($path);
 
         if (strlen($trimmed) == 0) {
@@ -708,9 +698,9 @@ abstract class ClassWriter {
      * @param string $classNameSuffix A string to append to class name such as 'Table' or
      * 'Service'. It must be a string which is considered as valid class name.
      *
-     * @return bool If set, the method will return true. False otherises.
+     * @return ClassWriter
      */
-    public function setSuffix(string $classNameSuffix) {
+    public function setSuffix(string $classNameSuffix) : ClassWriter {
         if (!self::isValidClassName($classNameSuffix)) {
             throw new \InvalidArgumentException(
                 "Invalid suffix '$classNameSuffix'. Suffix must be a valid class name."
@@ -722,12 +712,44 @@ abstract class ClassWriter {
         return $this;
     }
     /**
+     * Sets the parent class to extend.
+     *
+     * @param string|null $class The class to extend
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setExtends(?string $class) : ClassWriter {
+        $this->extendsClass = $class;
+        return $this;
+    }
+    /**
+     * Sets the interfaces to implement.
+     *
+     * @param array $interfaces Array of interface names
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setImplements(array $interfaces) : ClassWriter {
+        $this->implementsInterfaces = $interfaces;
+        return $this;
+    }
+    /**
+     * Sets a custom class comment.
+     *
+     * @param string $comment The class comment/description
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setClassComment(string $comment) : ClassWriter {
+        $this->classComment = $comment;
+        return $this;
+    }
+    /**
      * Write the new class to a .php file.
      *
      * Note that the method will remove the file if it was already created and create
      * new one.
      *
-     * @since 1.0
      */
     public function writeClass() {
         $classFile = new File($this->getName().'.php', $this->getPath());
@@ -748,7 +770,8 @@ abstract class ClassWriter {
         $this->writeClassDeclaration();
         $this->writeClassBody();
         return implode("\n", $this->normalizeCode($this->classLines));
-    }    public abstract function writeClassBody();
+    }    
+    public abstract function writeClassBody();
     /**
      * Writes the top section of the class that contains class comment.
      */

@@ -313,7 +313,10 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('}', 1);
     }
-    private function writeConstructor() {
+    protected function writeConstructor(array $params = [],
+        $body = '',
+        string $description = 'Creates new instance of the class.',
+        int $indent = 1) {
         $this->append([
             "/**",
             " * Creates new instance of the class.",

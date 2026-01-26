@@ -510,7 +510,10 @@ class TableClassWriter extends ClassWriter {
             }
         }
     }
-    private function writeConstructor() {
+    protected function writeConstructor(array $params = [],
+        $body = '',
+        string $description = 'Creates new instance of the class.',
+        int $indent = 1) {
         $this->append([
             "/**",
             " * Creates new instance of the class.",

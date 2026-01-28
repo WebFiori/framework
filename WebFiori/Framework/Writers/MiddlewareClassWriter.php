@@ -133,26 +133,26 @@ class MiddlewareClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Execute a set of instructions before accessing the application.',
-            ' */',
-            $this->f('before', ['request' => 'Request', 'response' => 'Response']),
-
+            ' */'
         ], 1);
+        $this->f('before', ['request' => 'Request', 'response' => 'Response']);
+
         $this->append('//TODO: Implement the action to perform before processing the request.', 2);
         $this->append([
             '}',
             '/**',
             ' * Execute a set of instructions after processing the request and before sending back the response.',
-            ' */',
-            $this->f('after', ['request' => 'Request', 'response' => 'Response']),
+            ' */'
         ], 1);
+        $this->f('after', ['request' => 'Request', 'response' => 'Response']);
         $this->append('//TODO: Implement the action to perform after processing the request.', 2);
         $this->append([
             '}',
             '/**',
             ' * Execute a set of instructions after sending the response.',
-            ' */',
-            $this->f('afterSend', ['request' => 'Request', 'response' => 'Response']),
+            ' */'
         ], 1);
+        $this->f('afterSend', ['request' => 'Request', 'response' => 'Response']);
         $this->append('//TODO: Implement the action to perform after sending the request.', 2);
         $this->append('}', 1);
 
@@ -191,10 +191,10 @@ class MiddlewareClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',
-            ' */',
-            $this->f('__construct'),
-
+            ' */'
         ], 1);
+        $this->f('__construct');
+
         $this->append("parent::__construct('$this->name');", 2);
         $this->append("\$this->setPriority($this->priority);", 2);
 

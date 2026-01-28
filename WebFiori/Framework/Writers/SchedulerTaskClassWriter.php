@@ -126,35 +126,35 @@ class SchedulerTaskClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Execute the process.',
-            ' */',
-            $this->f('execute')
+            ' */'
         ], 1);
+        $this->f('execute');
 
         $this->append('//TODO: Write the code that represents the process.', 2);
         $this->append([
             '}',
             '/**',
             ' * Execute a set of instructions when the task failed to complete without errors.',
-            ' */',
-            $this->f('onFail')
+            ' */'
         ], 1);
+        $this->f('onFail');
         $this->append('//TODO: Implement the action to perform when the task fails to complete without errors.', 2);
         $this->append([
             '}',
             '/**',
             ' * Execute a set of instructions when the task completed without errors.',
-            ' */',
-            $this->f('onSuccess'),
+            ' */'
         ], 1);
+        $this->f('onSuccess');
 
         $this->append('//TODO: Implement the action to perform when the task executes without errors.', 2);
         $this->append([
             '}',
             '/**',
             ' * Execute a set of instructions after the task has finished to execute.',
-            ' */',
-            $this->f('afterExec'),
+            ' */'
         ], 1);
+        $this->f('afterExec');
 
         $this->append('//TODO: Implement the action to perform when the task finishes to execute.', 2);
         $this->append("//\$email = new TaskStatusEmail('no-reply', [", 2);
@@ -202,9 +202,9 @@ class SchedulerTaskClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',
-            ' */',
-            $this->f('__construct')
+            ' */'
         ], 1);
+        $this->f('__construct');
         $this->append([
             "parent::__construct('".$this->getTaskName()."');",
             "\$this->setDescription('".str_replace('\'', '\\\'', $this->getTaskDescription())."');"

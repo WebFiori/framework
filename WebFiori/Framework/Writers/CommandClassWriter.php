@@ -132,9 +132,9 @@ class CommandClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Execute the command.',
-            ' */',
-            $this->f('exec', [], 'int'),
+            ' */'
         ], 1);
+        $this->f('exec', [], 'int');
         $this->append([
             '//TODO: Write the logic of the command.',
             'return 0;',
@@ -176,9 +176,9 @@ class CommandClassWriter extends ClassWriter {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',
-            ' */',
-            $this->f('__construct')
+            ' */'
         ], 1);
+        $this->f('__construct');
 
         if (count($this->args) > 0) {
             $this->append(["parent::__construct('$this->name', ["], 2);

@@ -21,7 +21,6 @@ class HelpCommandTest extends CLITestCase {
             "    v:              Display framework version info.\n",
 
             "    scheduler:      Run tasks scheduler.\n",
-            "    create:         Creates a system entity (middleware, web service, background process ...).\n",
             "    add:            Add a database connection or SMTP account.\n",
 
 

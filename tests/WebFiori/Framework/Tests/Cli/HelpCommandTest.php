@@ -26,6 +26,7 @@ class HelpCommandTest extends CLITestCase {
             "    add:lang:                Add a website language.\n",
             "    create:middleware:       Create a new middleware class.\n",
             "    create:task:             Create a new scheduler task class.\n",
+            "    create:command:          Create a new CLI command class.\n",
 
 
 

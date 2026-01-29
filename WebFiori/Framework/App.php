@@ -450,6 +450,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddLangCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateMiddlewareCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateTaskCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommandCommand',
 
 
 

@@ -30,6 +30,7 @@ class HelpCommandTest extends CLITestCase {
             "    create:entity:           Create a new domain entity class.\n",
             "    create:service:          Create a new REST service class.\n",
             "    create:table:            Create a new database table schema class.\n",
+            "    create:repository:       Create a new repository class.\n",
 
 
 

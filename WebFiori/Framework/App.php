@@ -454,6 +454,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateEntityCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateServiceCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateTableCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateRepositoryCommand',
 
 
 

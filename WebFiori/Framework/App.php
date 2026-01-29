@@ -452,6 +452,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateTaskCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateCommandCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateEntityCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateServiceCommand',
 
 
 

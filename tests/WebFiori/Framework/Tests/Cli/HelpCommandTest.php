@@ -28,6 +28,7 @@ class HelpCommandTest extends CLITestCase {
             "    create:task:             Create a new scheduler task class.\n",
             "    create:command:          Create a new CLI command class.\n",
             "    create:entity:           Create a new domain entity class.\n",
+            "    create:service:          Create a new REST service class.\n",
 
 
 

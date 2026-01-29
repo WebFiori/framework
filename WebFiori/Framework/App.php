@@ -449,6 +449,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddSmtpConnectionCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddLangCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateMiddlewareCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateTaskCommand',
 
 
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -18,7 +19,7 @@ namespace WebFiori\Framework\Writers;
 class RestServiceWriter extends ClassWriter {
     private $description;
     private $methods = [];
-    
+
     public function __construct() {
         parent::__construct('NewService', APP_PATH.'Apis', APP_DIR.'\\Apis');
         $this->setSuffix('Service');
@@ -29,17 +30,13 @@ class RestServiceWriter extends ClassWriter {
             'WebFiori\\Http\\Annotations\\PostMapping',
             'WebFiori\\Http\\Annotations\\PutMapping',
             'WebFiori\\Http\\Annotations\\DeleteMapping',
-            'WebFiori\\Http\\Annotations\\Param',
+            'WebFiori\\Http\\Annotations\\RequestParam',
             'WebFiori\\Http\\Annotations\\ResponseBody',
             'WebFiori\\Http\\Annotations\\AllowAnonymous',
             'WebFiori\\Http\\ParamType'
         ]);
     }
-    
-    public function setDescription(string $desc) {
-        $this->description = $desc;
-    }
-    
+
     public function addMethod(string $httpMethod, string $methodName, array $params = [], string $returnType = 'array') {
         $this->methods[] = [
             'http' => $httpMethod,
@@ -48,14 +45,18 @@ class RestServiceWriter extends ClassWriter {
             'return' => $returnType
         ];
     }
-    
+
+    public function setDescription(string $desc) {
+        $this->description = $desc;
+    }
+
     public function writeClassBody() {
         foreach ($this->methods as $method) {
             $this->writeMethod($method);
         }
         $this->append('}');
     }
-    
+
     public function writeClassComment() {
         $serviceName = strtolower(str_replace('Service', '', $this->getName()));
         $this->append('/**');
@@ -63,47 +64,13 @@ class RestServiceWriter extends ClassWriter {
         $this->append(' */');
         $this->append("#[RestController('$serviceName', '{$this->description}')]", 0);
     }
-    
+
     public function writeClassDeclaration() {
         $this->append('class '.$this->getName().' extends WebService {');
     }
-    
-    private function writeMethod(array $method) {
-        $this->append('', 1);
-        $mapping = ucfirst(strtolower($method['http'])).'Mapping';
-        $this->append("#[$mapping]", 1);
-        $this->append('#[ResponseBody]', 1);
-        $this->append('#[AllowAnonymous]', 1);
-        
-        foreach ($method['params'] as $param) {
-            $paramAttr = "#[Param('{$param['name']}', ParamType::{$param['type']}, '{$param['description']}'";
-            if (isset($param['min'])) {
-                $paramAttr .= ", min: {$param['min']}";
-            }
-            if (isset($param['max'])) {
-                $paramAttr .= ", max: {$param['max']}";
-            }
-            $paramAttr .= ')]';
-            $this->append($paramAttr, 1);
-        }
-        
-        $signature = 'public function '.$method['name'].'(';
-        $paramList = [];
-        foreach ($method['params'] as $param) {
-            $type = $this->mapParamType($param['type']);
-            $paramList[] = "?$type \${$param['name']} = null";
-        }
-        $signature .= implode(', ', $paramList);
-        $signature .= '): '.$method['return'].' {';
-        
-        $this->append($signature, 1);
-        $this->append('// TODO: Implement method logic', 2);
-        $this->append('return [];', 2);
-        $this->append('}', 1);
-    }
-    
+
     private function mapParamType(string $type): string {
-        return match($type) {
+        return match ($type) {
             'INT' => 'int',
             'STRING', 'EMAIL', 'URL' => 'string',
             'DOUBLE' => 'float',
@@ -111,5 +78,42 @@ class RestServiceWriter extends ClassWriter {
             'ARRAY' => 'array',
             default => 'string'
         };
+    }
+
+    private function writeMethod(array $method) {
+        $this->append('', 1);
+        $mapping = ucfirst(strtolower($method['http'])).'Mapping';
+        $this->append("#[$mapping]", 1);
+        $this->append('#[ResponseBody]', 1);
+        $this->append('#[AllowAnonymous]', 1);
+
+        foreach ($method['params'] as $param) {
+            $paramAttr = "#[RequestParam('{$param['name']}', ParamType::{$param['type']}, '{$param['description']}'";
+
+            if (isset($param['min'])) {
+                $paramAttr .= ", min: {$param['min']}";
+            }
+
+            if (isset($param['max'])) {
+                $paramAttr .= ", max: {$param['max']}";
+            }
+            $paramAttr .= ')]';
+            $this->append($paramAttr, 1);
+        }
+
+        $signature = 'public function '.$method['name'].'(';
+        $paramList = [];
+
+        foreach ($method['params'] as $param) {
+            $type = $this->mapParamType($param['type']);
+            $paramList[] = "?$type \${$param['name']} = null";
+        }
+        $signature .= implode(', ', $paramList);
+        $signature .= '): '.$method['return'].' {';
+
+        $this->append($signature, 1);
+        $this->append('// TODO: Implement method logic', 2);
+        $this->append('return [];', 2);
+        $this->append('}', 1);
     }
 }

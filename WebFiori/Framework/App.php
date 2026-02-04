@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -14,6 +15,7 @@ use Error;
 use Exception;
 use ReflectionClass;
 use WebFiori\Cli\Runner;
+use WebFiori\Error\Config\HandlerConfig;
 use WebFiori\Error\Handler;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
@@ -57,14 +59,14 @@ class App {
      */
     const STATUS_INITIALIZING = 'INITIALIZING';
     /**
+     * A constant that indicates that the status of the class is initiated.
+     */
+    const STATUS_INITIATED = 'INITIATED';
+    /**
      * A constant that indicates that the status of the class is 'none'.
      *
      */
     const STATUS_NONE = 'NONE';
-    /**
-     * A constant that indicates that the status of the class is initiated.
-     */
-    const STATUS_INITIATED = 'INITIATED';
     /**
      * An instance of autoloader class.
      *
@@ -136,19 +138,19 @@ class App {
 
         //Initialize CLI
         self::getRunner();
-        
+
         //Initialize Request and Response
         self::$Request = Request::createFromGlobals();
         self::$Response = new Response();
 
         $this->initThemesPath();
-        
-        if (!class_exists(APP_DIR.'\\Init\\InitPrivileges')) {
-            Ini::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
+
+        if (!class_exists(APP_DIR.'\\Ini\\Privileges')) {
+            Ini::get()->createIniClass('Privileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
-        self::call(APP_DIR.'\\Init\\InitPrivileges::init');
+        self::call(APP_DIR.'\\Ini\\Privileges::initialize');
 
         $this->initMiddleware();
         $this->initRoutes();
@@ -158,6 +160,7 @@ class App {
             register_shutdown_function(function()
             {
                 $uriObj = Router::getRouteUri();
+
                 if ($uriObj !== null) {
                     $mdArr = $uriObj->getMiddleware();
 
@@ -288,117 +291,20 @@ class App {
         return self::$ConfigDriver;
     }
     /**
-     * Calculates application root path by removing vendor framework path from current directory.
-     * 
-     * @return string The application root path.
+     * Returns the current request instance.
+     *
+     * @return Request
      */
-    private static function getRoot() {
-        //Following lines of code assumes that the class exist on the folder: 
-        //\vendor\WebFiori\framework\WebFiori\Framework
-        //Its used to construct the folder at which index file will exist at
-        $DS = DIRECTORY_SEPARATOR;
-        $vendorPath = $DS.'vendor'.$DS.'webFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'Framework';
-        $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
-        return $rootPath;
+    public static function getRequest() : Request {
+        return self::$Request;
     }
     /**
-     * Handel the request.
-     * 
-     * This method should only be called after the application has been initialized.
-     * Its used to handle HTTP requests or start CLI processing.
+     * Returns the current response instance.
+     *
+     * @return Response
      */
-    public static function handle() {
-        
-        if (self::$ClassStatus == self::STATUS_NONE) {
-            $publicFolderName = 'public';
-            self::initiate('App', $publicFolderName, self::getRoot().DIRECTORY_SEPARATOR.$publicFolderName);
-        }
-        if (self::$ClassStatus == self::STATUS_INITIATED) {
-            self::start();
-        }
-        if (self::$ClassStatus == self::STATUS_INITIALIZED) {
-            if (App::getRunner()->isCLI() === true) {
-                App::getRunner()->start();
-            } else {
-               //route user request.
-               Router::route(self::getRequest()->getRequestedURI());
-               self::getResponse()->send();
-            }
-        }
-    }
-    /**
-     * Initiate main components of the application.
-     * 
-     * This method is intended to be called in the index file of the project.
-     * It should be first thing to be called.
-     * 
-     * @param string $appFolder The name of the folder at which the application
-     * is created at.
-     * 
-     * @param string $publicFolder A string that represent the name of the public
-     * folder such as 'public'.
-     * 
-     * @param string $indexDir The directory at which index file exist at.
-     * Usually, its the value of the constant __DIR__.
-     */
-    public static function initiate(string $appFolder = 'App', string $publicFolder = 'public', string $indexDir = __DIR__) {
-        /**
-         * Change encoding of mb_ functions to UTF-8
-         */
-        if (function_exists('mb_internal_encoding')) {
-            $encoding = 'UTF-8';
-            mb_internal_encoding($encoding);
-            mb_http_output($encoding);
-            mb_regex_encoding($encoding);
-        }
-        if (!defined('DS')) {
-            /**
-             * Directory separator.
-             */
-            define('DS', DIRECTORY_SEPARATOR);
-        }
-        if (!defined('ROOT_PATH')) {
-            if ($indexDir == __DIR__) {
-                $indexDir = self::getRoot().DS.$publicFolder;
-            }
-            /**
-             * Path to source folder.
-             */
-            define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
-        }
-        if (!defined('APP_DIR')) {
-            /**
-             * Name of application directory.
-             */
-            define('APP_DIR', $appFolder);
-        }
-        if (!defined('APP_PATH')) {
-            /**
-             * Path to application directory.
-             */
-            define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
-        }
-        if (!defined('PUBLIC_FOLDER')) {
-            /**
-             * Name of public folder.
-             */
-            define('PUBLIC_FOLDER', $publicFolder);
-        }
-        
-        if (!defined('WF_CORE_PATHS')) {
-            /**
-             * Possible Paths to WebFiori's core library.
-             */
-            define('WF_CORE_PATHS', [
-                ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework',
-                ROOT_PATH.DS.'WebFiori'.DS.'Framework'
-            ]);
-        }
-        self::initAutoLoader();
-        self::checkStandardLibs();
-        self::checkStdInOut();
-        self::initFrameworkVersionInfo();
-        self::$ClassStatus = self::STATUS_INITIATED;
+    public static function getResponse() : Response {
+        return self::$Response;
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -408,7 +314,7 @@ class App {
      * @throws FileException
      */
     public static function getRunner() : Runner {
-        if (!class_exists(APP_DIR.'\Init\InitCommands')) {
+        if (!class_exists(APP_DIR.'\Ini\InitCommands')) {
             Ini::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
         }
 
@@ -475,6 +381,145 @@ class App {
         return self::$CliRunner;
     }
     /**
+     * Handel the request.
+     *
+     * This method should only be called after the application has been initialized.
+     * Its used to handle HTTP requests or start CLI processing.
+     */
+    public static function handle() {
+        if (self::$ClassStatus == self::STATUS_NONE) {
+            $publicFolderName = 'public';
+            self::initiate('App', $publicFolderName, self::getRoot().DIRECTORY_SEPARATOR.$publicFolderName);
+        }
+
+        if (self::$ClassStatus == self::STATUS_INITIATED) {
+            self::start();
+        }
+
+        if (self::$ClassStatus == self::STATUS_INITIALIZED) {
+            if (App::getRunner()->isCLI() === true) {
+                App::getRunner()->start();
+            } else {
+                //route user request.
+                Router::route(self::getRequest()->getRequestedURI());
+                self::getResponse()->send();
+            }
+        }
+    }
+    /**
+     * Initialize global constants which has information about framework version.
+     *
+     * The constants which are defined by this method include the following:
+     * <ul>
+     * <li><b>WF_VERSION</b>: A string such as '3.0.0'.</li>
+     * <li><b>WF_VERSION_TYPE</b>: Type of the release such as 'RC', 'Alpha' or 'Stable'.</li>
+     * <li><b>WF_RELEASE_DATE</b>: The date at which the specified version was created at.</li>
+     * </ul>
+     */
+    public static function initFrameworkVersionInfo() {
+        /**
+         * A constant that represents version number of the framework.
+         *
+         * @since 2.1
+         */
+        define('WF_VERSION', '3.0.0-beta.31');
+        /**
+         * A constant that tells the type of framework version.
+         *
+         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
+         *
+         * @since 2.1
+         */
+        define('WF_VERSION_TYPE', 'Beta');
+        /**
+         * The date at which the framework version was released.
+         *
+         * The value of the constant will be a string in the format YYYY-MM-DD.
+         *
+         * @since 2.1
+         */
+        define('WF_RELEASE_DATE', '2025-10-28');
+    }
+    /**
+     * Initiate main components of the application.
+     *
+     * This method is intended to be called in the index file of the project.
+     * It should be first thing to be called.
+     *
+     * @param string $appFolder The name of the folder at which the application
+     * is created at.
+     *
+     * @param string $publicFolder A string that represent the name of the public
+     * folder such as 'public'.
+     *
+     * @param string $indexDir The directory at which index file exist at.
+     * Usually, its the value of the constant __DIR__.
+     */
+    public static function initiate(string $appFolder = 'App', string $publicFolder = 'public', string $indexDir = __DIR__) {
+        /**
+         * Change encoding of mb_ functions to UTF-8
+         */
+        if (function_exists('mb_internal_encoding')) {
+            $encoding = 'UTF-8';
+            mb_internal_encoding($encoding);
+            mb_http_output($encoding);
+            mb_regex_encoding($encoding);
+        }
+
+        if (!defined('DS')) {
+            /**
+             * Directory separator.
+             */
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+
+        if (!defined('ROOT_PATH')) {
+            if ($indexDir == __DIR__) {
+                $indexDir = self::getRoot().DS.$publicFolder;
+            }
+            /**
+             * Path to source folder.
+             */
+            define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
+        }
+
+        if (!defined('APP_DIR')) {
+            /**
+             * Name of application directory.
+             */
+            define('APP_DIR', $appFolder);
+        }
+
+        if (!defined('APP_PATH')) {
+            /**
+             * Path to application directory.
+             */
+            define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
+        }
+
+        if (!defined('PUBLIC_FOLDER')) {
+            /**
+             * Name of public folder.
+             */
+            define('PUBLIC_FOLDER', $publicFolder);
+        }
+
+        if (!defined('WF_CORE_PATHS')) {
+            /**
+             * Possible Paths to WebFiori's core library.
+             */
+            define('WF_CORE_PATHS', [
+                ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework',
+                ROOT_PATH.DS.'WebFiori'.DS.'Framework'
+            ]);
+        }
+        self::initAutoLoader();
+        self::checkStandardLibs();
+        self::checkStdInOut();
+        self::initFrameworkVersionInfo();
+        self::$ClassStatus = self::STATUS_INITIATED;
+    }
+    /**
      * Sets the class that will be used as configuration driver.
      *
      * This method must be used before calling the method 'App::start()' in order
@@ -508,7 +553,7 @@ class App {
     }
     /**
      * Helper for automatic class registration using reflection with configuration options.
-     * 
+     *
      * @param array $options Configuration array with dir, php-file, folder, class-name, params, callback, constructor-params.
      */
     private static function autoRegisterHelper($options) {
@@ -539,12 +584,14 @@ class App {
     }
     /**
      * Safe function caller with CLI/web-aware exception handling.
-     * 
+     *
      * @param callable $func The function to call.
+     * 
+     * @return mixed
      */
     private static function call($func) {
         try {
-            call_user_func($func);
+            return call_user_func($func);
         } catch (Exception $ex) {
             if (self::getRunner()->isCLI()) {
                 printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
@@ -557,7 +604,6 @@ class App {
      * Validates and defines APP_DIR constant, checking for invalid characters.
      */
     private function checkAppDir() {
-        
         if (!defined('APP_DIR')) {
             /**
              * The name of the directory at which the developer will have his own application
@@ -652,6 +698,21 @@ class App {
             define('STDERR',fopen('php://stderr', 'w'));
         }
     }
+    /**
+     * Calculates application root path by removing vendor framework path from current directory.
+     *
+     * @return string The application root path.
+     */
+    private static function getRoot() {
+        //Following lines of code assumes that the class exist on the folder:
+        //\vendor\WebFiori\framework\WebFiori\Framework
+        //Its used to construct the folder at which index file will exist at
+        $DS = DIRECTORY_SEPARATOR;
+        $vendorPath = $DS.'vendor'.$DS.'webFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'Framework';
+        $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
+
+        return $rootPath;
+    }
 
     /**
      * @throws FileException
@@ -674,49 +735,17 @@ class App {
                 self::$AU = ClassLoader::get();
                 $isLoaded = true;
             }
-            if (!class_exists(APP_DIR.'\\Init\\InitAutoLoad')) {
+
+            if (!class_exists(APP_DIR.'\\Ini\\AutoLoad')) {
                 Ini::createAppDirs();
-                Ini::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
+                Ini::get()->createIniClass('AutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
             }
-            self::call(APP_DIR.'\\Init\\InitAutoLoad::init');
+            self::call(APP_DIR.'\\Ini\\AutoLoad::initialize');
         }
+
         if (!$isLoaded) {
-            throw new \Exception('Unable to locate the autoloader class.');
+            throw new Exception('Unable to locate the autoloader class.');
         }
-    }
-    /**
-     * Initialize global constants which has information about framework version.
-     * 
-     * The constants which are defined by this method include the following:
-     * <ul>
-     * <li><b>WF_VERSION</b>: A string such as '3.0.0'.</li>
-     * <li><b>WF_VERSION_TYPE</b>: Type of the release such as 'RC', 'Alpha' or 'Stable'.</li>
-     * <li><b>WF_RELEASE_DATE</b>: The date at which the specified version was created at.</li>
-     * </ul>
-     */
-    public static function initFrameworkVersionInfo() {
-        /**
-         * A constant that represents version number of the framework.
-         *
-         * @since 2.1
-         */
-        define('WF_VERSION', '3.0.0-beta.31');
-        /**
-         * A constant that tells the type of framework version.
-         *
-         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
-         *
-         * @since 2.1
-         */
-        define('WF_VERSION_TYPE', 'Beta');
-        /**
-         * The date at which the framework version was released.
-         *
-         * The value of the constant will be a string in the format YYYY-MM-DD.
-         *
-         * @since 2.1
-         */
-        define('WF_RELEASE_DATE', '2025-10-28');
     }
 
     /**
@@ -728,11 +757,11 @@ class App {
             MiddlewareManager::register($inst);
         });
 
-        if (!class_exists(APP_DIR.'\Init\InitMiddleware')) {
-            Ini::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'[APP_DIR]/Middleware\'.');
+        if (!class_exists(APP_DIR.'\Ini\Middleware')) {
+            Ini::get()->createIniClass('Middleware', 'Register middleware which are created outside the folder \'[APP_DIR]/Middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
-        self::call(APP_DIR.'\Init\InitMiddleware::init');
+        self::call(APP_DIR.'\Ini\Middleware::initialize');
     }
     /**
      * @throws FileException
@@ -741,12 +770,18 @@ class App {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
-            if (!class_exists(APP_DIR.'\\Init\\Routes\\'.$className)) {
+            if (!class_exists(APP_DIR.'\\Ini\\Routes\\'.$className)) {
                 Ini::get()->createRoutesClass($className);
             }
-            self::call(APP_DIR.'\Init\Routes\\'.$className.'::create');
-        }
+            $routesArr = self::call(APP_DIR.'\Ini\Routes\\'.$className.'::create');
 
+            if (gettype($routesArr) == 'array') {
+                foreach ($routesArr as $route) {
+                    Router::addRoute($route);
+                }
+            }
+        }
+        
         if (Router::routesCount() != 0) {
             $home = trim(self::getConfig()->getHomePage());
 
@@ -763,8 +798,8 @@ class App {
         $uriObj = new RouterUri(self::getRequest()->getUri()->getUri(true, true), '');
         $pathArr = $uriObj->getPathArray();
 
-        if (!class_exists(APP_DIR.'\Init\InitTasks')) {
-            Ini::get()->createIniClass('InitTasks', 'A method that can be used to register background tasks.');
+        if (!class_exists(APP_DIR.'\Ini\Tasks')) {
+            Ini::get()->createIniClass('Tasks', 'A method that can be used to register background tasks.');
         }
 
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
@@ -773,7 +808,7 @@ class App {
             }
             TasksManager::getPassword(self::getConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
-            self::call(APP_DIR.'\Init\InitTasks::init');
+            self::call(APP_DIR.'\Ini\Tasks::initialize');
             TasksManager::registerTasks();
         }
     }
@@ -799,21 +834,6 @@ class App {
         // Handler::registerHandler(new APICallErrHandler());
         // Handler::registerHandler(new HTTPErrHandler());
         // Handler::unregisterHandler(Handler::getHandler('Default'));
-    }
-    /**
-     * Returns the current request instance.
-     * 
-     * @return Request
-     */
-    public static function getRequest() : Request {
-        return self::$Request;
-    }
-    /**
-     * Returns the current response instance.
-     * 
-     * @return Response
-     */
-    public static function getResponse() : Response {
-        return self::$Response;
+        Handler::setConfig(HandlerConfig::createDevelopmentConfig());
     }
 }

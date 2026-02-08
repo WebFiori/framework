@@ -314,8 +314,8 @@ class App {
      * @throws FileException
      */
     public static function getRunner() : Runner {
-        if (!class_exists(APP_DIR.'\Ini\InitCommands')) {
-            Ini::get()->createIniClass('InitCommands', 'A method that can be used to initialize CLI commands.');
+        if (!class_exists(APP_DIR.'\Ini\Commands')) {
+            Ini::get()->createIniClass('Commands', 'A method that can be used to register custom CLI commands.');
         }
 
         if (self::$CliRunner === null) {
@@ -374,7 +374,7 @@ class App {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
-                self::call(APP_DIR.'\Init\InitCommands::init');
+                self::call(APP_DIR.'\Ini\Commands::init');
             });
         }
 
@@ -781,7 +781,7 @@ class App {
                 }
             }
         }
-        
+
         if (Router::routesCount() != 0) {
             $home = trim(self::getConfig()->getHomePage());
 

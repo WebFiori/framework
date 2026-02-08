@@ -89,7 +89,10 @@ class CreateMiddlewareCommand extends Command {
      */
     public function exec() : int {
         $className = $this->getArgValue('--class-name');
-        
+        if ($className !== null && strlen($className) == 0) {
+            $this->error('--class-name cannot be empty string.');
+            $className = null;
+        }
         if ($className === null) {
             $validator = new InputValidator(function($input) {
                 return !empty(trim($input));

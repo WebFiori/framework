@@ -374,7 +374,7 @@ class App {
                     $r->register(new $c());
                 }
                 $r->setDefaultCommand('help');
-                self::call(APP_DIR.'\Ini\Commands::init');
+                self::call(APP_DIR.'\Ini\Commands::initialize');
             });
         }
 

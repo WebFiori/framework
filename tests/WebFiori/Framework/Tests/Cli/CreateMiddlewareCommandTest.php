@@ -52,16 +52,16 @@ class CreateMiddlewareCommandTest extends CLITestCase {
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $output = $this->getOutput();
-
-        $this->assertEquals("Enter middleware class name:\n", $output[0]);
-        $this->assertEquals("Enter middleware name: Enter = '$className'\n", $output[1]);
-        $this->assertEquals("Enter middleware priority: Enter = '0'\n", $output[2]);
-        $this->assertEquals("Add middleware to groups?(y/N)\n", $output[3]);
-        $this->assertEquals("Enter group name (leave empty to finish):\n", $output[4]);
-        $this->assertEquals("Enter group name (leave empty to finish):\n", $output[5]);
-        $this->assertEquals("Enter group name (leave empty to finish):\n", $output[6]);
-        $this->assertEquals("Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n", $output[7]);
+        $this->assertEquals([
+            "Enter middleware class name:\n",
+            "Enter middleware name: Enter = '$className'\n",
+            "Enter middleware priority: Enter = '0'\n",
+            "Add middleware to groups?(y/N)\n",
+            "Enter group name (leave empty to finish):\n",
+            "Enter group name (leave empty to finish):\n",
+            "Enter group name (leave empty to finish):\n",
+            "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
+        ], $output);
 
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
@@ -129,8 +129,10 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             '--groups' => ''
         ]);
 
+        $this->assertEquals([
+            "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertContains("Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n", $output);
 
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
@@ -149,6 +151,9 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             '--groups' => 'api,web,admin'
         ]);
 
+        $this->assertEquals([
+            "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
@@ -195,8 +200,10 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             '--groups' => ''
         ]);
 
+        $this->assertEquals([
+            "Error: Priority must be a number.\n"
+        ], $output);
         $this->assertEquals(-1, $this->getExitCode());
-        $this->assertContains("Error: Priority must be a number.\n", $output);
     }
     /**
      * @test
@@ -212,6 +219,9 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             '--groups' => 'api,web'
         ]);
 
+        $this->assertEquals([
+            "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
+        ], $output);
         $this->assertEquals(0, $this->getExitCode());
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');

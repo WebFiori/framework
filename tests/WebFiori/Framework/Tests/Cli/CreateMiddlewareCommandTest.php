@@ -15,7 +15,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddleware00() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateMiddlewareCommand(), [], [
             $className,
             "\n", // Use default middleware name (same as class name)
@@ -31,7 +31,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             "Add middleware to groups?(y/N)\n",
             "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
@@ -40,7 +40,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddleware01() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateMiddlewareCommand(), [], [
             $className,
             'My Custom Middleware',
@@ -53,7 +53,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $output = $this->getOutput();
-        
+
         $this->assertEquals("Enter middleware class name:\n", $output[0]);
         $this->assertEquals("Enter middleware name: Enter = '$className'\n", $output[1]);
         $this->assertEquals("Enter middleware priority: Enter = '0'\n", $output[2]);
@@ -62,7 +62,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
         $this->assertEquals("Enter group name (leave empty to finish):\n", $output[5]);
         $this->assertEquals("Enter group name (leave empty to finish):\n", $output[6]);
         $this->assertEquals("Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n", $output[7]);
-        
+
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
@@ -71,7 +71,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddleware02() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateMiddlewareCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -90,7 +90,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
             "Add middleware to groups?(y/N)\n",
             "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
@@ -99,7 +99,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddleware03() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateMiddlewareCommand(), [
             'WebFiori',
             'create:middleware'
@@ -112,7 +112,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
-        
+
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
     /**
@@ -120,7 +120,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddlewareWithArgs00() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateMiddlewareCommand::class,
             '--class-name' => $className,
@@ -131,7 +131,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
         $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
@@ -140,7 +140,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddlewareWithArgs01() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateMiddlewareCommand::class,
             '--class-name' => $className,
@@ -170,7 +170,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddlewareWithArgs03() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateMiddlewareCommand::class,
             '--class-name' => $className,
@@ -187,7 +187,7 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      */
     public function testCreateMiddlewareWithArgs04() {
         $className = 'TestMd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateMiddlewareCommand::class,
             '--class-name' => $className,

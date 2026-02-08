@@ -15,7 +15,7 @@ class CreateServiceCommandTest extends CLITestCase {
      */
     public function testCreateService00() {
         $className = 'TestService'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateServiceCommand(), [], [
             $className,
             "\n", // Use default description
@@ -29,7 +29,7 @@ class CreateServiceCommandTest extends CLITestCase {
             "Add methods to the service?(y/N)\n",
             "Success: Service class created at: ".APP_PATH."Apis".DIRECTORY_SEPARATOR.$className."Service.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Apis\\'.$className.'Service'));
         $this->removeClass('\\App\\Apis\\'.$className.'Service');
     }
@@ -38,7 +38,7 @@ class CreateServiceCommandTest extends CLITestCase {
      */
     public function testCreateService01() {
         $className = 'TestService'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateServiceCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -55,7 +55,7 @@ class CreateServiceCommandTest extends CLITestCase {
             "Add methods to the service?(y/N)\n",
             "Success: Service class created at: ".APP_PATH."Apis".DIRECTORY_SEPARATOR.$className."Service.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Apis\\'.$className.'Service'));
         $this->removeClass('\\App\\Apis\\'.$className.'Service');
     }
@@ -64,7 +64,7 @@ class CreateServiceCommandTest extends CLITestCase {
      */
     public function testCreateServiceWithArgs00() {
         $className = 'TestService'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateServiceCommand::class,
             '--class-name' => $className,
@@ -73,7 +73,7 @@ class CreateServiceCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Service class created at: ".APP_PATH."Apis".DIRECTORY_SEPARATOR.$className."Service.php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Apis\\'.$className.'Service'));
         $this->removeClass('\\App\\Apis\\'.$className.'Service');
     }
@@ -101,7 +101,7 @@ class CreateServiceCommandTest extends CLITestCase {
                 'return' => 'array'
             ]
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateServiceCommand::class,
             '--class-name' => $className,
@@ -131,7 +131,7 @@ class CreateServiceCommandTest extends CLITestCase {
      */
     public function testCreateServiceWithArgs03() {
         $className = 'TestService'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateServiceCommand::class,
             '--class-name' => $className,

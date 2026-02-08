@@ -16,7 +16,7 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
      */
     public function testAddSMTPConnection00() {
         $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
-        
+
         $output = $this->executeSingleCommand(new AddSmtpConnectionCommand(), [
             'WebFiori',
             'add:smtp-connection'

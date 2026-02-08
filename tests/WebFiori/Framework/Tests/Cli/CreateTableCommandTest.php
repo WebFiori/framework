@@ -15,7 +15,7 @@ class CreateTableCommandTest extends CLITestCase {
      */
     public function testCreateTable00() {
         $className = 'TestTable'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTableCommand(), [], [
             $className,
             "\n", // Use default table name
@@ -29,7 +29,7 @@ class CreateTableCommandTest extends CLITestCase {
             "Add columns to the table?(y/N)\n",
             "Success: Table class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Schema".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
     }
@@ -38,7 +38,7 @@ class CreateTableCommandTest extends CLITestCase {
      */
     public function testCreateTable01() {
         $className = 'TestTable'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTableCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -55,7 +55,7 @@ class CreateTableCommandTest extends CLITestCase {
             "Add columns to the table?(y/N)\n",
             "Success: Table class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Schema".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
     }
@@ -64,7 +64,7 @@ class CreateTableCommandTest extends CLITestCase {
      */
     public function testCreateTableWithArgs00() {
         $className = 'TestTable'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateTableCommand::class,
             '--class-name' => $className,
@@ -73,7 +73,7 @@ class CreateTableCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Table class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Schema".DIRECTORY_SEPARATOR.$className.".php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
     }
@@ -87,7 +87,7 @@ class CreateTableCommandTest extends CLITestCase {
             ['name' => 'name', 'type' => 'VARCHAR', 'size' => 255, 'nullable' => false],
             ['name' => 'email', 'type' => 'VARCHAR', 'size' => 255, 'nullable' => true]
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateTableCommand::class,
             '--class-name' => $className,
@@ -117,7 +117,7 @@ class CreateTableCommandTest extends CLITestCase {
      */
     public function testCreateTableWithArgs03() {
         $className = 'TestTable'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateTableCommand::class,
             '--class-name' => $className,

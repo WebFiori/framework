@@ -15,7 +15,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
      */
     public function testCreateRepository00() {
         $className = 'TestRepo'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateRepositoryCommand(), [], [
             $className,
             'App\\Domain\\User',
@@ -33,7 +33,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
             "Add properties to the repository?(y/N)\n",
             "Success: Repository class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Repository".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Repository\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Repository\\'.$className);
     }
@@ -42,7 +42,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
      */
     public function testCreateRepository01() {
         $className = 'TestRepo'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateRepositoryCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -63,7 +63,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
             "Add properties to the repository?(y/N)\n",
             "Success: Repository class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Repository".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Repository\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Repository\\'.$className);
     }
@@ -72,7 +72,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
      */
     public function testCreateRepositoryWithArgs00() {
         $className = 'TestRepo'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateRepositoryCommand::class,
             '--class-name' => $className,
@@ -83,7 +83,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Repository class created at: ".APP_PATH."Infrastructure".DIRECTORY_SEPARATOR."Repository".DIRECTORY_SEPARATOR.$className.".php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Repository\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Repository\\'.$className);
     }
@@ -97,7 +97,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
             ['name' => 'name', 'type' => 'string'],
             ['name' => 'email', 'type' => 'string']
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateRepositoryCommand::class,
             '--class-name' => $className,
@@ -130,7 +130,7 @@ class CreateRepositoryCommandTest extends CLITestCase {
      */
     public function testCreateRepositoryWithArgs03() {
         $className = 'TestRepo'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateRepositoryCommand::class,
             '--class-name' => $className,

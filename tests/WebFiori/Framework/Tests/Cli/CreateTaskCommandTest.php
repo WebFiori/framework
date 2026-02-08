@@ -15,7 +15,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTask00() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTaskCommand(), [], [
             $className,
             "\n", // Use default task name (same as class name)
@@ -31,7 +31,7 @@ class CreateTaskCommandTest extends CLITestCase {
             "Add execution arguments to the task?(y/N)\n",
             "Success: Task class created at: ".APP_PATH."Tasks".DIRECTORY_SEPARATOR.$className."Task.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Tasks\\'.$className.'Task'));
         $this->removeClass('\\App\\Tasks\\'.$className.'Task');
     }
@@ -40,7 +40,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTask01() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTaskCommand(), [], [
             $className,
             'Email Sender Task',
@@ -64,7 +64,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTask02() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTaskCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -83,7 +83,7 @@ class CreateTaskCommandTest extends CLITestCase {
             "Add execution arguments to the task?(y/N)\n",
             "Success: Task class created at: ".APP_PATH."Tasks".DIRECTORY_SEPARATOR.$className."Task.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Tasks\\'.$className.'Task'));
         $this->removeClass('\\App\\Tasks\\'.$className.'Task');
     }
@@ -92,7 +92,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTask03() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateTaskCommand(), [
             'WebFiori',
             'create:task'
@@ -112,7 +112,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTaskWithArgs00() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateTaskCommand::class,
             '--class-name' => $className,
@@ -122,7 +122,7 @@ class CreateTaskCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Task class created at: ".APP_PATH."Tasks".DIRECTORY_SEPARATOR.$className."Task.php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Tasks\\'.$className.'Task'));
         $this->removeClass('\\App\\Tasks\\'.$className.'Task');
     }
@@ -131,7 +131,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTaskWithArgs01() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateTaskCommand::class,
             '--class-name' => $className,
@@ -166,7 +166,7 @@ class CreateTaskCommandTest extends CLITestCase {
             ['name' => 'email', 'description' => 'Email address', 'default' => 'admin@example.com'],
             ['name' => 'subject', 'description' => 'Email subject']
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateTaskCommand::class,
             '--class-name' => $className,
@@ -184,7 +184,7 @@ class CreateTaskCommandTest extends CLITestCase {
      */
     public function testCreateTaskWithArgs04() {
         $className = 'TestTask'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateTaskCommand::class,
             '--class-name' => $className,

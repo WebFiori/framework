@@ -1,7 +1,6 @@
 <?php
 namespace WebFiori\Framework\Test\Cli;
 
-use WebFiori\Framework\App;
 use WebFiori\Framework\Cli\CLITestCase;
 use WebFiori\Framework\Cli\Commands\AddLangCommand;
 use WebFiori\Framework\Config\Controller;
@@ -19,13 +18,13 @@ class AddLangCommandTest extends CLITestCase {
         // Generate a unique 2-character language code based on current microseconds
         $langCode = substr(str_replace('.', '', microtime(true)), -2);
         // Ensure it's exactly 2 characters and alphabetic
-        $langCode = chr(65 + ($langCode[0] % 26)) . chr(65 + ($langCode[1] % 26));
-        
+        $langCode = chr(65 + ($langCode[0] % 26)).chr(65 + ($langCode[1] % 26));
+
         // Clean up if it exists from previous runs
-        if (class_exists('\\App\\Langs\\Lang' . $langCode)) {
-            $this->removeClass('\\App\\Langs\\Lang' . $langCode);
+        if (class_exists('\\App\\Langs\\Lang'.$langCode)) {
+            $this->removeClass('\\App\\Langs\\Lang'.$langCode);
         }
-        
+
         $output = $this->executeSingleCommand(new AddLangCommand(), [], [
             $langCode,
             'F Name',
@@ -45,8 +44,8 @@ class AddLangCommandTest extends CLITestCase {
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\Langs\" for that language.\n"
         ], $output);
-        $this->assertTrue(class_exists('\\App\\Langs\\Lang' . $langCode));
-        $this->removeClass('\\App\\Langs\\Lang' . $langCode);
+        $this->assertTrue(class_exists('\\App\\Langs\\Lang'.$langCode));
+        $this->removeClass('\\App\\Langs\\Lang'.$langCode);
         Controller::getDriver()->initialize();
     }
     /**

@@ -11,7 +11,7 @@ class HelpCommandTest extends CLITestCase {
      */
     public function test00() {
         $this->assertEquals([
-            "WebFiori Framework  (c) Version ". WF_VERSION." ".WF_VERSION_TYPE."\n\n\n",
+            "WebFiori Framework  (c) Version ".WF_VERSION." ".WF_VERSION_TYPE."\n\n\n",
             "Usage:\n",
             "    command [arg1 arg2=\"val\" arg3...]\n\n",
             "Global Arguments:\n",

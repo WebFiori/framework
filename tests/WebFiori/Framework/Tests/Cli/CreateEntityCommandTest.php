@@ -15,7 +15,7 @@ class CreateEntityCommandTest extends CLITestCase {
      */
     public function testCreateEntity00() {
         $className = 'TestEntity'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateEntityCommand(), [], [
             $className,
             'n'   // Don't add properties
@@ -27,7 +27,7 @@ class CreateEntityCommandTest extends CLITestCase {
             "Add properties to the entity?(y/N)\n",
             "Success: Entity class created at: ".APP_PATH."Domain".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Domain\\'.$className));
         $this->removeClass('\\App\\Domain\\'.$className);
     }
@@ -36,7 +36,7 @@ class CreateEntityCommandTest extends CLITestCase {
      */
     public function testCreateEntity01() {
         $className = 'TestEntity'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateEntityCommand(), [], [
             $className,
             'y',    // Add properties
@@ -61,7 +61,7 @@ class CreateEntityCommandTest extends CLITestCase {
      */
     public function testCreateEntity02() {
         $className = 'TestEntity'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateEntityCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -76,7 +76,7 @@ class CreateEntityCommandTest extends CLITestCase {
             "Add properties to the entity?(y/N)\n",
             "Success: Entity class created at: ".APP_PATH."Domain".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Domain\\'.$className));
         $this->removeClass('\\App\\Domain\\'.$className);
     }
@@ -85,7 +85,7 @@ class CreateEntityCommandTest extends CLITestCase {
      */
     public function testCreateEntityWithArgs00() {
         $className = 'TestEntity'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateEntityCommand::class,
             '--class-name' => $className
@@ -93,7 +93,7 @@ class CreateEntityCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Entity class created at: ".APP_PATH."Domain".DIRECTORY_SEPARATOR.$className.".php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Domain\\'.$className));
         $this->removeClass('\\App\\Domain\\'.$className);
     }
@@ -107,7 +107,7 @@ class CreateEntityCommandTest extends CLITestCase {
             ['name' => 'name', 'type' => 'string', 'nullable' => false],
             ['name' => 'email', 'type' => 'string', 'nullable' => true]
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateEntityCommand::class,
             '--class-name' => $className,
@@ -135,7 +135,7 @@ class CreateEntityCommandTest extends CLITestCase {
      */
     public function testCreateEntityWithArgs03() {
         $className = 'TestEntity'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateEntityCommand::class,
             '--class-name' => $className,

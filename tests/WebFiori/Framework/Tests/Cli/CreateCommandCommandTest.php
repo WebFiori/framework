@@ -15,7 +15,7 @@ class CreateCommandCommandTest extends CLITestCase {
      */
     public function testCreateCommand00() {
         $className = 'TestCmd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateCommandCommand(), [], [
             $className,
             "\n", // Use default command name
@@ -31,7 +31,7 @@ class CreateCommandCommandTest extends CLITestCase {
             "Add arguments to the command?(y/N)\n",
             "Success: Command class created at: ".APP_PATH."Commands".DIRECTORY_SEPARATOR.$className."Command.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Commands\\'.$className.'Command'));
         $this->removeClass('\\App\\Commands\\'.$className.'Command');
     }
@@ -40,7 +40,7 @@ class CreateCommandCommandTest extends CLITestCase {
      */
     public function testCreateCommand01() {
         $className = 'TestCmd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateCommandCommand(), [], [
             $className,
             'test-command',
@@ -66,7 +66,7 @@ class CreateCommandCommandTest extends CLITestCase {
      */
     public function testCreateCommand02() {
         $className = 'TestCmd'.time();
-        
+
         $output = $this->executeSingleCommand(new CreateCommandCommand(), [], [
             '',  // Empty class name - will be rejected
             $className,  // Valid class name
@@ -85,7 +85,7 @@ class CreateCommandCommandTest extends CLITestCase {
             "Add arguments to the command?(y/N)\n",
             "Success: Command class created at: ".APP_PATH."Commands".DIRECTORY_SEPARATOR.$className."Command.php\n"
         ], $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Commands\\'.$className.'Command'));
         $this->removeClass('\\App\\Commands\\'.$className.'Command');
     }
@@ -94,7 +94,7 @@ class CreateCommandCommandTest extends CLITestCase {
      */
     public function testCreateCommandWithArgs00() {
         $className = 'TestCmd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateCommandCommand::class,
             '--class-name' => $className,
@@ -104,7 +104,7 @@ class CreateCommandCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $this->assertContains("Success: Command class created at: ".APP_PATH."Commands".DIRECTORY_SEPARATOR.$className."Command.php\n", $output);
-        
+
         $this->assertTrue(class_exists('\\App\\Commands\\'.$className.'Command'));
         $this->removeClass('\\App\\Commands\\'.$className.'Command');
     }
@@ -117,7 +117,7 @@ class CreateCommandCommandTest extends CLITestCase {
             ['name' => '--name', 'description' => 'User name', 'optional' => false],
             ['name' => '--type', 'description' => 'User type', 'optional' => true, 'values' => ['admin', 'user']]
         ]);
-        
+
         $output = $this->executeMultiCommand([
             CreateCommandCommand::class,
             '--class-name' => $className,
@@ -149,7 +149,7 @@ class CreateCommandCommandTest extends CLITestCase {
      */
     public function testCreateCommandWithArgs03() {
         $className = 'TestCmd'.time();
-        
+
         $output = $this->executeMultiCommand([
             CreateCommandCommand::class,
             '--class-name' => $className,

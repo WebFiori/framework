@@ -1,5 +1,4 @@
 <?php
-
 namespace WebFiori;
 
 $DS = DIRECTORY_SEPARATOR;

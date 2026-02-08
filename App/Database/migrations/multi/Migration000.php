@@ -14,19 +14,19 @@ class Migration000 extends AbstractMigration {
         parent::__construct('Third One', 2);
     }
     /**
-     * Performs the action that will apply the migration.
-     * 
-     * @param Database $schema The database at which the migration will be applied to.
-     */
-    public function up(Database $schema) : void {
-        //TODO: Implement the action which will apply the migration to database.
-    }
-    /**
      * Performs the action that will revert back the migration.
-     * 
+     *
      * @param Database $schema The database at which the migration will be applied to.
      */
     public function down(Database $schema) : void {
         //TODO: Implement the action which will revert back the migration.
+    }
+    /**
+     * Performs the action that will apply the migration.
+     *
+     * @param Database $schema The database at which the migration will be applied to.
+     */
+    public function up(Database $schema) : void {
+        //TODO: Implement the action which will apply the migration to database.
     }
 }

@@ -48,7 +48,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
      */
     public function testAddDBConnection01() {
         $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
-        
+
         $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
             'WebFiori',
             'add:db-connection'
@@ -65,7 +65,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $output = $this->getOutput();
-        
+
         $this->assertEquals("Select database type:\n", $output[0]);
         $this->assertEquals("0: mysql\n", $output[1]);
         $this->assertEquals("1: mssql\n", $output[2]);
@@ -88,7 +88,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
     public function testAddDBConnection02() {
         $count = count(App::getConfig()->getDBConnections());
         $connName = 'db-connection-'.($count + 1);
-        
+
         $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
             'WebFiori',
             'add:db-connection'
@@ -105,7 +105,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         $this->assertEquals(0, $this->getExitCode());
         $output = $this->getOutput();
-        
+
         $this->assertEquals("Select database type:\n", $output[0]);
         $this->assertEquals("0: mysql\n", $output[1]);
         $this->assertEquals("1: mssql\n", $output[2]);

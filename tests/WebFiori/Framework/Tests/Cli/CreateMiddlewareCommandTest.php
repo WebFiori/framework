@@ -157,13 +157,29 @@ class CreateMiddlewareCommandTest extends CLITestCase {
      * @test
      */
     public function testCreateMiddlewareWithArgs02() {
+        $className = 'TestMd'.time();
         $output = $this->executeMultiCommand([
             CreateMiddlewareCommand::class,
             '--class-name' => '',
+        ], [
+            $className,
+            "\n",  // Use default middleware name (same as class name)
+            '50',
+            "\n"
         ]);
 
-        $this->assertEquals(-1, $this->getExitCode());
-        $this->assertContains("Error: Class name cannot be empty.\n", $output);
+        $this->assertEquals([
+            "Error: --class-name cannot be empty string.\n",
+            "Enter middleware class name:\n",
+            "Enter middleware name: Enter = '$className'\n",
+            "Enter middleware priority: Enter = '0'\n",
+            "Add middleware to groups?(y/N)\n",
+            "Success: Middleware class created at: ".APP_PATH."Middleware".DIRECTORY_SEPARATOR.$className."Middleware.php\n"
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertTrue(class_exists('\\App\\Middleware\\'.$className.'Middleware'));
+
+        $this->removeClass('\\App\\Middleware\\'.$className.'Middleware');
     }
     /**
      * @test

@@ -42,6 +42,7 @@ class HelpCommandTest extends CLITestCase {
             "    migrations:ini:          Create migrations tracking table.\n",
             "    migrations:dry-run:      Preview pending migrations without executing.\n",
             "    migrations:status:       Show migration status (applied and pending).\n",
+            "    migrations:fresh:        Rollback all migrations and run them fresh.\n",
         ], $this->executeMultiCommand([
             'help',
         ]));

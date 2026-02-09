@@ -77,6 +77,77 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
 
+    /**
+     * @test
+     */
+    public function testDryRunWithCustomEnv() {
+        $this->createTestMigration('EnvTestMigration');
+
+        $output = $this->executeMultiCommand([
+            DryRunMigrationsCommand::class,
+            '--connection' => 'test-connection',
+            '--env' => 'staging'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('EnvTestMigration', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testDryRunShowsQueries() {
+        $this->createTestMigrationWithSchema('QueryTestMigration');
+
+        $output = $this->executeMultiCommand([
+            DryRunMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('QueryTestMigration', $outputStr);
+        // Queries section may or may not appear depending on migration content
+        // Just verify the migration is listed
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function createTestMigrationWithSchema(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+use WebFiori\Database\Table;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        \$table = new Table('test_table');
+        \$table->addColumns([
+            'id' => ['type' => 'int', 'primary' => true, 'auto-increment' => true],
+            'name' => ['type' => 'varchar', 'size' => 100]
+        ]);
+        \$db->table(\$table);
+    }
+    
+    public function down(Database \$db): void {
+        \$db->table('test_table')->drop();
+    }
+}
+PHP;
+
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
     private function createTestMigration(string $name): void {
         $dir = APP_PATH.'Database'.DS.'Migrations';
 

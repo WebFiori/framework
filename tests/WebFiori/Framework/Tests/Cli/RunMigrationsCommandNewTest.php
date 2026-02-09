@@ -60,6 +60,113 @@ class RunMigrationsCommandNewTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
 
+    /**
+     * @test
+     */
+    public function testRunWithPendingMigrations() {
+        $this->createTestMigration('RunTest1');
+        $this->createTestMigration('RunTest2');
+        $this->initMigrations();
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Applied: App\\Database\\Migrations\\RunTest1', $outputStr);
+        $this->assertStringContainsString('Applied: App\\Database\\Migrations\\RunTest2', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 2 migrations', $outputStr);
+        $this->assertStringContainsString('Info: Time:', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testRunWithAlreadyAppliedMigrations() {
+        $this->createTestMigration('AlreadyApplied');
+        $this->initMigrations();
+        
+        // Run migrations first time
+        $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        // Run again - should skip
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 0 migrations', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testRunWithCustomEnv() {
+        $this->createTestMigration('EnvTest');
+        $this->initMigrations('staging');
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection',
+            '--env' => 'staging'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Applied: App\\Database\\Migrations\\EnvTest', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function initMigrations(string $env = 'dev'): void {
+        $args = [
+            'WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
+            '--connection' => 'test-connection'
+        ];
+        
+        if ($env !== 'dev') {
+            $args['--env'] = $env;
+        }
+        
+        $this->executeMultiCommand($args);
+    }
+
+    private function createTestMigration(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        // Test migration
+    }
+    
+    public function down(Database \$db): void {
+        // Test rollback
+    }
+}
+PHP;
+
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
     private function cleanupMigrations(): void {
         $dir = APP_PATH.'Database'.DS.'Migrations';
 
@@ -86,7 +193,20 @@ class RunMigrationsCommandNewTest extends CLITestCase {
 
     protected function tearDown(): void {
         $this->cleanupMigrations();
+        $this->dropSchemaTable();
         App::getConfig()->removeAllDBConnections();
         parent::tearDown();
+    }
+
+    private function dropSchemaTable(): void {
+        try {
+            $connection = App::getConfig()->getDBConnection('test-connection');
+            if ($connection !== null) {
+                $runner = new \WebFiori\Database\Schema\SchemaRunner($connection);
+                $runner->dropSchemaTable();
+            }
+        } catch (\Throwable $e) {
+            // Ignore errors during cleanup
+        }
     }
 }

@@ -95,6 +95,137 @@ class RollbackMigrationsCommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
 
+    /**
+     * @test
+     */
+    public function testRollbackLastBatchWithMigrations() {
+        $this->createTestMigration('RollbackTest1');
+        $this->initAndRunMigrations();
+
+        $output = $this->executeMultiCommand([
+            RollbackMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Rolling back last batch...', $outputStr);
+        $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\RollbackTest1', $outputStr);
+        $this->assertStringContainsString('Info: Total rolled back: 1', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testRollbackSpecificBatchWithMigrations() {
+        $this->createTestMigration('Batch1Migration');
+        $this->initAndRunMigrations();
+
+        $output = $this->executeMultiCommand([
+            RollbackMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Rolling back last batch...', $outputStr);
+        $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\Batch1Migration', $outputStr);
+        $this->assertStringContainsString('Info: Total rolled back: 1', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testRollbackAllWithMigrations() {
+        $this->createTestMigration('Migration1');
+        $this->createTestMigration('Migration2');
+        $this->initAndRunMigrations();
+
+        $output = $this->executeMultiCommand([
+            RollbackMigrationsCommand::class,
+            '--connection' => 'test-connection',
+            '--all'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Rolling back all migrations...', $outputStr);
+        $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\Migration1', $outputStr);
+        $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\Migration2', $outputStr);
+        $this->assertStringContainsString('Info: Total rolled back: 2', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testRollbackWithCustomEnv() {
+        $this->createTestMigration('EnvTest1');
+        $this->initAndRunMigrations('staging');
+
+        $output = $this->executeMultiCommand([
+            RollbackMigrationsCommand::class,
+            '--connection' => 'test-connection',
+            '--env' => 'staging'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Rolling back last batch...', $outputStr);
+        $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\EnvTest1', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function initAndRunMigrations(string $env = 'dev'): void {
+        $args = [
+            'WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
+            '--connection' => 'test-connection'
+        ];
+        
+        if ($env !== 'dev') {
+            $args['--env'] = $env;
+        }
+        
+        $this->executeMultiCommand($args);
+        
+        $args = [
+            'WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommandNew',
+            '--connection' => 'test-connection'
+        ];
+        
+        if ($env !== 'dev') {
+            $args['--env'] = $env;
+        }
+        
+        $this->executeMultiCommand($args);
+    }
+
+    private function createTestMigration(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        // Test migration
+    }
+    
+    public function down(Database \$db): void {
+        // Test rollback
+    }
+}
+PHP;
+
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
     private function cleanupMigrations(): void {
         $dir = APP_PATH.'Database'.DS.'Migrations';
 

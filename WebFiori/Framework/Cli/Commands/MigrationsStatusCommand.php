@@ -87,8 +87,12 @@ class MigrationsStatusCommand extends Command {
     }
     
     private function showStatus(): int {
+        $allChanges = $this->runner->getChanges();
         $pending = $this->runner->getPendingChanges(false);
-        $applied = $this->runner->getAppliedChanges();
+        
+        // Separate applied and pending
+        $pendingNames = array_map(fn($item) => $item['change']->getName(), $pending);
+        $applied = array_filter($allChanges, fn($change) => !in_array($change->getName(), $pendingNames));
         
         if (!empty($applied)) {
             $this->println('Applied migrations:');

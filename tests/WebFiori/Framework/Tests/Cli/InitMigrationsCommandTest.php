@@ -61,6 +61,46 @@ class InitMigrationsCommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
 
+    /**
+     * @test
+     */
+    public function testInitWithCustomEnv() {
+        $output = $this->executeMultiCommand([
+            InitMigrationsCommand::class,
+            '--connection' => 'test-connection',
+            '--env' => 'staging'
+        ]);
+
+        $this->assertEquals([
+            "Creating migrations tracking table...\n",
+            "Success: Migrations table created successfully.\n"
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testInitTableAlreadyExists() {
+        // Create table first
+        $this->executeMultiCommand([
+            InitMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        // Try to create again
+        $output = $this->executeMultiCommand([
+            InitMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $this->assertEquals([
+            "Creating migrations tracking table...\n",
+            "Success: Migrations table created successfully.\n"
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
     private function setupTestConnection(): void {
         $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', '127.0.0.1', 3306);
         $this->testConnection->setName('test-connection');

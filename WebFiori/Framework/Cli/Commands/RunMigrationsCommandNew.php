@@ -91,20 +91,23 @@ class RunMigrationsCommandNew extends Command {
         
         $result = $this->runner->apply();
         
-        if ($result->hasApplied()) {
-            foreach ($result->getApplied() as $change) {
+        $applied = $result->getApplied();
+        if (!empty($applied)) {
+            foreach ($applied as $change) {
                 $this->success('Applied: ' . $change->getName());
             }
         }
         
-        if ($result->hasSkipped()) {
-            foreach ($result->getSkipped() as $item) {
+        $skipped = $result->getSkipped();
+        if (!empty($skipped)) {
+            foreach ($skipped as $item) {
                 $this->warning('Skipped: ' . $item['change']->getName() . ' (' . $item['reason'] . ')');
             }
         }
         
-        if ($result->hasFailed()) {
-            foreach ($result->getFailed() as $item) {
+        $failed = $result->getFailed();
+        if (!empty($failed)) {
+            foreach ($failed as $item) {
                 $this->error('Failed: ' . $item['change']->getName());
                 $this->println('  Error: ' . $item['error']->getMessage());
             }
@@ -113,6 +116,6 @@ class RunMigrationsCommandNew extends Command {
         $this->info('Applied: ' . $result->count() . ' migrations');
         $this->info('Time: ' . round($result->getTotalTime(), 2) . 'ms');
         
-        return $result->hasFailed() ? 1 : 0;
+        return !empty($failed) ? 1 : 0;
     }
 }

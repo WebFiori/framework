@@ -367,7 +367,6 @@ class App {
 
 
 
-                    '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommandNew',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RollbackMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',

@@ -362,6 +362,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateTableCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateRepositoryCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateResourceCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateMigrationCommand',
 
 
 

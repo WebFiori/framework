@@ -33,6 +33,7 @@ class HelpCommandTest extends CLITestCase {
             "    create:repository:       Create a new repository class.\n",
             "    create:resource:         Create a complete CRUD resource (entity, table, repository, service).\n",
             "    create:migration:        Create a new database migration class.\n",
+            "    create:seeder:           Create a new database seeder class.\n",
 
 
 

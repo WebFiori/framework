@@ -363,6 +363,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateRepositoryCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateResourceCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateMigrationCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\CreateSeederCommand',
 
 
 

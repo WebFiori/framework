@@ -39,12 +39,16 @@ class CreateSeederCommandTest extends CLITestCase {
         
         $output = $this->executeSingleCommand(new CreateSeederCommand(), [], [
             $className,
-            'Interactive seeder description'
+            'Interactive seeder description',
+            'n', // No environments
+            'n'  // No dependencies
         ]);
         
         $this->assertEquals([
             "Enter seeder class name:\n",
             "Enter seeder description: Enter = 'No description'\n",
+            "Restrict to specific environments?(y/N)\n",
+            "Add dependencies?(y/N)\n",
             "Success: Seeder class created at: ".APP_PATH."Database".DIRECTORY_SEPARATOR."Seeders".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
         $this->assertEquals(0, $this->getExitCode());

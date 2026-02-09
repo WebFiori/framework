@@ -39,12 +39,16 @@ class CreateMigrationCommandTest extends CLITestCase {
         
         $output = $this->executeSingleCommand(new CreateMigrationCommand(), [], [
             $className,
-            'Interactive migration description'
+            'Interactive migration description',
+            'n', // No environments
+            'n'  // No dependencies
         ]);
         
         $this->assertEquals([
             "Enter migration class name:\n",
             "Enter migration description: Enter = 'No description'\n",
+            "Restrict to specific environments?(y/N)\n",
+            "Add dependencies?(y/N)\n",
             "Success: Migration class created at: ".APP_PATH."Database".DIRECTORY_SEPARATOR."Migrations".DIRECTORY_SEPARATOR.$className.".php\n"
         ], $output);
         $this->assertEquals(0, $this->getExitCode());

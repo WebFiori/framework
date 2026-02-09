@@ -51,8 +51,8 @@ class Ini {
     public static function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
         self::mkdir(ROOT_PATH.$DS.APP_DIR);
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Init');
-        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Init'.$DS.'Routes');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Ini');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Ini'.$DS.'Routes');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Pages');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Commands');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Tasks');
@@ -83,13 +83,13 @@ class Ini {
      * @throws FileException
      */
     public function createIniClass(string $className, string $comment) {
-        $cFile = new File("$className.php", APP_PATH.'Init');
+        $cFile = new File("$className.php", APP_PATH.'Ini');
         $cFile->remove();
         $cFile->create();
         ClassDriver::a($cFile, [
             "<?php",
             '',
-            "namespace ".APP_DIR."\\Init;",
+            "namespace ".APP_DIR."\\Ini;",
             '',
             "class $className {",
 
@@ -99,14 +99,14 @@ class Ini {
             " * $comment",
             $this->docEmptyLine,
             $this->docEnd,
-            'public static function init() {'
+            'public static function initialize() {'
         ], 1);
         ClassDriver::a($cFile, "", 3);
         ClassDriver::a($cFile, "}", 1);
         ClassDriver::a($cFile, "}");
         $cFile->create(true);
         $cFile->write();
-        require_once APP_PATH.'Init'.DS."$className.php";
+        require_once APP_PATH.'Ini'.DS."$className.php";
     }
 
     /**
@@ -121,11 +121,11 @@ class Ini {
      * @throws FileException
      */
     public function createRoutesClass(string $className) {
-        $cFile = new File("$className.php", APP_PATH.'Init'.DS.'Routes');
+        $cFile = new File("$className.php", APP_PATH.'Ini'.DS.'Routes');
         $cFile->remove();
         ClassDriver::a($cFile, "<?php");
         ClassDriver::a($cFile, "");
-        ClassDriver::a($cFile, "namespace ".APP_DIR."\\Init\\Routes;");
+        ClassDriver::a($cFile, "namespace ".APP_DIR."\\Ini\\Routes;");
         ClassDriver::a($cFile, "");
         ClassDriver::a($cFile, "use WebFiori\\Framework\\Router\\Router;");
         ClassDriver::a($cFile, "");

@@ -60,6 +60,51 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
     }
 
+    /**
+     * @test
+     */
+    public function testDryRunWithPendingMigration() {
+        $this->createTestMigration('TestMigration');
+
+        $output = $this->executeMultiCommand([
+            DryRunMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('TestMigration', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function createTestMigration(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        // Test migration
+    }
+    
+    public function down(Database \$db): void {
+        // Test rollback
+    }
+}
+PHP;
+
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
     private function cleanupMigrations(): void {
         $dir = APP_PATH.'Database'.DS.'Migrations';
 

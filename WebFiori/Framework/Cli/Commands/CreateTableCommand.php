@@ -65,7 +65,7 @@ class CreateTableCommand extends Command {
                         break;
                     }
                     
-                    $colType = $this->select('Select column type:', DataType::getTypes());
+                    $colType = $this->select('Select column type:', DataType::getSupportedDataTypes('mysql'));
                     
                     $column = [
                         'name' => trim($colName),

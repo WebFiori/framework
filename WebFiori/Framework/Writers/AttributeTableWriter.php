@@ -55,7 +55,8 @@ class AttributeTableWriter extends ClassWriter {
         
         // Add Column attributes
         foreach ($this->columns as $col) {
-            $attr = "#[Column(name: '{$col['name']}', type: DataType::{$col['type']}";
+            $type = strtoupper($col['type']);
+            $attr = "#[Column(name: '{$col['name']}', type: DataType::{$type}";
             
             if (isset($col['size'])) {
                 $attr .= ", size: {$col['size']}";
@@ -69,7 +70,18 @@ class AttributeTableWriter extends ClassWriter {
             if (isset($col['nullable']) && $col['nullable']) {
                 $attr .= ", nullable: true";
             }
-            
+            if (isset($col['identity']) && $col['identity']) {
+                $attr .= ", identity: true";
+            }
+            if (isset($col['autoUpdate']) && $col['autoUpdate']) {
+                $attr .= ", autoUpdate: true";
+            }
+            if (isset($col['default'])) {
+                $attr .= ", default: ".$col['default'];
+            }
+            if (isset($col['comment']) && strlen($col['comment']) != 0) {
+                $attr .= ", comment: ".$col['comment'];
+            }
             $attr .= ')]';
             $this->append($attr, 0);
         }

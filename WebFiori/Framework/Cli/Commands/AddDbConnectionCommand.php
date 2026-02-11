@@ -43,7 +43,7 @@ class AddDbConnectionCommand extends Command {
         $connInfoObj->setHost($this->getInput('Database host:', '127.0.0.1'));
         $connInfoObj->setPort($this->getInput('Port number:', 3306));
         $connInfoObj->setUsername($this->getInput('Username:'));
-        $connInfoObj->setPassword($this->getInput('Password:'));
+        $connInfoObj->setPassword($this->getMaskedInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
         $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1)));
         $this->println('Trying to connect to the database...');

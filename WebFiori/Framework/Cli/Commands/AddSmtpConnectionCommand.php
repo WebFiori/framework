@@ -47,7 +47,7 @@ class AddSmtpConnectionCommand extends Command {
         }
         $smtpConn->setPort($this->getInput('Port number:', $smtpConn->getPort()));
         $smtpConn->setUsername($this->getInput('Username:'));
-        $smtpConn->setPassword($this->getInput('Password:'));
+        $smtpConn->setPassword($this->getMaskedInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', $smtpConn->getAddress()));
         $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(App::getConfig()->getSMTPConnections())));

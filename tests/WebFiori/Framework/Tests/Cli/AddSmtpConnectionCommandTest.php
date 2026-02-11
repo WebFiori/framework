@@ -37,6 +37,7 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
             "Port number: Enter = '25'\n",
             "Username:\n",
             "Password:\n",
+            "********\n",
             "Sender email address: Enter = 'test@example.com'\n",
             "Sender name: Enter = 'test@example.com'\n",
             "Give your connection a friendly name: Enter = '$connName'\n",

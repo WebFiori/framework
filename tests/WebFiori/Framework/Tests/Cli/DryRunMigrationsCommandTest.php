@@ -65,6 +65,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
      */
     public function testDryRunWithPendingMigration() {
         $this->createTestMigration('TestMigration');
+        $this->initMigrations();
 
         $output = $this->executeMultiCommand([
             DryRunMigrationsCommand::class,
@@ -82,6 +83,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
      */
     public function testDryRunWithCustomEnv() {
         $this->createTestMigration('EnvTestMigration');
+        $this->initMigrations('staging');
 
         $output = $this->executeMultiCommand([
             DryRunMigrationsCommand::class,
@@ -100,6 +102,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
      */
     public function testDryRunShowsQueries() {
         $this->createTestMigrationWithSchema('QueryTestMigration');
+        $this->initMigrations();
 
         $output = $this->executeMultiCommand([
             DryRunMigrationsCommand::class,
@@ -112,6 +115,19 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         // Queries section may or may not appear depending on migration content
         // Just verify the migration is listed
         $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function initMigrations(string $env = 'dev'): void {
+        $args = [
+            'WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
+            '--connection' => 'test-connection'
+        ];
+        
+        if ($env !== 'dev') {
+            $args['--env'] = $env;
+        }
+        
+        $this->executeMultiCommand($args);
     }
 
     private function createTestMigrationWithSchema(string $name): void {

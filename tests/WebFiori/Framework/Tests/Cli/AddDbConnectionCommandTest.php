@@ -35,6 +35,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
             "Port number: Enter = '3306'\n",
             "Username:\n",
             "Password:\n",
+            "******\n",
             "Database name:\n",
             "Give your connection a friendly name: Enter = '$connName'\n",
             "Trying to connect to the database...\n",
@@ -73,14 +74,15 @@ class AddDbConnectionCommandTest extends CLITestCase {
         $this->assertEquals("Port number: Enter = '3306'\n", $output[4]);
         $this->assertEquals("Username:\n", $output[5]);
         $this->assertEquals("Password:\n", $output[6]);
-        $this->assertEquals("Database name:\n", $output[7]);
-        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[8]);
-        $this->assertEquals("Trying to connect to the database...\n", $output[9]);
-        $this->assertEquals("Trying with 'localhost'...\n", $output[10]);
-        $this->assertEquals("Error: Unable to connect to the database.\n", $output[11]);
-        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[12]);
-        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[13]);
-        $this->assertEquals("Success: Connection information was stored in application configuration.\n", $output[14]);
+        $this->assertEquals("***********\n", $output[7]);
+        $this->assertEquals("Database name:\n", $output[8]);
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[9]);
+        $this->assertEquals("Trying to connect to the database...\n", $output[10]);
+        $this->assertEquals("Trying with 'localhost'...\n", $output[11]);
+        $this->assertEquals("Error: Unable to connect to the database.\n", $output[12]);
+        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[13]);
+        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[14]);
+        $this->assertEquals("Success: Connection information was stored in application configuration.\n", $output[15]);
     }
     /**
      * @test
@@ -113,12 +115,13 @@ class AddDbConnectionCommandTest extends CLITestCase {
         $this->assertEquals("Port number: Enter = '3306'\n", $output[4]);
         $this->assertEquals("Username:\n", $output[5]);
         $this->assertEquals("Password:\n", $output[6]);
-        $this->assertEquals("Database name:\n", $output[7]);
-        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[8]);
-        $this->assertEquals("Trying to connect to the database...\n", $output[9]);
-        $this->assertEquals("Trying with 'localhost'...\n", $output[10]);
-        $this->assertEquals("Error: Unable to connect to the database.\n", $output[11]);
-        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[12]);
-        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[13]);
+        $this->assertEquals("***********\n", $output[7]);
+        $this->assertEquals("Database name:\n", $output[8]);
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[9]);
+        $this->assertEquals("Trying to connect to the database...\n", $output[10]);
+        $this->assertEquals("Trying with 'localhost'...\n", $output[11]);
+        $this->assertEquals("Error: Unable to connect to the database.\n", $output[12]);
+        $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[13]);
+        $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[14]);
     }
 }

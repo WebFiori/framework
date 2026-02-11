@@ -130,4 +130,103 @@ class CreateTableCommandTest extends CLITestCase {
         $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
         $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
     }
+    
+    /**
+     * @test
+     */
+    public function testCreateTableWithMultipleColumnsViaJson() {
+        $className = 'TestTable'.time();
+        $columnsJson = json_encode([
+            ['name' => 'id', 'type' => 'INT', 'size' => 11, 'primary' => true, 'autoIncrement' => true],
+            ['name' => 'name', 'type' => 'VARCHAR', 'size' => 255, 'nullable' => false],
+            ['name' => 'email', 'type' => 'VARCHAR', 'size' => 255, 'nullable' => true],
+            ['name' => 'created_at', 'type' => 'DATETIME', 'nullable' => false]
+        ]);
+
+        $output = $this->executeMultiCommand([
+            CreateTableCommand::class,
+            '--class-name' => $className,
+            '--table-name' => 'users',
+            '--columns' => $columnsJson
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertStringContainsString("Success: Table class created", implode('', $output));
+        $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
+        $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateTableWithNullableColumn() {
+        $className = 'TestTable'.time();
+        $columnsJson = json_encode([
+            ['name' => 'description', 'type' => 'TEXT', 'nullable' => true]
+        ]);
+
+        $output = $this->executeMultiCommand([
+            CreateTableCommand::class,
+            '--class-name' => $className,
+            '--table-name' => 'items',
+            '--columns' => $columnsJson
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertStringContainsString("Success: Table class created", implode('', $output));
+        $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
+        $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateTableWithPrimaryKeyNoAutoIncrement() {
+        $className = 'TestTable'.time();
+        $columnsJson = json_encode([
+            ['name' => 'uuid', 'type' => 'VARCHAR', 'size' => 36, 'primary' => true, 'nullable' => false]
+        ]);
+
+        $output = $this->executeMultiCommand([
+            CreateTableCommand::class,
+            '--class-name' => $className,
+            '--table-name' => 'entities',
+            '--columns' => $columnsJson
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertStringContainsString("Success: Table class created", implode('', $output));
+        $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
+        $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
+    }
+    
+    /**
+     * @test
+     */
+    public function testCreateTableWithInteractiveColumnAddition() {
+        $className = 'TestTable'.time();
+
+        $output = $this->executeSingleCommand(new CreateTableCommand(), [], [
+            $className,
+            'users',
+            'y',   // Add columns
+            'id',  // Column name
+            '11',  // INT type (index 11 in getSupportedDataTypes)
+            '11',  // Size
+            'y',   // Primary key
+            'y',   // Auto increment
+            'n',   // Not nullable
+            ''     // Finish adding columns
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Enter table class name:', $outputStr);
+        $this->assertStringContainsString('Add columns to the table?', $outputStr);
+        $this->assertStringContainsString('Enter column name', $outputStr);
+        $this->assertStringContainsString('Select column type:', $outputStr);
+        $this->assertStringContainsString('Success: Table class created', $outputStr);
+        $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
+        $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
+    }
 }

@@ -112,14 +112,38 @@ class Controller {
     /**
      * Resolves environment variable references in configuration values.
      *
-     * If value starts with 'env:', attempts to read from environment.
-     * Falls back to original value if env var doesn't exist.
-     *
-     * @param mixed $value The value to resolve
+     * This method enables the use of environment variables in configuration files
+     * by using the 'env:' prefix. When a configuration value starts with 'env:',
+     * the method attempts to read the corresponding environment variable.
      * 
-     * @return mixed The resolved value
+     * Example usage in JSON configuration:
+     * <code>
+     * {
+     *   "database-connections": {
+     *     "production": {
+     *       "host": "env:DB_HOST",
+     *       "password": "env:DB_PASS"
+     *     }
+     *   }
+     * }
+     * </code>
+     * 
+     * The method will:
+     * - Check if the value starts with 'env:'
+     * - Extract the environment variable name (e.g., 'DB_HOST' from 'env:DB_HOST')
+     * - Attempt to read from getenv() first, then $_ENV
+     * - Fall back to the original value if the environment variable doesn't exist
+     *
+     * @param mixed $value The value to resolve. Can be any type, but only strings
+     * starting with 'env:' will be processed.
+     * 
+     * @return mixed The resolved value. Returns the environment variable value if found,
+     * otherwise returns the original value unchanged.
      */
-    public static function resolveEnvValue(string $value) {
+    public static function resolveEnvValue($value) {
+        if (!is_string($value)) {
+            return $value;
+        }
         
         if (str_starts_with($value, 'env:')) {
             $envVar = substr($value, 4);

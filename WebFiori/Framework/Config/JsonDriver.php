@@ -81,6 +81,9 @@ class JsonDriver implements ConfigurationDriver {
      * a named constant at run time using the function 'define'. This means
      * the constant will be accessable anywhere within the application's environment.
      *
+     * Note: The value parameter supports the 'env:' prefix for referencing
+     * system environment variables (e.g., "env:MY_VAR").
+     *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
      *
      * @param mixed $value The value of the constant.
@@ -95,6 +98,15 @@ class JsonDriver implements ConfigurationDriver {
         ], 'none', 'same'));
         $this->writeJson();
     }
+    /**
+     * Adds new database connections information or update existing connection.
+     *
+     * Note: When using this driver, connection properties support environment variable
+     * substitution using the 'env:' prefix. For example, you can set host to "env:DB_HOST"
+     * in the JSON configuration file, and it will be resolved at runtime.
+     *
+     * @param ConnectionInfo $dbConnectionsInfo An object which holds connection information.
+     */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
         $connectionJAsJson = new Json([
             'type' => $dbConnectionsInfo->getDatabaseType(),
@@ -108,7 +120,15 @@ class JsonDriver implements ConfigurationDriver {
         $this->json->get('database-connections')->add($dbConnectionsInfo->getName(), $connectionJAsJson);
         $this->writeJson();
     }
-
+    /**
+     * Adds new SMTP account or Updates an existing one.
+     *
+     * Note: When using this driver, SMTP account properties support environment variable
+     * substitution using the 'env:' prefix. For example, you can set password to "env:SMTP_PASS"
+     * in the JSON configuration file, and it will be resolved at runtime.
+     *
+     * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
+     */
     public function addOrUpdateSMTPAccount(SMTPAccount $emailAccount) {
         $connectionAsJson = new Json([
             'host' => $emailAccount->getServerAddress(),
@@ -190,6 +210,16 @@ class JsonDriver implements ConfigurationDriver {
         return self::$configFileName;
     }
 
+    /**
+     * Returns database connection information given connection name.
+     *
+     * Note: Connection properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
+     *
+     * @param string $conName The name of the connection.
+     *
+     * @return ConnectionInfo|null Returns connection info if found, null otherwise.
+     */
     public function getDBConnection(string $conName) {
         $jsonObj = $this->json->get('database-connections')->get($conName);
 
@@ -217,6 +247,9 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns an associative array that contain the information of database connections.
+     *
+     * Note: Connection properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * @return array An associative array. The indices are connections names and
      * values are objects of type 'ConnectionInfo'.
@@ -281,6 +314,9 @@ class JsonDriver implements ConfigurationDriver {
      * Returns an array that holds the information of defined application environment
      * variables.
      * 
+     * Note: Environment variable values that use the 'env:' prefix in configuration
+     * will be automatically resolved to their system environment variable values.
+     * 
      * @return array The returned array will be associative. The key will represent
      * the name of the variable and its value is a sub-associative array with
      * two indices, 'description' and 'value'. The description index is a text that describes
@@ -338,6 +374,9 @@ class JsonDriver implements ConfigurationDriver {
      * return the hashed value. If no password is set, this method will return the
      * string 'NO_PASSWORD'.
      *
+     * Note: The scheduler password value supports environment variable substitution
+     * using the 'env:' prefix (e.g., "env:SCHEDULER_PASS" in configuration).
+     *
      * @return string Password hash or the string 'NO_PASSWORD' if there is no
      * password.
      */
@@ -353,9 +392,11 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Returns SMTP connection given its name.
      *
-     * The method will search
-     * for an account with the given name in the set
+     * The method will search for an account with the given name in the set
      * of added accounts. If no account was found, null is returned.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * @param string $name The name of the account.
      *
@@ -382,6 +423,9 @@ class JsonDriver implements ConfigurationDriver {
     }
     /**
      * Returns an array that contains all added SMTP accounts.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * @return array An array that contains all added SMTP accounts.
      */

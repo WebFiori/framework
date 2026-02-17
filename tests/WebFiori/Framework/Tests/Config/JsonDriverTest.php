@@ -628,4 +628,38 @@ class JsonDriverTest extends TestCase {
         $account = $driver->getSMTPConnection('Cool2');
         $this->assertNotNull($account);
     }
+    public function testEnvVars00() {
+        $driver = new JsonDriver();
+        $driver->setConfigFileName('config-with-env.json');
+        putenv('HOST=22.22.22.22');
+        putenv('VERBOSE=1');
+        putenv('SMTP_00_USER=test@example.com');
+        putenv('SMTP_00_PASS=3241');
+        putenv('SMTP_00_ADDRESS=test2@example.com');
+        putenv('SMTP_00_NAME=Ibrahim');
+        putenv('SMTP_TOKEN=some_tkn');
+
+        putenv('DB_HOST_2=122.76.76.87');
+        putenv('DB_NAME_2=Ibrahim');
+        putenv('DB_PASS_2=some_pass');
+
+
+        $driver->initialize();
+        $vars = $driver->getEnvVars();
+        
+        $this->assertEquals('22.22.22.22', $vars['HOST']['value']);
+        $this->assertEquals('1', $vars['WF_VERBOSE_2']['value']);
+        
+        $smtp = $driver->getSMTPConnection('conn00');
+        $this->assertEquals('test2@example.com', $smtp->getAddress());
+        $this->assertEquals('some_tkn', $smtp->getAccessToken());
+        $this->assertEquals('3241', $smtp->getPassword());
+        $this->assertEquals('test@example.com', $smtp->getUsername());
+        $this->assertEquals('Ibrahim', $smtp->getSenderName());
+
+        $dbConn00 = $driver->getDBConnection('New_Connection_2');
+        $this->assertEquals('122.76.76.87', $dbConn00->getHost());
+        $this->assertEquals('Ibrahim', $dbConn00->getDBName());
+        $this->assertEquals('some_pass', $dbConn00->getPassword());
+    }
 }

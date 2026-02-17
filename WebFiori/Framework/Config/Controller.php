@@ -110,6 +110,25 @@ class Controller {
         self::init($driver);
     }
     /**
+     * Resolves environment variable references in configuration values.
+     *
+     * If value starts with 'env:', attempts to read from environment.
+     * Falls back to original value if env var doesn't exist.
+     *
+     * @param mixed $value The value to resolve
+     * 
+     * @return mixed The resolved value
+     */
+    public static function resolveEnvValue(string $value) {
+        
+        if (str_starts_with($value, 'env:')) {
+            $envVar = substr($value, 4);
+            
+            return getenv($envVar) ?: ($_ENV[$envVar] ?? $value);
+        }
+        return $value;
+    }
+    /**
      * Reads application environment variables and updates the class which holds
      * application environment variables.
      *
@@ -117,6 +136,12 @@ class Controller {
      */
     public static function updateEnv() {
         foreach (self::getDriver()->getEnvVars() as $name => $envVar) {
+            if (is_string($envVar) && str_starts_with($envVar, 'env:')) {
+                $envVar = self::resolveEnvValue($envVar);
+            } else if (is_array($envVar) && isset($envVar['value']) && str_starts_with($envVar['value'], 'env:')) {
+                $envVar['value'] = self::resolveEnvValue($envVar['value']);
+            }
+
             if (!defined($name)) {
                 if (isset($envVar['value'])) {
                     define($name, $envVar['value']);

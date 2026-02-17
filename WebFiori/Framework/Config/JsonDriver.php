@@ -117,7 +117,7 @@ class JsonDriver implements ConfigurationDriver {
             'password' => $emailAccount->getPassword(),
             'address' => $emailAccount->getAddress(),
             'sender-name' => $emailAccount->getSenderName(),
-
+            'access-token' => $emailAccount->getAccessToken()
         ], 'none', 'same');
         $this->json->get('smtp-connections')->add($emailAccount->getAccountName(), $connectionAsJson);
         $this->writeJson();
@@ -206,12 +206,12 @@ class JsonDriver implements ConfigurationDriver {
             }
 
             return new ConnectionInfo(
-                $jsonObj->get('type'),
-                $jsonObj->get('username'),
-                $jsonObj->get('password'),
-                $jsonObj->get('database'),
-                $jsonObj->get('host'),
-                $jsonObj->get('port'),
+                $this->getProp($jsonObj, 'type', $conName),
+                $this->getProp($jsonObj, 'username', $conName),
+                $this->getProp($jsonObj, 'password', $conName),
+                $this->getProp($jsonObj, 'database', $conName),
+                $this->getProp($jsonObj, 'host', $conName),
+                $this->getProp($jsonObj, 'port', $conName),
                 $extrasArr);
         }
     }
@@ -291,9 +291,19 @@ class JsonDriver implements ConfigurationDriver {
         $vars = $this->json->get('env-vars');
 
         foreach ($vars->getPropsNames() as $name) {
+            $value = '';
+            $desc = null;
+            $val =  $this->json->get('env-vars')->get($name);
+
+            if (gettype($val) == 'object') {
+                $value = $val->get('value');
+                $desc = $val->get('description');
+            } else {
+                $value = $val;
+            }
             $retVal[$name] = [
-                'value' => $this->json->get('env-vars')->get($name)->get('value'),
-                'description' => $this->json->get('env-vars')->get($name)->get('description')
+                'value' => Controller::resolveEnvValue($value),
+                'description' => $desc
             ];
         }
 
@@ -332,13 +342,13 @@ class JsonDriver implements ConfigurationDriver {
      * password.
      */
     public function getSchedulerPassword(): string {
-        $pass = $this->json->get('scheduler-password') ?? 'NO_PASSWORD';
+        $pass = ''.$this->json->get('scheduler-password') ?? 'NO_PASSWORD';
 
-        if (strlen($pass.'') == 0 || $pass == 'NO_PASSWORD') {
+        if (strlen($pass) == 0 || $pass == 'NO_PASSWORD') {
             return 'NO_PASSWORD';
         }
 
-        return $pass;
+        return Controller::resolveEnvValue($pass);
     }
     /**
      * Returns SMTP connection given its name.
@@ -365,7 +375,9 @@ class JsonDriver implements ConfigurationDriver {
                 'sender-name' => $this->getProp($jsonObj, 'sender-name', $name),
                 'server-address' => $this->getProp($jsonObj, 'host', $name),
                 'user' => $this->getProp($jsonObj, 'username', $name),
-                'account-name' => $name
+                'user' => $this->getProp($jsonObj, 'username', $name),
+                'account-name' => $name,
+                'access-token' => $this->getProp($jsonObj, 'access-token', $name)
             ]);
         }
     }
@@ -735,7 +747,7 @@ class JsonDriver implements ConfigurationDriver {
             throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
         }
 
-        return $val;
+        return Controller::resolveEnvValue($val);
     }
     private function isValidLangCode($langCode) {
         $code = strtoupper(trim($langCode));

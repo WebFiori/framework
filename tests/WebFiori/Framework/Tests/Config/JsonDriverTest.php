@@ -664,5 +664,6 @@ class JsonDriverTest extends TestCase {
 
         putenv('SCHEDULER_PASS=my_secure_hash');
         $this->assertEquals('my_secure_hash', $driver->getSchedulerPassword());
+        $driver->setConfigFileName('app-config.json');
     }
 }

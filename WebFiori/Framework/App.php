@@ -726,6 +726,7 @@ class App {
      * @throws Exception
      */
     private static function initAutoLoader() {
+        Ini::createAppDirs();
         /**
          * Initialize autoloader.
          */
@@ -744,7 +745,6 @@ class App {
             }
 
             if (!class_exists(APP_DIR.'\\Ini\\AutoLoad')) {
-                Ini::createAppDirs();
                 Ini::get()->createIniClass('AutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
             }
             self::call(APP_DIR.'\\Ini\\AutoLoad::initialize');

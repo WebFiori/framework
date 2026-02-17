@@ -15,6 +15,18 @@ use WebFiori\Http\Uri;
  * create a class called 'AppConfig' on the directory APP_DIR/Config and
  * use it to read and write configurations.
  *
+ * ## Environment Variable Support
+ *
+ * This driver supports environment variable substitution using the 'env:' prefix.
+ * The following configuration sections support this feature:
+ * - Database connections (all properties)
+ * - SMTP connections (all properties)
+ * - Environment variables (value field)
+ * - Scheduler password
+ *
+ * Values stored in the generated PHP class can use the 'env:' prefix, and they
+ * will be resolved to their environment variable values when read.
+ *
  * @author Ibrahim
  */
 class ClassDriver implements ConfigurationDriver {
@@ -60,6 +72,9 @@ class ClassDriver implements ConfigurationDriver {
      * a named constant at run time using the function 'define'. This means
      * the constant will be accesaable anywhere within the appllication's environment.
      *
+     * Note: The value parameter supports the 'env:' prefix for referencing
+     * system environment variables (e.g., "env:MY_VAR").
+     *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
      *
      * @param mixed $value The value of the constant.
@@ -77,6 +92,10 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Adds new database connections information or update existing connection.
      *
+     * Note: When using this driver, connection properties support environment variable
+     * substitution using the 'env:' prefix. Values will be stored in the generated PHP class
+     * and resolved when read.
+     *
      * @param ConnectionInfo $dbConnectionsInfo An object which holds connection information.
      */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
@@ -85,6 +104,10 @@ class ClassDriver implements ConfigurationDriver {
     }
     /**
      * Adds new SMTP account or Updates an existing one.
+     *
+     * Note: When using this driver, SMTP account properties support environment variable
+     * substitution using the 'env:' prefix. Values will be stored in the generated PHP class
+     * and resolved when read.
      *
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      */
@@ -157,6 +180,9 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Returns database connection information given connection name.
      *
+     * Note: Connection properties that use the 'env:' prefix will be
+     * automatically resolved to their environment variable values.
+     *
      * @param string $conName The name of the connection.
      *
      * @return ConnectionInfo|null The method will return an object of type
@@ -174,10 +200,30 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Returns an associative array that contain the information of database connections.
      *
+     * Note: Connection properties that use the 'env:' prefix will be
+     * automatically resolved to their environment variable values.
+     *
      * @return array An associative array of objects of type ConnectionInfo.
      */
     public function getDBConnections(): array {
-        return $this->configVars['database-connections'];
+        $connections = $this->configVars['database-connections'];
+        
+        foreach ($connections as $name => $connObj) {
+            if ($connObj instanceof ConnectionInfo) {
+                $connObj->setHost(Controller::resolveEnvValue($connObj->getHost()));
+                $connObj->setUsername(Controller::resolveEnvValue($connObj->getUsername()));
+                $connObj->setPassword(Controller::resolveEnvValue($connObj->getPassword()));
+                $connObj->setDBName(Controller::resolveEnvValue($connObj->getDBName()));
+                
+                $extras = $connObj->getExtars();
+                foreach ($extras as $key => $value) {
+                    $extras[$key] = Controller::resolveEnvValue($value);
+                }
+                $connObj->setExtras($extras);
+            }
+        }
+        
+        return $connections;
     }
 
     public function getDescription(string $langCode) {
@@ -198,12 +244,25 @@ class ClassDriver implements ConfigurationDriver {
     /**
      * Returns an associative array of application constants.
      *
+     * Note: Environment variable values that use the 'env:' prefix will be
+     * automatically resolved to their system environment variable values.
+     *
      * @return array The indices of the array are names of the constants and
      * values are sub-associative arrays. Each sub-array will have two indices,
      * 'value' and 'description'.
      */
     public function getEnvVars(): array {
-        return $this->configVars['env-vars'];
+        $vars = $this->configVars['env-vars'];
+        
+        foreach ($vars as $name => $varData) {
+            if (is_array($varData) && isset($varData['value'])) {
+                $vars[$name]['value'] = Controller::resolveEnvValue($varData['value']);
+            } else {
+                $vars[$name] = Controller::resolveEnvValue($varData);
+            }
+        }
+        
+        return $vars;
     }
     /**
      * Returns a string that represents the URL of home page of the application.
@@ -221,9 +280,17 @@ class ClassDriver implements ConfigurationDriver {
     public function getPrimaryLanguage() : string {
         return $this->configVars['site']['primary-lang'];
     }
-
+    /**
+     * Returns sha256 hash of the password which is used to prevent unauthorized
+     * access to run the tasks or access scheduler web interface.
+     *
+     * Note: The scheduler password value supports environment variable substitution
+     * using the 'env:' prefix (e.g., "env:SCHEDULER_PASS").
+     *
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no password.
+     */
     public function getSchedulerPassword(): string {
-        return $this->configVars['scheduler-password'];
+        return Controller::resolveEnvValue($this->configVars['scheduler-password']);
     }
 
     public function getSMTPAccount(string $name) {
@@ -242,15 +309,48 @@ class ClassDriver implements ConfigurationDriver {
      * will return an object of type SMTPAccount. Else, the
      * method will return null.
      *
+     */    /**
+     * Returns SMTP connection given its name.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix will be
+     * automatically resolved to their environment variable values.
+     *
+     * @param string $name The name of the account.
+     *
+     * @return SMTPAccount|null If the account is found, The method
+     * will return an object of type SMTPAccount. Else, the
+     * method will return null.
+     *
      */
     public function getSMTPConnection(string $name) {
         if (isset($this->getSMTPConnections()[$name])) {
             return $this->getSMTPConnections()[$name];
         }
     }
-
+    /**
+     * Returns an array that contains all added SMTP accounts.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix will be
+     * automatically resolved to their environment variable values.
+     *
+     * @return array An associative array of SMTPAccount objects.
+     */
     public function getSMTPConnections(): array {
-        return $this->configVars['smtp-connections'];
+        $connections = $this->configVars['smtp-connections'];
+        
+        foreach ($connections as $name => $smtpObj) {
+            if ($smtpObj instanceof SMTPAccount) {
+                $smtpObj->setServerAddress(Controller::resolveEnvValue($smtpObj->getServerAddress()));
+                $smtpObj->setPort(Controller::resolveEnvValue($smtpObj->getPort()));
+                $smtpObj->setUsername(Controller::resolveEnvValue($smtpObj->getUsername()));
+                $smtpObj->setPassword(Controller::resolveEnvValue($smtpObj->getPassword()));
+                $smtpObj->setAddress(Controller::resolveEnvValue($smtpObj->getAddress()));
+                $smtpObj->setSenderName(Controller::resolveEnvValue($smtpObj->getSenderName()));
+                $smtpObj->setAccessToken(Controller::resolveEnvValue($smtpObj->getAccessToken()));
+            }
+        }
+        
+        return $connections;
     }
 
     public function getTheme(): string {

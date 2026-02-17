@@ -78,13 +78,13 @@
       <file>../WebFiori/Framework/Session/SessionDB.php</file>
       <file>../WebFiori/Framework/Cli/Commands/AddCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/CreateCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/ListRoutesCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/ListThemesCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/RunSQLQueryCommand.php</file>
+
+
+
       <file>../WebFiori/Framework/Cli/Commands/SchedulerCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/SettingsCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/UpdateSettingsCommand.php</file>
-      <file>../WebFiori/Framework/Cli/Commands/UpdateTableCommand.php</file>
+
+
+
       <file>../WebFiori/Framework/Cli/Commands/VersionCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/WHelpCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/RunMigrationsCommand.php</file>

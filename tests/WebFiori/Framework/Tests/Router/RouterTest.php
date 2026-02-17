@@ -2,6 +2,7 @@
 namespace WebFiori\Framework\Test\Router;
 
 use PHPUnit\Framework\TestCase;
+use WebFiori\Framework\App;
 use WebFiori\Framework\Router\RouteOption;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Router\RouterUri;
@@ -262,8 +263,8 @@ class RouterTest extends TestCase {
 
         Router::redirect('home', 'home2');
         Router::route('https://127.0.0.1/home');
-        $this->assertEquals(301, Response::getCode());
-        $locHeader = Response::getHeader('location');
+        $this->assertEquals(301, App::getResponse()->getCode());
+        $locHeader = App::getResponse()->getHeader('location');
         $this->assertEquals(['home2'], $locHeader);
         
     }
@@ -271,22 +272,22 @@ class RouterTest extends TestCase {
      * @test
      */
     public function testRedirect01() {
-        Response::removeHeader('location');
+        App::getResponse()->removeHeader('location');
         Router::redirect('home', 'home2', 308);
         Router::route('https://127.0.0.1/home');
-        $this->assertEquals(308, Response::getCode());
-        $locHeader = Response::getHeader('location');
+        $this->assertEquals(308, App::getResponse()->getCode());
+        $locHeader = App::getResponse()->getHeader('location');
         $this->assertEquals(['home2'], $locHeader);
     }
     /**
      * @test
      */
     public function testRedirect03() {
-        Response::removeHeader('location');
+        App::getResponse()->removeHeader('location');
         Router::redirect('home/{id}', 'https://google.com', 3099);
         Router::route('https://127.0.0.1/home/55');
-        $this->assertEquals(301, Response::getCode());
-        $locHeader = Response::getHeader('location');
+        $this->assertEquals(301, App::getResponse()->getCode());
+        $locHeader = App::getResponse()->getHeader('location');
         $this->assertEquals(['https://google.com'], $locHeader);
         $this->assertEquals(55, Router::getParameterValue('id'));
         $this->assertTrue(Router::removeRoute('home/{id}'));
@@ -295,13 +296,13 @@ class RouterTest extends TestCase {
      * @test
      */
     public function testRedirect04() {
-        Response::setCode(404);
-        Response::removeHeader('location');
+        App::getResponse()->setCode(404);
+        App::getResponse()->removeHeader('location');
         Router::removeAll();
         Router::redirect('home/{id?}', 'https://google.com', 400);
         Router::route('https://127.0.0.1/home');
-        $this->assertEquals(301, Response::getCode());
-        $locHeader = Response::getHeader('location');
+        $this->assertEquals(301, App::getResponse()->getCode());
+        $locHeader = App::getResponse()->getHeader('location');
         $this->assertEquals(['https://google.com'], $locHeader);
         $this->assertNull(Router::getParameterValue('id'));
         $this->assertTrue(Router::removeRoute('home/{id?}'));
@@ -312,9 +313,9 @@ class RouterTest extends TestCase {
     public function testSitemap00() {
         Router::removeAll();
         Router::incSiteMapRoute();
-        Response::clear();
+        App::getResponse()->clear();
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -323,13 +324,13 @@ class RouterTest extends TestCase {
                 . '<url>'
                 . '<loc>https://127.0.0.1/sitemap</loc>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testSitemap01() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::incSiteMapRoute();
         Router::closure([
@@ -340,7 +341,7 @@ class RouterTest extends TestCase {
             RouteOption::SITEMAP => true
         ]);
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -352,13 +353,13 @@ class RouterTest extends TestCase {
                 . '<url>'
                 . '<loc>https://127.0.0.1/home</loc>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testSitemap02() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::incSiteMapRoute();
         Router::closure([
@@ -369,7 +370,7 @@ class RouterTest extends TestCase {
             RouteOption::SITEMAP => true
         ]);
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -378,13 +379,13 @@ class RouterTest extends TestCase {
                 . '<url>'
                 . '<loc>https://127.0.0.1/sitemap</loc>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testSitemap03() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::incSiteMapRoute();
         Router::closure([
@@ -398,7 +399,7 @@ class RouterTest extends TestCase {
             ]
         ]);
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -413,13 +414,13 @@ class RouterTest extends TestCase {
                 . '<url>'
                 . '<loc>https://127.0.0.1/home/2</loc>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testSitemap04() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::incSiteMapRoute();
         Router::closure([
@@ -434,7 +435,7 @@ class RouterTest extends TestCase {
             RouteOption::LANGS => ['en']
         ]);
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -451,13 +452,13 @@ class RouterTest extends TestCase {
                 . '<loc>https://127.0.0.1/home/2</loc>'
                 . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/2?lang=en"/>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testSitemap05() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::incSiteMapRoute();
         Router::closure([
@@ -472,7 +473,7 @@ class RouterTest extends TestCase {
             RouteOption::LANGS => ['en', 'ar']
         ]);
         Router::route('https://127.0.0.1/sitemap');
-        $this->assertEquals(['text/xml'], Response::getHeader('content-type'));
+        $this->assertEquals(['text/xml'], App::getResponse()->getHeader('content-type'));
         $this->assertEquals('<?xml version="1.0" encoding="UTF-8"?>'
                 . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
                 . '<url>'
@@ -491,26 +492,26 @@ class RouterTest extends TestCase {
                 . '<xhtml:link rel="alternate" hreflang="en" href="https://127.0.0.1/home/2?lang=en"/>'
                 . '<xhtml:link rel="alternate" hreflang="ar" href="https://127.0.0.1/home/2?lang=ar"/>'
                 . '</url>'
-                . '</urlset>', Response::getBody());
+                . '</urlset>', App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testClassRoute00() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::addRoute([
                 RouteOption::PATH => 'home',
                 RouteOption::TO => \App\Apis\RoutingTestClass::class
         ]);
         Router::route('https://127.0.0.1/home');
         
-        $this->assertEquals("I'm inside the class.", Response::getBody());
+        $this->assertEquals("I'm inside the class.", App::getResponse()->getBody());
     }
     /**
      * @test
      */
     public function testClassRoute02() {
-        Response::clear();
+        App::getResponse()->clear();
         Router::removeAll();
         Router::addRoute([
                 RouteOption::PATH => 'home',
@@ -519,7 +520,7 @@ class RouterTest extends TestCase {
         ]);
         Router::route('https://127.0.0.1/home');
         
-        $this->assertEquals("I'm doing something.", Response::getBody());
+        $this->assertEquals("I'm doing something.", App::getResponse()->getBody());
     }
  
 }

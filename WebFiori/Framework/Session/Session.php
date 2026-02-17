@@ -10,10 +10,10 @@
  */
 namespace WebFiori\Framework\Session;
 
-use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Http\HttpCookie;
 use WebFiori\Http\Request;
+use WebFiori\Framework\App;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
 /**
@@ -161,11 +161,11 @@ class Session implements JsonI {
         $this->startedAt = 0;
         $this->sessionVariables = [];
         $this->passedTime = 0;
-        $this->ipAddr = Request::getClientIP();
+        $this->ipAddr = App::getRequest()->getClientIP();
         $this->getCookie()->setSameSite('Lax');
-        Request::getUri()->getScheme();
+        App::getRequest()->getUri()->getScheme();
 
-        if ((defined('USE_HTTP') && USE_HTTP === true) || Request::getUri()->getScheme() == 'http') {
+        if ((defined('USE_HTTP') && USE_HTTP === true) || App::getRequest()->getUri()->getScheme() == 'http') {
             $this->getCookie()->setIsSecure(false);
         } else {
             $this->getCookie()->setIsSecure(true);
@@ -786,7 +786,7 @@ class Session implements JsonI {
      */
     private function getLangFromRequest() {
         $langIdx = 'lang';
-        $lang = Request::getParam($langIdx);
+        $lang = App::getRequest()->getParam($langIdx);
 
         if ($lang === null) {
             $lang = filter_input(INPUT_COOKIE, $langIdx);

@@ -1,10 +1,10 @@
-name: PHP 8.3
+name: PHP 8.5
 
 on:
   push:
     branches: [ main, dev ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -49,9 +49,9 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.5
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:10.5.48, composer
+          tools: phpunit:12.5.4, composer
           
       - name: Install ODBC Driver for SQL Server
         run: |
@@ -95,23 +95,38 @@ jobs:
       
       - name: Execute Tests
         run: phpunit --configuration=tests/phpunit10.xml --coverage-clover=clover.xml
-
+       
       - name: Rename coverage report
         run: |
-          mv clover.xml php-8.3-coverage.xml
+          mv clover.xml php-8.5-coverage.xml
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage
-          path: php-8.3-coverage.xml
+          path: php-8.5-coverage.xml
+
 
   code-coverage:
     name: Coverage
     needs: test
     uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
     with:
-      php-version: '8.3'
-      coverage-file: 'php-8.3-coverage.xml'
+      php-version: '8.5'
+      coverage-file: 'php-8.5-coverage.xml'
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  code-quality:
+    name: Code Quality
+    needs: test
+    uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@v1.2.1
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  
+  release-prod:
+    name: Prepare Production Release Branch / Publish Release
+    needs: [code-coverage, code-quality]
+    uses: WebFiori/workflows/.github/workflows/release-php.yaml@v1.2.1
+    with:
+      branch: 'main'

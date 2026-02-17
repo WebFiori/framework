@@ -788,7 +788,7 @@ class WebPage {
 
         if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
-            Response::write($this->getDocument()->toHTML($formatted));
+            App::getResponse()->write($this->getDocument()->toHTML($formatted));
 
             return null;
         }
@@ -826,7 +826,7 @@ class WebPage {
         $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
-        $this->setCanonical(Request::getRequestedURI());
+        $this->setCanonical(App::getRequest()->getRequestedURI());
         $this->document->setLanguage($this->getLangCode());
         $headNode = $this->getHead();
         $this->document->setHeadNode($headNode);
@@ -1197,7 +1197,7 @@ class WebPage {
         $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
 
         if ($langCodeFromSession === null) {
-            $langCodeFromRequest = Request::getParam('lang');
+            $langCodeFromRequest = App::getRequest()->getParam('lang');
 
             if ($langCodeFromRequest === null) {
                 $this->setLang($this->getConfigVar('getPrimaryLanguage', 'EN'));

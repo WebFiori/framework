@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/actions/workflows/php84.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/actions/workflows/php85.yml/badge.svg?branch=main"></a>
   <a href="https://codecov.io/gh/WebFiori/framework">
     <img src="https://codecov.io/gh/WebFiori/framework/branch/main/graph/badge.svg" />
   </a>
@@ -34,7 +34,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php82.yml/badge.svg?branch=main"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php83.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php83.yml/badge.svg?branch=main"></a>|
 |<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php84.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php84.yml/badge.svg?branch=main"></a><br>|
-
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php85.yml"><img src="https://github.com/WebFiori/framework/actions/workflows/php85.yml/badge.svg?branch=main"></a><br>|
 
 ## Key Features
 

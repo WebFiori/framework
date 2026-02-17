@@ -27,7 +27,7 @@ class SetupPasswordService extends AbstractWebService {
         $this->addRequestMethod('post');
         $this->addParameter(new RequestParameter('password'));
     }
-    public function isAuthorized() {
+    public function isAuthorized(): bool {
         return TasksManager::getPassword() == 'NO_PASSWORD';
     }
 

@@ -47,12 +47,13 @@ class WebService00 extends AbstractWebService {
      *
      * @return boolean If the client is authorized, the method will return true.
      */
-    public function isAuthorized() {
+    public function isAuthorized(): bool {
         // TODO: Check if the client is authorized to call the service 'say-hi-service'.
         // You can ignore this method or remove it.
         //$authHeader = $this->getAuthHeader();
         //$authType = $authHeader['type'];
         //$token = $authHeader['credentials'];
+        return true;
     }
     /**
      * Process the request.

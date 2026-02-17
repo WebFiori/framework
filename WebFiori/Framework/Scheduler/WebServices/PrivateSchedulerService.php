@@ -19,7 +19,7 @@ abstract class PrivateSchedulerService extends AbstractWebService {
      *
      * @return bool
      */
-    public function isAuthorized() {
+    public function isAuthorized(): bool {
         return SessionsManager::getActiveSession()->get('scheduler-is-logged-in') === true;
     }
 }

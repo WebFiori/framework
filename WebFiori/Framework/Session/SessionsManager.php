@@ -10,6 +10,7 @@
  */
 namespace WebFiori\Framework\Session;
 
+use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Http\Request;
 /**
@@ -228,7 +229,7 @@ class SessionsManager {
         $sid = self::getSessionIDFromCookie($trimmedSName);
 
         if ($sid === false) {
-            $sid = Request::getParam($sessionName);
+            $sid = App::getRequest()->getParam($sessionName);
 
             if ($sid === null) {
                 return false;

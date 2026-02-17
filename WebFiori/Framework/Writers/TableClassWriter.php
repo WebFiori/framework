@@ -15,7 +15,7 @@ use const APP_PATH;
 use WebFiori\Database\ColOption;
 use WebFiori\Database\Column;
 use WebFiori\Database\DataType;
-use WebFiori\Database\EntityMapper;
+use WebFiori\Database\Entity\EntityMapper;
 use WebFiori\Database\FK;
 use WebFiori\Database\mssql\MSSQLColumn;
 use WebFiori\Database\MsSql\MSSQLTable;

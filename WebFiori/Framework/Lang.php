@@ -13,6 +13,7 @@ namespace WebFiori\Framework;
 use WebFiori\Framework\Exceptions\MissingLangException;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
+use WebFiori\Framework\App;
 
 /**
  * A class that is can be used to make the application ready for
@@ -240,7 +241,7 @@ class Lang {
             if ($session !== null) {
                 $langCode = $session->getLangCode(true);
             } else {
-                $langCode = Request::getParam('lang');
+                $langCode = App::getRequest()->getParam('lang');
 
                 if ($langCode === null || strlen($langCode) != 2) {
                     $langCode = App::getConfig()->getPrimaryLanguage();

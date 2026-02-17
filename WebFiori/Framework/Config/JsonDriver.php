@@ -375,9 +375,8 @@ class JsonDriver implements ConfigurationDriver {
                 'sender-name' => $this->getProp($jsonObj, 'sender-name', $name),
                 'server-address' => $this->getProp($jsonObj, 'host', $name),
                 'user' => $this->getProp($jsonObj, 'username', $name),
-                'user' => $this->getProp($jsonObj, 'username', $name),
                 'account-name' => $name,
-                'access-token' => $this->getProp($jsonObj, 'access-token', $name)
+                'access-token' => $this->getProp($jsonObj, 'access-token', $name, false)
             ]);
         }
     }
@@ -402,6 +401,7 @@ class JsonDriver implements ConfigurationDriver {
             $acc->setSenderName($this->getProp($jsonObj, 'sender-name', $name));
             $acc->setServerAddress($this->getProp($jsonObj, 'host', $name));
             $acc->setUsername($this->getProp($jsonObj, 'username', $name));
+            $acc->setAccessToken($this->getProp($jsonObj, 'access-token', $name, false));
             $retVal[$name] = $acc;
         }
 
@@ -740,10 +740,10 @@ class JsonDriver implements ConfigurationDriver {
     public function toJSON() : Json {
         return $this->json;
     }
-    private function getProp(Json $j, $name, string $connName) {
+    private function getProp(Json $j, $name, string $connName, bool $requred = true) {
         $val = $j->get($name);
 
-        if ($val === null) {
+        if ($val === null && $requred) {
             throw new InitializationException('The property "'.$name.'" of the connection "'.$connName.'" is missing.');
         }
 

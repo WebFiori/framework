@@ -1,0 +1,211 @@
+<?php
+namespace WebFiori\Framework\Test\Cli;
+
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Framework\App;
+use WebFiori\Framework\Cli\CLITestCase;
+use WebFiori\Framework\Cli\Commands\MigrationsStatusCommand;
+
+/**
+ * Test cases for MigrationsStatusCommand.
+ *
+ * @author Ibrahim
+ */
+class MigrationsStatusCommandTest extends CLITestCase {
+    private ConnectionInfo $testConnection;
+
+    /**
+     * @test
+     */
+    public function testStatusWithNoConnections() {
+        App::getConfig()->removeAllDBConnections();
+
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class
+        ]);
+
+        $this->assertEquals([
+            "Info: No database connections configured.\n"
+        ], $output);
+        $this->assertEquals(1, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithInvalidConnection() {
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'invalid-connection'
+        ]);
+
+        $this->assertEquals([
+            "Error: Connection 'invalid-connection' not found.\n"
+        ], $output);
+        $this->assertEquals(1, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithNoMigrations() {
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $this->assertEquals([
+            "Info: No migrations found.\n"
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithPendingMigrationsOnly() {
+        $this->createTestMigration('TestMigration1');
+        $this->createTestMigration('TestMigration2');
+
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Info: No applied migrations.', $outputStr);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('TestMigration1', $outputStr);
+        $this->assertStringContainsString('TestMigration2', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithAppliedMigrationsOnly() {
+        $this->createTestMigration('AppliedMigration1');
+        $this->initAndRunMigrations();
+
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Applied migrations:', $outputStr);
+        $this->assertStringContainsString('AppliedMigration1', $outputStr);
+        $this->assertStringContainsString('Info: No pending migrations.', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithBothAppliedAndPending() {
+        $this->createTestMigration('AppliedMigration1');
+        $this->initAndRunMigrations();
+        
+        $this->createTestMigration('PendingMigration1');
+
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Applied migrations:', $outputStr);
+        $this->assertStringContainsString('AppliedMigration1', $outputStr);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('PendingMigration1', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testStatusWithCustomEnv() {
+        $this->createTestMigration('TestMigration1');
+
+        $output = $this->executeMultiCommand([
+            MigrationsStatusCommand::class,
+            '--connection' => 'test-connection',
+            '--env' => 'staging'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('TestMigration1', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function initAndRunMigrations(): void {
+        $this->executeMultiCommand([
+            'WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
+            '--connection' => 'test-connection'
+        ]);
+        
+        $this->executeMultiCommand([
+            'WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommandNew',
+            '--connection' => 'test-connection'
+        ]);
+    }
+
+    private function createTestMigration(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        // Test migration
+    }
+    
+    public function down(Database \$db): void {
+        // Test rollback
+    }
+}
+PHP;
+
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
+    private function cleanupMigrations(): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+
+        if (is_dir($dir)) {
+            foreach (glob($dir.DS.'*.php') as $file) {
+                if (basename($file) !== '.gitkeep') {
+                    unlink($file);
+                }
+            }
+        }
+    }
+
+    private function setupTestConnection(): void {
+        $this->testConnection = new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', '127.0.0.1', 3306);
+        $this->testConnection->setName('test-connection');
+        App::getConfig()->addOrUpdateDBConnection($this->testConnection);
+    }
+
+    protected function setUp(): void {
+        parent::setUp();
+        $this->setupTestConnection();
+        $this->cleanupMigrations();
+    }
+
+    protected function tearDown(): void {
+        $this->cleanupMigrations();
+        App::getConfig()->removeAllDBConnections();
+        parent::tearDown();
+    }
+}

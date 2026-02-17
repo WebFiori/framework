@@ -89,9 +89,9 @@ class ThemeClassWriter extends ClassWriter {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
-            " */",
-            $this->f('__construct')
+            " */"
         ], 1);
+        $this->f('__construct');
         $this->append([
             "parent::__construct('".$this->name."');",
             '//TODO: Set the properties of your theme.',
@@ -113,9 +113,9 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside",
             ' * section, the method might return null.',
-            ' */',
-            $this->f('getAsideNode', [], 'HTMLNode'),
+            ' */'
         ], 1);
+        $this->f('getAsideNode', [], 'HTMLNode');
         $this->append('return new AsideSection();', 2);
         $this->append('}', 1);
         $this->writeComponent('AsideSection', 'HTMLNode', 'A class that represents aside area of the theme.', 'Implement aside section of the theme.');
@@ -126,9 +126,9 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer",
             ' * section, the method might return null.',
-            ' */',
-            $this->f('getFooterNode', [], 'HTMLNode'),
+            ' */'
         ], 1);
+        $this->f('getFooterNode', [], 'HTMLNode');
         $this->append('return new FooterSection();', 2);
         $this->append('}', 1);
         $this->writeComponent('FooterSection', 'HTMLNode', 'A class that represents footer section of the theme.', 'Implement footer section of the theme.');
@@ -144,15 +144,15 @@ class ThemeClassWriter extends ClassWriter {
         if (PHP_VERSION_ID <= 70333) {
             $this->append([
                 " * @return HeadNode",
-                ' */',
-                $this->f('getHeadNode', [], 'HeadNode'),
+                ' */'
             ], 1);
+            $this->f('getHeadNode', [], 'HeadNode');
         } else {
             $this->append([
                 " * @return HeadSection",
-                ' */',
-                $this->f('getHeadNode', [], 'HeadSection'),
+                ' */'
             ], 1);
+            $this->f('getHeadNode', [], 'HeadSection');
         }
         $this->append('return new HeadSection();', 2);
         $this->append('}', 1);
@@ -164,9 +164,9 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             " * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header",
             ' * section, the method might return null.',
-            ' */',
-            $this->f('getHeaderNode', [], 'HTMLNode'),
+            ' */'
         ], 1);
+        $this->f('getHeaderNode', [], 'HTMLNode');
         $this->append('return new HeaderSection();', 2);
         $this->append('}', 1);
         $this->writeComponent('HeaderSection', 'HTMLNode', 'A class that represents the top section of the theme.', 'Add header components such as navigation links.');

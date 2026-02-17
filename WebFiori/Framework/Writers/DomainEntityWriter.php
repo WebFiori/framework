@@ -47,7 +47,7 @@ class DomainEntityWriter extends ClassWriter {
         $this->append('class '.$this->getName().' {');
     }
     
-    private function writeConstructor() {
+    protected function writeConstructor(array $params = [], $body = '', string $description = 'Creates new instance of the class.', int $indent = 1) {
         $this->append('public function __construct(', 1);
         
         $params = [];

@@ -35,10 +35,12 @@
     },
     "scripts": {
         "test": "phpunit --configuration tests/phpunit.xml",
-        "test10": "phpunit --configuration tests/phpunit10.xml"
+        "test10": "phpunit --configuration tests/phpunit10.xml",
+        "fix-cs": "php-cs-fixer fix --config=php_cs.php.dist"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^10.0",
+        "friendsofphp/php-cs-fixer": "^3.0"
     },
     "autoload": {
         "psr-4": {

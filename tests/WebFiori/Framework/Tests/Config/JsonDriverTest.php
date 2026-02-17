@@ -661,5 +661,8 @@ class JsonDriverTest extends TestCase {
         $this->assertEquals('122.76.76.87', $dbConn00->getHost());
         $this->assertEquals('Ibrahim', $dbConn00->getDBName());
         $this->assertEquals('some_pass', $dbConn00->getPassword());
+
+        putenv('SCHEDULER_PASS=my_secure_hash');
+        $this->assertEquals('my_secure_hash', $driver->getSchedulerPassword());
     }
 }

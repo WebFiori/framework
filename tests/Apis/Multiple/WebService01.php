@@ -16,9 +16,8 @@ class WebService01 extends AbstractWebService {
         parent::__construct('say-hi-service-2');
         $this->setDescription('');
         $this->setRequestMethods([
-                RequestMethod::HEAD,
+            RequestMethod::HEAD,
         ]);
-        
     }
     /**
      * Checks if the client is authorized to call a service or not.

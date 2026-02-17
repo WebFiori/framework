@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2020 Ibrahim BinAlshikh
+ * Copyright (c) 2020 WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -17,7 +17,6 @@ use WebFiori\File\File;
  *
  * @author Ibrahim
  *
- * @version 1.0.1
  */
 abstract class ClassWriter {
     /**
@@ -25,15 +24,13 @@ abstract class ClassWriter {
      *
      * @var string
      *
-     * @since 1.0
      */
-    private $classAsStr;
+    private $classLines;
     /**
      * The name of the class that will be created.
      *
      * @var string
      *
-     * @since 1.0
      */
     private $className;
     /**
@@ -45,11 +42,13 @@ abstract class ClassWriter {
     /**
      * The location at which the entity class will be created on.
      *
-     * @since 1.0
      */
     private $path;
     private $suffix;
     private $useArr;
+    private $extendsClass;
+    private $implementsInterfaces;
+    private $classComment;
     /**
      * Creates new instance of the class.
      *
@@ -110,18 +109,18 @@ abstract class ClassWriter {
      * @param int $tabsCount The number of tabs that will be added to the string.
      * A tab is represented as 4 spaces.
      *
-     * @since 1.0
      */
     public function append($strOrArr, $tabsCount = 0) {
         if (gettype($strOrArr) != 'array') {
             $this->a($strOrArr, $tabsCount);
 
-            return;
+            return $this;
         }
 
         foreach ($strOrArr as $str) {
             $this->a($str, $tabsCount);
         }
+        return $this;
     }
     /**
      * Adds method definition to the class.
@@ -139,29 +138,347 @@ abstract class ClassWriter {
      * it.
      */
     public function f($funcName, $argsArr = [], ?string $returns = null) {
+        return $this->method($funcName, $argsArr, $returns);
+    }
+    /**
+     * Adds method definition with full control over modifiers.
+     *
+     * @param string $funcName Method name
+     * @param array $argsArr Arguments [name => type]
+     * @param string|null $returns Return type
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * @param bool $isStatic Is static method
+     * @param bool $isAbstract Is abstract method
+     * @param bool $isFinal Is final method
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function method(
+        string $funcName, 
+        array $argsArr = [], 
+        ?string $returns = null,
+        string $visibility = 'public',
+        bool $isStatic = false,
+        bool $isAbstract = false,
+        bool $isFinal = false
+    ) {
+        $modifiers = [];
+        
+        if ($isFinal) {
+            $modifiers[] = 'final';
+        }
+        if ($isAbstract) {
+            $modifiers[] = 'abstract';
+        }
+        
+        $modifiers[] = $visibility;
+        
+        if ($isStatic) {
+            $modifiers[] = 'static';
+        }
+        
+        $signature = implode(' ', $modifiers) . ' function ' . $funcName;
+        
         $argsPart = '(';
-
         foreach ($argsArr as $argName => $argType) {
             if (strlen($argsPart) != 1) {
-                $argsPart .= ', '.$argType.' $'.$argName;
-                continue;
+                $argsPart .= ', ';
             }
-            $argsPart .= $argType.' $'.$argName;
+            $argsPart .= $argType . ' $' . $argName;
         }
         $argsPart .= ')';
-
+        
         if ($returns !== null) {
-            $argsPart .= ' : '.$returns;
+            $argsPart .= ' : ' . $returns;
         }
-
-        return 'public function '.$funcName.$argsPart.' {';
+        
+        $this->append($signature . $argsPart . ($isAbstract ? ';' : ' {'), 1);
+        return $this;
     }
+    /**
+     * Generate a property declaration.
+     *
+     * @param string $name Property name
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * @param string|null $type Property type
+     * @param string|null $defaultValue Default value as string
+     * @param bool $isStatic Is static property
+     * @param bool $isReadonly Is readonly property (PHP 8.1+)
+     * 
+     * @param int|null $indent If provided, appends to class and returns $this for chaining
+     * 
+     * @return string|$this Property declaration string, or $this if $indent is provided
+     */
+    public function property(
+        string $name,
+        string $visibility = 'private',
+        ?string $type = null,
+        ?string $defaultValue = null,
+        bool $isStatic = false,
+        bool $isReadonly = false
+    ) {
+        $modifiers = [$visibility];
+        
+        if ($isReadonly) {
+            $modifiers[] = 'readonly';
+        }
+        if ($isStatic) {
+            $modifiers[] = 'static';
+        }
+        
+        $declaration = implode(' ', $modifiers);
+        
+        if ($type !== null) {
+            $declaration .= ' ' . $type;
+        }
+        
+        $declaration .= ' $' . $name;
+        
+        if ($defaultValue !== null) {
+            $declaration .= ' = ' . $defaultValue;
+        }
+        
+        $this->append($declaration . ';', 1);
+        return $this;
+    }
+    /**
+     * Generate a constant declaration.
+     *
+     * @param string $name Constant name
+     * @param string $value Constant value as string
+     * @param string $visibility Visibility: 'public', 'protected', 'private'
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function constant(
+        string $name,
+        string $value,
+        string $visibility = 'public'
+    ) {
+        $this->append($visibility . ' const ' . $name . ' = ' . $value . ';', 1);
+        return $this;
+    }
+    /**
+     * Add an empty line (fluent version).
+     *
+     * @return ClassWriter For chaining
+     */
+    public function addEmptyLine() : ClassWriter {
+        $this->append('');
+        return $this;
+    }
+    /**
+     * Start building a docblock.
+     *
+     * @param string $description Main description
+     * 
+     * @return DocblockBuilder
+     */
+    public function docblock(string $description = '') : DocblockBuilder {
+        return new DocblockBuilder($this, $description);
+    }
+    /**
+     * Add an attribute for a class.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function classAttribute(string $name, array $params = [], int $indent = 0) : ClassWriter {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Add an attribute for a property.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function propertyAttribute(string $name, array $params = [], int $indent = 1) : ClassWriter {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Add an attribute for a method.
+     *
+     * @param string $name Attribute name (without #)
+     * @param array $params Attribute parameters
+     * @param int $indent Indentation level
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function methodAttribute(string $name, array $params = [], int $indent = 1) : ClassWriter {
+        $this->append($this->formatAttribute($name, $params), $indent);
+        return $this;
+    }
+    /**
+     * Format an attribute string.
+     *
+     * @param string $name Attribute name
+     * @param array $params Attribute parameters
+     * 
+     * @return string Formatted attribute
+     */
+    private function formatAttribute(string $name, array $params = []) : string {
+        $attr = '#[' . $name;
+        
+        if (!empty($params)) {
+            $args = [];
+            foreach ($params as $key => $value) {
+                if (is_int($key)) {
+                    $args[] = $this->formatAttributeValue($value);
+                } else {
+                    $args[] = $key . ': ' . $this->formatAttributeValue($value);
+                }
+            }
+            $attr .= '(' . implode(', ', $args) . ')';
+        }
+        
+        $attr .= ']';
+        return $attr;
+    }
+    /**
+     * Format a value for attribute parameters.
+     *
+     * @param mixed $value The value to format
+     * 
+     * @return string Formatted value
+     */
+    private function formatAttributeValue($value) : string {
+        if (is_string($value)) {
+            return "'" . addslashes($value) . "'";
+        }
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_array($value)) {
+            $items = array_map([$this, 'formatAttributeValue'], $value);
+            return '[' . implode(', ', $items) . ']';
+        }
+        if (is_null($value)) {
+            return 'null';
+        }
+        return (string)$value;
+    }
+    /**
+     * Write a standard constructor method.
+     *
+     * @param array $params Constructor parameters [name => type]
+     * @param string|array $body Constructor body (string or array of lines)
+     * @param string $description Optional docblock description
+     * @param int $indent Indentation level
+     */
+    protected function writeConstructor(
+        array $params = [],
+        $body = '',
+        string $description = 'Creates new instance of the class.',
+        int $indent = 1
+    ) {
+        $this->docblock($description)->build($indent);
+        $this->append($this->method('__construct', $params), $indent);
+        
+        if (is_array($body)) {
+            $this->append($body, $indent + 1);
+        } else if ($body) {
+            $this->append($body, $indent + 1);
+        }
+        
+        $this->append('}', $indent);
+    }
+    /**
+     * Write a standard getter method.
+     *
+     * @param string $property Property name
+     * @param string $type Return type
+     * @param string $description Optional description
+     * @param int $indent Indentation level
+     */
+    protected function writeGetter(
+        string $property, 
+        string $type, 
+        string $description = '',
+        int $indent = 1
+    ) {
+        $methodName = 'get' . ucfirst($property);
+        
+        $this->docblock($description ?: "Returns the value of $property.")
+            ->returns($type)
+            ->build($indent);
+        
+        $this->append($this->method($methodName, [], $type), $indent);
+        $this->append("return \$this->$property;", $indent + 1);
+        $this->append('}', $indent);
+    }
+    /**
+     * Write a standard setter method.
+     *
+     * @param string $property Property name
+     * @param string $type Parameter type
+     * @param string $description Optional description
+     * @param int $indent Indentation level
+     */
+    protected function writeSetter(
+        string $property, 
+        string $type, 
+        string $description = '',
+        int $indent = 1
+    ) {
+        $methodName = 'set' . ucfirst($property);
+        
+        $this->docblock($description ?: "Sets the value of $property.")
+            ->param($type, $property)
+            ->returns('void')
+            ->build($indent);
+        
+        $this->append($this->method($methodName, [$property => $type], 'void'), $indent);
+        $this->append("\$this->$property = \$$property;", $indent + 1);
+        $this->append('}', $indent);
+    }
+    /**
+     * Write both getter and setter for a property.
+     *
+     * @param string $property Property name
+     * @param string $type Property type
+     * @param int $indent Indentation level
+     */
+    protected function writeGetterSetter(string $property, string $type, int $indent = 1) {
+        $this->writeGetter($property, $type, '', $indent);
+        $this->writeSetter($property, $type, '', $indent);
+    }
+    /**
+     * Write an empty method stub with TODO comment.
+     *
+     * @param string $methodName Method name
+     * @param array $params Method parameters [name => type]
+     * @param string|null $returns Return type
+     * @param string $description Method description
+     * @param int $indent Indentation level
+     */
+    protected function writeMethodStub(
+        string $methodName,
+        array $params = [],
+        ?string $returns = null,
+        string $description = '',
+        int $indent = 1
+    ) {
+        if ($description) {
+            $this->docblock($description)->build($indent);
+        }
+        
+        $this->append($this->method($methodName, $params, $returns), $indent);
+        $this->append('//TODO: Implement this method.', $indent + 1);
+        $this->append('}', $indent);
+    } 
     /**
      * Returns the absolute path of the class that will be created.
      *
      * @return string The absolute path of the file that holds class information.
      *
-     * @since 1.0.1
      */
     public function getAbsolutePath() : string {
         return $this->getPath().DS.$this->getName().'.php';
@@ -178,7 +495,6 @@ abstract class ClassWriter {
      * @return string The name of the class that will be created. Default is
      * 'NewClass'
      *
-     * @since 1.0
      */
     public function getName(bool $withNs = false) : string {
         $retVal = $this->className.$this->getSuffix();
@@ -202,7 +518,6 @@ abstract class ClassWriter {
      * @return string The namespace at which the generated class will be added to.
      * default is '\' which is the global namespace.
      *
-     * @since 1.0
      */
     public function getNamespace() : string {
         return $this->ns;
@@ -213,7 +528,6 @@ abstract class ClassWriter {
      * @return string The location at which the class will be created on.
      * default is the value of the contstant ROOT_PATH
      *
-     * @since 1.0
      */
     public function getPath() : string {
         return $this->path;
@@ -325,19 +639,20 @@ abstract class ClassWriter {
      *
      * @param string $name A string that represents class name.
      *
-     * @return boolean If the name is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setClassName(string $name) : bool {
+    public function setClassName(string $name) : ClassWriter {
         $trimmed = trim($name);
 
-        if (self::isValidClassName($trimmed)) {
-            $this->className = $this->fixClassName($trimmed);
-
-            return true;
+        if (!self::isValidClassName($trimmed)) {
+            throw new \InvalidArgumentException(
+                "Invalid class name '$name'. Class names must start with a letter or underscore, " .
+                "followed by letters, numbers, or underscores."
+            );
         }
 
-        return false;
+        $this->className = $this->fixClassName($trimmed);
+        return $this;
     }
 
     /**
@@ -345,36 +660,37 @@ abstract class ClassWriter {
      *
      * @param string $namespace
      *
-     * @return boolean If the namespace is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setNamespace(string $namespace) {
+    public function setNamespace(string $namespace) : ClassWriter {
         $trimmed = trim($namespace, ' ');
 
         if (!self::isValidNamespace($trimmed)) {
-            return false;
+            throw new \InvalidArgumentException(
+                "Invalid namespace '$namespace'. Namespaces must contain valid PHP identifiers " .
+                "separated by backslashes."
+            );
         }
+        
         $this->ns = $trimmed[0] == '\\' ? substr($trimmed, 1) : $trimmed;
-
-        return true;
+        return $this;
     }
     /**
      * Sets the location at which the class will be created on.
      *
      * @param string $path A string that represents folder path.
      *
-     * @return boolean If the path is successfully set, the method will return true.
-     * Other than that, false is returned.
+     * @return ClassWriter
      */
-    public function setPath(string $path) : bool {
+    public function setPath(string $path) : ClassWriter {
         $trimmed = trim($path);
 
         if (strlen($trimmed) == 0) {
-            return false;
+            throw new \InvalidArgumentException("Path cannot be empty.");
         }
+        
         $this->path = str_replace('\\', DS, str_replace('/', DS, $trimmed));
-
-        return true;
+        return $this;
     }
     /**
      * Sets a string as a suffix to the class name.
@@ -382,17 +698,51 @@ abstract class ClassWriter {
      * @param string $classNameSuffix A string to append to class name such as 'Table' or
      * 'Service'. It must be a string which is considered as valid class name.
      *
-     * @return bool If set, the method will return true. False otherises.
+     * @return ClassWriter
      */
-    public function setSuffix(string $classNameSuffix) : bool {
-        if (self::isValidClassName($classNameSuffix)) {
-            $this->suffix = $classNameSuffix;
-            $this->className = $this->fixClassName($this->className);
-
-            return true;
+    public function setSuffix(string $classNameSuffix) : ClassWriter {
+        if (!self::isValidClassName($classNameSuffix)) {
+            throw new \InvalidArgumentException(
+                "Invalid suffix '$classNameSuffix'. Suffix must be a valid class name."
+            );
         }
 
-        return false;
+        $this->suffix = $classNameSuffix;
+        $this->className = $this->fixClassName($this->className);
+        return $this;
+    }
+    /**
+     * Sets the parent class to extend.
+     *
+     * @param string|null $class The class to extend
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setExtends(?string $class) : ClassWriter {
+        $this->extendsClass = $class;
+        return $this;
+    }
+    /**
+     * Sets the interfaces to implement.
+     *
+     * @param array $interfaces Array of interface names
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setImplements(array $interfaces) : ClassWriter {
+        $this->implementsInterfaces = $interfaces;
+        return $this;
+    }
+    /**
+     * Sets a custom class comment.
+     *
+     * @param string $comment The class comment/description
+     * 
+     * @return ClassWriter For chaining
+     */
+    public function setClassComment(string $comment) : ClassWriter {
+        $this->classComment = $comment;
+        return $this;
     }
     /**
      * Write the new class to a .php file.
@@ -400,20 +750,27 @@ abstract class ClassWriter {
      * Note that the method will remove the file if it was already created and create
      * new one.
      *
-     * @since 1.0
      */
     public function writeClass() {
         $classFile = new File($this->getName().'.php', $this->getPath());
         $classFile->remove();
-        $this->classAsStr = '';
+        $classFile->setRawData($this->getCode());
+        $classFile->write(false, true);
+    }
+    /**
+     * Generate the class code without writing to disk.
+     *
+     * @return string The generated class code
+     */
+    public function getCode() : string {
+        $this->classLines = [];
         $this->writeNsDeclaration();
         $this->writeUseStatements();
         $this->writeClassComment();
         $this->writeClassDeclaration();
         $this->writeClassBody();
-        $classFile->setRawData($this->classAsStr);
-        $classFile->write(false, true);
-    }
+        return implode("\n", $this->normalizeCode($this->classLines));
+    }    
     public abstract function writeClassBody();
     /**
      * Writes the top section of the class that contains class comment.
@@ -446,9 +803,25 @@ abstract class ClassWriter {
     }
     private function a($str, $tapsCount) {
         $tabStr = str_repeat('    ', $tapsCount);
-        $this->classAsStr .= $tabStr.$str."\n";
+        $this->classLines[] = $tabStr.$str;
     }
-    private function fixClassName($className) {
+    private function normalizeCode(array $lines) : array {
+        $normalized = [];
+        $prevLineEmpty = false;
+        
+        foreach ($lines as $line) {
+            $isEmpty = trim($line) === '';
+            
+            if ($isEmpty && $prevLineEmpty) {
+                continue;
+            }
+            
+            $normalized[] = $line;
+            $prevLineEmpty = $isEmpty;
+        }
+        
+        return $normalized;
+    }    private function fixClassName($className) {
         $classSuffix = $this->getSuffix();
 
         if ($classSuffix == '') {

@@ -57,6 +57,12 @@ class RunMigrationsCommandNew extends Command {
             return $this->runMigrations();
             
         } catch (Throwable $e) {
+            $msg = $e->getMessage();
+            if ((str_contains($msg, ".schema_changes' doesn't exist") && $e->getCode() == 1146)) {
+                $this->warning('Table "schema_changes" does not exist. No migrations executed.');
+                $this->info('Run "migrations:ini" to create the table.');
+                return 1;
+            }
             $this->error('An exception was thrown.');
             $this->println('Message: ' . $e->getMessage());
             $this->println('File: ' . $e->getFile() . ':' . $e->getLine());

@@ -61,6 +61,7 @@ class FreshMigrationsCommand extends Command {
             // Rollback all
             $this->println('Rolling back all migrations...');
             $rolled = $this->runner->rollbackUpTo(null);
+            $this->runner->getRepository()->clearAll();
             
             if (!empty($rolled)) {
                 foreach ($rolled as $change) {

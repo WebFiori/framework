@@ -48,6 +48,10 @@ class RunMigrationsCommandNew extends Command {
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
             $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+
+            $seedersPath = APP_PATH.'Database'.DS.'Seeders';
+            $seedersNamespace = APP_DIR.'\\Database\\Seeders';
+            $count += $this->runner->discoverFromPath($seedersPath, $seedersNamespace);
             
             if ($count === 0) {
                 $this->info('No migrations found.');
@@ -119,7 +123,21 @@ class RunMigrationsCommandNew extends Command {
             }
         }
         
-        $this->info('Applied: ' . $result->count() . ' migrations');
+        $migrationsCount = count(array_filter($result->getApplied(), fn($c) => $c->getType() === 'migration'));
+        $seedersCount = count(array_filter($result->getApplied(), fn($c) => $c->getType() === 'seeder'));
+
+        if ($migrationsCount > 0) {
+            $this->info('Applied: ' . $migrationsCount . ' migration(s)');
+        }
+
+        if ($seedersCount > 0) {
+            $this->info('Applied: ' . $seedersCount . ' seeder(s)');
+        }
+
+        if ($migrationsCount === 0 && $seedersCount === 0) {
+            $this->info('Applied: 0 migrations');
+        }
+
         $this->info('Time: ' . round($result->getTotalTime(), 2) . 'ms');
         
         return !empty($failed) ? 1 : 0;

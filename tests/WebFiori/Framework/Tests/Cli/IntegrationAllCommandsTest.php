@@ -134,7 +134,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
             '// TODO: Implement migration logic',
             '$db->addTable(\Webfiori\Database\Attributes\AttributeTableBuilder::build(\''.$tableClassNs.'\', $db->getConnectionInfo()->getDatabaseType()));'."\n".
             '            $query = $db->table(\'users\')->createTable()->getQuery();'."\n".
-            '            $db->table(\'users\')->createTable();',
+            '            $db->table(\'users\')->createTable()->execute();',
             $content
         );
         $content = str_replace(
@@ -163,7 +163,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $content = str_replace(
             '// TODO: Implement seeding logic',
             'for ($i = 1; $i <= 30; $i++) {'."\n".
-            '                $db->table(\'users\')->insert([\'name\' => \'User\'.$i, \'email\' => \'user\'.$i.\'@example.com\']);'."\n".
+            '                $db->table(\'users\')->insert([\'name\' => \'User\'.$i, \'email\' => \'user\'.$i.\'@example.com\'])->execute();'."\n".
             '            }',
             $content
         );

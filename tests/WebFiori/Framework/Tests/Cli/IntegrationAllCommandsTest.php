@@ -4,18 +4,27 @@ namespace WebFiori\Framework\Test\Cli;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Cli\CLITestCase;
 use WebFiori\Framework\Cli\Commands\AddDbConnectionCommand;
+use WebFiori\Framework\Cli\Commands\CreateEntityCommand;
+use WebFiori\Framework\Cli\Commands\CreateMigrationCommand;
+use WebFiori\Framework\Cli\Commands\CreateRepositoryCommand;
+use WebFiori\Framework\Cli\Commands\CreateSeederCommand;
+use WebFiori\Framework\Cli\Commands\CreateServiceCommand;
+use WebFiori\Framework\Cli\Commands\CreateTableCommand;
+use WebFiori\Framework\Cli\Commands\InitMigrationsCommand;
+use WebFiori\Framework\Cli\Commands\RunMigrationsCommandNew;
 
 /**
  * Test cases for All commands workflow
  *
  * @author Ibrahim
  */
-class AddDbConnectionCommandTest extends CLITestCase {
+class IntegrationAllCommandsTest extends CLITestCase {
     /**
      * @test
      */
     public function testAddDBConnection00() {
         //Step 1: Add DB Connection
+        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
         $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [], [
             '0',
             '127.0.0.1',
@@ -25,9 +34,6 @@ class AddDbConnectionCommandTest extends CLITestCase {
             'testing_db',
             "\n" // Hit Enter to pick default value (connection name)
         ]);
-
-        $count = count(App::getConfig()->getDBConnections());
-        $connName = 'db-connection-'.$count;
         $this->assertEquals([
             "Select database type:\n",
             "0: mysql\n",
@@ -47,7 +53,7 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         //Step 2: Create Database Table Structure
 
-        $className = 'TestTable'.time();
+        $tableClassName = 'TestTable'.time();
         $columnsJson = json_encode([
             ['name' => 'id', 'type' => 'INT', 'size' => 11, 'primary' => true, 'autoIncrement' => true],
             ['name' => 'name', 'type' => 'VARCHAR', 'size' => 255, 'nullable' => false],
@@ -56,18 +62,19 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         $output = $this->executeMultiCommand([
             CreateTableCommand::class,
-            '--class-name' => $className,
+            '--class-name' => $tableClassName,
             '--table-name' => 'users',
             '--columns' => $columnsJson
         ]);
 
+        $tableClassNs = '\\App\\Infrastructure\\Schema\\'.$tableClassName;
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertTrue(class_exists('\\App\\Infrastructure\\Schema\\'.$className));
-        $this->removeClass('\\App\\Infrastructure\\Schema\\'.$className);
+        $this->assertTrue(class_exists($tableClassNs));
+        //$this->removeClass($tableClassNs);
 
         //Step 3: Create Entity Class
 
-        $className = 'TestEntity'.time();
+        $entityClassName = 'UserEntity'.time();
         $propsJson = json_encode([
             ['name' => 'id', 'type' => 'int', 'nullable' => false],
             ['name' => 'name', 'type' => 'string', 'nullable' => false],
@@ -76,17 +83,18 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         $output = $this->executeMultiCommand([
             CreateEntityCommand::class,
-            '--class-name' => $className,
+            '--class-name' => $entityClassName,
             '--properties' => $propsJson
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertTrue(class_exists('\\App\\Domain\\'.$className));
-        $this->removeClass('\\App\\Domain\\'.$className);
+        $entityClassNs = '\\App\\Domain\\'.$entityClassName;
+        $this->assertTrue(class_exists($entityClassNs));
+        //$this->removeClass($entityClassNs);
 
         //Step 4: Create Repo
 
-        $className = 'TestRepo'.time();
+        $repoClassName = 'TestRepo'.time();
         $propsJson = json_encode([
             ['name' => 'id', 'type' => 'int'],
             ['name' => 'name', 'type' => 'string'],
@@ -95,27 +103,86 @@ class AddDbConnectionCommandTest extends CLITestCase {
 
         $output = $this->executeMultiCommand([
             CreateRepositoryCommand::class,
-            '--class-name' => $className,
-            '--entity' => 'App\\Domain\\User',
+            '--class-name' => $repoClassName,
+            '--entity' => $entityClassNs,
             '--table' => 'users',
             '--id-field' => 'id',
             '--properties' => $propsJson
         ]);
 
         $this->assertEquals(0, $this->getExitCode());
-        $this->assertTrue(class_exists('\\App\\Infrastructure\\Repository\\'.$className));
-        $this->removeClass('\\App\\Infrastructure\\Repository\\'.$className);
+        $repoClassNs = '\\App\\Infrastructure\\Repository\\'.$repoClassName;
+        $this->assertTrue(class_exists($repoClassNs));
+        //$this->removeClass($repoClassNs);
 
         //Step 5: Create Migration
-        //Modify migration code to create the table.
+        $migrationClass = 'CreateUsersTable'.time();
+        $output = $this->executeMultiCommand([
+            CreateMigrationCommand::class,
+            '--class-name' => $migrationClass,
+            '--description' => 'Creates users table'
+        ]);
+        $this->assertEquals(0, $this->getExitCode());
+        $migrationClassNs = '\\App\\Database\\Migrations\\'.$migrationClass;
+        $this->assertTrue(class_exists($migrationClassNs));
+
+        // Modify migration to create the users table
+        $migrationFile = APP_PATH.'Database'.DS.'Migrations'.DS.$migrationClass.'.php';
+        $content = file_get_contents($migrationFile);
+        $content = str_replace(
+            '// TODO: Implement migration logic',
+            '$db->addTable(new '.$tableClassNs.'());'."\n".
+            '            $db->table(\'users\')->createTable();',
+            $content
+        );
+        $content = str_replace(
+            '// TODO: Implement rollback logic',
+            '$db->table(\'users\')->drop();'."\n",
+            $content
+        );
+        file_put_contents($migrationFile, $content);
         //Step 6: Create Seeder
-        //Modify seeder code to add 30 random users
+        $seederClass = 'SeedUsers'.time();
+        $output = $this->executeMultiCommand([
+            CreateSeederCommand::class,
+            '--class-name' => $seederClass,
+            '--description' => 'Seeds 30 random users',
+            '--depends-on' => $tableClassNs
+        ]);
+        $this->assertEquals(0, $this->getExitCode());
+        $seederClassNs = '\\App\\Database\\Seeders\\'.$seederClass;
+        $this->assertTrue(class_exists($seederClassNs));
+
+        // Modify seeder to insert 30 random users
+        $seederFile = APP_PATH.'Database'.DS.'Seeders'.DS.$seederClass.'.php';
+        $content = file_get_contents($seederFile);
+        $content = str_replace(
+            '// TODO: Implement seeding logic',
+            'for ($i = 1; $i <= 30; $i++) {'."\n".
+            '                $db->table(\'users\')->insert([\'name\' => \'User\'.$i, \'email\' => \'user\'.$i.\'@example.com\']);'."\n".
+            '            }',
+            $content
+        );
+        file_put_contents($seederFile, $content);
+        $output = $this->executeMultiCommand([
+            InitMigrationsCommand::class,
+            '--connection' => $connName
+        ]);
         //Step 7: Run migrations
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => $connName
+        ]);
+        $this->assertEquals(0, $this->getExitCode());
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('App\\Database\\Migrations\\'.$migrationClass, $outputStr);
+        $this->assertStringContainsString('Info: Applied: 1 migrations', $outputStr);
         //Step 8: Create Web Service
-        $className = 'TestService'.time();
+        $serviceClass = 'TestService'.time();
 
         $output = $this->executeSingleCommand(new CreateServiceCommand(), [], [
-            $className,
+            $serviceClass,
             "\n", // Use default description
             'n'   // Don't add methods
         ]);
@@ -125,14 +192,43 @@ class AddDbConnectionCommandTest extends CLITestCase {
             "Enter service class name:\n",
             "Enter service description: Enter = 'REST API Service'\n",
             "Add methods to the service?(y/N)\n",
-            "Success: Service class created at: ".APP_PATH."Apis".DIRECTORY_SEPARATOR.$className."Service.php\n"
+            "Success: Service class created at: ".APP_PATH."Apis".DIRECTORY_SEPARATOR.$serviceClass."Service.php\n"
         ], $output);
 
-        $this->assertTrue(class_exists('\\App\\Apis\\'.$className.'Service'));
-        $this->removeClass('\\App\\Apis\\'.$className.'Service');
-        //Step 9: Modify the web service to use The repo
+        
+        //Step 9: Modify the web service to use the repo
+        $serviceFile = APP_PATH.'Apis'.DS.$serviceClass.'Service.php';
+        $serviceContent = file_get_contents($serviceFile);
+        // Add a GET method that returns all users via the repo
+        $serviceContent = str_replace(
+            'class '.$serviceClass.'Service extends WebService {',
+            'class '.$serviceClass.'Service extends WebService {'."\n\n".
+            '    #[GetMapping]'."\n".
+            '    #[AllowAnonymous]'."\n".
+            '    #[ResponseBody(200, \'success\', \'application/json\')]'."\n".
+            '    public function getUsers(): array {'."\n".
+            '        return [new \WebFiori\Json\Json(["name" => "Ibrahim"])];'."\n".
+            '    }',
+            $serviceContent
+        );
+        file_put_contents($serviceFile, $serviceContent);
 
-        //Step 10: Create annon test cases using the class APITestCase
+        //Step 10: Test the web service using APITestCase
+        $serviceClassName = '\\App\\Apis\\'.$serviceClass.'Service';
+        $this->assertTrue(class_exists($serviceClassName));
+        $manager = new \WebFiori\Http\WebServicesManager();
+        $manager->addService(new $serviceClassName());
+        $apiTest = new class('test') extends \WebFiori\Http\APITestCase {};
+        $result = $apiTest->getRequest($manager, 'get-users');
+        
+        var_dump($result);
+        
+        $json = json_decode($result, true);
+        $this->assertNotNull($json);
+
+        //$this->removeClass('\\App\\Apis\\'.$serviceClass.'Service');
+        //$this->removeClass('\\App\\Database\\Migrations\\'.$migrationClass);
+        //$this->removeClass('\\App\\Database\\Seeders\\'.$seederClass);
 
     }
 

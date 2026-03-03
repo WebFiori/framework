@@ -10,6 +10,7 @@ use WebFiori\Framework\Cli\Commands\CreateRepositoryCommand;
 use WebFiori\Framework\Cli\Commands\CreateSeederCommand;
 use WebFiori\Framework\Cli\Commands\CreateServiceCommand;
 use WebFiori\Framework\Cli\Commands\CreateTableCommand;
+use WebFiori\Framework\Cli\Commands\FreshMigrationsCommand;
 use WebFiori\Framework\Cli\Commands\InitMigrationsCommand;
 use WebFiori\Framework\Cli\Commands\RunMigrationsCommandNew;
 
@@ -70,7 +71,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $tableClassNs = '\\App\\Infrastructure\\Schema\\'.$tableClassName;
         $this->assertEquals(0, $this->getExitCode());
         $this->assertTrue(class_exists($tableClassNs));
-        //$this->removeClass($tableClassNs);
+        $this->removeClass($tableClassNs);
 
         //Step 3: Create Entity Class
 
@@ -90,7 +91,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $entityClassNs = '\\App\\Domain\\'.$entityClassName;
         $this->assertTrue(class_exists($entityClassNs));
-        //$this->removeClass($entityClassNs);
+        $this->removeClass($entityClassNs);
 
         //Step 4: Create Repo
 
@@ -113,7 +114,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $this->assertEquals(0, $this->getExitCode());
         $repoClassNs = '\\App\\Infrastructure\\Repository\\'.$repoClassName;
         $this->assertTrue(class_exists($repoClassNs));
-        //$this->removeClass($repoClassNs);
+        $this->removeClass($repoClassNs);
 
         //Step 5: Create Migration
         $migrationClass = 'CreateUsersTable'.time();
@@ -124,14 +125,15 @@ class IntegrationAllCommandsTest extends CLITestCase {
         ]);
         $this->assertEquals(0, $this->getExitCode());
         $migrationClassNs = '\\App\\Database\\Migrations\\'.$migrationClass;
-        $this->assertTrue(class_exists($migrationClassNs));
-
+        
+        
         // Modify migration to create the users table
         $migrationFile = APP_PATH.'Database'.DS.'Migrations'.DS.$migrationClass.'.php';
         $content = file_get_contents($migrationFile);
         $content = str_replace(
             '// TODO: Implement migration logic',
-            '$db->addTable(new '.$tableClassNs.'());'."\n".
+            '$db->addTable(\Webfiori\Database\Attributes\AttributeTableBuilder::build(\''.$tableClassNs.'\', $db->getConnectionInfo()->getDatabaseType()));'."\n".
+            '            $query = $db->table(\'users\')->createTable()->getQuery();'."\n".
             '            $db->table(\'users\')->createTable();',
             $content
         );
@@ -141,6 +143,8 @@ class IntegrationAllCommandsTest extends CLITestCase {
             $content
         );
         file_put_contents($migrationFile, $content);
+        $this->assertTrue(class_exists($migrationClassNs));
+        
         //Step 6: Create Seeder
         $seederClass = 'SeedUsers'.time();
         $output = $this->executeMultiCommand([
@@ -164,22 +168,31 @@ class IntegrationAllCommandsTest extends CLITestCase {
             $content
         );
         file_put_contents($seederFile, $content);
+        $this->assertTrue(class_exists($seederClassNs));
+        
         $output = $this->executeMultiCommand([
             InitMigrationsCommand::class,
             '--connection' => $connName
         ]);
+        $this->assertEquals(0, $this->getExitCode());
         //Step 7: Run migrations
         $output = $this->executeMultiCommand([
-            RunMigrationsCommandNew::class,
+            FreshMigrationsCommand::class,
             '--connection' => $connName
         ]);
         $this->assertEquals(0, $this->getExitCode());
         $outputStr = implode('', $output);
         $this->assertStringContainsString('Running migrations...', $outputStr);
         $this->assertStringContainsString('App\\Database\\Migrations\\'.$migrationClass, $outputStr);
-        $this->assertStringContainsString('Info: Applied: 1 migrations', $outputStr);
+        $this->assertStringContainsString('App\\Database\\Seeders\\'.$seederClass, $outputStr);
+        $this->assertStringContainsString('Info: Applied: 1 migration(s)', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 1 seeder(s)', $outputStr);
+
+        //Remove migrations after running
+        $this->removeClass($seederClassNs);
+        $this->removeClass($migrationClassNs);
         //Step 8: Create Web Service
-        $serviceClass = 'TestService'.time();
+        $serviceClass = 'Test'.time();
 
         $output = $this->executeSingleCommand(new CreateServiceCommand(), [], [
             $serviceClass,
@@ -199,7 +212,16 @@ class IntegrationAllCommandsTest extends CLITestCase {
         //Step 9: Modify the web service to use the repo
         $serviceFile = APP_PATH.'Apis'.DS.$serviceClass.'Service.php';
         $serviceContent = file_get_contents($serviceFile);
-        // Add a GET method that returns all users via the repo
+        // Add use statements for Database, App and the repo
+        $serviceContent = str_replace(
+            'use WebFiori\Http\WebService;',
+            'use App\Infrastructure\Repository\\'.$repoClassName.';'."\n".
+            'use WebFiori\Database\Database;'."\n".
+            'use WebFiori\Framework\App;'."\n".
+            'use WebFiori\Http\WebService;',
+            $serviceContent
+        );
+        // Add a GET method that uses the repo
         $serviceContent = str_replace(
             'class '.$serviceClass.'Service extends WebService {',
             'class '.$serviceClass.'Service extends WebService {'."\n\n".
@@ -207,7 +229,9 @@ class IntegrationAllCommandsTest extends CLITestCase {
             '    #[AllowAnonymous]'."\n".
             '    #[ResponseBody(200, \'success\', \'application/json\')]'."\n".
             '    public function getUsers(): array {'."\n".
-            '        return [new \WebFiori\Json\Json(["name" => "Ibrahim"])];'."\n".
+            '        $conn = App::getConfig()->getDBConnection(\''.$connName.'\');'."\n".
+            '        $repo = new '.$repoClassName.'(new Database($conn));'."\n".
+            '        return $repo->findAll();'."\n".
             '    }',
             $serviceContent
         );
@@ -216,6 +240,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         //Step 10: Test the web service using APITestCase
         $serviceClassName = '\\App\\Apis\\'.$serviceClass.'Service';
         $this->assertTrue(class_exists($serviceClassName));
+        $this->removeClass('\\App\\Apis\\'.$serviceClass.'Service');
         $manager = new \WebFiori\Http\WebServicesManager();
         $manager->addService(new $serviceClassName());
         $apiTest = new class('test') extends \WebFiori\Http\APITestCase {};
@@ -226,9 +251,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $json = json_decode($result, true);
         $this->assertNotNull($json);
 
-        //$this->removeClass('\\App\\Apis\\'.$serviceClass.'Service');
-        //$this->removeClass('\\App\\Database\\Migrations\\'.$migrationClass);
-        //$this->removeClass('\\App\\Database\\Seeders\\'.$seederClass);
+        
 
     }
 

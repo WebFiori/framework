@@ -157,14 +157,16 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $seederClassNs = '\\App\\Database\\Seeders\\'.$seederClass;
         $this->assertTrue(class_exists($seederClassNs));
 
-        // Modify seeder to insert 30 random users
+        // Modify seeder to insert 10 random users
         $seederFile = APP_PATH.'Database'.DS.'Seeders'.DS.$seederClass.'.php';
         $content = file_get_contents($seederFile);
         $content = str_replace(
             '// TODO: Implement seeding logic',
-            'for ($i = 1; $i <= 30; $i++) {'."\n".
-            '                $db->table(\'users\')->insert([\'name\' => \'User\'.$i, \'email\' => \'user\'.$i.\'@example.com\'])->execute();'."\n".
-            '            }',
+            '$rawDb = new \WebFiori\Database\Database($db->getConnectionInfo());'."\n".
+            '        $rawDb->table(\'users\')->insert([\'name\' => \'Ibrahim\', \'email\' => \'user@ibrahim.com\'])->execute();'."\n".
+            '        for ($i = 1; $i <= 10; $i++) {'."\n".
+            '            $rawDb->table(\'users\')->insert([\'name\' => \'User\'.$i, \'email\' => \'user\'.$i.\'@example.com\'])->execute();'."\n".
+            '        }',
             $content
         );
         file_put_contents($seederFile, $content);
@@ -182,7 +184,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
         ]);
         $this->assertEquals(0, $this->getExitCode());
         $outputStr = implode('', $output);
-        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Running database changes...', $outputStr);
         $this->assertStringContainsString('App\\Database\\Migrations\\'.$migrationClass, $outputStr);
         $this->assertStringContainsString('App\\Database\\Seeders\\'.$seederClass, $outputStr);
         $this->assertStringContainsString('Info: Applied: 1 migration(s)', $outputStr);

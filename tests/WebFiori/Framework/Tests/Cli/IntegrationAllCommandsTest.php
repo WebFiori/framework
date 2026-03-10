@@ -20,10 +20,31 @@ use WebFiori\Framework\Cli\Commands\RunMigrationsCommandNew;
  * @author Ibrahim
  */
 class IntegrationAllCommandsTest extends CLITestCase {
+    
+    private function cleanupTestFiles() {
+        $cleanupPaths = [
+            APP_PATH . 'Database' . DIRECTORY_SEPARATOR . 'Migrations' . DIRECTORY_SEPARATOR . 'CreateUsersTable*.php',
+            APP_PATH . 'Database' . DIRECTORY_SEPARATOR . 'Seeders' . DIRECTORY_SEPARATOR . 'SeedUsers*.php',
+            APP_PATH . 'Infrastructure' . DIRECTORY_SEPARATOR . 'Schema' . DIRECTORY_SEPARATOR . 'TestTable*.php',
+            APP_PATH . 'Domain' . DIRECTORY_SEPARATOR . 'UserEntity*.php',
+            APP_PATH . 'Infrastructure' . DIRECTORY_SEPARATOR . 'Repository' . DIRECTORY_SEPARATOR . 'TestRepo*.php',
+            APP_PATH . 'Apis' . DIRECTORY_SEPARATOR . 'Test*Service.php'
+        ];
+        
+        foreach ($cleanupPaths as $pattern) {
+            foreach (glob($pattern) as $file) {
+                unlink($file);
+            }
+        }
+    }
+    
     /**
      * @test
      */
     public function testAddDBConnection00() {
+        // Clean up any leftover migration/seeder files from previous test runs
+        $this->cleanupTestFiles();
+        
         //Step 1: Add DB Connection
         $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
         $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [], [

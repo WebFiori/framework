@@ -47,15 +47,19 @@ class FreshMigrationsCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $migrationsCount = $this->runner->discoverFromPath($migrationsPath, $namespace);
 
             $seedersPath = APP_PATH.'Database'.DS.'Seeders';
             $seedersNamespace = APP_DIR.'\\Database\\Seeders';
-            $count += $this->runner->discoverFromPath($seedersPath, $seedersNamespace);
+            $seedersCount = $this->runner->discoverFromPath($seedersPath, $seedersNamespace);
             
+            $count = $migrationsCount + $seedersCount;
+
             if ($count === 0) {
                 $this->info('No migrations found.');
                 return 0;
+            } else {
+                $this->info('Discovered '.$migrationsCount.' migration(s) and '.$seedersCount.' seeder(s).');
             }
             
             // Rollback all
@@ -69,7 +73,7 @@ class FreshMigrationsCommand extends Command {
                 }
                 $this->info('Total rolled back: ' . count($rolled));
             } else {
-                $this->info('No migrations to rollback.');
+                $this->info('No migrations were rolled back.');
             }
             
             $this->println('');
@@ -108,7 +112,7 @@ class FreshMigrationsCommand extends Command {
     }
     
     private function runMigrations(): int {
-        $this->println('Running migrations...');
+        $this->println('Running database changes...');
         
         $result = $this->runner->apply();
         

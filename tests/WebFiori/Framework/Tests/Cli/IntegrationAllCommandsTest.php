@@ -269,12 +269,10 @@ class IntegrationAllCommandsTest extends CLITestCase {
         $apiTest = new class('test') extends \WebFiori\Http\APITestCase {};
         $result = $apiTest->getRequest($manager, 'get-users');
         
-        var_dump($result);
-        
         $json = json_decode($result, true);
         $this->assertNotNull($json);
 
-        
+        $this->cleanupTestFiles();
 
     }
 

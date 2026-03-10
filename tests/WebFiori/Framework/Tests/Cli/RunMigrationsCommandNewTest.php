@@ -77,7 +77,7 @@ class RunMigrationsCommandNewTest extends CLITestCase {
         $this->assertStringContainsString('Running migrations...', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\RunTest1', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\RunTest2', $outputStr);
-        $this->assertStringContainsString('Info: Applied: 2 migrations', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 2 migration(s)', $outputStr);
         $this->assertStringContainsString('Info: Time:', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }

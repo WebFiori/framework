@@ -77,10 +77,10 @@ class FreshMigrationsCommandTest extends CLITestCase {
         $this->assertStringContainsString('Rolling back all migrations...', $outputStr);
         $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\FreshTest1', $outputStr);
         $this->assertStringContainsString('Rolled back: App\\Database\\Migrations\\FreshTest2', $outputStr);
-        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Running database changes...', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\FreshTest1', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\FreshTest2', $outputStr);
-        $this->assertStringContainsString('Info: Applied: 2 migrations', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 2 migration(s)', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }
 
@@ -98,8 +98,8 @@ class FreshMigrationsCommandTest extends CLITestCase {
 
         $outputStr = implode('', $output);
         $this->assertStringContainsString('Rolling back all migrations...', $outputStr);
-        $this->assertStringContainsString('Info: No migrations to rollback.', $outputStr);
-        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Info: No migrations were rolled back.', $outputStr);
+        $this->assertStringContainsString('Running database changes...', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\FreshTest3', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -119,7 +119,7 @@ class FreshMigrationsCommandTest extends CLITestCase {
 
         $outputStr = implode('', $output);
         $this->assertStringContainsString('Rolling back all migrations...', $outputStr);
-        $this->assertStringContainsString('Running migrations...', $outputStr);
+        $this->assertStringContainsString('Running database changes...', $outputStr);
         $this->assertStringContainsString('Applied: App\\Database\\Migrations\\EnvFreshTest', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }

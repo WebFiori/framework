@@ -23,7 +23,7 @@ class VersionCommandTest extends CLITestCase {
             'Version Type: '.WF_VERSION_TYPE."\n",
         ], $output);
     }
-    
+
     /**
      * @test
      */

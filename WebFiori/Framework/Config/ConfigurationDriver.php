@@ -20,6 +20,9 @@ interface ConfigurationDriver {
      * the constant will be accesaable anywhere within the application's environment.
      * Additionally, it will be added as environment variable using 'putenv()'.
      *
+     * Note: The value parameter supports the 'env:' prefix for referencing
+     * system environment variables (e.g., "env:MY_VAR").
+     *
      * @param string $name The name of the named constant such as 'MY_CONSTANT'.
      *
      * @param mixed|null $value The value of the constant.
@@ -31,12 +34,19 @@ interface ConfigurationDriver {
     /**
      * Adds new database connections information or update existing connections.
      *
+     * Note: When using JsonDriver, connection properties support environment variable
+     * substitution using the 'env:' prefix. For example, you can set host to "env:DB_HOST"
+     * in the JSON configuration file, and it will be resolved at runtime.
      *
      * @param ConnectionInfo $dbConnectionsInfo An object which holds connection information.
      */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo);
     /**
      * Adds new SMTP account or Updates an existing one.
+     *
+     * Note: When using JsonDriver, SMTP account properties support environment variable
+     * substitution using the 'env:' prefix. For example, you can set password to "env:SMTP_PASS"
+     * in the JSON configuration file, and it will be resolved at runtime.
      *
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      */
@@ -92,6 +102,9 @@ interface ConfigurationDriver {
     /**
      * Returns database connection information given connection name.
      *
+     * Note: Connection properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
+     *
      * @param string $conName The name of the connection.
      *
      * @return ConnectionInfo|null The method should return an object of type
@@ -106,6 +119,9 @@ interface ConfigurationDriver {
      * The method should be implemented in a way that it returns an associative array.
      * The keys of the array should be the name of database connection and the
      * value of each key should be an object of type ConnectionInfo.
+     *
+     * Note: Connection properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * @return array An associative array.
      */
@@ -133,6 +149,9 @@ interface ConfigurationDriver {
     /**
      * Returns an associative array of application constants.
      *
+     * Note: Environment variable values that use the 'env:' prefix in configuration
+     * will be automatically resolved to their system environment variable values.
+     *
      * @return array The indices of the array are names of the constants and
      * values are sub-associative arrays. Each sub-array must have two indices,
      * 'value' and 'description'.
@@ -158,12 +177,18 @@ interface ConfigurationDriver {
      * return the hashed value. If no password is set, this method should return the
      * string 'NO_PASSWORD'.
      *
+     * Note: The scheduler password value supports environment variable substitution
+     * using the 'env:' prefix (e.g., "env:SCHEDULER_PASS" in configuration).
+     *
      * @return string Password hash or the string 'NO_PASSWORD' if there is no
      * password.
      */
     public function getSchedulerPassword() : string;
     /**
      * Returns SMTP connection given its name.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * The method should be implemented in a way that it searches
      * for an account with the given name in the set
@@ -183,6 +208,9 @@ interface ConfigurationDriver {
      * The method should be implemented in a way that it returns an associative array.
      * The indices of the array should act as the names of the accounts,
      * and the value of the index should be an object of type SMTPAccount.
+     *
+     * Note: SMTP account properties that use the 'env:' prefix in configuration
+     * will be automatically resolved to their environment variable values.
      *
      * @return array An associative array that contains all added SMTP accounts.
      *

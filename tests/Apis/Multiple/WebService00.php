@@ -2,8 +2,8 @@
 namespace Apis\Multiple;
 
 use WebFiori\Http\AbstractWebService;
-use WebFiori\Http\ParamType;
 use WebFiori\Http\ParamOption;
+use WebFiori\Http\ParamType;
 use WebFiori\Http\RequestMethod;
 
 
@@ -24,10 +24,10 @@ class WebService00 extends AbstractWebService {
         parent::__construct('say-hi-service');
         $this->setDescription('');
         $this->setRequestMethods([
-                RequestMethod::GET,
-                RequestMethod::POST,
-                RequestMethod::PATCH,
-                RequestMethod::HEAD
+            RequestMethod::GET,
+            RequestMethod::POST,
+            RequestMethod::PATCH,
+            RequestMethod::HEAD
         ]);
         $this->addParameters([
             'first-name' => [

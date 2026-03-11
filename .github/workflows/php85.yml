@@ -1,0 +1,132 @@
+name: PHP 8.5
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    env:
+      SA_SQL_SERVER_PASSWORD: ${{ secrets.SA_SQL_SERVER_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+    
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          SA_PASSWORD: ${{ secrets.SA_SQL_SERVER_PASSWORD }}
+          ACCEPT_EULA: Y
+          MSSQL_PID: Express
+        ports:
+          - "1433:1433"  
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: testing_db
+          MYSQL_ROOT_HOST: '%'
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    strategy: 
+      fail-fast: true
+            
+    name: Run PHPUnit Tests 
+    
+    steps: 
+      - name: Clone Repo
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: mysqli, mbstring, sqlsrv
+          tools: phpunit:12.5.4, composer
+          
+      - name: Install ODBC Driver for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt update
+          sudo ACCEPT_EULA=Y apt install mssql-tools18 unixodbc-dev msodbcsql18
+        
+      - name: Wait for SQL Server
+        run: |
+          for i in {1..12}; do
+            if /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P '${{ secrets.SA_SQL_SERVER_PASSWORD }}' -Q 'SELECT 1' -C > /dev/null 2>&1; then
+              echo "SQL Server is ready"
+              break
+            fi
+            echo "Waiting for SQL Server... ($i/12)"
+            sleep 10
+          done
+          
+      - name: Create SQL Server Database
+        run: /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P '${{ secrets.SA_SQL_SERVER_PASSWORD }}' -Q 'create database testing_db' -C
+      
+      - name: Setup MySQL Client
+        run: |
+          sudo apt update
+          sudo apt install mysql-client-core-8.0
+          
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h 127.0.0.1 --silent; do
+            echo 'waiting for mysql...'
+            sleep 1
+          done
+          
+      - name: Create MySQL Database
+        run: |
+          mysql -h 127.0.0.1 -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS testing_db;"
+
+      - name: Install Dependencies
+        run: composer install --prefer-source --no-interaction
+      
+      - name: Execute Tests
+        run: phpunit --configuration=tests/phpunit10.xml --coverage-clover=clover.xml
+       
+      - name: Rename coverage report
+        run: |
+          mv clover.xml php-8.5-coverage.xml
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage
+          path: php-8.5-coverage.xml
+
+
+  code-coverage:
+    name: Coverage
+    needs: test
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
+    with:
+      php-version: '8.5'
+      coverage-file: 'php-8.5-coverage.xml'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  code-quality:
+    name: Code Quality
+    needs: test
+    uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@v1.2.1
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  
+  release-prod:
+    name: Prepare Production Release Branch / Publish Release
+    needs: [code-coverage, code-quality]
+    uses: WebFiori/workflows/.github/workflows/release-php.yaml@v1.2.1
+    with:
+      branch: 'main'

@@ -110,6 +110,49 @@ class Controller {
         self::init($driver);
     }
     /**
+     * Resolves environment variable references in configuration values.
+     *
+     * This method enables the use of environment variables in configuration files
+     * by using the 'env:' prefix. When a configuration value starts with 'env:',
+     * the method attempts to read the corresponding environment variable.
+     * 
+     * Example usage in JSON configuration:
+     * <code>
+     * {
+     *   "database-connections": {
+     *     "production": {
+     *       "host": "env:DB_HOST",
+     *       "password": "env:DB_PASS"
+     *     }
+     *   }
+     * }
+     * </code>
+     * 
+     * The method will:
+     * - Check if the value starts with 'env:'
+     * - Extract the environment variable name (e.g., 'DB_HOST' from 'env:DB_HOST')
+     * - Attempt to read from getenv() first, then $_ENV
+     * - Fall back to the original value if the environment variable doesn't exist
+     *
+     * @param mixed $value The value to resolve. Can be any type, but only strings
+     * starting with 'env:' will be processed.
+     * 
+     * @return mixed The resolved value. Returns the environment variable value if found,
+     * otherwise returns the original value unchanged.
+     */
+    public static function resolveEnvValue($value) {
+        if (!is_string($value)) {
+            return $value;
+        }
+        
+        if (str_starts_with($value, 'env:')) {
+            $envVar = substr($value, 4);
+            
+            return getenv($envVar) ?: ($_ENV[$envVar] ?? $value);
+        }
+        return $value;
+    }
+    /**
      * Reads application environment variables and updates the class which holds
      * application environment variables.
      *
@@ -117,6 +160,12 @@ class Controller {
      */
     public static function updateEnv() {
         foreach (self::getDriver()->getEnvVars() as $name => $envVar) {
+            if (is_string($envVar) && str_starts_with($envVar, 'env:')) {
+                $envVar = self::resolveEnvValue($envVar);
+            } else if (is_array($envVar) && isset($envVar['value']) && str_starts_with($envVar['value'], 'env:')) {
+                $envVar['value'] = self::resolveEnvValue($envVar['value']);
+            }
+
             if (!defined($name)) {
                 if (isset($envVar['value'])) {
                     define($name, $envVar['value']);

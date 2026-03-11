@@ -1378,7 +1378,8 @@ class Router {
      * @throws RoutingException
      */
     private function routeFound(RouterUri $route, bool $loadResource) {
-        if ($route->isRequestMethodAllowed()) {
+
+        if ($route->isRequestMethodAllowed((App::getRequest()->getMethod()))) {
             $this->uriObj = $route;
 
             foreach ($route->getMiddleware() as $mw) {

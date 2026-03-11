@@ -188,6 +188,7 @@ PHP;
     protected function setUp(): void {
         parent::setUp();
         $this->setupTestConnection();
+        $this->dropSchemaTable();
         $this->cleanupMigrations();
     }
 

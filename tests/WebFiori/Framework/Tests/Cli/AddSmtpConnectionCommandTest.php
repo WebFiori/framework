@@ -16,6 +16,7 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
      */
     public function testAddSMTPConnection00() {
         $connName = 'smtp-connection-'.count(App::getConfig()->getSMTPConnections());
+        $password = getenv('MYSQL_ROOT_PASSWORD') ?: '12345326';
 
         $output = $this->executeSingleCommand(new AddSmtpConnectionCommand(), [
             'WebFiori',
@@ -24,7 +25,7 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
             '127.0.0.1',
             "\n", // Hit Enter to pick default value (port 25)
             'test@example.com',
-            getenv('MYSQL_ROOT_PASSWORD') ?: '12345326',
+            $password,
             'test@example.com',
             'test@example.com',
             "\n", // Hit Enter to pick default value (connection name)
@@ -37,7 +38,7 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
             "Port number: Enter = '25'\n",
             "Username:\n",
             "Password:\n",
-            "********\n",
+            str_repeat('*', strlen($password))."\n",
             "Sender email address: Enter = 'test@example.com'\n",
             "Sender name: Enter = 'test@example.com'\n",
             "Give your connection a friendly name: Enter = '$connName'\n",

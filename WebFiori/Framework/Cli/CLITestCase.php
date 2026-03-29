@@ -21,7 +21,7 @@ use WebFiori\Framework\App;
  * @author Ibrahim
  */
 class CLITestCase extends CommandTestCase {
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
         $this->setRunner(App::getRunner());
     }

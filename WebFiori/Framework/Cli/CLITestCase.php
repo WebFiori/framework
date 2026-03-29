@@ -21,8 +21,8 @@ use WebFiori\Framework\App;
  * @author Ibrahim
  */
 class CLITestCase extends CommandTestCase {
-    public function __construct($name = null, array $data = [], $dataName = "") {
-        parent::__construct($name, $data, $dataName);
+    public function setUp(): void {
+        parent::setUp();
         $this->setRunner(App::getRunner());
     }
     /**

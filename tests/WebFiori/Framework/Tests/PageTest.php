@@ -170,14 +170,13 @@ class PageTest extends TestCase {
         $node = $page->getChildByID('side-content-area');
         $this->assertNull($node);
         $this->assertEquals(1,$page->getChildByID('page-body')->childrenCount());
-
-        return $page;
     }
     /**
      * @test
-     * @depends testAside01
      */
-    public function testAside02(WebPage $page) {
+    public function testAside02() {
+        $page = new WebPage();
+        $page->setHasAside(false);
         $this->assertFalse($page->hasAside());
         $node = $page->getChildByID('side-content-area');
         $this->assertNull($node);
@@ -461,7 +460,6 @@ class PageTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDirs00
      */
     public function testDirs01() {
         $page = new WebPage();
@@ -491,14 +489,13 @@ class PageTest extends TestCase {
         $node = $page->getChildByID('page-footer');
         $this->assertNull($node);
         $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
-
-        return $page;
     }
     /**
      * @test
-     * @depends testFooter01
      */
-    public function testFooter02(WebPage $page) {
+    public function testFooter02() {
+        $page = new WebPage();
+        $page->setHasFooter(false);
         $this->assertFalse($page->hasFooter());
         $node = $page->getChildByID('page-footer');
         $this->assertNull($node);
@@ -553,14 +550,13 @@ class PageTest extends TestCase {
         $node = $page->getChildByID('page-header');
         $this->assertNull($node);
         $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
-
-        return $page;
     }
     /**
      * @test
-     * @depends testHeader01
      */
-    public function testHeader02(WebPage $page) {
+    public function testHeader02() {
+        $page = new WebPage();
+        $page->setHasHeader(false);
         $this->assertFalse($page->hasHeader());
         $node = $page->getChildByID('page-header');
         $this->assertNull($node);
@@ -712,14 +708,13 @@ class PageTest extends TestCase {
         $page->setDescription('Hello World Page.');
         $this->assertEquals('Hello World Page.',$page->getDescription());
         $this->assertTrue($page->getDocument()->getHeadNode()->hasMeta('description'));
-
-        return $page;
     }
     /**
      * @test
-     * @depends testSetDescription00
      */
-    public function testSetDescription01(WebPage $page) {
+    public function testSetDescription01() {
+        $page = new WebPage();
+        $page->setDescription('Hello World Page.');
         $this->assertEquals('Hello World Page.',$page->getDescription());
         $page->setDescription('  ');
         $this->assertNull($page->getDescription());

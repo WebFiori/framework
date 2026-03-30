@@ -21,11 +21,14 @@ class SessionTest extends TestCase {
     }
 
     /**
-     * @depends testStart00
-     * @param Session $session
      * @test
      */
-    public function testClose00($session) {
+    public function testClose00() {
+        $_POST['lang'] = 'EN';
+        App::getRequest()->setRequestMethod('POST');
+        $session = new Session(['name' => 'new']);
+        $session->start();
+        $session->set('hello','world');
         $session->close();
         $filePath = ROOT_PATH.DS.'App'.DS.'sto'.DS.'sessions'.DS.$session->getId();
         $this->assertTrue(File::isFileExist($filePath));
@@ -33,8 +36,6 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$session->getStartedAt());
         $this->assertEquals(0,$session->getResumedAt());
         $this->assertNull($session->get('hello'));
-
-        return $session;
     }
     /**
      * @test
@@ -223,15 +224,17 @@ class SessionTest extends TestCase {
         $this->assertTrue($session->isRunning());
         $session->set('hello','world');
         $this->assertEquals('world',$session->get('hello'));
-
-        return $session;
     }
     /**
-     * @depends testClose00
-     * @param Session $session
      * @test
      */
-    public function testStart01($session) {
+    public function testStart01() {
+        $_POST['lang'] = 'EN';
+        App::getRequest()->setRequestMethod('POST');
+        $session = new Session(['name' => 'new']);
+        $session->start();
+        $session->set('hello','world');
+        $session->close();
         $this->assertEquals(0,$session->getPassedTime());
         sleep(1);
         $session->start();

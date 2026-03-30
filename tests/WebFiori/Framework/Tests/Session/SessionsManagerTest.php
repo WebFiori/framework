@@ -137,7 +137,6 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testClose00
      */
     public function testCookiesHeaders() {
         SessionsManager::reset();
@@ -173,7 +172,6 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testInitSessionsDb
      */
     public function testDatabaseSession02() {
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
@@ -183,6 +181,8 @@ class SessionsManagerTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables();
+        $sto->getController()->clear();
         SessionsManager::setStorage($sto);
 
         $this->assertEquals(0, count(SessionsManager::getSessions()));
@@ -280,8 +280,6 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDatabaseSession02
-     * @depends testCloseDb00
      */
     public function testDropDbTables00() {
         $this->expectException(DatabaseException::class);
@@ -313,7 +311,6 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDatabaseSession01
      */
     public function testInitSessionsDb() {
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
@@ -331,9 +328,18 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testInitSessionsDb
      */
     public function testDbSessions00() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('sessions-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables();
+        $sto->getController()->clear();
+        SessionsManager::setStorage($sto);
         SessionsManager::start('hello-x', [
             
         ]);
@@ -425,9 +431,18 @@ class SessionsManagerTest extends TestCase {
     }
     /**
      * @test
-     * @depends testInitSessionsDb
      */
     public function testCloseDb00() {
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('sessions-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables();
+        $sto->getController()->clear();
+        SessionsManager::setStorage($sto);
         SessionsManager::pauseAll();
         $this->assertNull(SessionsManager::getActiveSession());
         SessionsManager::start('xyz');

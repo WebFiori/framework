@@ -24,8 +24,6 @@ class UserTest extends TestCase {
         $this->assertNull($u->getRegDate());
         $this->assertNull($u->getDisplayName());
         $this->assertEquals(0,$u->getResetCount());
-
-        return $u;
     }
     /**
      * @test
@@ -41,8 +39,6 @@ class UserTest extends TestCase {
         $this->assertFalse($u->hasAnyPrivilege([
             'LOW_PR_1'
         ]));
-
-        return $u;
     }
     /**
      * @test
@@ -96,11 +92,12 @@ class UserTest extends TestCase {
     }
     /**
      *
-     * @param User $u
      * @test
-     * @depends testAddPrivilege00
      */
-    public function testRemovePrivilege00($u) {
+    public function testRemovePrivilege00() {
+        $this->initPrivileges();
+        $u = new User();
+        $u->addPrivilege('TOP_PR_1');
         $this->assertTrue($u->removePrivilege('TOP_PR_1'));
         $this->assertFalse($u->hasPrivilege('TOP_PR_1'));
     }
@@ -173,20 +170,18 @@ class UserTest extends TestCase {
     }
     /**
      * @test
-     * @param User $user
-     * @depends test00
      */
-    public function toStringTest00($user) {
+    public function toStringTest00() {
+        $user = new User();
         $j = $user->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{"userId":-1,"email":"","displayName":null,"username":""}',$j.'');
     }
     /**
      * @test
-     * @param User $user
-     * @depends test00
      */
-    public function toStringTest01($user) {
+    public function toStringTest01() {
+        $user = new User();
         $this->assertEquals('{"userId":-1,"email":"","displayName":null,"username":""}',$user.'');
     }
     private function initPrivileges() {

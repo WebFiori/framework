@@ -1,4 +1,4 @@
-name: Build PHP 8.4
+name: PHP 8.4
 
 on:
   push:

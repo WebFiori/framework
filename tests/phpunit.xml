@@ -4,84 +4,132 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            
+
             <file>../WebFiori/Framework/Access.php</file>
+            <file>../WebFiori/Framework/App.php</file>
             <file>../WebFiori/Framework/DB.php</file>
-            <file>../WebFiori/Framework/Language.php</file>
-            
-            <file>../WebFiori/Framework/Config/JsonDriver.php</file>
-            <file>../WebFiori/Framework/Config/ClassDriver.php</file>
-            
+            <file>../WebFiori/Framework/EmailMessage.php</file>
+            <file>../WebFiori/Framework/ExtendedWebServicesManager.php</file>
+            <file>../WebFiori/Framework/Ini.php</file>
+            <file>../WebFiori/Framework/Lang.php</file>
             <file>../WebFiori/Framework/Privilege.php</file>
             <file>../WebFiori/Framework/PrivilegesGroup.php</file>
-            <file>../WebFiori/Framework/User.php</file>
             <file>../WebFiori/Framework/Theme.php</file>
-            
-            <file>../WebFiori/Framework/ui/BeforeRenderCallback.php</file>
-            <file>../WebFiori/Framework/ui/WebPage.php</file>
-            
-            <file>../WebFiori/Framework/Scheduler/BaseTask.php</file>
-            <file>../WebFiori/Framework/Scheduler/AbstractTask.php</file>
-            <file>../WebFiori/Framework/Scheduler/TasksManager.php</file>
-            <file>../WebFiori/Framework/Scheduler/TaskArgument.php</file>
-            
-            <file>../WebFiori/Framework/Router/RouterUri.php</file>
-            <file>../WebFiori/Framework/Router/Router.php</file>
-            
+            <file>../WebFiori/Framework/ThemeManager.php</file>
+            <file>../WebFiori/Framework/User.php</file>
+            <file>../WebFiori/Framework/Util.php</file>
+
+            <file>../WebFiori/Framework/Autoload/ClassInfo.php</file>
+            <file>../WebFiori/Framework/Autoload/ClassLoader.php</file>
+            <file>../WebFiori/Framework/Autoload/ClassLoaderException.php</file>
+
+            <file>../WebFiori/Framework/Config/ClassDriver.php</file>
+            <file>../WebFiori/Framework/Config/ConfigurationDriver.php</file>
+            <file>../WebFiori/Framework/Config/Controller.php</file>
+            <file>../WebFiori/Framework/Config/JsonDriver.php</file>
+
+            <file>../WebFiori/Framework/Exceptions/ArrayIndexOutOfBoundsException.php</file>
+            <file>../WebFiori/Framework/Exceptions/InitializationException.php</file>
+            <file>../WebFiori/Framework/Exceptions/InvalidCRONExprException.php</file>
+            <file>../WebFiori/Framework/Exceptions/MissingLangException.php</file>
+            <file>../WebFiori/Framework/Exceptions/NoSuchThemeException.php</file>
+            <file>../WebFiori/Framework/Exceptions/RoutingException.php</file>
+            <file>../WebFiori/Framework/Exceptions/SessionException.php</file>
+            <file>../WebFiori/Framework/Exceptions/UIException.php</file>
+
+            <file>../WebFiori/Framework/Handlers/APICallErrHandler.php</file>
+            <file>../WebFiori/Framework/Handlers/CLIErrHandler.php</file>
+            <file>../WebFiori/Framework/Handlers/HTTPErrHandler.php</file>
+
             <file>../WebFiori/Framework/Middleware/AbstractMiddleware.php</file>
-            <file>../WebFiori/Framework/Middleware/MiddlewareManager.php</file>
             <file>../WebFiori/Framework/Middleware/CacheMiddleware.php</file>
+            <file>../WebFiori/Framework/Middleware/MiddlewareManager.php</file>
             <file>../WebFiori/Framework/Middleware/StartSessionMiddleware.php</file>
-            
-            <file>../WebFiori/Framework/Session/Session.php</file>
-            <file>../WebFiori/Framework/Session/SessionsManager.php</file>
-            <file>../WebFiori/Framework/Session/DefaultSessionStorage.php</file>
+
+            <file>../WebFiori/Framework/Router/RouteOption.php</file>
+            <file>../WebFiori/Framework/Router/Router.php</file>
+            <file>../WebFiori/Framework/Router/RouterUri.php</file>
+
+            <file>../WebFiori/Framework/Scheduler/AbstractTask.php</file>
+            <file>../WebFiori/Framework/Scheduler/BaseTask.php</file>
+            <file>../WebFiori/Framework/Scheduler/TaskArgument.php</file>
+            <file>../WebFiori/Framework/Scheduler/TaskStatusEmail.php</file>
+            <file>../WebFiori/Framework/Scheduler/TasksManager.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/ForceTaskExecutionService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/GetTasksService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/PrivateSchedulerService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/SetupPasswordService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/TasksLoginService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/TasksLogoutService.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebServices/TasksServicesManager.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebUI/BaseTasksPage.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebUI/ListTasksPage.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebUI/SetPasswordPage.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebUI/TasksLoginPage.php</file>
+            <file>../WebFiori/Framework/Scheduler/WebUI/TasksTable.php</file>
+
             <file>../WebFiori/Framework/Session/DatabaseSessionStorage.php</file>
+            <file>../WebFiori/Framework/Session/DefaultSessionStorage.php</file>
+            <file>../WebFiori/Framework/Session/MSSQLSessionDataTable.php</file>
+            <file>../WebFiori/Framework/Session/MSSQLSessionsTable.php</file>
+            <file>../WebFiori/Framework/Session/MySQLSessionDataTable.php</file>
+            <file>../WebFiori/Framework/Session/MySQLSessionsTable.php</file>
+            <file>../WebFiori/Framework/Session/Session.php</file>
             <file>../WebFiori/Framework/Session/SessionDB.php</file>
-            
-            <file>../WebFiori/Framework/Cli/Commands/AddCommand.php</file>
-            <file>../WebFiori/Framework/Cli/Commands/CreateCommand.php</file>
+            <file>../WebFiori/Framework/Session/SessionOption.php</file>
+            <file>../WebFiori/Framework/Session/SessionStatus.php</file>
+            <file>../WebFiori/Framework/Session/SessionStorage.php</file>
+            <file>../WebFiori/Framework/Session/SessionUser.php</file>
+            <file>../WebFiori/Framework/Session/SessionsManager.php</file>
 
+            <file>../WebFiori/Framework/Ui/BeforeRenderCallback.php</file>
+            <file>../WebFiori/Framework/Ui/HTTPCodeView.php</file>
+            <file>../WebFiori/Framework/Ui/MessageBox.php</file>
+            <file>../WebFiori/Framework/Ui/StarterPage.php</file>
+            <file>../WebFiori/Framework/Ui/WebPage.php</file>
 
-
+            <file>../WebFiori/Framework/Cli/CLITestCase.php</file>
+            <file>../WebFiori/Framework/Cli/CLIUtils.php</file>
+            <file>../WebFiori/Framework/Cli/Helpers/ClassInfoReader.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/AddDbConnectionCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/AddLangCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/AddSmtpConnectionCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateCommandCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateEntityCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateMiddlewareCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateMigrationCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateRepositoryCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateResourceCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateSeederCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateServiceCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateTableCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/CreateTaskCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/DryRunMigrationsCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/FreshMigrationsCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/InitMigrationsCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/MigrationsStatusCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/RollbackMigrationsCommand.php</file>
+            <file>../WebFiori/Framework/Cli/Commands/RunMigrationsCommandNew.php</file>
             <file>../WebFiori/Framework/Cli/Commands/SchedulerCommand.php</file>
-
-
-
             <file>../WebFiori/Framework/Cli/Commands/VersionCommand.php</file>
             <file>../WebFiori/Framework/Cli/Commands/WHelpCommand.php</file>
-            <file>../WebFiori/Framework/Cli/Commands/RunMigrationsCommand.php</file>
-            <file>../WebFiori/Framework/cli/CLITestCase.php</file>
-            <file>../WebFiori/Framework/cli/CLIUtils.php</file>
-            
-            <file>../WebFiori/Framework/Cli/Helpers/ClassInfoReader.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateBackgroundTask.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateCLIClassHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateClassHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateDBAccessHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateFullRESTHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateMiddleware.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateTableObj.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateThemeHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateWebService.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/TableObjHelper.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateAPITestCase.php</file>
-            <file>../WebFiori/Framework/Cli/Helpers/CreateMigration.php</file>
-            
-            
-            <file>../WebFiori/Framework/Writers/CLICommandClassWriter.php</file>
+
+            <file>../WebFiori/Framework/Writers/AttributeTableWriter.php</file>
             <file>../WebFiori/Framework/Writers/ClassWriter.php</file>
-            <file>../WebFiori/Framework/Writers/DBClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/CommandClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/DocblockBuilder.php</file>
+            <file>../WebFiori/Framework/Writers/DomainEntityWriter.php</file>
             <file>../WebFiori/Framework/Writers/LangClassWriter.php</file>
             <file>../WebFiori/Framework/Writers/MiddlewareClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/MigrationClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/RepositoryWriter.php</file>
+            <file>../WebFiori/Framework/Writers/RestServiceWriter.php</file>
             <file>../WebFiori/Framework/Writers/SchedulerTaskClassWriter.php</file>
-            <file>../WebFiori/Framework/Writers/TableClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/SeederClassWriter.php</file>
+            <file>../WebFiori/Framework/Writers/ServiceHolder.php</file>
             <file>../WebFiori/Framework/Writers/ThemeClassWriter.php</file>
             <file>../WebFiori/Framework/Writers/ThemeComponentWriter.php</file>
-            <file>../WebFiori/Framework/Writers/WebServiceWriter.php</file>
-            <file>../WebFiori/Framework/Writers/APITestCaseWriter.php</file>
-            <file>../WebFiori/Framework/Writers/DatabaseMigrationWriter.php</file>
-            
+
         </whitelist>
     </filter>
     <logging>

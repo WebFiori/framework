@@ -46,18 +46,20 @@ class ResponseTest extends TestCase {
     }
     /**
      * @test
-     * @depends testAddHeader00
      */
     public function testRemoveHeader00() {
+        App::getResponse()->addHeader('content-type', 'application/json');
         $this->assertTrue(App::getResponse()->hasHeader('content-type'));
         App::getResponse()->removeHeader('content-type');
         $this->assertFalse(App::getResponse()->hasHeader('content-type'));
     }
     /**
      * @test
-     * @depends testAddHeader01
      */
     public function testRemoveHeader01() {
+        App::getResponse()->addHeader('Set-Cookie', 'name=ok');
+        App::getResponse()->addHeader('Set-Cookie', 'name=good');
+        App::getResponse()->addHeader('Set-Cookie', 'name=no');
         $this->assertTrue(App::getResponse()->hasHeader('Set-Cookie'));
         $this->assertTrue(App::getResponse()->removeHeader('Set-cookie', 'name=good'));
         $this->assertFalse(App::getResponse()->hasHeader('Set-cookie','name=good'));

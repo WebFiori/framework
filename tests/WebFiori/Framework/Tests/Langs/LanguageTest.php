@@ -172,12 +172,17 @@ class LanguageTest extends TestCase {
     }
     /**
      * @test
-     * @depends testGetLabel01
      */
     public function testGetLabel02() {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         SessionsManager::setStorage(new DefaultSessionStorage());
         SessionsManager::start('new-x-session');
+        Lang::reset();
+        Lang::loadTranslation('EN');
+        Lang::getActive()->set('general.action', 'print', 'Print Report');
+        Lang::loadTranslation('AR');
+        Lang::getActive()->set('general.action', 'print', 'طباعة التقرير');
+        Lang::loadTranslation('EN');
         $_POST['lang'] = 'ar';
         $this->assertEquals('طباعة التقرير', Lang::getLabel('general.action.print','AR'));
         $_POST['lang'] = 'en';
@@ -330,9 +335,9 @@ class LanguageTest extends TestCase {
     /**
      * Testing the method 'Lang::setCode()' for a loaded translation.
      * @test
-     * @depends testUnloadTranslation00
      */
     public function testSetCode01() {
+        Lang::reset();
         $lang = Lang::loadTranslation('AR');
         $this->assertFalse($lang->setCode(''));
         $this->assertFalse($lang->setCode('z'));
@@ -344,11 +349,12 @@ class LanguageTest extends TestCase {
         $this->assertTrue(Lang::unloadTranslation('zk'));
     }
     /**
-     * Testing the method Lang::unloadTransaltion()
      * @test
-     * @depends testLoadTranslation04
      */
     public function testUnloadTranslation00() {
+        Lang::reset();
+        Lang::loadTranslation('Ar');
+        Lang::loadTranslation('en');
         $this->assertEquals(2,count(Lang::getLoadedLangs()));
         $this->assertFalse(Lang::unloadTranslation('arx'));
         $this->assertEquals(2,count(Lang::getLoadedLangs()));

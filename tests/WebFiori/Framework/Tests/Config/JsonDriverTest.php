@@ -80,7 +80,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testAddEnvVar00
      */
     public function testAddEnvVar01() {
         $driver = new JsonDriver();
@@ -115,7 +114,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testAddEnvVar01
      */
     public function testAddEnvVar02() {
         $driver = new JsonDriver();
@@ -166,7 +164,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testAppNames00
      */
     public function testAppNames01() {
         $driver = new JsonDriver();
@@ -220,7 +217,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDatabaseConnections00
      */
     public function testDatabaseConnections01() {
         $driver = new JsonDriver();
@@ -238,7 +234,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testDatabaseConnections01
      */
     public function testDatabaseConnections02() {
         $driver = new JsonDriver();
@@ -354,7 +349,6 @@ class JsonDriverTest extends TestCase {
 
     /**
      * @test
-     * @depends testSetDescription00
      */
     public function testSetDescription01() {
         $driver = new JsonDriver();
@@ -371,7 +365,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetDescription01
      */
     public function testSetDescription02() {
         $driver = new JsonDriver();
@@ -395,7 +388,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetPrimaryLanguage00
      */
     public function testSetPrimaryLanguage01() {
         $driver = new JsonDriver();
@@ -405,7 +397,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetPrimaryLanguage01
      */
     public function testSetPrimaryLanguage02() {
         $driver = new JsonDriver();
@@ -443,7 +434,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetTitle00
      */
     public function testSetTitle01() {
         $driver = new JsonDriver();
@@ -460,7 +450,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetTitle01
      */
     public function testSetTitle02() {
         $driver = new JsonDriver();
@@ -484,7 +473,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetTitleSeparator00
      */
     public function testSetTitleSeparator01() {
         $driver = new JsonDriver();
@@ -494,7 +482,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetTitleSeparator01
      */
     public function testSetTitleSeparator02() {
         $driver = new JsonDriver();
@@ -513,7 +500,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetVersion00
      */
     public function testSetVersion01() {
         $driver = new JsonDriver();
@@ -543,7 +529,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSMTPConnections00
      */
     public function testSMTPConnections01() {
         $driver = new JsonDriver();
@@ -561,7 +546,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSMTPConnections01
      */
     public function testSMTPConnections02() {
         $driver = new JsonDriver();
@@ -576,7 +560,6 @@ class JsonDriverTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSMTPConnections02
      */
     public function testSMTPConnections03() {
         $driver = new JsonDriver();

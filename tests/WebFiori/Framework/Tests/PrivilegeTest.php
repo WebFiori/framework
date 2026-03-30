@@ -32,8 +32,6 @@ class PrivilegeTest extends TestCase {
         $pr = new Privilege('  Valid_ID_55  ','Valid Name');
         $this->assertEquals('Valid_ID_55',$pr->getID());
         $this->assertEquals('Valid Name',$pr->getName());
-
-        return $pr;
     }
     /**
      * @test
@@ -47,10 +45,9 @@ class PrivilegeTest extends TestCase {
     }
     /**
      * @test
-     * @depends testConstructor02
-     * @param Privilege $pr
      */
-    public function testToJson00($pr) {
+    public function testToJson00() {
+        $pr = new Privilege('  Valid_ID_55  ','Valid Name');
         $j = $pr->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{"privilegeId":"Valid_ID_55","name":"Valid Name"}',$j.'');

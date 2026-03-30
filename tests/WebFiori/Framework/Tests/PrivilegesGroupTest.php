@@ -43,8 +43,6 @@ class PrivilegesGroupTest extends TestCase {
         $group = new PrivilegesGroup(' valid_ID','Valid Name');
         $this->assertEquals('valid_ID',$group->getID());
         $this->assertEquals('Valid Name',$group->getName());
-
-        return $group;
     }
     /**
      * @test
@@ -90,13 +88,14 @@ class PrivilegesGroupTest extends TestCase {
     }
     /**
      * @test
-     * @depends testSetParentGroup00
-     * @param $gArr Description
      */
-    public function testRemoveParentGroup00($gArr) {
-        $this->assertTrue($gArr['child']->setParentGroup());
-        $this->assertEquals(0,count($gArr['parent']->childGroups()));
-        $this->assertNull($gArr['child']->getParentGroup());
+    public function testRemoveParentGroup00() {
+        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
+        $parentGroup = new PrivilegesGroup('PARENT_1', 'Parent Group #1');
+        $child->setParentGroup($parentGroup);
+        $this->assertTrue($child->setParentGroup());
+        $this->assertEquals(0,count($parentGroup->childGroups()));
+        $this->assertNull($child->getParentGroup());
     }
 
     /**
@@ -148,19 +147,12 @@ class PrivilegesGroupTest extends TestCase {
         $this->assertSame($parentGroup,$child->getParentGroup());
         $this->assertEquals(1,count($child->getParentGroup()->childGroups()));
         $this->assertSame($child,$parentGroup->childGroups()[0]);
-
-        return [
-            'child' => $child,
-            'parent' => $parentGroup
-        ];
     }
     /**
-     *
-     * @param PrivilegesGroup $group
-     * @depends testConstructor02
      * @test
      */
-    public function testToJson00($group) {
+    public function testToJson00() {
+        $group = new PrivilegesGroup(' valid_ID','Valid Name');
         $j = $group->toJSON();
         $j->setPropsStyle('kebab');
         $this->assertEquals('{"group-id":"valid_ID","parent-group-id":null,"name":"Valid Name","privileges":[],"child-groups":[]}',$j.'');

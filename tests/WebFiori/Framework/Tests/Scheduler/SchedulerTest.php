@@ -191,4 +191,32 @@ class SchedulerTest extends TestCase {
         $this->assertEquals('NO_PASSWORD', TasksManager::getPassword());
         TasksManager::run('', 'Task Ok', true);
     }
+
+
+    /**
+     * @test
+     * Covers: setPasswordHelper env: branch + getPasswordHelper env: resolution
+     */
+    public function testSetPasswordFromEnvVar() {
+        putenv('TEST_SCHED_PASS=mysecret');
+        TasksManager::setPassword('env:TEST_SCHED_PASS');
+
+        $this->assertEquals(hash('sha256', 'mysecret'), TasksManager::getPassword());
+
+        putenv('TEST_SCHED_PASS'); // unset
+        TasksManager::reset();
+    }
+
+    /**
+     * @test
+     * Covers: getPasswordHelper env: branch when env var is not set -> NO_PASSWORD
+     */
+    public function testSetPasswordFromEnvVar_notSet() {
+        putenv('UNSET_SCHED_PASS'); // ensure unset
+        TasksManager::setPassword('env:UNSET_SCHED_PASS');
+
+        $this->assertEquals('NO_PASSWORD', TasksManager::getPassword());
+
+        TasksManager::reset();
+    }
 }

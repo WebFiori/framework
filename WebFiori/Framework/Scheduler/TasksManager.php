@@ -893,6 +893,11 @@ class TasksManager {
             return 'NO_PASSWORD';
         }
 
+        if (str_starts_with($this->accessPass, 'env:')) {
+            $resolved = (string) getenv(substr($this->accessPass, 4));
+            return strlen($resolved) > 0 ? hash('sha256', $resolved) : 'NO_PASSWORD';
+        }
+
         return $this->accessPass;
     }
     /**
@@ -1004,6 +1009,10 @@ class TasksManager {
      * @since 1.0
      */
     private function setPasswordHelper(string $pass) {
+        if (str_starts_with($pass, 'env:')) {
+            $this->accessPass = $pass;
+            return;
+        }
         if (strlen($pass) != 0) {
             $this->accessPass = hash('sha256', $pass);
             return;

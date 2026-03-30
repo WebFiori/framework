@@ -30,7 +30,7 @@ class SessionTest extends TestCase {
         $session->start();
         $session->set('hello','world');
         $session->close();
-        $filePath = ROOT_PATH.DS.'App'.DS.'sto'.DS.'sessions'.DS.$session->getId();
+        $filePath = ROOT_PATH.DS.'App'.DS.'Storage'.DS.'Sessions'.DS.$session->getId();
         $this->assertTrue(File::isFileExist($filePath));
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0,$session->getStartedAt());

@@ -292,7 +292,7 @@ class ClassLoader {
      * @throws Exception
      */
     public static function getCachePath() : string {
-        return self::get()->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        return self::get()->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'Storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
     }
 
     /**
@@ -838,7 +838,7 @@ class ClassLoader {
      *
      */
     private function readCache() {
-        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'sto';
+        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR.'Storage';
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {

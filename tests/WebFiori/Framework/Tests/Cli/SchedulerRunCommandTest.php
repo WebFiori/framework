@@ -60,8 +60,18 @@ class SchedulerRunCommandTest extends CLITestCase {
 
     /**
      * @test
-     * Covers: printResult() — all tasks succeed (failed list shows <NONE>)
+     * Covers: CLIUtils::resolvePassword() env: prefix — password read from environment variable
      */
+    public function testRunWithEnvPassword() {
+        putenv('SCHEDULER_PASS=123456');
+
+        $output = $this->executeSingleCommand(new SchedulerRunCommand(), ['p' => 'env:SCHEDULER_PASS']);
+
+        putenv('SCHEDULER_PASS');  // unset
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertContains("Total number of tasks: 5\n", $output);
+    }
     public function testRunAllSucceed() {
         TasksManager::reset();
         TasksManager::setPassword('123456');

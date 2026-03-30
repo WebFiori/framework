@@ -12,6 +12,7 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
+use WebFiori\Framework\Cli\CLIUtils;
 use WebFiori\Framework\Scheduler\AbstractTask;
 use WebFiori\Framework\Scheduler\TasksManager;
 /**
@@ -71,10 +72,10 @@ class SchedulerCommand extends Command {
             $this->listTasks();
             $retVal = 0;
         } else if ($this->isArgProvided('--check')) {
-            $pass = $this->getArgValue('p');
+            $rawPass = $this->getArgValue('p');
 
-            if ($pass !== null) {
-                $result = TasksManager::run($pass, null, false, $this);
+            if ($rawPass !== null) {
+                $result = TasksManager::run(CLIUtils::resolvePassword($rawPass), null, false, $this);
 
                 if ($result == 'INV_PASS') {
                     $this->error("Provided password is incorrect");
@@ -126,7 +127,7 @@ class SchedulerCommand extends Command {
     }
     private function force(): int {
         $taskName = $this->getArgValue('--task-name');
-        $cPass = $this->getArgValue('p').'';
+        $cPass = CLIUtils::resolvePassword($this->getArgValue('p'));
         $retVal = -1;
         $tasksNamesArr = TasksManager::getTasksNames();
         $tasksNamesArr[] = 'Cancel';

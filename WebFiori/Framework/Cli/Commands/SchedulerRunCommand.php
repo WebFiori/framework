@@ -12,6 +12,7 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
+use WebFiori\Framework\Cli\CLIUtils;
 use WebFiori\Framework\Scheduler\TasksManager;
 
 /**
@@ -45,7 +46,7 @@ class SchedulerRunCommand extends Command {
             return 0;
         }
 
-        $pass = $this->getArgValue('p') ?? '';
+        $pass = CLIUtils::resolvePassword($this->getArgValue('p')) ?? '';
         $result = TasksManager::run($pass, null, false, $this);
 
         if ($result == 'INV_PASS') {

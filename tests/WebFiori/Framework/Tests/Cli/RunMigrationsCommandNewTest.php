@@ -194,6 +194,7 @@ PHP;
 
     protected function tearDown(): void {
         $this->cleanupMigrations();
+        $this->cleanupSeeders();
         $this->dropSchemaTable();
         App::getConfig()->removeAllDBConnections();
         parent::tearDown();

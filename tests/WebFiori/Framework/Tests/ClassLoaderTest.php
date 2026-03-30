@@ -7,6 +7,12 @@ use WebFiori\Framework\Autoload\ClassLoaderException;
 
 class ClassLoaderTest extends TestCase {
 
+    protected function tearDown(): void {
+        // Always restore to do-nothing so other tests are not affected
+        ClassLoader::setOnFail('do-nothing');
+        parent::tearDown();
+    }
+
     // ── isValidNamespace ────────────────────────────────────────────────────
 
     /** @test */
@@ -188,6 +194,7 @@ class ClassLoaderTest extends TestCase {
         ClassLoader::setOnFail('throw-exception');
         $this->expectException(ClassLoaderException::class);
         class_exists('\\AbsolutelyNonExistent' . time()); // triggers spl_autoload
+        ClassLoader::setOnFail('do-nothing'); // restore (only reached if no exception, but expectException handles it)
     }
 
     /** @test */
@@ -200,6 +207,6 @@ class ClassLoaderTest extends TestCase {
         class_exists('\\AbsolutelyNonExistent' . time());
 
         $this->assertTrue($called);
-        ClassLoader::setOnFail('throw-exception'); // restore
+        ClassLoader::setOnFail('do-nothing'); // restore to safe default
     }
 }

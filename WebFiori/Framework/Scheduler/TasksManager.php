@@ -17,7 +17,6 @@ use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
-use WebFiori\Framework\Cli\Commands\SchedulerCommand;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
 use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
@@ -654,7 +653,7 @@ class TasksManager {
      *
      * @since 1.0.6
      */
-    public static function run(string $pass = '', ?string $taskName = null, bool $force = false, ?SchedulerCommand $command = null) {
+    public static function run(string $pass = '', ?string $taskName = null, bool $force = false, ?Command $command = null) {
         self::get()->command = $command;
         self::log('Running task(s) check...');
         $activeSession = SessionsManager::getActiveSession();
@@ -953,7 +952,7 @@ class TasksManager {
      * @param bool $xForce
      * @param SchedulerCommand|null $command
      */
-    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, ?SchedulerCommand $command = null) {
+    private static function runTaskHelper(array &$retVal, AbstractTask $task, bool $xForce, ?Command $command = null) {
         if ($task->isTime() || $xForce) {
             if ($command !== null) {
                 $task->setCommand($command);

@@ -21,6 +21,7 @@ class HelpCommandTest extends CLITestCase {
             "    v:                       Display framework version info.\n",
 
             "    scheduler:               Run tasks scheduler.\n",
+            "    scheduler:run:           Run the tasks scheduler check.\n",
             "    add:db-connection:       Add a database connection.\n",
             "    add:smtp-connection:     Add an SMTP account.\n",
             "    add:lang:                Add a website language.\n",

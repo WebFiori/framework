@@ -351,6 +351,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddDbConnectionCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddSmtpConnectionCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\AddLangCommand',

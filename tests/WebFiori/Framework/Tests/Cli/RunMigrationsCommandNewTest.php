@@ -210,4 +210,166 @@ PHP;
             // Ignore errors during cleanup
         }
     }
+
+
+    /**
+     * @test
+     * Covers: getConnection() interactive path (no --connection arg, select from list)
+     */
+    public function testRunWithInteractiveConnectionSelection() {
+        $output = $this->executeSingleCommand(new RunMigrationsCommandNew(), [], [
+            'test-connection', // select connection interactively
+        ]);
+
+        $this->assertContains("Info: No migrations found.
+", $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     * Covers: catch block — schema_changes table missing (code 1146) → warning branch
+     */
+    public function testRunWithMissingSchemaTable() {
+        $this->createTestMigration('SchemaTableMissing');
+        // Do NOT call initMigrations() so schema_changes table doesn't exist
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection',
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Table "schema_changes" does not exist', $outputStr);
+        $this->assertStringContainsString('Run "migrations:ini" to create the table.', $outputStr);
+        $this->assertEquals(1, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     * Covers: runMigrations() $skipped non-empty — environment mismatch
+     */
+    public function testRunWithSkippedMigrations() {
+        $this->createMigrationWithEnvironment('SkippedEnvMigration', 'production');
+        $this->initMigrations('dev');
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection',
+            '--env'        => 'dev',
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Skipped: App\Database\Migrations\SkippedEnvMigration', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     * Covers: runMigrations() $failed non-empty — migration up() throws
+     */
+    public function testRunWithFailedMigration() {
+        $this->createFailingMigration('FailingMigration');
+        $this->initMigrations();
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection',
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Failed: App\Database\Migrations\FailingMigration', $outputStr);
+        $this->assertEquals(1, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     * Covers: runMigrations() $seedersCount > 0 — seeder applied
+     */
+    public function testRunWithSeeder() {
+        $this->createTestSeeder('RunTestSeeder');
+        $this->initMigrations();
+
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection',
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Applied: App\Database\Seeders\RunTestSeeder', $outputStr);
+        $this->assertStringContainsString('Info: Applied: 1 seeder(s)', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    private function createMigrationWithEnvironment(string $name, string $env): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function getEnvironments(): array { return ['$env']; }
+    public function up(Database \$db): void {}
+    public function down(Database \$db): void {}
+}
+PHP;
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
+    private function createFailingMigration(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $content = <<<PHP
+<?php
+namespace App\Database\Migrations;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractMigration;
+
+class $name extends AbstractMigration {
+    public function up(Database \$db): void {
+        throw new \RuntimeException('Intentional failure for testing.');
+    }
+    public function down(Database \$db): void {}
+}
+PHP;
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
+    private function createTestSeeder(string $name): void {
+        $dir = APP_PATH.'Database'.DS.'Seeders';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $content = <<<PHP
+<?php
+namespace App\Database\Seeders;
+
+use WebFiori\Database\Database;
+use WebFiori\Database\Schema\AbstractSeeder;
+
+class $name extends AbstractSeeder {
+    public function run(Database \$db): void {}
+    public function rollback(Database \$db): void {}
+}
+PHP;
+        file_put_contents($dir.DS.$name.'.php', $content);
+    }
+
+    private function cleanupSeeders(): void {
+        $dir = APP_PATH.'Database'.DS.'Seeders';
+        if (is_dir($dir)) {
+            foreach (glob($dir.DS.'*.php') as $file) {
+                unlink($file);
+            }
+        }
+    }
 }

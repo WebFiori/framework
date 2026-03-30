@@ -13,6 +13,22 @@ use WebFiori\Framework\Writers\ClassWriter;
  */
 class CLIUtils {
     /**
+     * Resolves a scheduler password, supporting env variable lookup.
+     * If value starts with 'env:', the rest is used as env var name.
+     *
+     * @param string|null $value Raw value of the 'p' argument.
+     * @return string Resolved password, or empty string if null.
+     */
+    public static function resolvePassword(?string $value): string {
+        if ($value === null) {
+            return '';
+        }
+        if (str_starts_with($value, 'env:')) {
+            return (string) getenv(substr($value, 4));
+        }
+        return $value;
+    }
+    /**
      * Select database connection and return its name as string.
      *
      * This method is used to get connection name from the argument '--connection'.

@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use Throwable;
 use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
-use WebFiori\Framework\Cli\Commands\SchedulerCommand;
+use WebFiori\Cli\Command;
 use WebFiori\Framework\Exceptions\InvalidCRONExprException;
 use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
@@ -974,11 +974,11 @@ abstract class AbstractTask implements JsonI {
     /**
      * Associate the task with the command that was used to execute the task.
      *
-     * @param SchedulerCommand $command
+     * @param Command $command
      *
      * @since 1.0.1
      */
-    public function setCommand(SchedulerCommand $command) {
+    public function setCommand(Command $command) {
         $this->command = $command;
     }
     /**

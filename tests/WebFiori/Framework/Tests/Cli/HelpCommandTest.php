@@ -38,7 +38,6 @@ class HelpCommandTest extends CLITestCase {
 
 
 
-
             "    migrations:run:          Execute pending database migrations.\n",
             "    migrations:rollback:     Rollback database migrations.\n",
             "    migrations:ini:          Create migrations tracking table.\n",
@@ -48,6 +47,39 @@ class HelpCommandTest extends CLITestCase {
         ], $this->executeMultiCommand([
             'help',
         ]));
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     * Covers: printLogo() branch — argsVector set to ['--ansi'] so array_diff count == 0
+     */
+    public function testPrintsLogoWhenOnlyAnsiInArgV() {
+        $runner = $this->getRunner(true);
+        $runner->setArgsVector(['--ansi']);
+        $runner->setInputs([]);
+        $runner->start();
+        $output = $runner->getOutput();
+
+        $this->assertEquals("|\                /|\n", $output[0]);
+        $this->assertEquals("| \      /\      / |              |  / \  |\n", $output[1]);
+        $this->assertEquals("\  \    /  \    /  / __________   |\/   \/|\n", $output[2]);
+        $this->assertEquals(" \  \  /    \  /  / /  /______ /  | \/ \/ |\n", $output[3]);
+        $this->assertEquals("  \  \/  /\  \/  / /  /           |  \ /  |\n", $output[4]);
+        $this->assertEquals("   \    /  \    / /  /______      |\  |  /|\n", $output[5]);
+        $this->assertEquals("    \  /    \  / /  /______ /       \ | /  \n", $output[6]);
+        $this->assertEquals("     \/  /\  \/ /  /                  |    \n", $output[7]);
+        $this->assertEquals("      \ /  \ / /  /                   |    \n", $output[8]);
+        $this->assertEquals("       ______ /__/                    |    \n", $output[9]);
+    }
+
+    /**
+     * @test
+     * Covers: exec() with --command arg — logo is NOT printed (array_diff count > 0)
+     */
+    public function testWithCommandArgSkipsLogo() {
+        $output = $this->executeMultiCommand(['help', '--command' => 'help']);
+        $this->assertNotContains("|\                /|\n", $output);
         $this->assertEquals(0, $this->getExitCode());
     }
 }

@@ -49,8 +49,13 @@ class DryRunMigrationsCommand extends Command {
             $namespace = APP_DIR.'\\Database\\Migrations';
             $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
             
+            // Discover seeders
+            $seedersPath = APP_PATH.'Database'.DS.'Seeders';
+            $seedersNs = APP_DIR.'\\Database\\Seeders';
+            $count += $this->runner->discoverFromPath($seedersPath, $seedersNs);
+
             if ($count === 0) {
-                $this->info('No migrations found.');
+                $this->info('No migrations/seeders found.');
                 return 0;
             }
             
@@ -90,11 +95,11 @@ class DryRunMigrationsCommand extends Command {
         $pending = $this->runner->getPendingChanges(true);
         
         if (empty($pending)) {
-            $this->info('No pending migrations.');
+            $this->info('No pending migrations/seeders.');
             return 0;
         }
         
-        $this->println('Pending migrations:');
+        $this->println('Pending migrations/seeders:');
         foreach ($pending as $item) {
             $this->println('  - ' . $item['change']->getName());
             if (!empty($item['queries'])) {
@@ -102,6 +107,9 @@ class DryRunMigrationsCommand extends Command {
                 foreach ($item['queries'] as $query) {
                     $this->println('      ' . $query);
                 }
+            } else {
+                $this->println('    Queries:');
+                $this->println('      No Queries');
             }
         }
         

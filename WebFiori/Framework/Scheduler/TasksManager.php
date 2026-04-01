@@ -941,7 +941,7 @@ class TasksManager {
      */
     private function logTaskExecution($task,$forced = false) {
         if ($this->isLogEnabled) {
-            $logsPath = ROOT_PATH.DS.APP_DIR.DS.'sto'.DS.'logs';
+            $logsPath = ROOT_PATH.DS.APP_DIR.DS.'Storage'.DS.'Logs';
             $logFile = $logsPath.DS.'tasks.log';
             $file = new File($logFile);
             $file->create(true);

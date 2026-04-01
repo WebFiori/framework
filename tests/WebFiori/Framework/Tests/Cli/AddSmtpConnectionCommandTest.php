@@ -48,4 +48,88 @@ class AddSmtpConnectionCommandTest extends CLITestCase {
             "Would you like to store connection information anyway?(y/N)\n",
         ], $output);
     }
+    /**
+     * @test
+     * Tests that all args bypass interactive prompts and --no-check skips connection attempt.
+     */
+    public function testAddSMTPConnection01() {
+        $connName = 'my-smtp-conn-'.time();
+        $countBefore = count(App::getConfig()->getSMTPConnections());
+
+        $output = $this->executeSingleCommand(new AddSmtpConnectionCommand(), [
+            '--host=smtp.example.com',
+            '--port=587',
+            '--user=user@example.com',
+            '--password=secret',
+            '--sender-address=user@example.com',
+            '--sender-name=Test User',
+            '--name='.$connName,
+            '--no-check',
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals([
+            "Success: Connection information was stored in application configuration.\n"
+        ], $output);
+
+        $connections = App::getConfig()->getSMTPConnections();
+        $this->assertCount($countBefore + 1, $connections);
+        $this->assertArrayHasKey($connName, $connections);
+        $conn = $connections[$connName];
+        $this->assertEquals('smtp.example.com', $conn->getServerAddress());
+        $this->assertEquals(587, $conn->getPort());
+        $this->assertEquals('user@example.com', $conn->getUsername());
+        $this->assertEquals('user@example.com', $conn->getAddress());
+        $this->assertEquals('Test User', $conn->getSenderName());
+    }
+    /**
+     * @test
+     * Tests that --oauth-token is stored on the connection.
+     */
+    public function testAddSMTPConnection02() {
+        $connName = 'oauth-smtp-conn-'.time();
+        $token = 'my-oauth-token-xyz';
+
+        $output = $this->executeSingleCommand(new AddSmtpConnectionCommand(), [
+            '--host=smtp.example.com',
+            '--port=587',
+            '--user=user@example.com',
+            '--password=secret',
+            '--sender-address=user@example.com',
+            '--sender-name=Test User',
+            '--name='.$connName,
+            '--oauth-token='.$token,
+            '--no-check',
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $connections = App::getConfig()->getSMTPConnections();
+        $this->assertArrayHasKey($connName, $connections);
+        $this->assertEquals($token, $connections[$connName]->getAccessToken());
+    }
+    /**
+     * @test
+     * Tests that providing some args still prompts for the missing ones.
+     */
+    public function testAddSMTPConnection03() {
+        $connName = 'smtp-connection-'.(count(App::getConfig()->getSMTPConnections()));
+
+        $output = $this->executeSingleCommand(new AddSmtpConnectionCommand(), [
+            '--host=127.0.0.1',
+            '--port=25',
+            '--user=test@example.com',
+            '--password=secret',
+            '--sender-address=test@example.com',
+            '--sender-name=Test',
+        ], [
+            "\n", // Hit Enter to pick default connection name
+            'n'
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->getOutput();
+
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[0]);
+        $this->assertEquals("Trying to connect. This can take up to 1 minute...\n", $output[1]);
+    }
 }

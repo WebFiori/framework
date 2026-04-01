@@ -18,7 +18,7 @@ use WebFiori\Framework\Exceptions\SessionException;
  * The default sessions storage engine.
  *
  * This storage engine will store session state as a file in the folder
- * 'app/sto/sessions'. The name of the file that contains session state
+ * '[APP_DIR]/Storage/Sessions'. The name of the file that contains session state
  * will be the ID of the session.
  *
  * @author Ibrahim
@@ -31,8 +31,8 @@ class DefaultSessionStorage implements SessionStorage {
      *
      */
     public function __construct() {
-        $sessionsDirName = 'sessions';
-        $sessionsStoragePath = APP_PATH.'sto';
+        $sessionsDirName = 'Sessions';
+        $sessionsStoragePath = APP_PATH.'Storage';
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {

@@ -70,7 +70,7 @@ class ListTasksPage extends BaseTasksPage {
             'cols' => 12
         ])->addChild('v-card');
         $card->addChild('v-card-title')->text('Tasks Execution Log');
-        $file = new File(APP_PATH.'sto'.DS.'logs'.DS.'tasks-execution.log');
+        $file = new File(APP_PATH.'Storage'.DS.'Logs'.DS.'tasks-execution.log');
 
         if ($file->isExist()) {
             $file->read();

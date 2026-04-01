@@ -10,6 +10,7 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Argument;
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
@@ -24,7 +25,17 @@ use WebFiori\Framework\DB;
  */
 class AddDbConnectionCommand extends Command {
     public function __construct() {
-        parent::__construct('add:db-connection', [], 'Add a database connection.');
+        parent::__construct('add:db-connection', [
+            new Argument('--db-type', 'The type of the database server. Supported values: '.implode(', ', ConnectionInfo::SUPPORTED_DATABASES).'.', true),
+            new Argument('--host', 'The address of the database host.', true),
+            new Argument('--port', 'Port number of the database server.', true),
+            new Argument('--user', 'The username to use when connecting to the database.', true),
+            new Argument('--password', 'The password to use when connecting to the database.', true),
+            new Argument('--database', 'The name of the database to connect to.', true),
+            new Argument('--name', 'A friendly name to identify the connection.', true),
+            new Argument('--extras', 'A JSON string of key-value pairs with extra connection information.', true),
+            new Argument('--no-check', 'If provided, the connection will be added without the attempt to check if provided credentials are valid.', true),
+        ], 'Add a database connection.');
     }
     /**
      * Execute the command.
@@ -32,26 +43,62 @@ class AddDbConnectionCommand extends Command {
      * @return int
      */
     public function exec() : int {
-        $dbType = $this->select('Select database type:', ConnectionInfo::SUPPORTED_DATABASES);
+        $dbTypeArg = $this->getArgValue('--db-type');
+        $supportedDbs = ConnectionInfo::SUPPORTED_DATABASES;
 
-        $connInfoObj = new ConnectionInfo('mysql', 'root', 'pass', 'ok');
-
-        if ($dbType == 'mssql') {
-            $connInfoObj = new ConnectionInfo('mssql', 'root', 'pass', 'ok');
+        if ($dbTypeArg !== null && in_array($dbTypeArg, $supportedDbs)) {
+            $dbType = $dbTypeArg;
+        } else {
+            if ($dbTypeArg !== null && !in_array($dbTypeArg, $supportedDbs)) {
+                $this->warning("Database not supported: $dbTypeArg");
+            }
+            $dbType = $this->select('Select database type:', $supportedDbs);
         }
 
-        $connInfoObj->setHost($this->getInput('Database host:', '127.0.0.1'));
-        $connInfoObj->setPort($this->getInput('Port number:', 3306));
-        $connInfoObj->setUsername($this->getInput('Username:'));
-        $connInfoObj->setPassword($this->getMaskedInput('Password:'));
-        $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1)));
+        $connInfoObj = new ConnectionInfo($dbType, 'root', 'pass', 'ok');
+
+        $hostArg = $this->getArgValue('--host');
+        $connInfoObj->setHost($hostArg !== null ? $hostArg : $this->getInput('Database host:', '127.0.0.1'));
+
+        $portArg = $this->getArgValue('--port');
+        $connInfoObj->setPort($portArg !== null ? (int) $portArg : $this->getInput('Port number:', 3306));
+
+        $userArg = $this->getArgValue('--user');
+        $connInfoObj->setUsername($userArg !== null ? $userArg : $this->getInput('Username:'));
+
+        $passArg = $this->getArgValue('--password');
+        $connInfoObj->setPassword($passArg !== null ? $passArg : $this->getMaskedInput('Password:'));
+
+        $dbArg = $this->getArgValue('--database');
+        $connInfoObj->setDBName($dbArg !== null ? $dbArg : $this->getInput('Database name:'));
+
+        $defaultName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
+        $nameArg = $this->getArgValue('--name');
+        $connInfoObj->setName($nameArg !== null ? $nameArg : $this->getInput('Give your connection a friendly name:', $defaultName));
+
+        $extrasArg = $this->getArgValue('--extras');
+
+        if ($extrasArg !== null) {
+            $decoded = json_decode($extrasArg, true);
+
+            if (is_array($decoded)) {
+                $connInfoObj->setExtras($decoded);
+            }
+        }
+
+        if ($this->isArgProvided('--no-check')) {
+            App::getConfig()->addOrUpdateDBConnection($connInfoObj);
+            $this->success('Connection information was stored in application configuration.');
+
+            return 0;
+        }
+
         $this->println('Trying to connect to the database...');
 
         $addConnection = $this->tryConnect($connInfoObj);
         $orgHost = $connInfoObj->getHost();
         $orgErr = $addConnection !== true ? $addConnection->getMessage() : '';
-        
+
         if ($addConnection !== true) {
             if ($connInfoObj->getHost() == '127.0.0.1') {
                 $this->println("Trying with 'localhost'...");

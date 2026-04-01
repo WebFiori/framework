@@ -124,4 +124,112 @@ class AddDbConnectionCommandTest extends CLITestCase {
         $this->assertStringContainsString("Error: Unable to connect to database: 1045 - Access denied for user", $output[13]);
         $this->assertEquals("Would you like to store connection information anyway?(y/N)\n", $output[14]);
     }
+    /**
+     * @test
+     * Tests that all args bypass interactive prompts and --no-check skips connection attempt.
+     */
+    public function testAddDBConnection03() {
+        $connName = 'my-test-conn-'.time();
+        $countBefore = count(App::getConfig()->getDBConnections());
+
+        $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
+            '--db-type=mysql',
+            '--host=127.0.0.1',
+            '--port=3306',
+            '--user=root',
+            '--password=secret',
+            '--database=mydb',
+            '--name='.$connName,
+            '--no-check',
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $this->assertEquals([
+            "Success: Connection information was stored in application configuration.\n"
+        ], $output);
+
+        $connections = App::getConfig()->getDBConnections();
+        $this->assertCount($countBefore + 1, $connections);
+        $this->assertArrayHasKey($connName, $connections);
+        $conn = $connections[$connName];
+        $this->assertEquals('mysql', $conn->getDatabaseType());
+        $this->assertEquals('127.0.0.1', $conn->getHost());
+        $this->assertEquals(3306, $conn->getPort());
+        $this->assertEquals('root', $conn->getUsername());
+        $this->assertEquals('mydb', $conn->getDBName());
+    }
+    /**
+     * @test
+     * Tests that providing some args still prompts for the missing ones.
+     */
+    public function testAddDBConnection04() {
+        $connName = 'db-connection-'.(count(App::getConfig()->getDBConnections()) + 1);
+
+        $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
+            '--db-type=mysql',
+            '--host=127.0.0.1',
+            '--port=3306',
+            '--user=root',
+            '--password=123456',
+            '--database=testing_db',
+        ], [
+            "\n" // Hit Enter to pick default connection name
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->getOutput();
+
+        $this->assertEquals("Give your connection a friendly name: Enter = '$connName'\n", $output[0]);
+        $this->assertEquals("Trying to connect to the database...\n", $output[1]);
+        $this->assertEquals("Success: Connected. Adding the connection...\n", $output[2]);
+        $this->assertEquals("Success: Connection information was stored in application configuration.\n", $output[3]);
+    }
+    /**
+     * @test
+     * Tests that --extras JSON is decoded and stored on the connection.
+     */
+    public function testAddDBConnection05() {
+        $connName = 'extras-conn-'.time();
+        $extras = ['charset' => 'utf8mb4', 'timeout' => '30'];
+
+        $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
+            '--db-type=mysql',
+            '--host=127.0.0.1',
+            '--port=3306',
+            '--user=root',
+            '--password=secret',
+            '--database=mydb',
+            '--name='.$connName,
+            '--extras='.json_encode($extras),
+            '--no-check',
+        ], []);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $connections = App::getConfig()->getDBConnections();
+        $this->assertArrayHasKey($connName, $connections);
+        $this->assertEquals($extras, $connections[$connName]->getExtars());
+    }
+    /**
+     * @test
+     * Tests that an unsupported --db-type value shows a warning and falls back to interactive select.
+     */
+    public function testAddDBConnection06() {
+        $output = $this->executeSingleCommand(new AddDbConnectionCommand(), [
+            '--db-type=oracle',
+        ], [
+            '0',       // select mysql
+            '127.0.0.1',
+            "\n",      // default port
+            'root',
+            '123456',
+            'testing_db',
+            "\n",      // default connection name
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+        $output = $this->getOutput();
+
+        $this->assertEquals("Warning: Database not supported: oracle\n", $output[0]);
+        $this->assertEquals("Select database type:\n", $output[1]);
+    }
 }

@@ -107,6 +107,9 @@ class DryRunMigrationsCommand extends Command {
                 foreach ($item['queries'] as $query) {
                     $this->println('      ' . $query);
                 }
+            } else {
+                $this->println('    Queries:');
+                $this->println('      No Queries');
             }
         }
         

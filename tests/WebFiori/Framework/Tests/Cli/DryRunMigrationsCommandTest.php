@@ -55,7 +55,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         ]);
 
         $this->assertEquals([
-            "Info: No migrations found.\n"
+            "Info: No migrations/seeders found.\n"
         ], $output);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -73,7 +73,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         ]);
 
         $outputStr = implode('', $output);
-        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('Pending migrations/seeders:', $outputStr);
         $this->assertStringContainsString('TestMigration', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -92,7 +92,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         ]);
 
         $outputStr = implode('', $output);
-        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('Pending migrations/seeders:', $outputStr);
         $this->assertStringContainsString('EnvTestMigration', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
     }
@@ -110,7 +110,7 @@ class DryRunMigrationsCommandTest extends CLITestCase {
         ]);
 
         $outputStr = implode('', $output);
-        $this->assertStringContainsString('Pending migrations:', $outputStr);
+        $this->assertStringContainsString('Pending migrations/seeders:', $outputStr);
         $this->assertStringContainsString('QueryTestMigration', $outputStr);
         // Queries section may or may not appear depending on migration content
         // Just verify the migration is listed

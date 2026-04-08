@@ -1,5 +1,85 @@
 # Changelog
 
+## [3.0.0-RC0](https://github.com/WebFiori/framework/compare/v3.0.0-beta.31...v3.0.0-RC0) (2026-04-08)
+
+
+### Features
+
+* (cli): Run Seeders With Migrations ([7796e93](https://github.com/WebFiori/framework/commit/7796e935b04e299d85958f5646b39a2f026ecdfc))
+* Add `env:` to Class Driver ([89cd39d](https://github.com/WebFiori/framework/commit/89cd39d0f48c558a471a6351218539a8c72f30b2))
+* Add `property` and `constant` ([bebe151](https://github.com/WebFiori/framework/commit/bebe151ebf59b7612b4f064c5dfddcd926e7fd82))
+* Add Arguments Support in Add DB Connection Command ([8223428](https://github.com/WebFiori/framework/commit/8223428c2ed1c67fc9eeb6828ec65d66627067a7))
+* Add Dependencies and Envs ([e3950b6](https://github.com/WebFiori/framework/commit/e3950b601a218abee6296bef73bb3adabd9165c6))
+* Add New Method" `method` ([4d486b2](https://github.com/WebFiori/framework/commit/4d486b27446d6d6e53a0d2e54a23e09b8d6e40bc))
+* Added `getCode` ([ff37c27](https://github.com/WebFiori/framework/commit/ff37c27169234495d3fe8abc1a318ca039521535))
+* Added `migrations:fresh` Command ([d5f732b](https://github.com/WebFiori/framework/commit/d5f732b219375f8c795bc5ed4941d89f14f07594))
+* Added Options to `AttributeTableWriter` ([1d6340c](https://github.com/WebFiori/framework/commit/1d6340c93cffc8b90ab3d3b99179ceddb335a355))
+* Added Scan for Seeders in Dry Run ([a2697f8](https://github.com/WebFiori/framework/commit/a2697f837b193a54e2f82cd14935f871748facf5))
+* Added Support For Args in Add SMTP Conn ([4554cca](https://github.com/WebFiori/framework/commit/4554cca7730f64cc5dc1ee781790f4c081ce3d80))
+* Attributes ([9e11d2b](https://github.com/WebFiori/framework/commit/9e11d2be039a04ea2b0fa6797cd463e03b146584))
+* Chaining ([d3b2407](https://github.com/WebFiori/framework/commit/d3b24077f1652396226152581f043d8bc323c15a))
+* Code Reuse Helpers ([f54ed91](https://github.com/WebFiori/framework/commit/f54ed91850136e334b6092e27c797ace2cf6a63c))
+* Create Attributes Table ([6f4a7fc](https://github.com/WebFiori/framework/commit/6f4a7fc315667081ca22893068a4f744003b7344))
+* Create Background Task Command ([fab0c39](https://github.com/WebFiori/framework/commit/fab0c39acd3ae9f88a033e43122a7b0938880ca5))
+* Create CLI Command ([3c88ecf](https://github.com/WebFiori/framework/commit/3c88ecf2b547e9e55e652800e63d8c73fbe97dcf))
+* Create CRUD Resource ([78d5ecf](https://github.com/WebFiori/framework/commit/78d5ecf1986e4050ab70709f304816afabc18433))
+* Create Domain Entity ([3c4944c](https://github.com/WebFiori/framework/commit/3c4944c4c4a0696784f6b1b1c7b47d4d7c38d56a))
+* Create Middleware Command ([2b189be](https://github.com/WebFiori/framework/commit/2b189be7fc0404942db188cbd60d5a6be01f43e2))
+* Create Migration ([989cf6d](https://github.com/WebFiori/framework/commit/989cf6df71b2b3c50256b039a8ea19957e1c6cdd))
+* Create Repo ([498c214](https://github.com/WebFiori/framework/commit/498c2141fd48ed23acc79e9cf08e3bfc73265fd9))
+* Create Seeder ([b3038d0](https://github.com/WebFiori/framework/commit/b3038d09b671a60957bece8c24c1bf25169a0c9f))
+* Create Table Command ([6fe3be5](https://github.com/WebFiori/framework/commit/6fe3be5486c6f98ec8409a644ad15d8ec5f96cd0))
+* Doc-block Builder ([0eb7760](https://github.com/WebFiori/framework/commit/0eb7760ea9107f5a004f30e2b2d0b5526e3eb9ac))
+* Env Vars for Json Driver ([f28f977](https://github.com/WebFiori/framework/commit/f28f9776e7b19d91b352ef1e3fb4a1cc7a793674))
+* Optional Config Var ([b34cd18](https://github.com/WebFiori/framework/commit/b34cd182ae731d9b814b3362da1332b103e08277))
+* **scheduler:** Added Support for `env:` Syntax ([8240078](https://github.com/WebFiori/framework/commit/824007895f60ba0bb6c774c7ceb4dfe15dc987f6))
+* Split Migrations Count from Seeders Count ([69c69d6](https://github.com/WebFiori/framework/commit/69c69d655ae0473d46a783cbeb04f97e326c90df))
+* Web Services Writer ([ff39f02](https://github.com/WebFiori/framework/commit/ff39f02ddadcfcbef0bccd9d3c3dc38fec1c49eb))
+
+
+### Bug Fixes
+
+* Access Modifier ([95016a8](https://github.com/WebFiori/framework/commit/95016a88a419eeed43e7e02cce70ac3bfbe16754))
+* App Directories Creation ([a8ee667](https://github.com/WebFiori/framework/commit/a8ee6672e2758e919dc7b2bfcc6e8d3718cab82f))
+* Check for Empty `--class-name` ([e5f845c](https://github.com/WebFiori/framework/commit/e5f845cdeea492ba59d0069da0c06114d8badc37))
+* CLI Test Case Class Fix ([ac64c01](https://github.com/WebFiori/framework/commit/ac64c0180521c036a47bfb7608baecd988edd116))
+* **cli:** Deleting All Records of Changes Table ([61d2107](https://github.com/WebFiori/framework/commit/61d2107bf05aef515a92cd19df80a903bcc776a8))
+* **cli:** object-to-string conversion errors ([e1a6e81](https://github.com/WebFiori/framework/commit/e1a6e810a3ac4919934a7b61b3ca68a4108c393e))
+* **cli:** Run Migrations With No Tables Check ([b5e9f06](https://github.com/WebFiori/framework/commit/b5e9f067a8f0848095af373ad2eab4b5cf4a69bc))
+* Fix Session Tables Creation ([f318ba4](https://github.com/WebFiori/framework/commit/f318ba4204c45d49717b7dea85f5fbda5645b070))
+* Getting Requested URI ([79f47a8](https://github.com/WebFiori/framework/commit/79f47a8682a5ffd15c604b6e9138ec912c391c3a))
+* Initialization Path ([192c2f0](https://github.com/WebFiori/framework/commit/192c2f02ea2da20e28ed577c6211bc17f4052b4f))
+* Max/Min Values Issue ([b57b6bc](https://github.com/WebFiori/framework/commit/b57b6bc51de36c579cd9a3dd1ebc065e06be18fe))
+* Method Call ([f598610](https://github.com/WebFiori/framework/commit/f598610d039dd5b7f505e714de8c92bdb631d119))
+* Multiple Fixes ([bd09605](https://github.com/WebFiori/framework/commit/bd09605110e17c2516200f78040bbcf1aca94a35))
+* Request Method not Allowed ([868e123](https://github.com/WebFiori/framework/commit/868e123f2d8d75e12b2d9160d9425ddaa105ffc2))
+
+
+### Miscellaneous Chores
+
+* Added `.gitkeep` ([ec80899](https://github.com/WebFiori/framework/commit/ec80899b72ae0babab1589a8b0fd48c3042817f9))
+* Added CS Fixer ([4f87f0d](https://github.com/WebFiori/framework/commit/4f87f0d07e47e58c2dfa831eb41b7a202f079c88))
+* CS Fixer ([e281dfa](https://github.com/WebFiori/framework/commit/e281dfa973b9aee8730e9ce428d337ad0687bd6a))
+* Fix Storage Dir Name ([fcfbc85](https://github.com/WebFiori/framework/commit/fcfbc85e28dc4b69f01e2e27a11376dde95ce74d))
+* Merge pull request [#273](https://github.com/WebFiori/framework/issues/273) from WebFiori/dev ([21b650e](https://github.com/WebFiori/framework/commit/21b650e81178cd6ae3325bf01e1a29a4e6e8d803))
+* Merge pull request [#276](https://github.com/WebFiori/framework/issues/276) from WebFiori/dev ([785add2](https://github.com/WebFiori/framework/commit/785add28805104ddbdf175a6c8a3b656fafa61a9))
+* Merge pull request [#277](https://github.com/WebFiori/framework/issues/277) from WebFiori/refactor-create ([9c06b94](https://github.com/WebFiori/framework/commit/9c06b9430a6ac45348dc9d0b644c9e34489f543b))
+* Merge pull request [#281](https://github.com/WebFiori/framework/issues/281) from WebFiori/dev ([fc52e00](https://github.com/WebFiori/framework/commit/fc52e00e36941ba394f000263c1cc0aabd899119))
+* Merge pull request [#282](https://github.com/WebFiori/framework/issues/282) from WebFiori/dev ([a36adc0](https://github.com/WebFiori/framework/commit/a36adc097331f9e0737d66e8aa264817d317a086))
+* Merge pull request [#295](https://github.com/WebFiori/framework/issues/295) from WebFiori/dev ([317ea3b](https://github.com/WebFiori/framework/commit/317ea3bb2a0d59b0d800428eb81be62cc89e19e3))
+* Pump-Up Database to V1.2 ([f8af600](https://github.com/WebFiori/framework/commit/f8af600f2fd2e70f3a34f2d0b8614021a84db79f))
+* release v3.0.0-RC0 ([b92e3da](https://github.com/WebFiori/framework/commit/b92e3dafb4da9f7e33415704c20732e3a005cb68))
+* Remove Funding Info ([29a9e00](https://github.com/WebFiori/framework/commit/29a9e00c2a498ba912d916a74b00e9a18408fc87))
+* Remove Non-Needed Files ([3e64be3](https://github.com/WebFiori/framework/commit/3e64be3523a86ddfc4bd87549963f826d31cdfd6))
+* Rename Folders ([ff3f35e](https://github.com/WebFiori/framework/commit/ff3f35e0707db456df5d2f24a2f42037220789a3))
+* Rename Folders ([3afeaec](https://github.com/WebFiori/framework/commit/3afeaec247751d780771a0ee5e2ced586b5a180d))
+* Run CS Fixer ([94775c5](https://github.com/WebFiori/framework/commit/94775c56e8cc5394767fd530fd7563a481960e02))
+* Update issue templates ([e6a10a8](https://github.com/WebFiori/framework/commit/e6a10a85fddec748a82c6e033574dea434e871b8))
+* Update Sonar Config ([7d230c9](https://github.com/WebFiori/framework/commit/7d230c97f58fc17cd02f723fa6ac361e7a2072ba))
+* Updated Core Libraries ([641c4cf](https://github.com/WebFiori/framework/commit/641c4cf1b134f6ccdcb89b68a37617d7306b8da2))
+* Updated Framework Verstion ([b5913c0](https://github.com/WebFiori/framework/commit/b5913c042b3787bb44acc0cc216e990b80f8f7b3))
+* Workflow Name Correction ([1b72dbb](https://github.com/WebFiori/framework/commit/1b72dbb077461c124e4b9d1ad5ae13ce8c1d5709))
+
 ## [3.0.0-beta.31](https://github.com/WebFiori/framework/compare/v3.0.0-Beta.30...v3.0.0-beta.31) (2025-10-27)
 
 

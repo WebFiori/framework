@@ -26,7 +26,7 @@ class StartSessionMiddleware extends AbstractMiddleware {
             $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
 
             foreach ($sessionsCookiesHeaders as $headerVal) {
-                Response::addHeader('set-cookie', $headerVal);
+                $response->addHeader('set-cookie', $headerVal);
             }
         } catch (Error $exc) {
         }

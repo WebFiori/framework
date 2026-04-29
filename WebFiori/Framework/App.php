@@ -164,7 +164,7 @@ class App {
                 if ($uriObj !== null) {
                     $mdArr = $uriObj->getMiddleware();
 
-                    for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
+                    for ($x = count($mdArr) - 1 ; $x >= 0  ; $x--) {
                         $mdArr[$x]->afterSend(self::getRequest(), self::getResponse());
                     }
                 }
@@ -175,7 +175,7 @@ class App {
             if ($uriObj !== null) {
                 $mdArr = $uriObj->getMiddleware();
 
-                for ($x = count($mdArr) - 1 ; $x > 0  ; $x--) {
+                for ($x = count($mdArr) - 1 ; $x >= 0  ; $x--) {
                     $mdArr[$x]->after(self::getRequest(), self::getResponse());
                 }
             }

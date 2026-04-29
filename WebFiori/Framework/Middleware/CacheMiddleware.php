@@ -3,6 +3,7 @@
 namespace WebFiori\Framework\Middleware;
 
 use WebFiori\Cache\Cache;
+use WebFiori\Cache\FileStorage;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
@@ -10,6 +11,7 @@ use WebFiori\Http\Response;
 
 
 class CacheMiddleware extends AbstractMiddleware {
+    private $cache;
     private $fromCache;
     /**
      * Creates new instance of the class.
@@ -22,6 +24,7 @@ class CacheMiddleware extends AbstractMiddleware {
         $this->setPriority(50);
         $this->addToGroups(['web']);
         $this->fromCache = false;
+        $this->cache = new Cache(new FileStorage());
     }
     /**
      * Checks if the response is loaded from the cache or caching must be performed.
@@ -45,7 +48,7 @@ class CacheMiddleware extends AbstractMiddleware {
                     'http-code' => $response->getCode(),
                     'body' => $response->getBody()
                 ];
-                Cache::set($key, $data, $uriObj->getCacheDuration());
+                $this->cache->set($key, $data, $uriObj->getCacheDuration());
             }
         }
     }
@@ -73,7 +76,7 @@ class CacheMiddleware extends AbstractMiddleware {
      */
     public function before(Request $request, Response $response) {
         $key = $this->getKey();
-        $data = Cache::get($key);
+        $data = $this->cache->get($key);
         
         if ($data !== null) {
             $this->fromCache = true;

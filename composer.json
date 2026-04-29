@@ -22,7 +22,7 @@
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
         "ext-openssl": "*",
-        "webfiori/cache": "v2.0.*",
+        "webfiori/cache": "v3.0.*",
         "webfiori/http": "v5.0.*",
         "webfiori/file": "v2.0.*",
         "webfiori/jsonx": "v4.0.*",

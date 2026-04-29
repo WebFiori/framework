@@ -22,6 +22,7 @@ class HelpCommandTest extends CLITestCase {
 
             "    scheduler:               Run tasks scheduler.\n",
             "    scheduler:run:           Run the tasks scheduler check.\n",
+            "    scheduler:daemon:        Run the scheduler in a loop for a limited duration.\n",
             "    add:db-connection:       Add a database connection.\n",
             "    add:smtp-connection:     Add an SMTP account.\n",
             "    add:lang:                Add a website language.\n",

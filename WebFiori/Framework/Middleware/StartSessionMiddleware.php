@@ -2,7 +2,6 @@
 
 namespace WebFiori\Framework\Middleware;
 
-use Error;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
@@ -22,13 +21,10 @@ class StartSessionMiddleware extends AbstractMiddleware {
         $this->addToGroup('web');
     }
     public function after(Request $request, Response $response) {
-        try {
-            $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+        $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
 
-            foreach ($sessionsCookiesHeaders as $headerVal) {
-                $response->addHeader('set-cookie', $headerVal);
-            }
-        } catch (Error $exc) {
+        foreach ($sessionsCookiesHeaders as $headerVal) {
+            $response->addHeader('set-cookie', $headerVal);
         }
     }
 

@@ -607,6 +607,10 @@ class Router {
                 if (!in_array($httpCode, $allowedCodes)) {
                     $httpCode = 301;
                 }
+                $requestedUri = Router::getRouteUri()->getRequestedUri();
+                if ($requestedUri !== null && strlen($requestedUri->getQueryString()) > 0) {
+                    $to .= '?'.$requestedUri->getQueryString();
+                }
                 App::getResponse()->addHeader('location', $to);
                 App::getResponse()->setCode($httpCode);
 
@@ -1104,7 +1108,7 @@ class Router {
     private function fixUriPath(string $path): string {
         if (strlen($path) != 0 && $path != '/') {
             if ($path[strlen($path) - 1] == '/' || $path[0] == '/') {
-                while ($path[0] == '/' || $path[strlen($path) - 1] == '/') {
+                while (strlen($path) > 0 && ($path[0] == '/' || $path[strlen($path) - 1] == '/')) {
                     $path = trim($path, '/');
                 }
                 $path = '/'.$path;

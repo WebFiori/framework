@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.0.0-RC1](https://github.com/WebFiori/framework/compare/v3.0.0-RC0...v3.0.0-RC1) (2026-04-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** Application code using Cache::get(), Cache::set(),
+
+### Features
+
+* **deps:** upgrade webfiori/cache from v2 to v3 ([c24817d](https://github.com/WebFiori/framework/commit/c24817d4f9794cca5a0f32b4b64c096dde565f9e)), closes [#301](https://github.com/WebFiori/framework/issues/301)
+* **scheduler:** add scheduler:daemon command with time-limited execution ([3d3cb1d](https://github.com/WebFiori/framework/commit/3d3cb1d6ddb3aa35828935a34650b67744375391)), closes [#300](https://github.com/WebFiori/framework/issues/300)
+
+
+### Bug Fixes
+
+* correct parent constructor call and static method usage in ExtendedWebServicesManager ([b110a38](https://github.com/WebFiori/framework/commit/b110a38fd8cae51b2596fa02180e21e28e03acc0)), closes [#296](https://github.com/WebFiori/framework/issues/296)
+* off-by-one in middleware after() and afterSend() loops ([1faf4a1](https://github.com/WebFiori/framework/commit/1faf4a1c7c90eb40d343ae668dda98577fe4c329)), closes [#299](https://github.com/WebFiori/framework/issues/299)
+* Proper Fix for The Issue ([3bb8970](https://github.com/WebFiori/framework/commit/3bb8970280e807f5f0b9a73064dc5c6a1e9f1f1d))
+* remove silent try-catch in StartSessionMiddleware::after() ([9c5c3b6](https://github.com/WebFiori/framework/commit/9c5c3b6a13c1d00dce57b044f95b3c8592f571d7)), closes [#298](https://github.com/WebFiori/framework/issues/298)
+* **routing:** preserve query string on redirect and prevent crash on root sub-routes ([007c799](https://github.com/WebFiori/framework/commit/007c799cf2511b96d251be223fa9fca9104482c9))
+* use $response instance instead of static Response::addHeader() in StartSessionMiddleware ([907984c](https://github.com/WebFiori/framework/commit/907984c70f29694cccf207c9e60985709fb8aa23)), closes [#297](https://github.com/WebFiori/framework/issues/297)
+
+
+### Miscellaneous Chores
+
+* bump version to v3.0.0-RC1 (2026-04-30) ([a9d4117](https://github.com/WebFiori/framework/commit/a9d411757e68aaa91d62be707733e236a2312f82))
+* Merge pull request [#312](https://github.com/WebFiori/framework/issues/312) from WebFiori/dev ([a629646](https://github.com/WebFiori/framework/commit/a629646133f2fc756523f6560e6f8af9d190afd9))
+
 ## [3.0.0-RC0](https://github.com/WebFiori/framework/compare/v3.0.0-beta.31...v3.0.0-RC0) (2026-04-08)
 
 

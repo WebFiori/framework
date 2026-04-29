@@ -35,7 +35,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * @since 1.0
      */
     public function __construct(string $version = '1.0.0') {
-        parent::__construct(null, $version);
+        parent::__construct(App::getRequest(), $version);
         $this->setTranslationHelper();
         $langCode = $this->getTranslation()->getCode();
         $generalDir = 'general';

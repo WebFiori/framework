@@ -576,7 +576,11 @@ class App {
         $instanceNs = require_once $dir.DS.$phpFile;
 
         if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-            $instanceNs = '\\'.APP_DIR.'\\'.$folder;
+            $instanceNs = self::extractNamespace($dir.DS.$phpFile);
+
+            if ($instanceNs === null) {
+                $instanceNs = '\\'.APP_DIR.'\\'.$folder;
+            }
         }
         $class = $instanceNs.'\\'.$className;
         try {
@@ -687,6 +691,22 @@ class App {
         }
 
         return $arg instanceof $typeName;
+    }
+    /**
+     * Extracts the namespace declaration from a PHP file.
+     *
+     * @param string $filePath Absolute path to the PHP file.
+     *
+     * @return string|null The namespace string, or null if not found.
+     */
+    private static function extractNamespace(string $filePath): ?string {
+        $content = file_get_contents($filePath);
+
+        if ($content !== false && preg_match('/^\s*namespace\s+([^;{]+)/m', $content, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return null;
     }
     /**
      * Safe function caller with CLI/web-aware exception handling.

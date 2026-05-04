@@ -582,7 +582,13 @@ class App {
         try {
             $reflectionClass = new ReflectionClass($class);
 
-            $toPass = [$reflectionClass->newInstanceArgs($constructorParams)];
+            if (self::canAcceptArgs($reflectionClass, $constructorParams)) {
+                $instance = $reflectionClass->newInstanceArgs($constructorParams);
+            } else {
+                $instance = $reflectionClass->newInstance();
+            }
+
+            $toPass = [$instance];
 
             foreach ($otherParams as $param) {
                 $toPass[] = $param;
@@ -590,6 +596,97 @@ class App {
             call_user_func_array($regCallback, $toPass);
         } catch (Error $ex) {
         }
+    }
+    /**
+     * Checks if a class constructor can accept the given arguments.
+     *
+     * Returns true if the constructor can be called with the given params.
+     * Returns false if there is a type mismatch or if the constructor
+     * has no parameters but args were provided.
+     *
+     * @param ReflectionClass $refClass The reflection of the class to check.
+     * @param array $args The arguments to check against the constructor.
+     *
+     * @return bool
+     */
+    private static function canAcceptArgs(ReflectionClass $refClass, array $args): bool {
+        if (empty($args)) {
+            return true;
+        }
+
+        $constructor = $refClass->getConstructor();
+
+        if ($constructor === null) {
+            return false;
+        }
+
+        $params = $constructor->getParameters();
+
+        if (count($args) > count($params)) {
+            return false;
+        }
+
+        foreach ($args as $index => $arg) {
+            if (!isset($params[$index])) {
+                return false;
+            }
+
+            $paramType = $params[$index]->getType();
+
+            if ($paramType === null) {
+                // No type hint, accepts anything.
+                continue;
+            }
+
+            if ($paramType instanceof \ReflectionUnionType) {
+                $matched = false;
+
+                foreach ($paramType->getTypes() as $type) {
+                    if (self::argMatchesType($arg, $type)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+
+                if (!$matched) {
+                    return false;
+                }
+            } else if (!self::argMatchesType($arg, $paramType)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    /**
+     * Checks if a single argument matches a single reflected type.
+     *
+     * @param mixed $arg The argument value.
+     * @param \ReflectionNamedType $type The reflected type to check against.
+     *
+     * @return bool
+     */
+    private static function argMatchesType($arg, \ReflectionNamedType $type): bool {
+        $typeName = $type->getName();
+
+        if ($arg === null) {
+            return $type->allowsNull();
+        }
+
+        if ($type->isBuiltin()) {
+            return match ($typeName) {
+                'string' => is_string($arg),
+                'int' => is_int($arg),
+                'float' => is_float($arg) || is_int($arg),
+                'bool' => is_bool($arg),
+                'array' => is_array($arg),
+                'callable' => is_callable($arg),
+                'mixed' => true,
+                default => false,
+            };
+        }
+
+        return $arg instanceof $typeName;
     }
     /**
      * Safe function caller with CLI/web-aware exception handling.

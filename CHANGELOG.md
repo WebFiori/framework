@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.0.0-RC.2](https://github.com/WebFiori/framework/compare/v3.0.0-RC1...v3.0.0-RC.2) (2026-05-04)
+
+
+### Bug Fixes
+
+* Auto-Reg With RegEx ([1d99fb8](https://github.com/WebFiori/framework/commit/1d99fb815adfccad978d4210cf5c6535ae858657))
+* Auto-Register on Attributes ([52898f9](https://github.com/WebFiori/framework/commit/52898f9def1d0ad92670e6ab2b18420c2f07a7aa)), closes [#313](https://github.com/WebFiori/framework/issues/313)
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#315](https://github.com/WebFiori/framework/issues/315) from WebFiori/dev ([a897a10](https://github.com/WebFiori/framework/commit/a897a10122fd26eb59f79bdffb4715c42883bb09))
+* Merge pull request [#316](https://github.com/WebFiori/framework/issues/316) from WebFiori/dev ([2ee892a](https://github.com/WebFiori/framework/commit/2ee892a2e7d0da0f80160d592761d253ac4bd703))
+* Updated Framework Version ([40e135a](https://github.com/WebFiori/framework/commit/40e135ad5b348606c414402a0a26959555a2fb60))
+
 ## [3.0.0-RC1](https://github.com/WebFiori/framework/compare/v3.0.0-RC0...v3.0.0-RC1) (2026-04-29)
 
 

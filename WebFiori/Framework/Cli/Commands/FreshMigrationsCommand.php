@@ -47,11 +47,11 @@ class FreshMigrationsCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $migrationsCount = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $migrationsCount = $this->runner->discoverFromPath($migrationsPath, $namespace, true);
 
             $seedersPath = APP_PATH.'Database'.DS.'Seeders';
             $seedersNamespace = APP_DIR.'\\Database\\Seeders';
-            $seedersCount = $this->runner->discoverFromPath($seedersPath, $seedersNamespace);
+            $seedersCount = $this->runner->discoverFromPath($seedersPath, $seedersNamespace, true);
             
             $count = $migrationsCount + $seedersCount;
 

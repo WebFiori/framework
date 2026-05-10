@@ -49,7 +49,7 @@ class RollbackMigrationsCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $this->runner->discoverFromPath($migrationsPath, $namespace, true);
             
             return $this->rollback();
             

@@ -47,7 +47,7 @@ class MigrationsStatusCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $count = $this->runner->discoverFromPath($migrationsPath, $namespace, true);
             
             if ($count === 0) {
                 $this->info('No migrations found.');

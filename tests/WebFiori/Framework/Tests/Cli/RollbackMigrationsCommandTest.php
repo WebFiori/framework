@@ -228,12 +228,24 @@ PHP;
 
     private function cleanupMigrations(): void {
         $dir = APP_PATH.'Database'.DS.'Migrations';
+        $this->cleanPhpFiles($dir);
+    }
 
-        if (is_dir($dir)) {
-            foreach (glob($dir.DS.'*.php') as $file) {
-                if (basename($file) !== '.gitkeep') {
-                    unlink($file);
-                }
+    private function cleanPhpFiles(string $dir): void {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isFile() && $item->getExtension() === 'php') {
+                unlink($item->getRealPath());
+            } elseif ($item->isDir() && count(scandir($item->getRealPath())) === 2) {
+                rmdir($item->getRealPath());
             }
         }
     }
@@ -248,11 +260,33 @@ PHP;
         parent::setUp();
         $this->setupTestConnection();
         $this->cleanupMigrations();
+        $this->dropSchemaTable();
+        $this->initSchemaTable();
     }
 
     protected function tearDown(): void {
         $this->cleanupMigrations();
+        $this->dropSchemaTable();
         App::getConfig()->removeAllDBConnections();
         parent::tearDown();
+    }
+
+    private function dropSchemaTable(): void {
+        try {
+            $connection = App::getConfig()->getDBConnection('test-connection');
+            if ($connection !== null) {
+                $runner = new \WebFiori\Database\Schema\SchemaRunner($connection);
+                $runner->dropSchemaTable();
+            }
+        } catch (\Throwable $e) {
+            // Ignore
+        }
+    }
+
+    private function initSchemaTable(): void {
+        $this->executeMultiCommand([
+            'WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
+            '--connection' => 'test-connection'
+        ]);
     }
 }

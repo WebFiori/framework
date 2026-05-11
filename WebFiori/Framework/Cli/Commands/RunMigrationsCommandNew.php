@@ -47,11 +47,11 @@ class RunMigrationsCommandNew extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $count = $this->runner->discoverFromPath($migrationsPath, $namespace, true);
 
             $seedersPath = APP_PATH.'Database'.DS.'Seeders';
             $seedersNamespace = APP_DIR.'\\Database\\Seeders';
-            $count += $this->runner->discoverFromPath($seedersPath, $seedersNamespace);
+            $count += $this->runner->discoverFromPath($seedersPath, $seedersNamespace, true);
             
             if ($count === 0) {
                 $this->info('No migrations found.');
@@ -71,6 +71,10 @@ class RunMigrationsCommandNew extends Command {
             $this->println('Message: ' . $e->getMessage());
             $this->println('File: ' . $e->getFile() . ':' . $e->getLine());
             return 1;
+        } finally {
+            if ($this->runner !== null) {
+                $this->runner->close();
+            }
         }
     }
     

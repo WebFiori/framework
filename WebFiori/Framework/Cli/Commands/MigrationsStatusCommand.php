@@ -47,7 +47,7 @@ class MigrationsStatusCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $count = $this->runner->discoverFromPath($migrationsPath, $namespace, true);
             
             if ($count === 0) {
                 $this->info('No migrations found.');
@@ -61,6 +61,10 @@ class MigrationsStatusCommand extends Command {
             $this->println('Message: ' . $e->getMessage());
             $this->println('File: ' . $e->getFile() . ':' . $e->getLine());
             return 1;
+        } finally {
+            if ($this->runner !== null) {
+                $this->runner->close();
+            }
         }
     }
     

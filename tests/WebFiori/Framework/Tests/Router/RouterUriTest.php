@@ -407,4 +407,44 @@ class RouterUriTest extends TestCase {
         $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());
         $this->assertEquals(2,count($uriObj->getParameters()));
     }
+    /**
+     * @test
+     */
+    public function testAddMiddlewareByClassName() {
+        $uri = new RouterUri('https://example.com/test', '');
+
+        $uri->addMiddleware(\WebFiori\Framework\Middleware\StartSessionMiddleware::class);
+
+        $middlewares = $uri->getMiddleware();
+        $found = false;
+
+        foreach ($middlewares as $mw) {
+            if ($mw->getName() === 'start-session') {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($found, 'Middleware should be resolved by class name');
+    }
+    /**
+     * @test
+     */
+    public function testAddMiddlewareInvalidNameSilent() {
+        $uri = new RouterUri('https://example.com/test', '');
+        $countBefore = count($uri->getMiddleware());
+
+        // Non-class strings are treated as group names (silent, backward compatible)
+        $uri->addMiddleware('non-existent-middleware');
+        $this->assertEquals($countBefore, count($uri->getMiddleware()));
+    }
+    /**
+     * @test
+     */
+    public function testAddMiddlewareInvalidClassThrows() {
+        $uri = new RouterUri('https://example.com/test', '');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $uri->addMiddleware('App\\Middleware\\NonExistentMiddleware');
+    }
 }

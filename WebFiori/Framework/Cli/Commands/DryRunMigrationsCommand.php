@@ -47,12 +47,12 @@ class DryRunMigrationsCommand extends Command {
             // Discover migrations
             $migrationsPath = APP_PATH.'Database'.DS.'Migrations';
             $namespace = APP_DIR.'\\Database\\Migrations';
-            $count = $this->runner->discoverFromPath($migrationsPath, $namespace);
+            $count = $this->runner->discoverFromPath($migrationsPath, $namespace, true);
             
             // Discover seeders
             $seedersPath = APP_PATH.'Database'.DS.'Seeders';
             $seedersNs = APP_DIR.'\\Database\\Seeders';
-            $count += $this->runner->discoverFromPath($seedersPath, $seedersNs);
+            $count += $this->runner->discoverFromPath($seedersPath, $seedersNs, true);
 
             if ($count === 0) {
                 $this->info('No migrations/seeders found.');
@@ -66,6 +66,10 @@ class DryRunMigrationsCommand extends Command {
             $this->println('Message: ' . $e->getMessage());
             $this->println('File: ' . $e->getFile() . ':' . $e->getLine());
             return 1;
+        } finally {
+            if ($this->runner !== null) {
+                $this->runner->close();
+            }
         }
     }
     

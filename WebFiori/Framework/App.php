@@ -878,7 +878,7 @@ class App {
      * @throws FileException
      */
     private function initMiddleware() {
-        App::autoRegister('middleware', function(AbstractMiddleware $inst)
+        App::autoRegister('Middleware', function(AbstractMiddleware $inst)
         {
             MiddlewareManager::register($inst);
         });

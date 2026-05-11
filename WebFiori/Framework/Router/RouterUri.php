@@ -12,6 +12,7 @@ namespace WebFiori\Framework\Router;
 
 use Closure;
 use InvalidArgumentException;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Http\RequestUri;
 use WebFiori\Http\Uri;
@@ -191,10 +192,32 @@ class RouterUri extends RequestUri {
         if ($mw === null) {
             $group = MiddlewareManager::getGroup($name);
 
-            foreach ($group as $mw) {
-                $this->assignedMiddlewareList[] = $mw;
+            if (!empty($group)) {
+                foreach ($group as $mw) {
+                    $this->assignedMiddlewareList[] = $mw;
+                }
+
+                return;
             }
 
+            // Try resolving as class name
+            if (class_exists($name) && is_subclass_of($name, AbstractMiddleware::class)) {
+                $inst = new $name();
+                MiddlewareManager::register($inst);
+                $this->assignedMiddlewareList[] = $inst;
+
+                return;
+            }
+
+            // If it looks like a class reference (contains backslash) but isn't valid, throw
+            if (str_contains($name, '\\')) {
+                throw new \InvalidArgumentException(
+                    "Middleware '$name' is not registered, does not match any group, "
+                    . "and is not a valid middleware class."
+                );
+            }
+
+            // Otherwise treat as a group/name that may be registered later (silent)
             return;
         }
         $this->assignedMiddlewareList[] = $mw;

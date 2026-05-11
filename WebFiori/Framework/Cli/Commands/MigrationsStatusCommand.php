@@ -61,6 +61,10 @@ class MigrationsStatusCommand extends Command {
             $this->println('Message: ' . $e->getMessage());
             $this->println('File: ' . $e->getFile() . ':' . $e->getLine());
             return 1;
+        } finally {
+            if ($this->runner !== null) {
+                $this->runner->close();
+            }
         }
     }
     

@@ -12,6 +12,7 @@ namespace WebFiori\Framework\Cli;
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\CommandTestCase;
+use WebFiori\Database\ConnectionPool;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
 
@@ -24,6 +25,10 @@ class CLITestCase extends CommandTestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->setRunner(App::getRunner());
+    }
+    protected function tearDown(): void {
+        ConnectionPool::reset();
+        parent::tearDown();
     }
     /**
      * Register multiple commands and simulate the process of executing the app

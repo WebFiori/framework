@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0-RC.3](https://github.com/WebFiori/framework/compare/v3.0.0-RC.2...v3.0.0-RC.3) (2026-05-11)
+
+
+### Features
+
+* **migrations:** enable recursive discovery of migrations in subdirectories ([b855c18](https://github.com/WebFiori/framework/commit/b855c18ce8ef134efefa18e9984986efa3704fe0)), closes [#317](https://github.com/WebFiori/framework/issues/317)
+
+
+### Bug Fixes
+
+* Middleware Discovery ([91aaf4b](https://github.com/WebFiori/framework/commit/91aaf4b88dbbf043311fc9f67dcb8fd3797d1176)), closes [#319](https://github.com/WebFiori/framework/issues/319)
+* **migrations:** close database connection after command execution ([e271833](https://github.com/WebFiori/framework/commit/e2718335af8713feeb3537d6b0db3a3c0fc6ba22))
+* **router:** resolve middleware by class reference in addMiddleware() ([6dc18da](https://github.com/WebFiori/framework/commit/6dc18daefee339e14c56e3de954302f6e38f1ef9)), closes [#318](https://github.com/WebFiori/framework/issues/318)
+* **tests:** reset connection pool in CLITestCase tearDown ([cb813cb](https://github.com/WebFiori/framework/commit/cb813cb45c164379a50200afb41c3e8a18f3b273))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#324](https://github.com/WebFiori/framework/issues/324) from WebFiori/dev ([53dd434](https://github.com/WebFiori/framework/commit/53dd434fa34cda6676b99b7cbe7ea3550243f2f6))
+* Updated Database Library ([a901134](https://github.com/WebFiori/framework/commit/a901134f3eb6f9b6844ed0210ff95f5683915f2a))
+* Updated Version ([be6d69d](https://github.com/WebFiori/framework/commit/be6d69dc0d24273d91a58d74eb97d2847ec4beb4))
+
 ## [3.0.0-RC.2](https://github.com/WebFiori/framework/compare/v3.0.0-RC1...v3.0.0-RC.2) (2026-05-04)
 
 

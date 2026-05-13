@@ -234,6 +234,7 @@ class JsonDriver implements ConfigurationDriver {
             } else if (gettype($extras) == 'array') {
                 $extrasArr = $extras;
             }
+            $extrasArr['connection-name'] = trim($conName);
 
             return new ConnectionInfo(
                 $this->getProp($jsonObj, 'type', $conName),

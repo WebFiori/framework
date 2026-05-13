@@ -4,81 +4,15 @@ namespace WebFiori\Framework\Test\Cli;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Cli\CLITestCase;
-use WebFiori\Framework\Cli\Commands\SkipMigrationsCommand;
-use WebFiori\Framework\Cli\Commands\RunMigrationsCommandNew;
 use WebFiori\Framework\Cli\Commands\InitMigrationsCommand;
+use WebFiori\Framework\Cli\Commands\RunMigrationsCommandNew;
+use WebFiori\Framework\Cli\Commands\SkipMigrationsCommand;
 
 /**
  * Test cases for SkipMigrationsCommand.
  */
 class SkipMigrationsCommandTest extends CLITestCase {
     private ConnectionInfo $testConnection;
-
-    /**
-     * @test
-     */
-    public function testSkipWithNoConnections() {
-        App::getConfig()->removeAllDBConnections();
-
-        $output = $this->executeMultiCommand([
-            SkipMigrationsCommand::class,
-            '--all' => ''
-        ]);
-
-        $this->assertEquals([
-            "Info: No database connections configured.\n"
-        ], $output);
-        $this->assertEquals(1, $this->getExitCode());
-    }
-
-    /**
-     * @test
-     */
-    public function testSkipWithInvalidConnection() {
-        $output = $this->executeMultiCommand([
-            SkipMigrationsCommand::class,
-            '--all' => '',
-            '--connection' => 'ghost'
-        ]);
-
-        $this->assertEquals([
-            "Error: Connection 'ghost' not found.\n"
-        ], $output);
-        $this->assertEquals(1, $this->getExitCode());
-    }
-
-    /**
-     * @test
-     */
-    public function testSkipWithNoMigrations() {
-        $output = $this->executeMultiCommand([
-            SkipMigrationsCommand::class,
-            '--all' => '',
-            '--connection' => 'test-connection'
-        ]);
-
-        $this->assertEquals([
-            "Info: No migrations found.\n"
-        ], $output);
-        $this->assertEquals(0, $this->getExitCode());
-    }
-
-    /**
-     * @test
-     */
-    public function testSkipWithNoModeFlag() {
-        $this->createTestMigration('NoMode1');
-        $this->initMigrations();
-
-        $output = $this->executeMultiCommand([
-            SkipMigrationsCommand::class,
-            '--connection' => 'test-connection'
-        ]);
-
-        $outputStr = implode('', $output);
-        $this->assertStringContainsString('Provide --name, --all, or --up-to', $outputStr);
-        $this->assertEquals(1, $this->getExitCode());
-    }
 
     /**
      * @test
@@ -99,6 +33,102 @@ class SkipMigrationsCommandTest extends CLITestCase {
         $this->assertStringContainsString('Skipped: App\\Database\\Migrations\\SkipAll2', $outputStr);
         $this->assertStringContainsString('Total skipped: 2', $outputStr);
         $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testSkipAllWhenNothingPending() {
+        $this->createTestMigration('NoPending');
+        $this->initMigrations();
+
+        // Run it first
+        $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        // Skip all - nothing left
+        $output = $this->executeMultiCommand([
+            SkipMigrationsCommand::class,
+            '--all' => '',
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('No pending migrations to skip', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testSkipAlreadyApplied() {
+        $this->createTestMigration('AlreadyDone');
+        $this->initMigrations();
+
+        // Run it first
+        $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        // Try to skip it
+        $output = $this->executeMultiCommand([
+            SkipMigrationsCommand::class,
+            '--name' => 'App\\Database\\Migrations\\AlreadyDone',
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Could not skip', $outputStr);
+        $this->assertStringContainsString('not found or already applied', $outputStr);
+        $this->assertEquals(1, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testSkippedMigrationWontRun() {
+        $this->createTestMigration('WontRun');
+        $this->initMigrations();
+
+        // Skip it
+        $this->executeMultiCommand([
+            SkipMigrationsCommand::class,
+            '--name' => 'App\\Database\\Migrations\\WontRun',
+            '--connection' => 'test-connection'
+        ]);
+
+        // Now run migrations
+        $output = $this->executeMultiCommand([
+            RunMigrationsCommandNew::class,
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('Skipped: App\\Database\\Migrations\\WontRun', $outputStr);
+        $this->assertStringNotContainsString('Applied: App\\Database\\Migrations\\WontRun', $outputStr);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testSkipSchemaTableMissing() {
+        $this->createTestMigration('NoTable');
+        // Do NOT call initMigrations()
+
+        $output = $this->executeMultiCommand([
+            SkipMigrationsCommand::class,
+            '--all' => '',
+            '--connection' => 'test-connection'
+        ]);
+
+        $outputStr = implode('', $output);
+        $this->assertStringContainsString('schema_changes', $outputStr);
+        $this->assertStringContainsString('migrations:ini', $outputStr);
+        $this->assertEquals(1, $this->getExitCode());
     }
 
     /**
@@ -142,112 +172,96 @@ class SkipMigrationsCommandTest extends CLITestCase {
     /**
      * @test
      */
-    public function testSkipAlreadyApplied() {
-        $this->createTestMigration('AlreadyDone');
-        $this->initMigrations();
-
-        // Run it first
-        $this->executeMultiCommand([
-            RunMigrationsCommandNew::class,
-            '--connection' => 'test-connection'
-        ]);
-
-        // Try to skip it
+    public function testSkipWithInvalidConnection() {
         $output = $this->executeMultiCommand([
             SkipMigrationsCommand::class,
-            '--name' => 'App\\Database\\Migrations\\AlreadyDone',
-            '--connection' => 'test-connection'
+            '--all' => '',
+            '--connection' => 'ghost'
         ]);
 
-        $outputStr = implode('', $output);
-        $this->assertStringContainsString('Could not skip', $outputStr);
-        $this->assertStringContainsString('not found or already applied', $outputStr);
+        $this->assertEquals([
+            "Error: Connection 'ghost' not found.\n"
+        ], $output);
         $this->assertEquals(1, $this->getExitCode());
     }
 
     /**
      * @test
      */
-    public function testSkipAllWhenNothingPending() {
-        $this->createTestMigration('NoPending');
-        $this->initMigrations();
-
-        // Run it first
-        $this->executeMultiCommand([
-            RunMigrationsCommandNew::class,
-            '--connection' => 'test-connection'
-        ]);
-
-        // Skip all - nothing left
-        $output = $this->executeMultiCommand([
-            SkipMigrationsCommand::class,
-            '--all' => '',
-            '--connection' => 'test-connection'
-        ]);
-
-        $outputStr = implode('', $output);
-        $this->assertStringContainsString('No pending migrations to skip', $outputStr);
-        $this->assertEquals(0, $this->getExitCode());
-    }
-
-    /**
-     * @test
-     */
-    public function testSkipSchemaTableMissing() {
-        $this->createTestMigration('NoTable');
-        // Do NOT call initMigrations()
+    public function testSkipWithNoConnections() {
+        App::getConfig()->removeAllDBConnections();
 
         $output = $this->executeMultiCommand([
             SkipMigrationsCommand::class,
-            '--all' => '',
-            '--connection' => 'test-connection'
+            '--all' => ''
         ]);
 
-        $outputStr = implode('', $output);
-        $this->assertStringContainsString('schema_changes', $outputStr);
-        $this->assertStringContainsString('migrations:ini', $outputStr);
+        $this->assertEquals([
+            "Info: No database connections configured.\n"
+        ], $output);
         $this->assertEquals(1, $this->getExitCode());
     }
 
     /**
      * @test
      */
-    public function testSkippedMigrationWontRun() {
-        $this->createTestMigration('WontRun');
-        $this->initMigrations();
-
-        // Skip it
-        $this->executeMultiCommand([
+    public function testSkipWithNoMigrations() {
+        $output = $this->executeMultiCommand([
             SkipMigrationsCommand::class,
-            '--name' => 'App\\Database\\Migrations\\WontRun',
+            '--all' => '',
             '--connection' => 'test-connection'
         ]);
 
-        // Now run migrations
+        $this->assertEquals([
+            "Info: No migrations found.\n"
+        ], $output);
+        $this->assertEquals(0, $this->getExitCode());
+    }
+
+    /**
+     * @test
+     */
+    public function testSkipWithNoModeFlag() {
+        $this->createTestMigration('NoMode1');
+        $this->initMigrations();
+
         $output = $this->executeMultiCommand([
-            RunMigrationsCommandNew::class,
+            SkipMigrationsCommand::class,
             '--connection' => 'test-connection'
         ]);
 
         $outputStr = implode('', $output);
-        $this->assertStringContainsString('Skipped: App\\Database\\Migrations\\WontRun', $outputStr);
-        $this->assertStringNotContainsString('Applied: App\\Database\\Migrations\\WontRun', $outputStr);
-        $this->assertEquals(0, $this->getExitCode());
+        $this->assertStringContainsString('Provide --name, --all, or --up-to', $outputStr);
+        $this->assertEquals(1, $this->getExitCode());
     }
 
-    // --- Helpers ---
-
-    private function initMigrations(string $env = 'dev'): void {
-        $args = [
-            InitMigrationsCommand::class,
-            '--connection' => 'test-connection'
-        ];
-
-        if ($env !== 'dev') {
-            $args['--env'] = $env;
+    private function cleanPhpFiles(string $dir): void {
+        if (!is_dir($dir)) {
+            return;
         }
 
-        $this->executeMultiCommand($args);
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isFile() && $item->getExtension() === 'php') {
+                unlink($item->getRealPath());
+            } elseif ($item->isDir() && count(scandir($item->getRealPath())) === 2) {
+                rmdir($item->getRealPath());
+            }
+        }
+    }
+
+    private function cleanupMigrations(): void {
+        $dir = APP_PATH.'Database'.DS.'Migrations';
+        $this->cleanPhpFiles($dir);
+    }
+
+    private function cleanupSeeders(): void {
+        $dir = APP_PATH.'Database'.DS.'Seeders';
+        $this->cleanPhpFiles($dir);
     }
 
     private function createTestMigration(string $name): void {
@@ -278,38 +292,10 @@ PHP;
         file_put_contents($dir.DS.$name.'.php', $content);
     }
 
-    private function cleanupMigrations(): void {
-        $dir = APP_PATH.'Database'.DS.'Migrations';
-        $this->cleanPhpFiles($dir);
-    }
-
-    private function cleanPhpFiles(string $dir): void {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($iterator as $item) {
-            if ($item->isFile() && $item->getExtension() === 'php') {
-                unlink($item->getRealPath());
-            } elseif ($item->isDir() && count(scandir($item->getRealPath())) === 2) {
-                rmdir($item->getRealPath());
-            }
-        }
-    }
-
-    private function cleanupSeeders(): void {
-        $dir = APP_PATH.'Database'.DS.'Seeders';
-        $this->cleanPhpFiles($dir);
-    }
-
     private function dropSchemaTable(): void {
         try {
             $conn = App::getConfig()->getDBConnection('test-connection');
+
             if ($conn !== null) {
                 $db = new \WebFiori\Database\Database($conn);
                 $db->raw("DROP TABLE IF EXISTS schema_changes")->execute();
@@ -318,6 +304,21 @@ PHP;
         } catch (\Throwable $e) {
             // Ignore
         }
+    }
+
+    // --- Helpers ---
+
+    private function initMigrations(string $env = 'dev'): void {
+        $args = [
+            InitMigrationsCommand::class,
+            '--connection' => 'test-connection'
+        ];
+
+        if ($env !== 'dev') {
+            $args['--env'] = $env;
+        }
+
+        $this->executeMultiCommand($args);
     }
 
     private function setupTestConnection(): void {

@@ -254,7 +254,8 @@ class JsonDriverTest extends TestCase {
         $this->assertEquals('root', $account->getUsername());
         $this->assertEquals([
             'KG' => 9,
-            'OP' => 'hello'
+            'OP' => 'hello',
+            'connection-name' => 'New_Connection'
         ], $account->getExtars());
         $driver->removeAllDBConnections();
         $this->assertEquals(0, count($driver->getDBConnections()));
@@ -290,7 +291,8 @@ class JsonDriverTest extends TestCase {
         $this->assertEquals('root', $account->getUsername());
         $this->assertEquals([
             'A' => 'B',
-            'C' => 'D'
+            'C' => 'D',
+            'connection-name' => 'not_ok'
         ], $account->getExtars());
     }
     /**

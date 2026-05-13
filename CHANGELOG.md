@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.0.0-RC.4](https://github.com/WebFiori/framework/compare/v3.0.0-RC.3...v3.0.0-RC.4) (2026-05-13)
+
+
+### Features
+
+* **cli:** add --all-connections flag and connection validation for migrations ([5a4daea](https://github.com/WebFiori/framework/commit/5a4daea0bed464f43980c273ff5d8f9b2f7967db)), closes [#326](https://github.com/WebFiori/framework/issues/326)
+* **cli:** add migrations:skip command for baselining ([4cbde82](https://github.com/WebFiori/framework/commit/4cbde826774f2a533278e4d2b98f523c65fa42d7)), closes [#320](https://github.com/WebFiori/framework/issues/320)
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#327](https://github.com/WebFiori/framework/issues/327) from WebFiori/dev ([9f2efb0](https://github.com/WebFiori/framework/commit/9f2efb0cb72af2baf355ee8e84da01b5a80d6864))
+
 ## [3.0.0-RC.3](https://github.com/WebFiori/framework/compare/v3.0.0-RC.2...v3.0.0-RC.3) (2026-05-11)
 
 

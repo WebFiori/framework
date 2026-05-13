@@ -432,7 +432,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_VERSION', 'v3.0.0-RC.3');
+        define('WF_VERSION', '3.0.0-RC.4');
         /**
          * A constant that tells the type of framework version.
          *
@@ -448,7 +448,7 @@ class App {
          *
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2026-05-11');
+        define('WF_RELEASE_DATE', '2026-05-13');
     }
     /**
      * Initiate main components of the application.

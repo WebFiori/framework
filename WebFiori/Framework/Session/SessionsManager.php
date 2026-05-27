@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -20,7 +21,7 @@ use WebFiori\Http\Request;
  *
  * @since 1.1.0
  *
- * @version 1.0
+ * @version 1.1
  */
 class SessionsManager {
     /**
@@ -31,6 +32,24 @@ class SessionsManager {
      * @since 1.0
      */
     private $activeSession;
+    /**
+     * Maximum number of sessions to remove per GC run.
+     *
+     * @var int
+     */
+    private $gcBatchSize;
+    /**
+     * GC probability divisor.
+     *
+     * @var int
+     */
+    private $gcDivisor;
+    /**
+     * GC probability numerator.
+     *
+     * @var int
+     */
+    private $gcProbability;
     /**
      *
      * @var SessionsManager
@@ -61,6 +80,9 @@ class SessionsManager {
      */
     private function __construct() {
         $this->sessionsArr = [];
+        $this->gcProbability = 1;
+        $this->gcDivisor = 100;
+        $this->gcBatchSize = 100;
 
         if (defined('WF_SESSION_STORAGE')) {
             $constructor = WF_SESSION_STORAGE.'';
@@ -170,18 +192,41 @@ class SessionsManager {
         return $retVal;
     }
     /**
-     * Returns a date string that represents the time at which all sessions
-     * that was created before it will be cleared.
+     * Returns the maximum number of sessions to remove per GC run.
      *
-     * This method will try to use the environment variable 'SESSION_GC' to
-     * decide on the time. If this environment variable does not exist,
-     * it will use the value 30 days to create the date time string which
-     * indicates that any session created 30 days ago will be cleared.
+     * @return int
+     */
+    public static function getGCBatchSize(): int {
+        return self::getInstance()->gcBatchSize;
+    }
+    /**
+     * Returns the GC probability divisor.
      *
-     * @return string A date string in the format 'YYYY-MM-DD HH:MM:SS'.
+     * @return int
+     */
+    public static function getGCDivisor(): int {
+        return self::getInstance()->gcDivisor;
+    }
+    /**
+     * Returns the GC probability numerator.
+     *
+     * @return int
+     */
+    public static function getGCProbability(): int {
+        return self::getInstance()->gcProbability;
+    }
+    /**
+     * Returns a date string that represents the time at which sessions
+     * older than it will be cleared by GC.
+     *
+     * The method uses the session default duration to compute the threshold.
+     * If the environment variable 'SESSION_GC' or the constant 'SESSION_GC'
+     * is set, it will be used as a Unix timestamp instead.
+     *
+     * @return string A date string in the format 'Y-m-d H:i:s'.
      */
     public static function getGCTime() : string {
-        $olderThan = time() - 60 * 60 * 24 * 30;
+        $olderThan = time() - (Session::DEFAULT_SESSION_DURATION * 60 * 2);
         $fromEnv = getenv('SESSION_GC') !== false ? intval(getenv('SESSION_GC')) : 0;
         $fromConst = defined('SESSION_GC') && intval(SESSION_GC) > 0 ? intval(SESSION_GC) : 0;
 
@@ -373,6 +418,9 @@ class SessionsManager {
         self::getInstance()->sessionsArr = [];
         self::getInstance()->sessionStorage = new DefaultSessionStorage();
         self::getInstance()->activeSession = null;
+        self::getInstance()->gcProbability = 1;
+        self::getInstance()->gcDivisor = 100;
+        self::getInstance()->gcBatchSize = 100;
     }
     /**
      * Sets session variable.
@@ -396,6 +444,34 @@ class SessionsManager {
         }
 
         return false;
+    }
+    /**
+     * Sets the maximum number of sessions to remove per GC run.
+     *
+     * @param int $size Maximum number of sessions to remove. 0 means no limit.
+     */
+    public static function setGCBatchSize(int $size) {
+        if ($size >= 0) {
+            self::getInstance()->gcBatchSize = $size;
+        }
+    }
+    /**
+     * Sets the GC probability and divisor.
+     *
+     * GC will run with a probability of $probability/$divisor on each request.
+     * For example, setGCProbability(1, 100) means 1% chance per request.
+     *
+     * @param int $probability The numerator. Must be >= 0.
+     * @param int $divisor The denominator. Must be > 0. Set to 0 to disable GC.
+     */
+    public static function setGCProbability(int $probability, int $divisor) {
+        if ($probability >= 0) {
+            self::getInstance()->gcProbability = $probability;
+        }
+
+        if ($divisor >= 0) {
+            self::getInstance()->gcDivisor = $divisor;
+        }
     }
     /**
      * Sets sessions storage engine.
@@ -459,9 +535,7 @@ class SessionsManager {
      * will store session state using specified storage engine. If the status
      * of the session is killed, the method will remove session state from
      * the storage. In addition to that, the method will garbage-collect all
-     * sessions which are not active anymore. The garbage collection algorithm
-     * will depend on the way the developer have implemented his own sessions
-     * storage engine.
+     * sessions which are not active anymore based on GC probability settings.
      *
      * @since 1.0
      */
@@ -477,7 +551,10 @@ class SessionsManager {
                 self::getStorage()->remove($session->getId());
             }
         }
-        self::getStorage()->gc();
+
+        if (self::shouldRunGC()) {
+            self::getStorage()->gc(self::getGCTime(), self::getGCBatchSize());
+        }
     }
 
     /**
@@ -547,5 +624,25 @@ class SessionsManager {
         foreach ($this->sessionsArr as $session) {
             $session->close();
         }
+    }
+    /**
+     * Determines if GC should run on this request based on probability settings.
+     *
+     * @return bool True if GC should run.
+     */
+    private static function shouldRunGC(): bool {
+        $divisor = self::getInstance()->gcDivisor;
+
+        if ($divisor <= 0) {
+            return false;
+        }
+
+        $probability = self::getInstance()->gcProbability;
+
+        if ($probability <= 0) {
+            return false;
+        }
+
+        return random_int(1, $divisor) <= $probability;
     }
 }

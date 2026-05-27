@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -17,15 +18,21 @@ namespace WebFiori\Framework\Session;
  *
  * @since 1.1.0
  *
- * @version 1.0
+ * @version 1.1
  */
 interface SessionStorage {
     /**
-     * Removes all inactive sessions from the storage.
+     * Removes sessions that are older than the given time.
+     *
+     * @param string $olderThan A date string in the format 'Y-m-d H:i:s'.
+     * Sessions not modified since this time should be removed.
+     *
+     * @param int $maxCount Maximum number of sessions to remove in this run.
+     * 0 means no limit.
      *
      * @since 1.0
      */
-    public function gc();
+    public function gc(string $olderThan, int $maxCount = 0);
     /**
      * Reads session state.
      *

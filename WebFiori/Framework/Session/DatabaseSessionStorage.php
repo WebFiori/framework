@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -18,7 +19,7 @@ use WebFiori\Framework\Exceptions\SessionException;
  *
  * @author Ibrahim
  *
- * @version 1.0
+ * @version 1.1
  *
  * @since 2.1.0
  */
@@ -57,10 +58,24 @@ class DatabaseSessionStorage implements SessionStorage {
         $this->getController()->table('sessions')->drop()->execute();
     }
     /**
-     * Removes all inactive sessions from the database.
+     * Removes sessions that are older than the given time.
+     *
+     * @param string $olderThan A date string in the format 'Y-m-d H:i:s'.
+     * Sessions not modified since this time should be removed.
+     *
+     * @param int $maxCount Maximum number of sessions to remove in this run.
+     * 0 means no limit.
      */
-    public function gc() {
-        $this->dbController->gc();
+    public function gc(string $olderThan, int $maxCount = 0) {
+        $ids = $this->dbController->getSessionsIDs($olderThan);
+
+        if ($maxCount > 0) {
+            $ids = array_slice($ids, 0, $maxCount);
+        }
+
+        foreach ($ids as $id) {
+            $this->dbController->removeSession($id);
+        }
     }
     /**
      * Returns the instance at which the storage is using to send queries to

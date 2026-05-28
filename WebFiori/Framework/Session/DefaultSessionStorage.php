@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,7 +12,6 @@
 namespace WebFiori\Framework\Session;
 
 use WebFiori\Cli\Runner;
-use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
 use WebFiori\Framework\Exceptions\SessionException;
 /**
@@ -52,27 +52,34 @@ class DefaultSessionStorage implements SessionStorage {
         }
     }
     /**
-     * Removes all inactive sessions.
+     * Removes sessions that are older than the given time.
      *
-     * This method will check if the constant 'SESSION_GC' is existed and its value
-     * is valid. If exist and valid, it will be used as reference for removing
-     * old sessions. If it does not exist, the method will remove any inactive
-     * session which is older than 30 days.
+     * @param string $olderThan A date string in the format 'Y-m-d H:i:s'.
+     * Sessions not modified since this time should be removed.
      *
+     * @param int $maxCount Maximum number of sessions to remove in this run.
+     * 0 means no limit.
      */
-    public function gc() {
+    public function gc(string $olderThan, int $maxCount = 0) {
         if (!$this->isStorageDirExist()) {
             return;
         }
-        $sessionsFiles = array_diff(scandir($this->storeLoc), ['.','..']);
 
-        $olderThan = SessionsManager::getGCTime();
+        $sessionsFiles = array_diff(scandir($this->storeLoc), ['.', '..']);
+        $removed = 0;
+        $olderThanTimestamp = strtotime($olderThan);
 
         foreach ($sessionsFiles as $file) {
-            $fileObj = new File($this->storeLoc.DS.$file);
+            if ($maxCount > 0 && $removed >= $maxCount) {
+                break;
+            }
 
-            if ($fileObj->getLastModified() < $olderThan) {
-                $fileObj->remove();
+            $filePath = $this->storeLoc.DS.$file;
+            $mtime = filemtime($filePath);
+
+            if ($mtime !== false && $mtime < $olderThanTimestamp) {
+                unlink($filePath);
+                $removed++;
             }
         }
     }
@@ -100,6 +107,8 @@ class DefaultSessionStorage implements SessionStorage {
         if ($this->isStorageDirExist()) {
             return file_exists($this->storeLoc.DS.$sId);
         }
+
+        return false;
     }
     /**
      * Reads a session from session file.
@@ -109,8 +118,6 @@ class DefaultSessionStorage implements SessionStorage {
      * @return string|null If the method successfully accessed session state,
      * the method will return a string that represents the session. Other than that,
      * the method will return null.
-     *
-     * @throws FileException
      */
     public function read(string $sessionId) {
         if (!$this->isStorageDirExist()) {
@@ -123,6 +130,8 @@ class DefaultSessionStorage implements SessionStorage {
 
             return $file->getRawData();
         }
+
+        return null;
     }
     /**
      * Removes session file.
@@ -142,8 +151,6 @@ class DefaultSessionStorage implements SessionStorage {
      * @param string $sessionId The session that will be stored.
      *
      * @param string $serializedSession The session that will be stored.
-     *
-     * @throws FileException
      */
     public function save(string $sessionId, string $serializedSession) {
         if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__') || class_exists('PHPUnit\\Framework\\TestCase')) && $this->isStorageDirExist()) {

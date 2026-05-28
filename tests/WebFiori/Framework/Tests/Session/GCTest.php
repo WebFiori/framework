@@ -35,7 +35,6 @@ class GCTest extends TestCase {
         $storage = new DefaultSessionStorage();
         $ref = new \ReflectionClass($storage);
         $prop = $ref->getProperty('storeLoc');
-        $prop->setAccessible(true);
         $prop->setValue($storage, $this->tempDir);
 
         // GC with threshold of 1 hour ago
@@ -60,7 +59,6 @@ class GCTest extends TestCase {
         $storage = new DefaultSessionStorage();
         $ref = new \ReflectionClass($storage);
         $prop = $ref->getProperty('storeLoc');
-        $prop->setAccessible(true);
         $prop->setValue($storage, $this->tempDir);
 
         // Should not throw
@@ -87,7 +85,6 @@ class GCTest extends TestCase {
         $storage = new DefaultSessionStorage();
         $ref = new \ReflectionClass($storage);
         $prop = $ref->getProperty('storeLoc');
-        $prop->setAccessible(true);
         $prop->setValue($storage, $this->tempDir);
 
         // GC with no limit (0)
@@ -114,7 +111,6 @@ class GCTest extends TestCase {
         $storage = new DefaultSessionStorage();
         $ref = new \ReflectionClass($storage);
         $prop = $ref->getProperty('storeLoc');
-        $prop->setAccessible(true);
         $prop->setValue($storage, $this->tempDir);
 
         // GC with batch limit of 5

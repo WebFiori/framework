@@ -67,6 +67,10 @@ class JsonDriver implements ConfigurationDriver {
                 "CLI_HTTP_HOST" => new Json([
                     "value" => "127.0.0.1",
                     "description" => "Host name that will be used when runing the application as command line utility."
+                ], 'none', 'same'),
+                "SESSION_KEY" => new Json([
+                    "value" => bin2hex(random_bytes(32)),
+                    "description" => "A secret key used for encrypting session data at rest. Auto-generated on first run. Changing this will invalidate all existing sessions."
                 ], 'none', 'same')
             ], 'none', 'same'),
             'smtp-connections' => new Json([], 'none', 'same'),

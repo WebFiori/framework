@@ -999,6 +999,10 @@ class ClassDriver implements ConfigurationDriver {
                 "CLI_HTTP_HOST" => [
                     "value" => "127.0.0.1",
                     "description" => "Host name that will be used when runing the application as command line utility."
+                ],
+                "SESSION_KEY" => [
+                    "value" => bin2hex(random_bytes(32)),
+                    "description" => "A secret key used for encrypting session data at rest. Auto-generated on first run. Changing this will invalidate all existing sessions."
                 ]
             ],
             'site' => [

@@ -207,66 +207,20 @@ class Session implements JsonI {
      * @throws SessionException
      */
     public function deserialize(string $serialized): bool {
-        $cipherMeth = 'aes-256-ctr';
-        $split = explode('_', $serialized);
-        $len = $split[0];
-        $serialized = $split[1];
-        // [Decrypt] => decode => deserialize
-
-        if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
-
-            //Shall we use IP address in key or not?
-            //It would add more security. But the session will be invalid
-            //If user changes network.
-            $key = $this->getId().$userAgent;
-
-            $iv = substr(hash('sha256', $key), 0,16);
-            $decrypted = substr(openssl_decrypt(substr($serialized, 0, $len), $cipherMeth, $key,0, $iv), 0, $len);
-
-            if (strlen($decrypted) > 0) {
-                set_error_handler(function ($errNo, $errStr, $errFile, $errLine)
-                {
-                    throw  new SessionException($errStr.' at line '.$errLine, $errNo);
-                });
-                try {
-                    $sessionObj = unserialize(base64_decode(trim($decrypted)));
-                    restore_error_handler();
-                } catch (SessionException $ex) {
-                    restore_error_handler();
-                    return false;
-                }
-                
-
-                if ($sessionObj instanceof Session) {
-                    $this->sessionStatus = SessionStatus::RESUMED;
-                    $this->cloneHelper($sessionObj);
-
-                    return true;
-                }
-            }
+        if (str_starts_with($serialized, 'ENC:')) {
+            $plaintext = $this->decryptSession(substr($serialized, 4));
+        } else if (str_starts_with($serialized, 'RAW:')) {
+            $plaintext = substr($serialized, 4);
         } else {
-            set_error_handler(function ($errNo, $errStr)
-            {
-                throw  new SessionException($errStr, $errNo);
-            });
-            try {
-                $sessionObj = unserialize(base64_decode($serialized));
-                restore_error_handler();
-            } catch (SessionException $ex) {
-                restore_error_handler();
-                return false;
-            }
-
-            if ($sessionObj instanceof Session) {
-                $this->sessionStatus = SessionStatus::RESUMED;
-                $this->cloneHelper($sessionObj);
-
-                return true;
-            }
+            // Legacy format (len_ciphertext)
+            $plaintext = $this->decryptLegacy($serialized);
         }
 
-        return false;
+        if ($plaintext === null) {
+            return false;
+        }
+
+        return $this->restoreFromPlaintext($plaintext);
     }
     /**
      * Generate a random session ID.
@@ -593,31 +547,25 @@ class Session implements JsonI {
      * Serialize the session.
      *
      * @return string The method will return a string that represents serialized
-     * session data. Note that if openssl is enabled and the cipher aes-256-ctr
-     * is supported, returned string will be encrypted.
+     * session data. If the constant SESSION_KEY is defined and non-empty,
+     * the data will be encrypted using AES-256-GCM. Otherwise, it will be
+     * stored as base64-encoded plaintext.
      *
      */
     public function serialize() : string {
-        // Serialize => Encode => [Encrypt]
-        $serializedSession = base64_encode(trim(serialize($this)));
-        $len = strlen($serializedSession);
+        $plaintext = base64_encode(serialize($this));
+        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
 
-        $cipherMeth = 'aes-256-ctr';
+        if ($sessionKey !== null && $sessionKey !== '') {
+            $key = hash('sha256', $sessionKey.$this->getId(), true);
+            $iv = random_bytes(12);
+            $tag = '';
+            $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
-        if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            //Need to do more research about the security of this approach.
-
-            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
-            //Shall we use IP address in key or not?
-            //It would add more security.
-            $key = $this->getId().$userAgent;
-
-            $iv = substr(hash('sha256', $key), 0,16);
-            $serializedSession = openssl_encrypt($serializedSession, $cipherMeth, $key,0, $iv);
-            $len = strlen($serializedSession);
+            return 'ENC:'.base64_encode($iv.$tag.$ciphertext);
         }
 
-        return $len.'_'.$serializedSession;
+        return 'RAW:'.$plaintext;
     }
     /**
      * Sets session variable.
@@ -752,6 +700,81 @@ class Session implements JsonI {
         $json->addArray('vars', $this->getVars(), true);
 
         return $json;
+    }
+    private function decryptSession(string $encoded): ?string {
+        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
+
+        if ($sessionKey === null || $sessionKey === '') {
+            return null;
+        }
+
+        $raw = base64_decode($encoded, true);
+
+        if ($raw === false || strlen($raw) < 29) {
+            return null;
+        }
+
+        $iv = substr($raw, 0, 12);
+        $tag = substr($raw, 12, 16);
+        $ciphertext = substr($raw, 28);
+
+        $key = hash('sha256', $sessionKey.$this->getId(), true);
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        return $plaintext !== false ? $plaintext : null;
+    }
+    private function decryptLegacy(string $serialized): ?string {
+        $split = explode('_', $serialized, 2);
+
+        if (count($split) !== 2) {
+            return null;
+        }
+
+        $len = intval($split[0]);
+        $data = $split[1];
+        $cipherMeth = 'aes-256-ctr';
+
+        if (in_array($cipherMeth, openssl_get_cipher_methods())) {
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
+            $key = $this->getId().$userAgent;
+            $iv = substr(hash('sha256', $key), 0, 16);
+            $decrypted = openssl_decrypt(substr($data, 0, $len), $cipherMeth, $key, 0, $iv);
+
+            if ($decrypted !== false && strlen($decrypted) > 0) {
+                $decoded = base64_decode(substr($decrypted, 0, $len), true);
+
+                if ($decoded !== false && $decoded !== '') {
+                    return substr($decrypted, 0, $len);
+                }
+            }
+        }
+
+        // Try as unencrypted legacy (no openssl or decryption produced invalid data)
+        return $data;
+    }
+    private function restoreFromPlaintext(string $plaintext): bool {
+        set_error_handler(function ($errNo, $errStr)
+        {
+            throw new SessionException($errStr, $errNo);
+        });
+
+        try {
+            $sessionObj = unserialize(base64_decode($plaintext));
+            restore_error_handler();
+        } catch (SessionException $ex) {
+            restore_error_handler();
+
+            return false;
+        }
+
+        if ($sessionObj instanceof Session) {
+            $this->sessionStatus = SessionStatus::RESUMED;
+            $this->cloneHelper($sessionObj);
+
+            return true;
+        }
+
+        return false;
     }
     private function checkIfExpired() {
         if ($this->getRemainingTime() < 0) {

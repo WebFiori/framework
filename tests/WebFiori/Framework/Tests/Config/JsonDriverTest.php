@@ -41,7 +41,7 @@ class JsonDriverTest extends TestCase {
                 "value" => "127.0.0.1",
                 'description' => 'Host name that will be used when runing the application as command line utility.'
             ],
-        ],$driver->getEnvVars());
+        ], array_diff_key($driver->getEnvVars(), ['SESSION_KEY' => true]));
         $this->assertEquals('https://127.0.0.1',$driver->getHomePage());
         $this->assertEquals('EN',$driver->getPrimaryLanguage());
         $this->assertEquals([
@@ -72,7 +72,7 @@ class JsonDriverTest extends TestCase {
                 "value" => "127.0.0.1",
                 "description" => "Host name that will be used when runing the application as command line utility."
             ]
-        ], $driver->getEnvVars());
+        ], array_diff_key($driver->getEnvVars(), ['SESSION_KEY' => true]));
         $driver->addEnvVar('COOL_OR_NOT', 'cool');
         $driver->addEnvVar('DO_IT', false);
         $driver->addEnvVar('MULTIPLY_BY', 4, 'A number to multiply by.');
@@ -109,7 +109,7 @@ class JsonDriverTest extends TestCase {
                 "value" => null,
                 "description" => null
             ]
-        ], $driver->getEnvVars());
+        ], array_diff_key($driver->getEnvVars(), ['SESSION_KEY' => true]));
         $driver->removeEnvVar('COOL_OR_NOT');
     }
     /**
@@ -139,7 +139,7 @@ class JsonDriverTest extends TestCase {
                 "value" => null,
                 "description" => null
             ]
-        ], $driver->getEnvVars());
+        ], array_diff_key($driver->getEnvVars(), ['SESSION_KEY' => true]));
     }
     /**
      * @test

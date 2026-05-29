@@ -15,6 +15,7 @@ use WebFiori\Database\Database;
 use WebFiori\Database\DatabaseException;
 use WebFiori\Database\MsSql\MSSQLTable;
 use WebFiori\Database\MySql\MySQLTable;
+use WebFiori\Database\Sqlite\SQLiteTable;
 use WebFiori\Database\Table;
 
 /**
@@ -78,7 +79,8 @@ class DB extends Database {
         $connType = $this->getConnectionInfo()->getDatabaseType();
 
         if (($connType == 'mysql' && $table instanceof MySQLTable)
-         || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
+         || ($connType == 'mssql' && $table instanceof MSSQLTable)
+         || ($connType == 'sqlite' && $table instanceof SQLiteTable)) {
             foreach ($table->getForeignKeys() as $fk) {
                 parent::addTable($fk->getSource(), false);
             }

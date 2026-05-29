@@ -230,6 +230,15 @@ abstract class AbstractMiddleware implements Comparable {
      * For example, a middleware with priority 100 will be reached before a
      * middleware with priority 99.
      *
+     * Recommended priority ranges:
+     * <ul>
+     * <li>PHP_INT_MAX: Session and core infrastructure (e.g., StartSessionMiddleware)</li>
+     * <li>10000 - 99999: Security middleware (rate limiting, CSRF, authentication)</li>
+     * <li>1000 - 9999: Application-level middleware (authorization, locale)</li>
+     * <li>100 - 999: Feature middleware (caching, compression)</li>
+     * <li>1 - 99: Logging, metrics, and diagnostics</li>
+     * </ul>
+     *
      * @param int $priority Middleware priority.
      *
      * @since 1.0

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -10,15 +11,17 @@
  */
 namespace WebFiori\Framework\Session;
 
+use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\DB;
+
 /**
  * A class which includes all database related operations to add, update,
  * and delete sessions from a database.
  *
  * @author Ibrahim
  *
- * @version 1.0
+ * @version 2.0
  *
  * @since 2.1.1
  */
@@ -26,26 +29,32 @@ class SessionDB extends DB {
     /**
      * Creates new instance of the class.
      *
-     * @throws DatabaseException
-     * @since 1.0
-     */
-    public function __construct() {
-        parent::__construct('sessions-connection');
-        $this->addTable(new MySQLSessionsTable());
-        $this->addTable(new MSSQLSessionsTable());
-        $this->addTable(new MSSQLSessionDataTable());
-        $this->addTable(new MySQLSessionDataTable());
-    }
-    /**
-     * Clears the sessions which are older than the constant 'SESSION_GC' or
-     * older than 30 days if the constant is not defined.
+     * @param string|ConnectionInfo $connection The name of the connection or a ConnectionInfo object.
      *
      * @throws DatabaseException
      * @since 1.0
      */
-    public function gc() {
-        $date = SessionsManager::getGCTime();
-        $ids = $this->getSessionsIDs($date);
+    public function __construct($connection = 'sessions-connection') {
+        parent::__construct($connection);
+        $dbType = $this->getConnectionInfo()->getDatabaseType();
+        $this->addTable(SessionSchema::createSessionsTable($dbType));
+        $this->addTable(SessionSchema::createSessionDataTable($dbType));
+    }
+    /**
+     * Clears the sessions which are older than the given date.
+     *
+     * @param string $olderThan A date-time string in the format 'YYYY-MM-DD HH:MM:SS'.
+     * @param int $maxCount Maximum number of sessions to remove. 0 means no limit.
+     *
+     * @throws DatabaseException
+     * @since 2.0
+     */
+    public function gc(string $olderThan, int $maxCount = 0) {
+        $ids = $this->getSessionsIDs($olderThan);
+
+        if ($maxCount > 0) {
+            $ids = array_slice($ids, 0, $maxCount);
+        }
 
         foreach ($ids as $id) {
             $this->removeSession($id);
@@ -102,6 +111,8 @@ class SessionDB extends DB {
 
             return base64_decode($retVal);
         }
+
+        return null;
     }
 
     /**
@@ -121,7 +132,7 @@ class SessionDB extends DB {
         return $this->table('sessions')->select()->where('last-used', $olderThan, '<=')->execute()
             ->map(function ($record)
             {
-                return $record['s_id'];
+                return $record['s-id'] ?? $record['s_id'] ?? null;
             })->toArray();
     }
 
@@ -203,21 +214,13 @@ class SessionDB extends DB {
      */
     private function getChunks(string $data) : array {
         $retVal = [];
-        $index = 0;
         $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
         $dataLen = strlen($data);
+        $index = 0;
 
         while ($index < $dataLen) {
             $retVal[] = substr($data, $index, $chunkSize);
             $index += $chunkSize;
-        }
-
-        //This part is to add any extra remaining
-        //data in the last part of the session
-        $remainingChars = $dataLen - count($retVal) * $chunkSize;
-
-        if ($remainingChars > 0) {
-            $retVal[] = substr($data, $index);
         }
 
         return $retVal;
@@ -270,7 +273,7 @@ class SessionDB extends DB {
 
         if ($currentChunksCount > $newChunksCount) {
             $chunksCountToRemove = $currentChunksCount - $newChunksCount;
-            $this->removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount + 1);
+            $this->removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount);
         }
     }
 }

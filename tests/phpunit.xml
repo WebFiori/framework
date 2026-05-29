@@ -70,12 +70,9 @@
 
             <file>../WebFiori/Framework/Session/DatabaseSessionStorage.php</file>
             <file>../WebFiori/Framework/Session/DefaultSessionStorage.php</file>
-            <file>../WebFiori/Framework/Session/MSSQLSessionDataTable.php</file>
-            <file>../WebFiori/Framework/Session/MSSQLSessionsTable.php</file>
-            <file>../WebFiori/Framework/Session/MySQLSessionDataTable.php</file>
-            <file>../WebFiori/Framework/Session/MySQLSessionsTable.php</file>
             <file>../WebFiori/Framework/Session/Session.php</file>
             <file>../WebFiori/Framework/Session/SessionDB.php</file>
+      <file>../WebFiori/Framework/Session/SessionSchema.php</file>
             <file>../WebFiori/Framework/Session/SessionOption.php</file>
             <file>../WebFiori/Framework/Session/SessionStatus.php</file>
             <file>../WebFiori/Framework/Session/SessionStorage.php</file>

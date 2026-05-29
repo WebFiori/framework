@@ -11,6 +11,7 @@
  */
 namespace WebFiori\Framework\Session;
 
+use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\Exceptions\SessionException;
 
@@ -19,7 +20,7 @@ use WebFiori\Framework\Exceptions\SessionException;
  *
  * @author Ibrahim
  *
- * @version 1.1
+ * @version 2.0
  *
  * @since 2.1.0
  */
@@ -31,17 +32,26 @@ class DatabaseSessionStorage implements SessionStorage {
     private $dbController;
 
     /**
-     * Creates new instance of the class
+     * Creates new instance of the class.
+     *
+     * @param string|ConnectionInfo $connection The name of the database connection to use,
+     * or a ConnectionInfo object directly.
      *
      * @throws SessionException
      * @since 1.0
      */
-    public function __construct() {
+    public function __construct($connection = 'sessions-connection') {
         try {
-            $this->dbController = new SessionDB();
+            if ($connection instanceof ConnectionInfo) {
+                $this->dbController = new SessionDB($connection);
+            } else {
+                $this->dbController = new SessionDB($connection);
+            }
         } catch (DatabaseException $ex) {
-            if (strpos($ex->getMessage(), 'sessions-connection') !== false) {
-                throw new SessionException("Connection 'sessions-connection' was not found in application configuration.");
+            $connName = $connection instanceof ConnectionInfo ? $connection->getName() : $connection;
+
+            if (strpos($ex->getMessage(), $connName) !== false) {
+                throw new SessionException("Connection '$connName' was not found in application configuration.");
             } else {
                 throw $ex;
             }
@@ -67,15 +77,7 @@ class DatabaseSessionStorage implements SessionStorage {
      * 0 means no limit.
      */
     public function gc(string $olderThan, int $maxCount = 0) {
-        $ids = $this->dbController->getSessionsIDs($olderThan);
-
-        if ($maxCount > 0) {
-            $ids = array_slice($ids, 0, $maxCount);
-        }
-
-        foreach ($ids as $id) {
-            $this->dbController->removeSession($id);
-        }
+        $this->dbController->gc($olderThan, $maxCount);
     }
     /**
      * Returns the instance at which the storage is using to send queries to
@@ -88,7 +90,6 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Reads session state.
-     *
      *
      * @param string $sessionId The unique identifier of the session.
      *
@@ -113,7 +114,6 @@ class DatabaseSessionStorage implements SessionStorage {
     }
     /**
      * Store session state.
-     *
      *
      * @param string $sessionId The ID of the session that will be stored.
      *

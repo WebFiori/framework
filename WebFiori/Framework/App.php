@@ -349,6 +349,8 @@ class App {
                 $commands = [
                     '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\DownCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\UpCommand',
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',
@@ -888,6 +890,7 @@ class App {
             Ini::get()->createIniClass('Middleware', 'Register middleware which are created outside the folder \'[APP_DIR]/Middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
+        MiddlewareManager::register(new Middleware\CheckMaintenanceMode());
         self::call(APP_DIR.'\Ini\Middleware::initialize');
     }
     /**

@@ -631,11 +631,19 @@ class RouterUri extends RequestUri {
             return [];
         }
 
-        // Build name-to-middleware map
+        // Build name-to-middleware map (skip empty names)
         $byName = [];
 
         foreach ($middlewareList as $mw) {
-            $byName[$mw->getName()] = $mw;
+            $name = $mw->getName();
+
+            if ($name !== '') {
+                $byName[$name] = $mw;
+            }
+        }
+
+        if (empty($byName)) {
+            return $middlewareList;
         }
 
         // Build adjacency list (dependency graph)
@@ -699,7 +707,7 @@ class RouterUri extends RequestUri {
             });
         }
 
-        if (count($sorted) !== count($middlewareList)) {
+        if (count($sorted) !== count($byName)) {
             // Circular dependency detected — find the cycle
             $remaining = array_diff(array_keys($inDegree), array_map(fn ($m) => $m->getName(), $sorted));
 

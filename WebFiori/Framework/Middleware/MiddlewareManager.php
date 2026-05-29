@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -10,107 +11,67 @@
  */
 namespace WebFiori\Framework\Middleware;
 
-use Exception;
-
 /**
- * This class is used to manage the operations which are related to middleware.
+ * A static facade for the MiddlewareRegistry class.
+ *
+ * Provides a convenient static API that delegates to a default MiddlewareRegistry instance.
+ * For dependency injection or testing, use MiddlewareRegistry directly.
  *
  * @author Ibrahim
- *
  */
 class MiddlewareManager {
-    private static $inst;
     /**
-     *
-     * @var array
+     * @var MiddlewareRegistry|null
      */
-    private $middlewareList;
-    private function __construct() {
-        $this->middlewareList = [];
-    }
+    private static ?MiddlewareRegistry $inst = null;
     /**
-     * Returns a set of middleware that belongs to a specific group.
+     * Returns the default MiddlewareRegistry instance.
      *
-     * @param string $groupName The name of the group.
-     *
-     * @return array The method will return a linked list with all
-     * middleware in the group. If no group which has the given name exist, the
-     * list will be empty.
+     * @return MiddlewareRegistry
      */
-    public static function getGroup(string $groupName) : array {
-        $list = [];
-        $mdList = self::get()->middlewareList;
-
-        foreach ($mdList as $mw) {
-            if (in_array($groupName, $mw->getGroups())) {
-                $list[] = $mw;
-            }
-        }
-
-        return $list;
-    }
-    /**
-     * Returns a registered middleware given its name.
-     *
-     * @param string $name The name of the middleware.
-     *
-     * @return AbstractMiddleware|null If a middleware with the given name is
-     * found, the method will return it. Other than that, the method will return
-     * null.
-     */
-    public static function getMiddleware(string $name) {
-        $mdList = self::get()->middlewareList;
-
-        foreach ($mdList as $mw) {
-            if ($mw->getName() == $name) {
-                return $mw;
-            }
-        }
-    }
-    /**
-     * Register a new middleware.
-     *
-     * @param AbstractMiddleware|string $middleware The middleware that will be registered.
-     */
-    public static function register($middleware) : bool {
-        if (gettype($middleware) == 'string') {
-            try {
-                $middleware = new $middleware();
-            } catch (Exception $exc) {
-                return false;
-            }
-        }
-        if ($middleware instanceof AbstractMiddleware) {
-            self::get()->middlewareList[] = $middleware;
-            return true;
-        }
-        return false;
-    }
-    /**
-     * Removes a middleware given its name.
-     *
-     * @param string $name The name of the middleware.
-     */
-    public static function remove(string $name) {
-        $manager = self::get();
-        $newList = [];
-        
-        foreach ($manager->middlewareList as $md) {
-            if ($md->getName() != $name) {
-                $newList[] = $md;
-            }
-        }
-        $manager->middlewareList = $newList;
-    }
-    /**
-     *
-     * @return MiddlewareManager
-     */
-    private static function get() {
+    public static function getInstance(): MiddlewareRegistry {
         if (self::$inst === null) {
-            self::$inst = new MiddlewareManager();
+            self::$inst = new MiddlewareRegistry();
         }
 
         return self::$inst;
+    }
+    /**
+     * Replaces the default MiddlewareRegistry instance.
+     *
+     * @param MiddlewareRegistry $registry The registry to use as default.
+     */
+    public static function setInstance(MiddlewareRegistry $registry): void {
+        self::$inst = $registry;
+    }
+    /**
+     * Destroys the default instance. Next call creates a fresh one.
+     */
+    public static function reset(): void {
+        self::$inst = null;
+    }
+    /**
+     * @see MiddlewareRegistry::getGroup()
+     */
+    public static function getGroup(string $groupName): array {
+        return self::getInstance()->getGroup($groupName);
+    }
+    /**
+     * @see MiddlewareRegistry::getMiddleware()
+     */
+    public static function getMiddleware(string $name): ?AbstractMiddleware {
+        return self::getInstance()->getMiddleware($name);
+    }
+    /**
+     * @see MiddlewareRegistry::register()
+     */
+    public static function register($middleware): bool {
+        return self::getInstance()->register($middleware);
+    }
+    /**
+     * @see MiddlewareRegistry::remove()
+     */
+    public static function remove(string $name): void {
+        self::getInstance()->remove($name);
     }
 }

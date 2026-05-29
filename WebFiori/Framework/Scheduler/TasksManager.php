@@ -280,6 +280,20 @@ class TasksManager {
         return self::$tasksManager;
     }
     /**
+     * Replaces the default TasksManager instance.
+     *
+     * @param TasksManager $manager The instance to use.
+     */
+    public static function setInstance(TasksManager $manager): void {
+        self::$tasksManager = $manager;
+    }
+    /**
+     * Destroys the default instance. Next call to get() creates a fresh one.
+     */
+    public static function resetInstance(): void {
+        self::$tasksManager = null;
+    }
+    /**
      * Returns the number of current hour in the day as integer.
      *
      * This method is used by the class 'AbstractTask' to validate task

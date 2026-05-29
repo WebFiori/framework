@@ -195,6 +195,18 @@ abstract class AbstractMiddleware implements Comparable {
      *
      * @since 1.0
      */
+    /**
+     * Returns an array of middleware names that this middleware depends on.
+     *
+     * Middleware listed here will be executed before this one. The framework
+     * performs a topological sort based on these dependencies to determine
+     * execution order.
+     *
+     * @return array An array of middleware names (strings).
+     */
+    public function getDependencies(): array {
+        return [];
+    }
     public function getPriority() : int {
         return $this->priority;
     }

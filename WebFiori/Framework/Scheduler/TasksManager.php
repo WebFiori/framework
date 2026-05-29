@@ -23,7 +23,6 @@ use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
 use WebFiori\Framework\Scheduler\WebUI\SetPasswordPage;
 use WebFiori\Framework\Scheduler\WebUI\TasksLoginPage;
 use WebFiori\Framework\Session\SessionsManager;
-use WebFiori\Framework\Util;
 /**
  * A class that is used to manage scheduled background tasks.
  *
@@ -920,7 +919,7 @@ class TasksManager {
      */
     private function logExecHelper($forced, $task, File $file) {
         if ($forced) {
-            $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+            $file->setRawData('Task \''.$task->getTaskName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".App::getRequest()->getClientIP()."\n");
         } else {
             $file->setRawData('Task \''.$task->getTaskName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
         }

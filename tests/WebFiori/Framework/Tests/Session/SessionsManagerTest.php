@@ -16,6 +16,15 @@ use WebFiori\Framework\Session\SessionStatus;
  * @author Ibrahim
  */
 class SessionsManagerTest extends TestCase {
+
+    private function skipIfMssqlUnavailable(): void {
+        try {
+            $dsn = 'sqlsrv:Server='.SQL_SERVER_HOST.',1433;Database='.SQL_SERVER_DB.';TrustServerCertificate=true';
+            new \PDO($dsn, SQL_SERVER_USER, SQL_SERVER_PASS);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('MSSQL not available: '.$e->getMessage());
+        }
+    }
     /**
      * @test
      */
@@ -159,6 +168,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testDatabaseSession01() {
+        $this->skipIfMssqlUnavailable();
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
@@ -174,6 +184,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testDatabaseSession02() {
+        $this->skipIfMssqlUnavailable();
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -282,6 +293,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testDropDbTables00() {
+        $this->skipIfMssqlUnavailable();
         $this->expectException(DatabaseException::class);
         $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
@@ -313,6 +325,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testInitSessionsDb() {
+        $this->skipIfMssqlUnavailable();
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -330,6 +343,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testDbSessions00() {
+        $this->skipIfMssqlUnavailable();
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -433,6 +447,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function testCloseDb00() {
+        $this->skipIfMssqlUnavailable();
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);

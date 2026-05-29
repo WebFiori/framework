@@ -182,11 +182,19 @@ class RouterUri extends RequestUri {
     /**
      * Adds the URI to middleware or to middleware group.
      *
-     * @param string $name The name of the middleware or the group.
+     * @param string|AbstractMiddleware $middleware The name of the middleware,
+     * the group name, or a pre-configured middleware instance.
      *
      * @since 1.4
      */
-    public function addMiddleware(string $name) {
+    public function addMiddleware(string|AbstractMiddleware $middleware) {
+        if ($middleware instanceof AbstractMiddleware) {
+            MiddlewareManager::register($middleware);
+            $this->assignedMiddlewareList[] = $middleware;
+
+            return;
+        }
+        $name = $middleware;
         $mw = MiddlewareManager::getMiddleware($name);
 
         if ($mw === null) {
@@ -290,13 +298,9 @@ class RouterUri extends RequestUri {
      */
     public function getMiddleware() : array {
         if (count($this->assignedMiddlewareList) != count($this->sortedMiddleeareList)) {
-            $compareFunc = function ($a, $b) {
-                return $a->compare($b);
-            };
-            $this->sortedMiddleeareList = $this->assignedMiddlewareList;
-            
-            usort($this->sortedMiddleeareList, $compareFunc);
+            $this->sortedMiddleeareList = $this->sortByDependencies($this->assignedMiddlewareList);
         }
+
         return $this->sortedMiddleeareList;
     }
 
@@ -610,5 +614,100 @@ class RouterUri extends RequestUri {
         $requestedPath = $requestedArr['path'];
 
         return $this->comparePathHelper($originalPath, $requestedPath);
+    }
+
+    /**
+     * Sorts middleware using topological sort based on dependencies.
+     * Falls back to priority for middleware with no dependency relationship.
+     *
+     * @param array $middlewareList Array of AbstractMiddleware instances.
+     *
+     * @return array Sorted array.
+     *
+     * @throws \WebFiori\Framework\Exceptions\RoutingException If circular dependency detected.
+     */
+    private function sortByDependencies(array $middlewareList): array {
+        if (empty($middlewareList)) {
+            return [];
+        }
+
+        // Build name-to-middleware map
+        $byName = [];
+
+        foreach ($middlewareList as $mw) {
+            $byName[$mw->getName()] = $mw;
+        }
+
+        // Build adjacency list (dependency graph)
+        $graph = [];
+        $inDegree = [];
+
+        foreach ($middlewareList as $mw) {
+            $name = $mw->getName();
+
+            if (!isset($graph[$name])) {
+                $graph[$name] = [];
+            }
+
+            if (!isset($inDegree[$name])) {
+                $inDegree[$name] = 0;
+            }
+
+            foreach ($mw->getDependencies() as $dep) {
+                if (isset($byName[$dep])) {
+                    $graph[$dep][] = $name;
+
+                    if (!isset($inDegree[$dep])) {
+                        $inDegree[$dep] = 0;
+                    }
+                    $inDegree[$name]++;
+                }
+            }
+        }
+
+        // Kahn's algorithm with priority as tiebreaker
+        $queue = [];
+
+        foreach ($inDegree as $name => $degree) {
+            if ($degree === 0) {
+                $queue[] = $name;
+            }
+        }
+
+        // Sort initial queue by priority (higher first)
+        usort($queue, function ($a, $b) use ($byName) {
+            return $byName[$b]->getPriority() - $byName[$a]->getPriority();
+        });
+
+        $sorted = [];
+
+        while (!empty($queue)) {
+            $current = array_shift($queue);
+            $sorted[] = $byName[$current];
+
+            foreach ($graph[$current] as $neighbor) {
+                $inDegree[$neighbor]--;
+
+                if ($inDegree[$neighbor] === 0) {
+                    $queue[] = $neighbor;
+                }
+            }
+
+            // Re-sort queue by priority for tiebreaking
+            usort($queue, function ($a, $b) use ($byName) {
+                return $byName[$b]->getPriority() - $byName[$a]->getPriority();
+            });
+        }
+
+        if (count($sorted) !== count($middlewareList)) {
+            // Circular dependency detected — find the cycle
+            $remaining = array_diff(array_keys($inDegree), array_map(fn ($m) => $m->getName(), $sorted));
+
+            throw new \WebFiori\Framework\Exceptions\RoutingException(
+                "Circular middleware dependency detected involving: '".implode("', '", $remaining)."'"
+            );
+        }
+
+        return $sorted;
     }
 }

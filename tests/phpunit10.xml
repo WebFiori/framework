@@ -62,7 +62,6 @@
       <file>../WebFiori/Framework/Theme.php</file>
       <file>../WebFiori/Framework/ThemeManager.php</file>
       <file>../WebFiori/Framework/User.php</file>
-      <file>../WebFiori/Framework/Util.php</file>
 
       <file>../WebFiori/Framework/Autoload/ClassInfo.php</file>
       <file>../WebFiori/Framework/Autoload/ClassLoader.php</file>

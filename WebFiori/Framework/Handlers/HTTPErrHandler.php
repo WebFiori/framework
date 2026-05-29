@@ -43,6 +43,12 @@ class HTTPErrHandler extends AbstractHandler {
      * general server error message.
      */
     public function handle() {
+        $ex = $this->getException();
+        App::log()->error($ex->getMessage(), [
+            'file' => $ex->getFile(),
+            'line' => $ex->getLine(),
+            'trace' => $ex->getTraceAsString(),
+        ]);
         $exceptionView = new ServerErrPage($this);
         Response::clear();
         $exceptionView->render();

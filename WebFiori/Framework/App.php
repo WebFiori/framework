@@ -123,6 +123,11 @@ class App {
      * @since 1.0
      */
     private function __construct() {
+        // Initialize logger
+        $logDir = APP_PATH.'Storage'.DS.'Logs';
+        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? \WebFiori\Log\LogLevel::DEBUG : \WebFiori\Log\LogLevel::WARNING;
+        \WebFiori\Log\LoggerFacade::setInstance(new \WebFiori\Log\FileLogger($logDir, $minLevel));
+
         $this->checkAppDir();
         $this->setHandlers();
         Controller::get()->updateEnv();
@@ -305,6 +310,14 @@ class App {
      */
     public static function getResponse() : Response {
         return self::$Response;
+    }
+    /**
+     * Returns the application logger instance.
+     *
+     * @return \WebFiori\Log\Logger
+     */
+    public static function log(): \WebFiori\Log\Logger {
+        return \WebFiori\Log\LoggerFacade::getInstance();
     }
     /**
      * Returns an instance which represents the class that is used to run the

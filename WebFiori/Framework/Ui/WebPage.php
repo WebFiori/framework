@@ -25,7 +25,6 @@ use WebFiori\Framework\Session\Session;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Framework\Theme;
 use WebFiori\Framework\ThemeManager;
-use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 use WebFiori\Json\Json;
@@ -1221,7 +1220,7 @@ class WebPage {
 
     private function getHead() {
         $loadedTheme = $this->getTheme();
-        $defaultBase = Util::getBaseURL();
+        $defaultBase = App::getConfig()->getBaseURL();
         $base = $this->getConfigVar('getBaseURL', $defaultBase);
 
         $headNode = new HeadNode(
@@ -1304,7 +1303,7 @@ class WebPage {
 
                 $jsDir = ROOT_PATH.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getJsDirName();
 
-                if (Util::isDirectory($jsDir)) {
+                if (is_dir(str_replace('\\\\', '/', $jsDir))) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
                     $fileBase = $page->getThemeJSDir().'/';
 
@@ -1325,7 +1324,7 @@ class WebPage {
 
                 $cssDir = ROOT_PATH.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getCssDirName();
 
-                if (Util::isDirectory($cssDir)) {
+                if (is_dir(str_replace('\\\\', '/', $cssDir))) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
                     $fileBase = $page->getThemeCSSDir().'/';
 

@@ -6,7 +6,6 @@ use WebFiori\Framework\App;
 use WebFiori\Framework\Router\RouteOption;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Router\RouterUri;
-use WebFiori\Framework\Util;
 use WebFiori\Http\RequestMethod;
 use WebFiori\Http\Response;
 /**
@@ -101,7 +100,7 @@ class RouterTest extends TestCase {
         $this->assertNotNull($obj);
 
         $this->assertEquals(2, count($obj->getParameters()));
-        Router::route(Util::getBaseURL().'/hello/world');
+        Router::route(App::getConfig()->getBaseURL().'/hello/world');
 
         $this->assertEquals('hello', Router::getParameterValue('var-1'));
         $this->assertEquals('world',$obj->getParameterValue('var-2'));
@@ -119,7 +118,7 @@ class RouterTest extends TestCase {
             }
         ]);
 
-        Router::route(Util::getBaseURL().'/hello');
+        Router::route(App::getConfig()->getBaseURL().'/hello');
         $obj = Router::getRouteUri();
         $this->assertNotNull($obj);
         $this->assertEquals('hello',$obj->getParameterValue('var-1'));
@@ -142,7 +141,7 @@ class RouterTest extends TestCase {
         ]);
         $obj = Router::getRouteUri();
         $this->assertNull($obj);
-        Router::route(Util::getBaseURL().'/hello/world');
+        Router::route(App::getConfig()->getBaseURL().'/hello/world');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
         $this->assertEquals('hello',$obj->getParameterValue('var-1'));
@@ -163,7 +162,7 @@ class RouterTest extends TestCase {
             {
             }
         ]);
-        Router::route(Util::getBaseURL().'/hello/world/boy');
+        Router::route(App::getConfig()->getBaseURL().'/hello/world/boy');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
         $this->assertEquals('boy',$obj->getParameterValue('var-1'));

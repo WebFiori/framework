@@ -156,7 +156,19 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
             'type' => '',
             'credentials' => ''
         ];
-        $headers = Util::getRequestHeaders();
+        $headers = [];
+        if (function_exists('apache_request_headers')) {
+            foreach (apache_request_headers() as $k => $v) {
+                $headers[strtolower($k)] = filter_var($v, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            }
+        } else if (isset($_SERVER)) {
+            foreach ($_SERVER as $k => $v) {
+                if (str_starts_with($k, 'HTTP_')) {
+                    $key = strtolower(str_replace('_', '-', substr($k, 5)));
+                    $headers[$key] = filter_var($v, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                }
+            }
+        }
 
         if (isset($headers['authorization'])) {
             $split = explode(' ', $headers['authorization']);

@@ -16,6 +16,7 @@ use WebFiori\Cli\Runner;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
+use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Framework\Exceptions\RoutingException;
 use WebFiori\Framework\Ui\HTTPCodeView;
 use WebFiori\Framework\Ui\StarterPage;
@@ -950,10 +951,12 @@ class Router {
         $incInSiteMap = $options[RouteOption::SITEMAP] ?? false;
 
         if (isset($options[RouteOption::MIDDLEWARE])) {
-            if (gettype($options[RouteOption::MIDDLEWARE]) == 'array') {
-                $mdArr = $options[RouteOption::MIDDLEWARE];
-            } else if (gettype($options[RouteOption::MIDDLEWARE]) == 'string') {
-                $mdArr = [$options[RouteOption::MIDDLEWARE]];
+            $raw = $options[RouteOption::MIDDLEWARE];
+
+            if (is_array($raw)) {
+                $mdArr = $raw;
+            } else if (is_string($raw) || $raw instanceof AbstractMiddleware) {
+                $mdArr = [$raw];
             } else {
                 $mdArr = [];
             }

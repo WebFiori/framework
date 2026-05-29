@@ -22,6 +22,9 @@ class HelpCommandTest extends CLITestCase {
 
             "    down:                    Put the application in maintenance mode.\n",
             "    up:                      Bring the application out of maintenance mode.\n",
+            "    queue:status:            Show pending and failed job counts.\n",
+            "    queue:retry:             Retry or flush failed queue jobs.\n",
+            "    queue:work:              Process queue jobs continuously.\n",
             "    scheduler:               Run tasks scheduler.\n",
             "    scheduler:run:           Run the tasks scheduler check.\n",
             "    scheduler:daemon:        Run the scheduler in a loop for a limited duration.\n",

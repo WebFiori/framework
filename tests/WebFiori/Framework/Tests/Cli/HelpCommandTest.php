@@ -20,6 +20,8 @@ class HelpCommandTest extends CLITestCase {
             "    help:                    Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    v:                       Display framework version info.\n",
 
+            "    down:                    Put the application in maintenance mode.\n",
+            "    up:                      Bring the application out of maintenance mode.\n",
             "    scheduler:               Run tasks scheduler.\n",
             "    scheduler:run:           Run the tasks scheduler check.\n",
             "    scheduler:daemon:        Run the scheduler in a loop for a limited duration.\n",

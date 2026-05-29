@@ -57,6 +57,8 @@ class Ini {
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Commands');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Tasks');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Middleware');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Listeners');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Health');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Langs');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Apis');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Config');

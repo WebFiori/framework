@@ -60,6 +60,7 @@ class IntegrationAllCommandsTest extends CLITestCase {
             "Select database type:\n",
             "0: mysql\n",
             "1: mssql\n",
+            "2: sqlite\n",
             "Database host: Enter = '127.0.0.1'\n",
             "Port number: Enter = '3306'\n",
             "Username:\n",

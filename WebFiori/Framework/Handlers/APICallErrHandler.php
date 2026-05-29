@@ -38,6 +38,11 @@ class APICallErrHandler extends AbstractHandler {
      * Handles the exception
      */
     public function handle() {
+        $ex = $this->getException();
+        App::log()->error($ex->getMessage(), [
+            'file' => $ex->getFile(),
+            'line' => $ex->getLine(),
+        ]);
         if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
             $j = new Json([
                 'message' => '500 - Server Error: Uncaught Exception.',

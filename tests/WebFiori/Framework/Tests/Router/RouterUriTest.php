@@ -447,4 +447,41 @@ class RouterUriTest extends TestCase {
         $this->expectException(\InvalidArgumentException::class);
         $uri->addMiddleware('App\\Middleware\\NonExistentMiddleware');
     }
+
+    /**
+     * @test
+     */
+    public function testAddMiddlewareByInstance() {
+        $uri = new RouterUri('https://example.com/test', '');
+        $mw = new \TestMiddleware();
+        $uri->addMiddleware($mw);
+        $list = $uri->getMiddleware();
+        $found = false;
+
+        foreach ($list as $m) {
+            if ($m === $mw) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found);
+    }
+    /**
+     * @test
+     */
+    public function testAddMiddlewareInstanceIsRegistered() {
+        $uri = new RouterUri('https://example.com/reg', '');
+        $mw = new \TestMiddleware();
+        $uri->addMiddleware($mw);
+        $found = \WebFiori\Framework\Middleware\MiddlewareManager::getMiddleware($mw->getName());
+        $this->assertNotNull($found);
+    }
+    /**
+     * @test
+     */
+    public function testStringMiddlewareStillWorks() {
+        $uri = new RouterUri('https://example.com/str', '');
+        $uri->addMiddleware('start-session');
+        $list = $uri->getMiddleware();
+        $this->assertNotEmpty($list);
+    }
 }

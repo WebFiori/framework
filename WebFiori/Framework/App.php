@@ -29,6 +29,7 @@ use WebFiori\Framework\Handlers\HTTPErrHandler;
 use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Framework\Middleware\StartSessionMiddleware;
+use WebFiori\Framework\Health;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
@@ -74,7 +75,6 @@ class App {
      *
      * @since 1.0
      */
-    private static $AU;
     /**
      * A mutex lock to disallow class access during initialization state.
      *
@@ -123,6 +123,11 @@ class App {
      * @since 1.0
      */
     private function __construct() {
+        // Initialize logger
+        $logDir = APP_PATH.'Storage'.DS.'Logs';
+        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? \WebFiori\Log\LogLevel::DEBUG : \WebFiori\Log\LogLevel::WARNING;
+        \WebFiori\Log\LoggerFacade::setInstance(new \WebFiori\Log\FileLogger($logDir, $minLevel));
+
         // Initialize queue storage
         $queueDir = APP_PATH.'Storage'.DS.'Queue';
         \WebFiori\Queue\QueueFacade::setInstance(
@@ -158,7 +163,9 @@ class App {
         self::call(APP_DIR.'\\Ini\\Privileges::initialize');
 
         $this->initMiddleware();
+        $this->initListeners();
         $this->initRoutes();
+        $this->initHealthCheck();
         $this->initScheduler();
         self::getResponse()->beforeSend(function ()
         {
@@ -211,44 +218,7 @@ class App {
      * @since 1.3.6
      */
     public static function autoRegister(string $folder, callable $regCallback, ?string $suffix = null, array $constructorParams = [], array $otherParams = []) {
-        $dir = APP_PATH.$folder;
-
-        if (!File::isDirectory($dir)) {
-            //If directory is outside application folder.
-            $dir = ROOT_PATH.DS.$folder;
-        }
-
-        if (File::isDirectory($dir)) {
-            $dirContent = array_diff(scandir($dir), ['.','..']);
-
-            //Since it will be used to build class namespace, each
-            //backslash must be replaced with forward slash.
-            $folder = str_replace('/', '\\', $folder);
-
-            foreach ($dirContent as $phpFile) {
-                $expl = explode('.', $phpFile);
-
-                if (count($expl) == 2 && $expl[1] == 'php') {
-                    if ($suffix !== null) {
-                        $classSuffix = substr($expl[0], -1 * strlen($suffix));
-
-                        if ($classSuffix !== $suffix) {
-                            continue;
-                        }
-                    }
-
-                    self::autoRegisterHelper([
-                        'dir' => $dir,
-                        'php-file' => $phpFile,
-                        'folder' => $folder,
-                        'class-name' => $expl[0],
-                        'params' => $otherParams,
-                        'callback' => $regCallback,
-                        'constructor-params' => $constructorParams
-                    ]);
-                }
-            }
-        }
+        ClassRegistrar::register($folder, $regCallback, $suffix, $constructorParams, $otherParams);
     }
     /**
      * Returns a reference to an instance of 'ClassLoader'.
@@ -258,7 +228,7 @@ class App {
      * @since 1.2.1
      */
     public static function getClassLoader(): ClassLoader {
-        return self::$AU;
+        return ClassLoader::get();
     }
     /**
      * Returns the status of the class.
@@ -312,6 +282,14 @@ class App {
         return self::$Response;
     }
     /**
+     * Returns the application logger instance.
+     *
+     * @return \WebFiori\Log\Logger
+     */
+    public static function log(): \WebFiori\Log\Logger {
+        return \WebFiori\Log\LoggerFacade::getInstance();
+    }
+    /**
      * Returns an instance which represents the class that is used to run the
      * terminal.
      *
@@ -354,6 +332,8 @@ class App {
                 $commands = [
                     '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\DownCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\UpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueStatusCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueRetryCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueWorkCommand',
@@ -419,8 +399,11 @@ class App {
                 App::getRunner()->start();
             } else {
                 //route user request.
+                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
                 Router::route(self::getRequest()->getRequestedURI());
                 self::getResponse()->send();
+                $duration = (microtime(true) - MICRO_START) * 1000;
+                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
             }
         }
     }
@@ -435,28 +418,7 @@ class App {
      * </ul>
      */
     public static function initFrameworkVersionInfo() {
-        /**
-         * A constant that represents version number of the framework.
-         *
-         * @since 2.1
-         */
-        define('WF_VERSION', '3.0.0-RC.4');
-        /**
-         * A constant that tells the type of framework version.
-         *
-         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
-         *
-         * @since 2.1
-         */
-        define('WF_VERSION_TYPE', 'RC');
-        /**
-         * The date at which the framework version was released.
-         *
-         * The value of the constant will be a string in the format YYYY-MM-DD.
-         *
-         * @since 2.1
-         */
-        define('WF_RELEASE_DATE', '2026-05-13');
+        AppBootstrapper::initFrameworkVersionInfo();
     }
     /**
      * Initiate main components of the application.
@@ -474,67 +436,7 @@ class App {
      * Usually, its the value of the constant __DIR__.
      */
     public static function initiate(string $appFolder = 'App', string $publicFolder = 'public', string $indexDir = __DIR__) {
-        /**
-         * Change encoding of mb_ functions to UTF-8
-         */
-        if (function_exists('mb_internal_encoding')) {
-            $encoding = 'UTF-8';
-            mb_internal_encoding($encoding);
-            mb_http_output($encoding);
-            mb_regex_encoding($encoding);
-        }
-
-        if (!defined('DS')) {
-            /**
-             * Directory separator.
-             */
-            define('DS', DIRECTORY_SEPARATOR);
-        }
-
-        if (!defined('ROOT_PATH')) {
-            if ($indexDir == __DIR__) {
-                $indexDir = self::getRoot().DS.$publicFolder;
-            }
-            /**
-             * Path to source folder.
-             */
-            define('ROOT_PATH', substr($indexDir,0, strlen($indexDir) - strlen(DS.$publicFolder)));
-        }
-
-        if (!defined('APP_DIR')) {
-            /**
-             * Name of application directory.
-             */
-            define('APP_DIR', $appFolder);
-        }
-
-        if (!defined('APP_PATH')) {
-            /**
-             * Path to application directory.
-             */
-            define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DS);
-        }
-
-        if (!defined('PUBLIC_FOLDER')) {
-            /**
-             * Name of public folder.
-             */
-            define('PUBLIC_FOLDER', $publicFolder);
-        }
-
-        if (!defined('WF_CORE_PATHS')) {
-            /**
-             * Possible Paths to WebFiori's core library.
-             */
-            define('WF_CORE_PATHS', [
-                ROOT_PATH.DS.'vendor'.DS.'webfiori'.DS.'framework'.DS.'WebFiori'.DS.'Framework',
-                ROOT_PATH.DS.'WebFiori'.DS.'Framework'
-            ]);
-        }
-        self::initAutoLoader();
-        self::checkStandardLibs();
-        self::checkStdInOut();
-        self::initFrameworkVersionInfo();
+        AppBootstrapper::boot($appFolder, $publicFolder, $indexDir);
         self::$ClassStatus = self::STATUS_INITIATED;
     }
     /**
@@ -570,108 +472,6 @@ class App {
         return self::$LC;
     }
     /**
-     * Helper for automatic class registration using reflection with configuration options.
-     *
-     * @param array $options Configuration array with dir, php-file, folder, class-name, params, callback, constructor-params.
-     */
-    private static function autoRegisterHelper($options) {
-        $dir = $options['dir'];
-        $phpFile = $options['php-file'];
-        $folder = $options['folder'];
-        $className = $options['class-name'];
-        $otherParams = $options['params'];
-        $regCallback = $options['callback'];
-        $constructorParams = $options['constructor-params'];
-        $instanceNs = require_once $dir.DS.$phpFile;
-
-        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-            $instanceNs = self::extractNamespace($dir.DS.$phpFile);
-
-            if ($instanceNs === null) {
-                $instanceNs = '\\'.APP_DIR.'\\'.$folder;
-            }
-        }
-        $class = $instanceNs.'\\'.$className;
-        try {
-            $reflectionClass = new ReflectionClass($class);
-
-            if (self::canAcceptArgs($reflectionClass, $constructorParams)) {
-                $instance = $reflectionClass->newInstanceArgs($constructorParams);
-            } else {
-                $instance = $reflectionClass->newInstance();
-            }
-
-            $toPass = [$instance];
-
-            foreach ($otherParams as $param) {
-                $toPass[] = $param;
-            }
-            call_user_func_array($regCallback, $toPass);
-        } catch (Error $ex) {
-        }
-    }
-    /**
-     * Checks if a class constructor can accept the given arguments.
-     *
-     * Returns true if the constructor can be called with the given params.
-     * Returns false if there is a type mismatch or if the constructor
-     * has no parameters but args were provided.
-     *
-     * @param ReflectionClass $refClass The reflection of the class to check.
-     * @param array $args The arguments to check against the constructor.
-     *
-     * @return bool
-     */
-    private static function canAcceptArgs(ReflectionClass $refClass, array $args): bool {
-        if (empty($args)) {
-            return true;
-        }
-
-        $constructor = $refClass->getConstructor();
-
-        if ($constructor === null) {
-            return false;
-        }
-
-        $params = $constructor->getParameters();
-
-        if (count($args) > count($params)) {
-            return false;
-        }
-
-        foreach ($args as $index => $arg) {
-            if (!isset($params[$index])) {
-                return false;
-            }
-
-            $paramType = $params[$index]->getType();
-
-            if ($paramType === null) {
-                // No type hint, accepts anything.
-                continue;
-            }
-
-            if ($paramType instanceof \ReflectionUnionType) {
-                $matched = false;
-
-                foreach ($paramType->getTypes() as $type) {
-                    if (self::argMatchesType($arg, $type)) {
-                        $matched = true;
-                        break;
-                    }
-                }
-
-                if (!$matched) {
-                    return false;
-                }
-            } else if (!self::argMatchesType($arg, $paramType)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-    /**
      * Checks if a single argument matches a single reflected type.
      *
      * @param mixed $arg The argument value.
@@ -702,29 +502,13 @@ class App {
         return $arg instanceof $typeName;
     }
     /**
-     * Extracts the namespace declaration from a PHP file.
-     *
-     * @param string $filePath Absolute path to the PHP file.
-     *
-     * @return string|null The namespace string, or null if not found.
-     */
-    private static function extractNamespace(string $filePath): ?string {
-        $content = file_get_contents($filePath);
-
-        if ($content !== false && preg_match('/^\s*namespace\s+([^;{]+)/m', $content, $matches)) {
-            return trim($matches[1]);
-        }
-
-        return null;
-    }
-    /**
      * Safe function caller with CLI/web-aware exception handling.
      *
      * @param callable $func The function to call.
      * 
      * @return mixed
      */
-    private static function call($func) {
+    public static function call($func) {
         try {
             return call_user_func($func);
         } catch (Exception $ex) {
@@ -773,119 +557,29 @@ class App {
      * @throws InitializationException
      * @since 1.3.5
      */
-    private static function checkStandardLibs() {
-        $standardLibsClasses = [
-            'WebFiori/collections' => 'WebFiori\\Collections\\Node',
-            'WebFiori/ui' => 'WebFiori\\Ui\\HTMLNode',
-            'WebFiori/jsonx' => 'WebFiori\\Json\\Json',
-            'WebFiori/database' => 'WebFiori\\Database\\ResultSet',
-            'WebFiori/http' => 'WebFiori\\Http\\Response',
-            'WebFiori/file' => 'WebFiori\\File\\File',
-            'WebFiori/mailer' => 'WebFiori\\Mail\\SMTPAccount',
-            'WebFiori/cli' => 'WebFiori\\Cli\\Command',
 
-            'WebFiori/cache' => 'WebFiori\\Cache\\Cache'
-        ];
 
-        foreach ($standardLibsClasses as $lib => $class) {
-            if (!class_exists($class)) {
-                throw new InitializationException("The standard library '$lib' is missing.");
-            }
-        }
-    }
-
-    /**
-     * Checks and initialize standard input and output streams.
-     */
-    private static function checkStdInOut() {
-        /*
-         * first, check for php streams if they are open or not.
-         */
-        if (!defined('STDIN')) {
-            /**
-             * A constant that represents standard input stream of PHP.
-             *
-             * The value of the constant is a 'resource' which can be used with
-             * all file related PHP functions.
-             *
-             */
-            define('STDIN', fopen('php://stdin', 'r'));
-        }
-
-        if (!defined('STDOUT')) {
-            /**
-             * A constant that represents standard output stream of PHP.
-             *
-             * The value of the constant is a 'resource' which can be used with
-             * all file related PHP functions.
-             */
-            define('STDOUT', fopen('php://stdout', 'w'));
-        }
-
-        if (!defined('STDERR')) {
-            /**
-             * A constant that represents standard error output stream of PHP.
-             *
-             * The value of the constant is a 'resource' which can be used with
-             * all file related PHP functions.
-             *
-             */
-            define('STDERR',fopen('php://stderr', 'w'));
-        }
-    }
-    /**
-     * Calculates application root path by removing vendor framework path from current directory.
-     *
-     * @return string The application root path.
-     */
-    private static function getRoot() {
-        //Following lines of code assumes that the class exist on the folder:
-        //\vendor\WebFiori\framework\WebFiori\Framework
-        //Its used to construct the folder at which index file will exist at
-        $DS = DIRECTORY_SEPARATOR;
-        $vendorPath = $DS.'vendor'.$DS.'webFiori'.$DS.'framework'.$DS.'WebFiori'.$DS.'Framework';
-        $rootPath = substr(__DIR__, 0, strlen(__DIR__) - strlen($vendorPath));
-
-        return $rootPath;
-    }
-
-    /**
-     * @throws FileException
-     * @throws Exception
-     */
-    private static function initAutoLoader() {
-        Ini::createAppDirs();
-        /**
-         * Initialize autoloader.
-         */
-        if (class_exists('WebFiori\Framework\Autoload\ClassLoader', false)) {
-            return;
-        }
-        $isLoaded = false;
-
-        foreach (WF_CORE_PATHS as $path) {
-            $autoloader = $path.DIRECTORY_SEPARATOR.'Autoload'.DIRECTORY_SEPARATOR.'ClassLoader.php';
-
-            if (file_exists($autoloader)) {
-                require_once $autoloader;
-                self::$AU = ClassLoader::get();
-                $isLoaded = true;
-            }
-
-            if (!class_exists(APP_DIR.'\\Ini\\AutoLoad')) {
-                Ini::get()->createIniClass('AutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
-            }
-            self::call(APP_DIR.'\\Ini\\AutoLoad::initialize');
-        }
-
-        if (!$isLoaded) {
-            throw new Exception('Unable to locate the autoloader class.');
-        }
-    }
 
     /**
      * @throws FileException
      */
+    private function initListeners() {
+        // Auto-discover listeners from App/Listeners/
+        self::autoRegister('Listeners', function ($instance) {
+            if (method_exists($instance, 'handle')) {
+                $ref = new \ReflectionMethod($instance, 'handle');
+                $params = $ref->getParameters();
+
+                if (count($params) > 0 && $params[0]->getType() !== null) {
+                    $eventClass = $params[0]->getType()->getName();
+
+                    if ($eventClass !== 'object') {
+                        \WebFiori\Event\EventDispatcherFacade::listen($eventClass, $instance);
+                    }
+                }
+            }
+        });
+    }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
         {
@@ -896,11 +590,27 @@ class App {
             Ini::get()->createIniClass('Middleware', 'Register middleware which are created outside the folder \'[APP_DIR]/Middleware\'.');
         }
         MiddlewareManager::register(new StartSessionMiddleware());
+        MiddlewareManager::register(new Middleware\CheckMaintenanceMode());
         self::call(APP_DIR.'\Ini\Middleware::initialize');
     }
     /**
      * @throws FileException
      */
+    private function initHealthCheck() {
+        // Register built-in checks
+        Health\HealthCheck::register(new Health\Checks\StorageCheck());
+
+        if (\WebFiori\Cache\CacheFacade::isEnabled()) {
+            Health\HealthCheck::register(new Health\Checks\CacheCheck());
+        }
+
+        // Auto-discover from App/Health/
+        self::autoRegister('Health', function ($instance) {
+            if ($instance instanceof Health\HealthCheckInterface) {
+                Health\HealthCheck::register($instance);
+            }
+        });
+    }
     private function initRoutes() {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
@@ -922,6 +632,17 @@ class App {
 
             if (strlen($home) != 0) {
                 Router::redirect('/', App::getConfig()->getHomePage());
+            }
+
+            // Register health check route only when app has user-defined routes
+            $healthPath = defined('HEALTH_CHECK_PATH') ? HEALTH_CHECK_PATH : '/health';
+
+            if ($healthPath !== '') {
+                Router::api([
+                    'path' => $healthPath,
+                    'route-to' => Health\HealthCheckService::class,
+                    'methods' => 'GET',
+                ]);
             }
         }
     }

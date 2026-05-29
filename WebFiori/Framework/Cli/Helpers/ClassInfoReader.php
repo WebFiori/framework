@@ -13,7 +13,6 @@ namespace WebFiori\Framework\Cli\Helpers;
 use InvalidArgumentException;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
-use WebFiori\Framework\Util;
 /**
  * A class which is used to read class information as prompt from any input stream
  * which is set by the class 'Runner'.
@@ -127,7 +126,8 @@ class ClassInfoReader {
     private function getPath($default) {
         $fixedPath = ROOT_PATH.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
 
-        if (!Util::isDirectory($fixedPath, true)) {
+        $fixedPathNorm = str_replace('\\\\', '/', $fixedPath);
+        if (!is_dir($fixedPathNorm) && !mkdir($fixedPathNorm, 0777, true)) {
             throw new InvalidArgumentException("Unable to create class at $default");
         }
 

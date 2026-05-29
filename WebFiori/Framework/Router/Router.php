@@ -1143,13 +1143,32 @@ class Router {
      *
      * @since 1.0
      */
-    private static function getInstance(): Router {
+    /**
+     * Returns the default Router instance.
+     *
+     * @return Router
+     */
+    public static function getInstance(): Router {
         if (self::$router != null) {
             return self::$router;
         }
         self::$router = new Router();
 
         return self::$router;
+    }
+    /**
+     * Replaces the default Router instance.
+     *
+     * @param Router $router The router instance to use.
+     */
+    public static function setInstance(Router $router): void {
+        self::$router = $router;
+    }
+    /**
+     * Destroys the default Router instance. Next call creates a fresh one.
+     */
+    public static function resetInstance(): void {
+        self::$router = null;
     }
     /**
      * Returns an array that holds allowed request methods for fetching the

@@ -29,6 +29,7 @@ use WebFiori\Framework\Handlers\HTTPErrHandler;
 use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Framework\Middleware\StartSessionMiddleware;
+use WebFiori\Framework\Health;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
@@ -154,6 +155,7 @@ class App {
 
         $this->initMiddleware();
         $this->initRoutes();
+        $this->initHealthCheck();
         $this->initScheduler();
         self::getResponse()->beforeSend(function ()
         {
@@ -896,6 +898,21 @@ class App {
     /**
      * @throws FileException
      */
+    private function initHealthCheck() {
+        // Register built-in checks
+        Health\HealthCheck::register(new Health\Checks\StorageCheck());
+
+        if (\WebFiori\Cache\CacheFacade::isEnabled()) {
+            Health\HealthCheck::register(new Health\Checks\CacheCheck());
+        }
+
+        // Auto-discover from App/Health/
+        self::autoRegister('Health', function ($instance) {
+            if ($instance instanceof Health\HealthCheckInterface) {
+                Health\HealthCheck::register($instance);
+            }
+        });
+    }
     private function initRoutes() {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
@@ -917,6 +934,17 @@ class App {
 
             if (strlen($home) != 0) {
                 Router::redirect('/', App::getConfig()->getHomePage());
+            }
+
+            // Register health check route only when app has user-defined routes
+            $healthPath = defined('HEALTH_CHECK_PATH') ? HEALTH_CHECK_PATH : '/health';
+
+            if ($healthPath !== '') {
+                Router::api([
+                    'path' => $healthPath,
+                    'route-to' => Health\HealthCheckService::class,
+                    'methods' => 'GET',
+                ]);
             }
         }
     }

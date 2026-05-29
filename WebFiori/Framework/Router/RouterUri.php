@@ -182,11 +182,19 @@ class RouterUri extends RequestUri {
     /**
      * Adds the URI to middleware or to middleware group.
      *
-     * @param string $name The name of the middleware or the group.
+     * @param string|AbstractMiddleware $middleware The name of the middleware,
+     * the group name, or a pre-configured middleware instance.
      *
      * @since 1.4
      */
-    public function addMiddleware(string $name) {
+    public function addMiddleware(string|AbstractMiddleware $middleware) {
+        if ($middleware instanceof AbstractMiddleware) {
+            MiddlewareManager::register($middleware);
+            $this->assignedMiddlewareList[] = $middleware;
+
+            return;
+        }
+        $name = $middleware;
         $mw = MiddlewareManager::getMiddleware($name);
 
         if ($mw === null) {

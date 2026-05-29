@@ -17,7 +17,6 @@ use WebFiori\Cli\Runner;
 use WebFiori\Collections\Queue;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Exceptions\InvalidCRONExprException;
-use WebFiori\Framework\Util;
 use WebFiori\Http\Request;
 use WebFiori\Json\Json;
 use WebFiori\Json\JsonI;
@@ -1558,7 +1557,9 @@ abstract class AbstractTask implements JsonI {
                 .'The output of the task might be not as expected.');
         TasksManager::log('Exception class: '.get_class($ex));
         TasksManager::log('Exception message: '.$ex->getMessage());
-        TasksManager::log('Thrown in: '.Util::extractClassName($ex->getFile()));
+        $exFile = explode(DIRECTORY_SEPARATOR, $ex->getFile());
+            $className = explode('.', end($exFile))[0];
+            TasksManager::log('Thrown in: '.ucfirst($className));
         TasksManager::log('Line: '.$ex->getLine());
         TasksManager::log('Stack Trace:');
         $index = 0;

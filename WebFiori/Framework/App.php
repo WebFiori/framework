@@ -158,6 +158,7 @@ class App {
         self::call(APP_DIR.'\\Ini\\Privileges::initialize');
 
         $this->initMiddleware();
+        $this->initListeners();
         $this->initRoutes();
         $this->initHealthCheck();
         $this->initScheduler();
@@ -390,8 +391,11 @@ class App {
                 App::getRunner()->start();
             } else {
                 //route user request.
+                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
                 Router::route(self::getRequest()->getRequestedURI());
                 self::getResponse()->send();
+                $duration = (microtime(true) - MICRO_START) * 1000;
+                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
             }
         }
     }
@@ -551,6 +555,23 @@ class App {
     /**
      * @throws FileException
      */
+    private function initListeners() {
+        // Auto-discover listeners from App/Listeners/
+        self::autoRegister('Listeners', function ($instance) {
+            if (method_exists($instance, 'handle')) {
+                $ref = new \ReflectionMethod($instance, 'handle');
+                $params = $ref->getParameters();
+
+                if (count($params) > 0 && $params[0]->getType() !== null) {
+                    $eventClass = $params[0]->getType()->getName();
+
+                    if ($eventClass !== 'object') {
+                        \WebFiori\Event\EventDispatcherFacade::listen($eventClass, $instance);
+                    }
+                }
+            }
+        });
+    }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
         {

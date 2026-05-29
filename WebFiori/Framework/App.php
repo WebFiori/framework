@@ -123,6 +123,11 @@ class App {
      * @since 1.0
      */
     private function __construct() {
+        // Initialize queue storage
+        $queueDir = APP_PATH.'Storage'.DS.'Queue';
+        \WebFiori\Queue\QueueFacade::setInstance(
+            new \WebFiori\Queue\Queue(new \WebFiori\Queue\FileQueueStorage($queueDir))
+        );
         $this->checkAppDir();
         $this->setHandlers();
         Controller::get()->updateEnv();
@@ -349,6 +354,9 @@ class App {
                 $commands = [
                     '\\WebFiori\\Framework\\Cli\\Commands\\WHelpCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueStatusCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueRetryCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueWorkCommand',
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',

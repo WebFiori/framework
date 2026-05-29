@@ -32,8 +32,9 @@
         "webfiori/cli": "v2.1.*",
         "webfiori/mailer": "v2.1.*",
         "webfiori/err": "v2.0.*",
-        "webfiori/event": "v1.0.*"
-        "webfiori/log": "v1.0.*"
+        "webfiori/log": "v1.0.*",
+        "webfiori/event": "v1.0.*",
+        "webfiori/queue": "v1.0.*"
     },
     "scripts": {
         "test": "phpunit --configuration tests/phpunit.xml",

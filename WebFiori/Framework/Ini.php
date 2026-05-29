@@ -66,6 +66,7 @@ class Ini {
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Uploads');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Logs');
         self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Sessions');
+        self::mkdir(ROOT_PATH.$DS.APP_DIR.$DS.'Storage'.$DS.'Queue');
         self::mkdir(ROOT_PATH.$DS.'public');
         self::mkdir(ROOT_PATH.$DS.'tests');
     }

@@ -128,6 +128,11 @@ class App {
         $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? \WebFiori\Log\LogLevel::DEBUG : \WebFiori\Log\LogLevel::WARNING;
         \WebFiori\Log\LoggerFacade::setInstance(new \WebFiori\Log\FileLogger($logDir, $minLevel));
 
+        // Initialize queue storage
+        $queueDir = APP_PATH.'Storage'.DS.'Queue';
+        \WebFiori\Queue\QueueFacade::setInstance(
+            new \WebFiori\Queue\Queue(new \WebFiori\Queue\FileQueueStorage($queueDir))
+        );
         $this->checkAppDir();
         $this->setHandlers();
         Controller::get()->updateEnv();
@@ -329,6 +334,9 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\VersionCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\DownCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\UpCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueStatusCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueRetryCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\QueueWorkCommand',
 
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',

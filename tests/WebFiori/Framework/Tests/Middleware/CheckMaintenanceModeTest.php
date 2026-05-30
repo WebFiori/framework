@@ -69,4 +69,34 @@ class CheckMaintenanceModeTest extends TestCase {
         $this->assertEquals(200, $response->getCode());
         unset($_SERVER['REMOTE_ADDR']);
     }
+    /** @test */
+    public function testApiResponseIsJson() {
+        file_put_contents($this->maintenanceFile, json_encode([
+            'message' => 'Maintenance',
+            'retry_after' => 60,
+            'allowed' => [],
+            'api_prefix' => '/api',
+        ]));
+
+        // Use Accept header to trigger JSON response
+        $_SERVER['HTTP_ACCEPT'] = 'application/json';
+        $mw = new CheckMaintenanceMode();
+        $request = \WebFiori\Http\Request::createFromGlobals();
+        $response = new \WebFiori\Http\Response();
+
+        $mw->before($request, $response);
+
+        $this->assertEquals(503, $response->getCode());
+        $this->assertStringContainsString('Maintenance', $response->getBody());
+        unset($_SERVER['HTTP_ACCEPT']);
+    }
+    /** @test */
+    public function testAfterAndAfterSendDoNothing() {
+        $mw = new CheckMaintenanceMode();
+        $request = new \WebFiori\Http\Request();
+        $response = new \WebFiori\Http\Response();
+        $mw->after($request, $response);
+        $mw->afterSend($request, $response);
+        $this->assertTrue(true);
+    }
 }

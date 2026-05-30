@@ -566,4 +566,47 @@ class RouterTest extends TestCase {
         Router::removeRoute('/to-remove');
         $this->assertFalse(Router::hasRoute('/to-remove'));
     }
+    /** @test */
+    public function testResetInstance() {
+        $original = Router::getInstance();
+        Router::resetInstance();
+        $fresh = Router::getInstance();
+        $this->assertNotSame($original, $fresh);
+        // Restore original
+        Router::setInstance($original);
+    }
+    /** @test */
+    public function testClosureRoute() {
+        $called = false;
+        Router::closure([
+            'path' => '/closure-test-'.time(),
+            'route-to' => function() use (&$called) { $called = true; }
+        ]);
+        $this->assertTrue(Router::routesCount() > 0);
+    }
+    /** @test */
+    public function testRedirectSimple() {
+        Router::redirect('/old-path-'.time(), '/new-path');
+        $this->assertTrue(Router::routesCount() > 0);
+    }
+    /** @test */
+    public function testGetParameterValueNoRoute() {
+        $val = Router::getParameterValue('nonexistent');
+        $this->assertNull($val);
+    }
+    /** @test */
+    public function testGetRouteUriNoMatch() {
+        $uri = Router::getRouteUri();
+        // No route dispatched yet in test context
+        $this->assertNull($uri);
+    }
+    /** @test */
+    public function testHasRouteNonExistent() {
+        $this->assertFalse(Router::hasRoute('/definitely-not-a-route-'.time()));
+    }
+    /** @test */
+    public function testGetUriObjNonExistent() {
+        $obj = Router::getUriObj('/no-such-path-'.time());
+        $this->assertNull($obj);
+    }
 }

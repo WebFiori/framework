@@ -18,10 +18,6 @@ use WebFiori\Collections\Queue;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Router\Router;
-use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
-use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
-use WebFiori\Framework\Scheduler\WebUI\SetPasswordPage;
-use WebFiori\Framework\Scheduler\WebUI\TasksLoginPage;
 use WebFiori\Framework\Session\SessionsManager;
 /**
  * A class that is used to manage scheduled background tasks.
@@ -461,31 +457,6 @@ class TasksManager {
      *
      * @since 1.1.0
      */
-    public static function initRoutes() {
-        Router::addRoute([
-            'path' => '/scheduler',
-            'route-to' => TasksLoginPage::class,
-            'routes' => [
-                [
-                    'path' => '/tasks',
-                    'route-to' => ListTasksPage::class
-                ],
-                [
-                    'path' => '/apis/{action}',
-                    'route-to' => TasksServicesManager::class,
-                    'as-api' => true
-                ],
-                [
-                    'path' => '/login',
-                    'route-to' => TasksLoginPage::class
-                ],
-                [
-                    'path' => '/set-password',
-                    'route-to' => SetPasswordPage::class
-                ]
-            ]
-        ]);
-    }
     /**
      * Appends a message to the array that contains logged messages.
      *

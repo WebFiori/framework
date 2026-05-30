@@ -20,7 +20,6 @@ class BackgroundTaskWritterTest extends TestCase {
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\\Framework\\Scheduler\\AbstractTask",
-            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
             "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getTaskDescription());
@@ -37,7 +36,6 @@ class BackgroundTaskWritterTest extends TestCase {
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\\Framework\\Scheduler\\AbstractTask",
-            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
             "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getTaskDescription());
@@ -67,7 +65,6 @@ class BackgroundTaskWritterTest extends TestCase {
         $this->assertEquals('Task', $writter->getSuffix());
         $this->assertEquals([
             "WebFiori\\Framework\\Scheduler\\AbstractTask",
-            "WebFiori\\Framework\\Scheduler\\TaskStatusEmail",
             "WebFiori\\Framework\\Scheduler\\TasksManager",
         ], $writter->getUseStatements());
         $this->assertEquals('A test Task', $writter->getTaskDescription());

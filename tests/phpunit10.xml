@@ -93,20 +93,7 @@
       <file>../WebFiori/Framework/Scheduler/AbstractTask.php</file>
       <file>../WebFiori/Framework/Scheduler/BaseTask.php</file>
       <file>../WebFiori/Framework/Scheduler/TaskArgument.php</file>
-      <file>../WebFiori/Framework/Scheduler/TaskStatusEmail.php</file>
       <file>../WebFiori/Framework/Scheduler/TasksManager.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/ForceTaskExecutionService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/GetTasksService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/PrivateSchedulerService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/SetupPasswordService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/TasksLoginService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/TasksLogoutService.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebServices/TasksServicesManager.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebUI/BaseTasksPage.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebUI/ListTasksPage.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebUI/SetPasswordPage.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebUI/TasksLoginPage.php</file>
-      <file>../WebFiori/Framework/Scheduler/WebUI/TasksTable.php</file>
 
       <file>../WebFiori/Framework/Session/DatabaseSessionStorage.php</file>
       <file>../WebFiori/Framework/Session/DefaultSessionStorage.php</file>

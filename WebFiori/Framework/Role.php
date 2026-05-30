@@ -16,7 +16,7 @@ class Role extends PrivilegesGroup {
      * @param string $name The unique name of the role.
      */
     public function __construct(string $name = 'ROLE') {
-        parent::__construct($name);
+        parent::__construct($name, $name);
     }
     /**
      * Set this role to inherit all permissions from another role.
@@ -47,11 +47,15 @@ class Role extends PrivilegesGroup {
      * @return bool
      */
     public function hasPermission(string $permissionId, AccessManager $manager): bool {
-        if ($this->hasPrivilege($permissionId)) {
+        $perm = new Permission($permissionId);
+
+        if (parent::hasPrivilege($perm)) {
             return true;
         }
 
-        if ($this->hasPrivilege('*')) {
+        $wildcard = new Permission('*');
+
+        if (parent::hasPrivilege($wildcard)) {
             return true;
         }
 

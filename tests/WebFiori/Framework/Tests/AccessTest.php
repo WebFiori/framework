@@ -3,6 +3,10 @@ namespace WebFiori\Framework\Test;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Access;
+use WebFiori\Framework\AccessManager;
+use WebFiori\Framework\Permission;
+use WebFiori\Framework\Role;
+use WebFiori\Framework\Storage\InMemoryAccessStorage;
 use WebFiori\Framework\User;
 /**
  * A test class for testing the class 'WebFiori\Framework\Access'.
@@ -283,5 +287,186 @@ class AccessTest extends TestCase {
         Access::newPrivileges('SUB_OF_SUB', ['SUB_OF_PR_1','SUB_OF_PR_2','SUB_OF_PR_3']);
         Access::newGroup('SUB_OF_SUB2', 'SUB_GROUP');
         Access::newPrivileges('SUB_OF_SUB', ['SUB2_OF_PR_1','SUB2_OF_PR_2','SUB2_OF_PR_3']);
+    }
+
+    // --- New RBAC/ABAC Tests ---
+
+    /** @test */
+    public function testRoleCreation() {
+        $manager = new AccessManager();
+        $role = $manager->role('admin', ['VIEW_ALL', 'EDIT_ALL']);
+        $this->assertEquals('admin', $role->getName());
+        $this->assertTrue($role->hasPermission('VIEW_ALL', $manager));
+        $this->assertTrue($role->hasPermission('EDIT_ALL', $manager));
+    }
+    /** @test */
+    public function testRoleInheritance() {
+        $manager = new AccessManager();
+        $manager->role('viewer', ['VIEW_POSTS']);
+        $manager->role('editor', ['EDIT_POSTS'])->inherits('viewer');
+
+        $editor = $manager->getRole('editor');
+        $this->assertTrue($editor->hasPermission('EDIT_POSTS', $manager));
+        $this->assertTrue($editor->hasPermission('VIEW_POSTS', $manager));
+        $this->assertFalse($editor->hasPermission('DELETE_POSTS', $manager));
+    }
+    /** @test */
+    public function testRoleWildcard() {
+        $manager = new AccessManager();
+        $manager->role('superadmin', ['*']);
+        $manager->assignRoleToUser(1, 'superadmin');
+
+        $this->assertTrue($manager->can(1, 'ANY_PERMISSION'));
+        $this->assertTrue($manager->can(1, 'ANOTHER_ONE'));
+    }
+    /** @test */
+    public function testCanWithRBAC() {
+        $manager = new AccessManager();
+        $manager->role('editor', ['EDIT_POST', 'VIEW_POST']);
+        $manager->assignRoleToUser(42, 'editor');
+
+        $this->assertTrue($manager->can(42, 'EDIT_POST'));
+        $this->assertTrue($manager->can(42, 'VIEW_POST'));
+        $this->assertFalse($manager->can(42, 'DELETE_POST'));
+    }
+    /** @test */
+    public function testCanWithNoRole() {
+        $manager = new AccessManager();
+        $manager->role('admin', ['MANAGE']);
+
+        $this->assertFalse($manager->can(99, 'MANAGE'));
+    }
+    /** @test */
+    public function testCanWithPolicy() {
+        $manager = new AccessManager();
+        $manager->role('author', ['EDIT_OWN_POST']);
+        $manager->assignRoleToUser(10, 'author');
+
+        $manager->policy('EDIT_OWN_POST', function ($user, $resource) {
+            return $resource->authorId === $user;
+        });
+
+        $ownPost = (object) ['authorId' => 10];
+        $otherPost = (object) ['authorId' => 20];
+
+        $this->assertTrue($manager->can(10, 'EDIT_OWN_POST', $ownPost));
+        $this->assertFalse($manager->can(10, 'EDIT_OWN_POST', $otherPost));
+    }
+    /** @test */
+    public function testCanWithPolicyObject() {
+        $manager = new AccessManager();
+        $manager->role('user', ['VIEW_PRIVATE']);
+        $manager->assignRoleToUser(5, 'user');
+
+        $policy = new class {
+            public function getPermission(): string { return 'VIEW_PRIVATE'; }
+            public function evaluate($user, $resource): bool {
+                return $resource->isPublic || $resource->ownerId === $user;
+            }
+        };
+        $manager->registerPolicy($policy);
+
+        $public = (object) ['isPublic' => true, 'ownerId' => 99];
+        $private = (object) ['isPublic' => false, 'ownerId' => 5];
+        $otherPrivate = (object) ['isPublic' => false, 'ownerId' => 99];
+
+        $this->assertTrue($manager->can(5, 'VIEW_PRIVATE', $public));
+        $this->assertTrue($manager->can(5, 'VIEW_PRIVATE', $private));
+        $this->assertFalse($manager->can(5, 'VIEW_PRIVATE', $otherPrivate));
+    }
+    /** @test */
+    public function testAssignAndRemoveRole() {
+        $manager = new AccessManager();
+        $manager->role('temp', ['DO_STUFF']);
+        $manager->assignRoleToUser(1, 'temp');
+        $this->assertTrue($manager->can(1, 'DO_STUFF'));
+
+        $manager->removeRoleFromUser(1, 'temp');
+        $this->assertFalse($manager->can(1, 'DO_STUFF'));
+    }
+    /** @test */
+    public function testGetUserRoles() {
+        $manager = new AccessManager();
+        $manager->role('a');
+        $manager->role('b');
+        $manager->assignRoleToUser(1, 'a');
+        $manager->assignRoleToUser(1, 'b');
+        $this->assertEquals(['a', 'b'], $manager->getUserRoles(1));
+    }
+    /** @test */
+    public function testChainedInheritance() {
+        $manager = new AccessManager();
+        $manager->role('base', ['READ']);
+        $manager->role('mid', ['WRITE'])->inherits('base');
+        $manager->role('top', ['DELETE'])->inherits('mid');
+        $manager->assignRoleToUser(1, 'top');
+
+        $this->assertTrue($manager->can(1, 'DELETE'));
+        $this->assertTrue($manager->can(1, 'WRITE'));
+        $this->assertTrue($manager->can(1, 'READ'));
+    }
+    /** @test */
+    public function testAccessFacadeNewAPI() {
+        Access::getManager()->reset();
+        Access::role('tester', ['RUN_TESTS']);
+        Access::assignRoleToUser(1, 'tester');
+        $this->assertTrue(Access::can(1, 'RUN_TESTS'));
+        $this->assertFalse(Access::can(1, 'DEPLOY'));
+    }
+    /** @test */
+    public function testAccessFacadeBackwardCompat() {
+        Access::clear();
+        Access::newGroup('devs');
+        Access::newPrivilege('devs', 'CODE');
+        $this->assertTrue(Access::hasPrivilege('CODE'));
+        $this->assertFalse(Access::hasPrivilege('DEPLOY'));
+    }
+    /** @test */
+    public function testInMemoryStorage() {
+        $storage = new InMemoryAccessStorage();
+        $role = new Role('stored-role');
+        $role->addPermission('PERM_A');
+        $storage->saveRole($role);
+        $storage->assignRoleToUser(1, 'stored-role');
+
+        $loaded = $storage->loadRoles();
+        $this->assertCount(1, $loaded);
+        $this->assertEquals('stored-role', $loaded[0]->getName());
+        $this->assertEquals(['stored-role'], $storage->loadUserRoles(1));
+
+        $storage->removeRoleFromUser(1, 'stored-role');
+        $this->assertEquals([], $storage->loadUserRoles(1));
+
+        $storage->removeRole('stored-role');
+        $this->assertCount(0, $storage->loadRoles());
+    }
+    /** @test */
+    public function testPermissionClass() {
+        $p = new Permission('ADD_USER', 'Can add users');
+        $this->assertEquals('ADD_USER', $p->getID());
+        $this->assertEquals('Can add users', $p->getDescription());
+        $p->setDbId(5);
+        $this->assertEquals(5, $p->getDbId());
+    }
+    /** @test */
+    public function testRoleClass() {
+        $r = new Role('moderator');
+        $r->addPermission('BAN_USER');
+        $r->setDescription('Can moderate');
+        $r->setDbId(3);
+        $this->assertEquals('moderator', $r->getName());
+        $this->assertEquals('Can moderate', $r->getDescription());
+        $this->assertEquals(3, $r->getDbId());
+        $manager = new AccessManager();
+        $this->assertTrue($r->hasPermission('BAN_USER', $manager));
+    }
+    /** @test */
+    public function testManagerReset() {
+        $manager = new AccessManager();
+        $manager->role('x', ['Y']);
+        $manager->assignRoleToUser(1, 'x');
+        $manager->reset();
+        $this->assertEmpty($manager->getRoles());
+        $this->assertEmpty($manager->getUserRoles(1));
     }
 }

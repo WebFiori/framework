@@ -17,3 +17,4 @@ App/Config/*
 tests/clover.xml
 /.vscode
 /App
+cov.xml

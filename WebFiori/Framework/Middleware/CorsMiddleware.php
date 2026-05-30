@@ -89,8 +89,6 @@ class CorsMiddleware extends AbstractMiddleware {
             $response->addHeader('Access-Control-Allow-Methods', implode(', ', $this->methods));
             $response->addHeader('Access-Control-Allow-Headers', implode(', ', $this->headers));
             $response->addHeader('Access-Control-Max-Age', (string) $this->maxAge);
-            $response->send();
-            exit;
         }
     }
     /**

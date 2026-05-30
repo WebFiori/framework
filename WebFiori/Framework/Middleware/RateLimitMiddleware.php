@@ -106,8 +106,6 @@ class RateLimitMiddleware extends AbstractMiddleware {
                 'message' => 'Too many requests.',
                 'retry_after' => $this->windowSeconds,
             ]));
-            $response->send();
-            exit;
         }
     }
 

@@ -480,9 +480,91 @@ class SessionsManagerTest extends TestCase {
         $this->assertNotEquals($oldId, SessionsManager::getActiveSession()->getId());
         $this->assertEquals($newId, SessionsManager::getActiveSession()->getId());
     }
+    /** @test */
+    public function testSetManager() {
+        $manager = new \WebFiori\Framework\Session\SessionManager(new \WebFiori\Framework\Session\DefaultSessionStorage());
+        SessionsManager::setManager($manager);
+        $this->assertSame($manager, SessionsManager::getInstance());
+    }
+    /** @test */
+    public function testCloseNoSession() {
+        SessionsManager::reset();
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /** @test */
+    public function testDestroyNoSession() {
+        SessionsManager::reset();
+        SessionsManager::destroy();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /** @test */
+    public function testGetNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::get('anything'));
+    }
+    /** @test */
+    public function testSetNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::set('k', 'v'));
+    }
+    /** @test */
+    public function testPullNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::pull('k'));
+    }
+    /** @test */
+    public function testRemoveNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::remove('k'));
+    }
+    /** @test */
+    public function testHasCookieNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::hasCookie());
+    }
+    /** @test */
+    public function testNewIdNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::newId());
+    }
+    /** @test */
+    public function testFacadeClose() {
+        SessionsManager::reset();
+        SessionsManager::start('close-test');
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /** @test */
+    public function testFacadeDestroy() {
+        SessionsManager::reset();
+        SessionsManager::start('destroy-test');
+        SessionsManager::destroy();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /** @test */
+    public function testFacadePull() {
+        SessionsManager::reset();
+        SessionsManager::start('pull-test');
+        SessionsManager::set('pk', 'pv');
+        $this->assertEquals('pv', SessionsManager::pull('pk'));
+        $this->assertNull(SessionsManager::get('pk'));
+    }
+    /** @test */
+    public function testFacadeNewId() {
+        SessionsManager::reset();
+        SessionsManager::start('newid-test');
+        $this->assertNotNull(SessionsManager::newId());
+    }
+    /** @test */
+    public function testFacadePauseAll() {
+        SessionsManager::reset();
+        SessionsManager::start('pause-test');
+        SessionsManager::pauseAll();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /** @test */
+    public function testGetSessionIDFromCookieNotSet() {
+        $this->assertFalse(SessionsManager::getSessionIDFromCookie('nonexistent'));
+    }
 }
-
-
-
-
-

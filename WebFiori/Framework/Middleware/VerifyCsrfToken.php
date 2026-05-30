@@ -88,8 +88,6 @@ class VerifyCsrfToken extends AbstractMiddleware {
             $response->setCode(403);
             $response->addHeader('Content-Type', 'application/json');
             $response->write(json_encode(['message' => 'CSRF token mismatch.']));
-            $response->send();
-            exit;
         }
     }
     /**

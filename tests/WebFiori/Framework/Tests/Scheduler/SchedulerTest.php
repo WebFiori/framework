@@ -4,9 +4,6 @@ namespace WebFiori\Framework\Test\Scheduler;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Scheduler\TasksManager;
-use WebFiori\Framework\Scheduler\WebServices\TasksServicesManager;
-use WebFiori\Framework\Scheduler\WebUI\ListTasksPage;
-use WebFiori\Framework\Scheduler\WebUI\TasksLoginPage;
 /**
  *
  * @author Ibrahim
@@ -117,27 +114,6 @@ class SchedulerTest extends TestCase {
     /**
      * @test
      */
-    public function testRoutes() {
-        Router::removeAll();
-        TasksManager::initRoutes();
-        $this->assertEquals(5, Router::routesCount());
-
-        $route1 = Router::getUriObj('/scheduler');
-        $this->assertNotNull($route1);
-        $this->assertEquals(TasksLoginPage::class, $route1->getRouteTo());
-
-        $route2 = Router::getUriObj('/scheduler/login');
-        $this->assertNotNull($route2);
-        $this->assertEquals(TasksLoginPage::class, $route2->getRouteTo());
-
-        $route3 = Router::getUriObj('/scheduler/tasks');
-        $this->assertNotNull($route3);
-        $this->assertEquals(ListTasksPage::class, $route3->getRouteTo());
-
-        $route4 = Router::getUriObj('/scheduler/apis/{action}');
-        $this->assertNotNull($route4);
-        $this->assertEquals(TasksServicesManager::class, $route4->getRouteTo());
-    }
     /**
      * @test
      */

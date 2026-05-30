@@ -97,4 +97,56 @@ class CreateSeederCommandTest extends CLITestCase {
         $this->assertTrue(class_exists('\\App\\Database\\Seeders\\'.$className));
         $this->removeClass('\\App\\Database\\Seeders\\'.$className);
     }
+    /** @test */
+    public function testCreateSeederWithDescription() {
+        $className = 'DescSeeder'.time();
+
+        $output = $this->executeSingleCommand(new CreateSeederCommand(), [], [
+            $className,
+            "Seeds test data",
+            "\n",  // default environments
+            "n"    // no dependencies
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+    }
+    /** @test */
+    public function testCreateSeederDefaultName() {
+        $className = 'DefSeeder'.time();
+
+        $output = $this->executeSingleCommand(new CreateSeederCommand(), [], [
+            $className,
+            "\n",  // default description
+            "\n",  // default environments
+            "n"    // no dependencies
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+    }
+    /** @test */
+    public function testCreateSeederWithCustomDescription() {
+        $className = 'DescSeeder'.time();
+
+        $output = $this->executeSingleCommand(new CreateSeederCommand(), [], [
+            $className,
+            "Seeds test data",
+            "\n",
+            "n"
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+    }
+    /** @test */
+    public function testCreateSeederDefaultOptions() {
+        $className = 'DefSeeder'.time();
+
+        $output = $this->executeSingleCommand(new CreateSeederCommand(), [], [
+            $className,
+            "\n",
+            "\n",
+            "n"
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+    }
 }

@@ -5,6 +5,7 @@ use const DS;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\File\File;
+use WebFiori\Framework\Config\Controller;
 use WebFiori\Framework\Config\JsonDriver;
 use WebFiori\Mail\SMTPAccount;
 /**
@@ -650,5 +651,55 @@ class JsonDriverTest extends TestCase {
         putenv('SCHEDULER_PASS=my_secure_hash');
         $this->assertEquals('my_secure_hash', $driver->getSchedulerPassword());
         $driver->setConfigFileName('app-config.json');
+    }
+    /** @test */
+    public function testControllerGetDriver() {
+        $driver = Controller::getDriver();
+        $this->assertInstanceOf(JsonDriver::class, $driver);
+    }
+    /** @test */
+    public function testControllerSetDriver() {
+        $newDriver = new JsonDriver();
+        Controller::setDriver($newDriver);
+        $this->assertSame($newDriver, Controller::getDriver());
+    }
+    /** @test */
+    public function testControllerResolveEnvValueNonString() {
+        $this->assertEquals(42, Controller::resolveEnvValue(42));
+        $this->assertEquals(true, Controller::resolveEnvValue(true));
+        $this->assertNull(Controller::resolveEnvValue(null));
+    }
+    /** @test */
+    public function testControllerResolveEnvValuePlainString() {
+        $this->assertEquals('hello', Controller::resolveEnvValue('hello'));
+    }
+    /** @test */
+    public function testControllerResolveEnvValueWithEnvPrefix() {
+        putenv('TEST_RESOLVE_VAR=resolved_value');
+        $this->assertEquals('resolved_value', Controller::resolveEnvValue('env:TEST_RESOLVE_VAR'));
+        putenv('TEST_RESOLVE_VAR');
+    }
+    /** @test */
+    public function testControllerResolveEnvValueMissingVar() {
+        $result = Controller::resolveEnvValue('env:NONEXISTENT_VAR_XYZ');
+        // Falls back to original value if env var not found
+        $this->assertEquals('env:NONEXISTENT_VAR_XYZ', $result);
+    }
+    /** @test */
+    public function testControllerAddEnvVar() {
+        $controller = Controller::get();
+        $controller->addEnvVar('TEST_NEW_VAR', 'test_value', 'A test variable');
+        $vars = Controller::getDriver()->getEnvVars();
+        $this->assertArrayHasKey('TEST_NEW_VAR', $vars);
+        $this->assertEquals('test_value', $vars['TEST_NEW_VAR']['value']);
+        // Cleanup
+        Controller::getDriver()->removeEnvVar('TEST_NEW_VAR');
+    }
+    /** @test */
+    public function testControllerUpdateEnv() {
+        // updateEnv defines constants from env vars - already called during boot
+        // Just verify it doesn't throw
+        Controller::updateEnv();
+        $this->assertTrue(defined('WF_VERBOSE'));
     }
 }

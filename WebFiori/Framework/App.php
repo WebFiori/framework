@@ -594,6 +594,7 @@ class App {
         $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
         $container->instance(Router::class, Router::getInstance());
         $container->instance(TasksManager::class, TasksManager::get());
+        $container->instance(AccessManager::class, Access::getManager());
     }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
@@ -674,9 +675,6 @@ class App {
         }
 
         if (Runner::isCLI() || (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP && in_array('scheduler', $pathArr))) {
-            if (defined('SCHEDULER_THROUGH_HTTP') && SCHEDULER_THROUGH_HTTP) {
-                TasksManager::initRoutes();
-            }
             TasksManager::getPassword(self::getConfig()->getSchedulerPassword());
             //initialize scheduler tasks only if in CLI or scheduler is enabled through HTTP.
             self::call(APP_DIR.'\Ini\Tasks::initialize');

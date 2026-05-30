@@ -25,6 +25,7 @@ class Access {
      * @since 1.0
      */
     private static $access;
+    private static ?AccessManager $manager = null;
     /**
      * An array which contains an objects of type UsersGroup.
      *
@@ -747,5 +748,77 @@ class Access {
         }
 
         return false;
+    }
+
+    // --- New RBAC/ABAC API ---
+
+    /**
+     * Returns the AccessManager instance.
+     *
+     * @return AccessManager
+     */
+    public static function getManager(): AccessManager {
+        if (!isset(self::$manager)) {
+            self::$manager = new AccessManager();
+        }
+
+        return self::$manager;
+    }
+    /**
+     * Sets the AccessManager instance.
+     *
+     * @param AccessManager $manager
+     */
+    public static function setManager(AccessManager $manager): void {
+        self::$manager = $manager;
+    }
+    /**
+     * Create or get a role.
+     *
+     * @param string $name Role name.
+     * @param array $permissions Optional permissions.
+     *
+     * @return Role
+     */
+    public static function role(string $name, array $permissions = []): Role {
+        return self::getManager()->role($name, $permissions);
+    }
+    /**
+     * Register a policy for a permission.
+     *
+     * @param string $permission Permission name.
+     * @param callable|object $condition Callable or policy object.
+     */
+    public static function policy(string $permission, callable|object $condition): void {
+        self::getManager()->policy($permission, $condition);
+    }
+    /**
+     * Register a policy object (duck typing).
+     *
+     * @param object $policyObj Object with getPermission() and evaluate().
+     */
+    public static function registerPolicy(object $policyObj): void {
+        self::getManager()->registerPolicy($policyObj);
+    }
+    /**
+     * Check if a user has a permission (RBAC + ABAC).
+     *
+     * @param object|int|string $user User or user ID.
+     * @param string $permission Permission to check.
+     * @param object|null $resource Optional resource for ABAC.
+     *
+     * @return bool
+     */
+    public static function can($user, string $permission, ?object $resource = null): bool {
+        return self::getManager()->can($user, $permission, $resource);
+    }
+    /**
+     * Assign a role to a user.
+     *
+     * @param int|string $userId User ID.
+     * @param string $roleName Role name.
+     */
+    public static function assignRoleToUser($userId, string $roleName): void {
+        self::getManager()->assignRoleToUser($userId, $roleName);
     }
 }

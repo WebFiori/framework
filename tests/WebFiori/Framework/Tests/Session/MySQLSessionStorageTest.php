@@ -22,6 +22,6 @@ class MySQLSessionStorageTest extends AbstractDatabaseSessionStorageTest {
     }
 
     protected function getConnectionInfo(): ConnectionInfo {
-        return new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', 'localhost', getenv('MYSQL_PORT') !== false ? intval(getenv('MYSQL_PORT')) : 3306);
+        return new ConnectionInfo('mysql', 'root', MYSQL_ROOT_PASSWORD, 'testing_db', '127.0.0.1', getenv('MYSQL_PORT') !== false ? intval(getenv('MYSQL_PORT')) : 3306);
     }
 }

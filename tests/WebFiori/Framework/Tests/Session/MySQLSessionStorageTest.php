@@ -3,6 +3,7 @@
 namespace WebFiori\Framework\Test\Session;
 
 use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Database;
 
 /**
  * MySQL-based database session storage tests.
@@ -11,11 +12,9 @@ use WebFiori\Database\ConnectionInfo;
 class MySQLSessionStorageTest extends AbstractDatabaseSessionStorageTest {
     protected function setUp(): void {
         try {
-            new \PDO(
-                'mysql:host=localhost;port=3307;dbname=testing_db',
-                'root',
-                MYSQL_ROOT_PASSWORD
-            );
+            $conn = $this->getConnectionInfo();
+            $db = new Database($conn);
+            $db->getConnection();
         } catch (\Throwable $e) {
             $this->markTestSkipped('MySQL not available: '.$e->getMessage());
         }

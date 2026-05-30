@@ -35,6 +35,16 @@ use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
+use WebFiori\Container\Container;
+use WebFiori\Container\ContainerFacade;
+use WebFiori\Event\EventDispatcherFacade;
+use WebFiori\Log\FileLogger;
+use WebFiori\Log\Logger;
+use WebFiori\Log\LoggerFacade;
+use WebFiori\Log\LogLevel;
+use WebFiori\Queue\FileQueueStorage;
+use WebFiori\Queue\Queue;
+use WebFiori\Queue\QueueFacade;
 /**
  * The time at which the framework was booted in microseconds as a float.
  *
@@ -125,13 +135,13 @@ class App {
     private function __construct() {
         // Initialize logger
         $logDir = APP_PATH.'Storage'.DS.'Logs';
-        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? \WebFiori\Log\LogLevel::DEBUG : \WebFiori\Log\LogLevel::WARNING;
-        \WebFiori\Log\LoggerFacade::setInstance(new \WebFiori\Log\FileLogger($logDir, $minLevel));
+        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? LogLevel::DEBUG : LogLevel::WARNING;
+        LoggerFacade::setInstance(new FileLogger($logDir, $minLevel));
 
         // Initialize queue storage
         $queueDir = APP_PATH.'Storage'.DS.'Queue';
-        \WebFiori\Queue\QueueFacade::setInstance(
-            new \WebFiori\Queue\Queue(new \WebFiori\Queue\FileQueueStorage($queueDir))
+        QueueFacade::setInstance(
+            new Queue(new FileQueueStorage($queueDir))
         );
         $this->checkAppDir();
         $this->setHandlers();
@@ -285,18 +295,18 @@ class App {
     /**
      * Returns the application DI container.
      *
-     * @return \WebFiori\Container\Container
+     * @return Container
      */
-    public static function container(): \WebFiori\Container\Container {
-        return \WebFiori\Container\ContainerFacade::getInstance();
+    public static function container(): Container {
+        return ContainerFacade::getInstance();
     }
     /**
      * Returns the application logger instance.
      *
-     * @return \WebFiori\Log\Logger
+     * @return Logger
      */
-    public static function log(): \WebFiori\Log\Logger {
-        return \WebFiori\Log\LoggerFacade::getInstance();
+    public static function log(): Logger {
+        return LoggerFacade::getInstance();
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -408,11 +418,11 @@ class App {
                 App::getRunner()->start();
             } else {
                 //route user request.
-                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
+                EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
                 Router::route(self::getRequest()->getRequestedURI());
                 self::getResponse()->send();
                 $duration = (microtime(true) - MICRO_START) * 1000;
-                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
+                EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
             }
         }
     }
@@ -583,14 +593,14 @@ class App {
                     $eventClass = $params[0]->getType()->getName();
 
                     if ($eventClass !== 'object') {
-                        \WebFiori\Event\EventDispatcherFacade::listen($eventClass, $instance);
+                        EventDispatcherFacade::listen($eventClass, $instance);
                     }
                 }
             }
         });
     }
     private function initContainer() {
-        $container = \WebFiori\Container\ContainerFacade::getInstance();
+        $container = ContainerFacade::getInstance();
         $container->instance(\WebFiori\Framework\Session\SessionManager::class, \WebFiori\Framework\Session\SessionsManager::getInstance());
         $container->instance(\WebFiori\Framework\Middleware\MiddlewareRegistry::class, \WebFiori\Framework\Middleware\MiddlewareManager::getInstance());
         $container->instance(\WebFiori\Framework\Router\Router::class, \WebFiori\Framework\Router\Router::getInstance());

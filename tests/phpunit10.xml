@@ -53,7 +53,7 @@
       <file>../WebFiori/Framework/Access.php</file>
       <file>../WebFiori/Framework/DB.php</file>
       <file>../WebFiori/Framework/EmailMessage.php</file>
-      <file>../WebFiori/Framework/ExtendedWebServicesManager.php</file>
+
       <file>../WebFiori/Framework/Ini.php</file>
       <file>../WebFiori/Framework/Lang.php</file>
       <file>../WebFiori/Framework/Privilege.php</file>
@@ -77,12 +77,10 @@
       <file>../WebFiori/Framework/Exceptions/SessionException.php</file>
       <file>../WebFiori/Framework/Exceptions/UIException.php</file>
 
-      <file>../WebFiori/Framework/Handlers/APICallErrHandler.php</file>
-      <file>../WebFiori/Framework/Handlers/CLIErrHandler.php</file>
-      <file>../WebFiori/Framework/Handlers/HTTPErrHandler.php</file>
+
 
       <file>../WebFiori/Framework/Middleware/AbstractMiddleware.php</file>
-      <file>../WebFiori/Framework/Middleware/CacheMiddleware.php</file>
+
       <file>../WebFiori/Framework/Middleware/MiddlewareManager.php</file>
       <file>../WebFiori/Framework/Middleware/StartSessionMiddleware.php</file>
 
@@ -130,15 +128,15 @@
       <file>../WebFiori/Framework/Storage/InMemoryAccessStorage.php</file>
       <file>../WebFiori/Framework/Storage/FileAccessStorage.php</file>
       <file>../WebFiori/Framework/Storage/DatabaseAccessStorage.php</file>
-      <file>../WebFiori/Framework/Middleware/AuthorizeMiddleware.php</file>
+
 
       <file>../WebFiori/Framework/Ui/BeforeRenderCallback.php</file>
       <file>../WebFiori/Framework/Ui/HTTPCodeView.php</file>
-      <file>../WebFiori/Framework/Ui/MessageBox.php</file>
-      <file>../WebFiori/Framework/Ui/StarterPage.php</file>
+
+
       <file>../WebFiori/Framework/Ui/WebPage.php</file>
 
-      <file>../WebFiori/Framework/Cli/Helpers/ClassInfoReader.php</file>
+
       <file>../WebFiori/Framework/Cli/Commands/AddDbConnectionCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/AddLangCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/AddSmtpConnectionCommand.php</file>

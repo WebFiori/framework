@@ -609,4 +609,305 @@ class RouterTest extends TestCase {
         $obj = Router::getUriObj('/no-such-path-'.time());
         $this->assertNull($obj);
     }
+    /**
+     * @test
+     */
+    public function testIncSiteMapRoute() {
+        Router::removeAll();
+        Router::incSiteMapRoute();
+        $this->assertTrue(Router::hasRoute('/sitemap.xml'));
+        $this->assertTrue(Router::hasRoute('/sitemap'));
+    }
+    /**
+     * @test
+     */
+    public function testNotFound() {
+        Router::removeAll();
+        ob_start();
+        Router::notFound();
+        ob_end_clean();
+        $this->assertEquals(404, App::getResponse()->getCode());
+    }
+    /**
+     * @test
+     */
+    public function testSetOnNotFoundCustom() {
+        Router::removeAll();
+        $called = false;
+        Router::setOnNotFound(function () use (&$called) {
+            $called = true;
+        });
+        Router::notFound();
+        $this->assertTrue($called);
+    }
+    /**
+     * @test
+     */
+    public function testRedirectBasic() {
+        Router::removeAll();
+        Router::redirect('/old-path', '/new-path', 301);
+        $this->assertTrue(Router::hasRoute('/old-path'));
+    }
+    /**
+     * @test
+     */
+    public function testRedirectInvalidCode() {
+        Router::removeAll();
+        Router::redirect('/old2', '/new2', 999);
+        $this->assertTrue(Router::hasRoute('/old2'));
+    }
+    /**
+     * @test
+     */
+    public function testRemoveRouteAndNonExistent() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/to-remove',
+            RouteOption::TO => function () {}
+        ]);
+        $this->assertTrue(Router::hasRoute('/to-remove'));
+        $this->assertTrue(Router::removeRoute('/to-remove'));
+        $this->assertFalse(Router::hasRoute('/to-remove'));
+        $this->assertFalse(Router::removeRoute('/non-existent'));
+    }
+    /**
+     * @test
+     */
+    public function testRoutesCount() {
+        Router::removeAll();
+        $this->assertEquals(0, Router::routesCount());
+        Router::closure([
+            RouteOption::PATH => '/count-test',
+            RouteOption::TO => function () {}
+        ]);
+        $this->assertEquals(1, Router::routesCount());
+    }
+    /**
+     * @test
+     */
+    public function testRoutesAsRouterUriStructure() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/uri-test',
+            RouteOption::TO => function () {}
+        ]);
+        $arr = Router::routesAsRouterUri();
+        $this->assertArrayHasKey('static', $arr);
+        $this->assertArrayHasKey('variable', $arr);
+    }
+    /**
+     * @test
+     */
+    public function testGetUriObjByURLNotFound() {
+        Router::removeAll();
+        $result = Router::getUriObjByURL('https://127.0.0.1/no-such-route');
+        $this->assertNull($result);
+    }
+    /**
+     * @test
+     */
+    public function testGetUriObjByURLFound() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/found-route',
+            RouteOption::TO => function () {}
+        ]);
+        $result = Router::getUriObjByURL(Router::base().'/found-route');
+        $this->assertInstanceOf(RouterUri::class, $result);
+    }
+    /**
+     * @test
+     */
+    public function testGetParameterValueBeforeRouting() {
+        Router::removeAll();
+        $this->assertNull(Router::getParameterValue('test'));
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithParameters() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/users/{user-id}',
+            RouteOption::TO => function () {}
+        ]);
+        $this->assertTrue(Router::hasRoute('/users/{user-id}'));
+        $this->assertEquals(1, Router::routesCount());
+    }
+    /**
+     * @test
+     */
+    public function testPageRoute() {
+        Router::removeAll();
+        $result = Router::page([
+            RouteOption::PATH => '/my-page',
+            RouteOption::TO => '/home.php'
+        ]);
+        $this->assertTrue($result);
+        $this->assertTrue(Router::hasRoute('/my-page'));
+    }
+    /**
+     * @test
+     */
+    public function testAddRouteNoRouteTo() {
+        Router::removeAll();
+        $result = Router::addRoute([
+            RouteOption::PATH => '/no-target'
+        ]);
+        $this->assertFalse($result);
+    }
+    /**
+     * @test
+     */
+    public function testClosureRouteNotCallable() {
+        Router::removeAll();
+        $result = Router::closure([
+            RouteOption::PATH => '/bad-closure',
+            RouteOption::TO => 'not-a-function'
+        ]);
+        $this->assertFalse($result);
+    }
+    /**
+     * @test
+     */
+    public function testSubRoutes() {
+        Router::removeAll();
+        $result = Router::addRoute([
+            RouteOption::PATH => '/api/v1',
+            RouteOption::SUB_ROUTES => [
+                [
+                    RouteOption::PATH => 'users',
+                    RouteOption::TO => function () {}
+                ],
+                [
+                    RouteOption::PATH => 'posts',
+                    RouteOption::TO => function () {}
+                ]
+            ]
+        ]);
+        $this->assertTrue($result);
+        $this->assertTrue(Router::hasRoute('/api/v1/users'));
+        $this->assertTrue(Router::hasRoute('/api/v1/posts'));
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithRequestMethods() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/method-test',
+            RouteOption::TO => function () {},
+            RouteOption::REQUEST_METHODS => ['GET', 'POST']
+        ]);
+        $uri = Router::getUriObj('/method-test');
+        $this->assertNotNull($uri);
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithMiddleware() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/mw-test',
+            RouteOption::TO => function () {},
+            RouteOption::MIDDLEWARE => 'global'
+        ]);
+        $this->assertTrue(Router::hasRoute('/mw-test'));
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithAction() {
+        Router::removeAll();
+        Router::addRoute([
+            RouteOption::PATH => '/action-test',
+            RouteOption::TO => 'SomeClass',
+            RouteOption::ACTION => 'doSomething'
+        ]);
+        $this->assertTrue(Router::hasRoute('/action-test'));
+    }
+    /**
+     * @test
+     */
+    public function testDuplicateRoute() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/dup',
+            RouteOption::TO => function () {}
+        ]);
+        $result = Router::closure([
+            RouteOption::PATH => '/dup',
+            RouteOption::TO => function () {}
+        ]);
+        $this->assertFalse($result);
+    }
+    /**
+     * @test
+     */
+    public function testCaseInsensitiveRoute() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/Case-Test',
+            RouteOption::TO => function () {},
+            RouteOption::CASE_SENSITIVE => false
+        ]);
+        $result = Router::getUriObjByURL(Router::base().'/case-test');
+        $this->assertNotNull($result);
+    }
+    /**
+     * @test
+     */
+    public function testResetAndSetInstance() {
+        Router::closure([
+            RouteOption::PATH => '/before-reset',
+            RouteOption::TO => function () {}
+        ]);
+        Router::resetInstance();
+        $this->assertEquals(0, Router::routesCount());
+    }
+    /**
+     * @test
+     */
+    public function testSetInstance() {
+        Router::resetInstance();
+        $instance = Router::getInstance();
+        Router::setInstance($instance);
+        $this->assertSame($instance, Router::getInstance());
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithVarsValues() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/products/{category}',
+            RouteOption::TO => function () {},
+            RouteOption::VALUES => ['category' => ['electronics', 'books']]
+        ]);
+        $this->assertTrue(Router::hasRoute('/products/{category}'));
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithLanguages() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/lang-test',
+            RouteOption::TO => function () {},
+            RouteOption::LANGS => ['AR', 'EN']
+        ]);
+        $this->assertTrue(Router::hasRoute('/lang-test'));
+    }
+    /**
+     * @test
+     */
+    public function testRouteWithCacheDuration() {
+        Router::removeAll();
+        Router::closure([
+            RouteOption::PATH => '/cached',
+            RouteOption::TO => function () {},
+            RouteOption::CACHE_DURATION => 3600
+        ]);
+        $this->assertTrue(Router::hasRoute('/cached'));
+    }
 }

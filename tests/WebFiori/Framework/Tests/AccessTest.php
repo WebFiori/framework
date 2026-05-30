@@ -638,4 +638,14 @@ class AccessTest extends TestCase {
             }
         }
     }
+    /** @test */
+    public function testPermissionDbId() {
+        $perm = new \WebFiori\Framework\Permission('TEST_PERM', 'A test permission');
+        $this->assertNull($perm->getDbId());
+        $perm->setDbId(42);
+        $this->assertEquals(42, $perm->getDbId());
+        $this->assertEquals('A test permission', $perm->getDescription());
+        $perm->setDescription('Updated');
+        $this->assertEquals('Updated', $perm->getDescription());
+    }
 }

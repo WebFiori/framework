@@ -99,4 +99,45 @@ class CheckMaintenanceModeTest extends TestCase {
         $mw->afterSend($request, $response);
         $this->assertTrue(true);
     }
+    /** @test */
+    public function testHtmlResponseWhenNotApi() {
+        file_put_contents($this->maintenanceFile, json_encode([
+            'message' => 'We are updating',
+            'retry_after' => 120,
+            'allowed' => [],
+            'api_prefix' => '/api',
+        ]));
+
+        unset($_SERVER['HTTP_ACCEPT']);
+        $mw = new CheckMaintenanceMode();
+        $request = new \WebFiori\Http\Request();
+        $response = new \WebFiori\Http\Response();
+
+        $mw->before($request, $response);
+
+        $this->assertEquals(503, $response->getCode());
+        $this->assertStringContainsString('Under Maintenance', $response->getBody());
+        $this->assertStringContainsString('We are updating', $response->getBody());
+    }
+    /** @test */
+    public function testCustomMaintenancePage() {
+        $customPage = APP_PATH.'Storage'.DIRECTORY_SEPARATOR.'maintenance.html';
+        file_put_contents($customPage, '<html><body>Custom maintenance</body></html>');
+        file_put_contents($this->maintenanceFile, json_encode([
+            'message' => 'Down',
+            'allowed' => [],
+            'api_prefix' => '/api',
+        ]));
+
+        unset($_SERVER['HTTP_ACCEPT']);
+        $mw = new CheckMaintenanceMode();
+        $request = new \WebFiori\Http\Request();
+        $response = new \WebFiori\Http\Response();
+
+        $mw->before($request, $response);
+
+        $this->assertEquals(503, $response->getCode());
+        $this->assertStringContainsString('Custom maintenance', $response->getBody());
+        unlink($customPage);
+    }
 }

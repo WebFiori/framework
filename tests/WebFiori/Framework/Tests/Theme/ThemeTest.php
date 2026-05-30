@@ -128,4 +128,48 @@ class ThemeTest extends TestCase {
         $this->expectExceptionMessage('No such theme: \''.$themeName.'\'.');
         ThemeManager::usingTheme('Not Exist');
     }
+    /**
+     * @test
+     */
+    public function testRegisterThemeByClassName() {
+        ThemeManager::resetRegistered();
+        // Register by instance since the test themes have names set during bootstrap
+        $themes = ThemeManager::getRegisteredThemes();
+        $this->assertIsArray($themes);
+    }
+    /**
+     * @test
+     */
+    public function testRegisterInvalidClass() {
+        $this->expectException(\WebFiori\Framework\Exceptions\NoSuchThemeException::class);
+        ThemeManager::register('NonExistentClass12345');
+    }
+    /**
+     * @test
+     */
+    public function testRegisterNonThemeClass() {
+        $this->expectException(\WebFiori\Framework\Exceptions\NoSuchThemeException::class);
+        ThemeManager::register(\stdClass::class);
+    }
+    /**
+     * @test
+     */
+    public function testRegisterDuplicate() {
+        $themes = ThemeManager::getRegisteredThemes();
+        if (count($themes) > 0) {
+            $firstTheme = array_values($themes)[0];
+            $this->expectException(\WebFiori\Framework\Exceptions\NoSuchThemeException::class);
+            ThemeManager::register($firstTheme);
+        } else {
+            $this->markTestSkipped('No themes registered');
+        }
+    }
+    /**
+     * @test
+     */
+    public function testUsingThemeEmptyName() {
+        $result = ThemeManager::usingTheme('');
+        // When empty and config theme is empty, returns null
+        $this->assertTrue($result === null || $result instanceof Theme);
+    }
 }

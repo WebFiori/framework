@@ -837,4 +837,185 @@ class PageTest extends TestCase {
         $page = new WebPage();
         $page->setLang('jp');
     }
+    /**
+     * @test
+     */
+    public function testHasAside() {
+        $page = new WebPage();
+        $page->setHasAside(true);
+        $this->assertTrue($page->hasAside());
+        $page->setHasAside(false);
+        $this->assertFalse($page->hasAside());
+    }
+    /**
+     * @test
+     */
+    public function testHasFooter() {
+        $page = new WebPage();
+        $page->setHasFooter(true);
+        $this->assertTrue($page->hasFooter());
+        $page->setHasFooter(false);
+        $this->assertFalse($page->hasFooter());
+    }
+    /**
+     * @test
+     */
+    public function testHasHeader() {
+        $page = new WebPage();
+        $page->setHasHeader(true);
+        $this->assertTrue($page->hasHeader());
+        $page->setHasHeader(false);
+        $this->assertFalse($page->hasHeader());
+    }
+    /**
+     * @test
+     */
+    public function testGetBase() {
+        $page = new WebPage();
+        $base = $page->getBase();
+        $this->assertIsString($base);
+    }
+    /**
+     * @test
+     */
+    public function testGetCanonical() {
+        $page = new WebPage();
+        $page->setCanonical('https://example.com/page');
+        $this->assertEquals('https://example.com/page', $page->getCanonical());
+    }
+    /**
+     * @test
+     */
+    public function testGetMetaVal() {
+        $page = new WebPage();
+        $page->addMeta('author', 'Ibrahim');
+        $this->assertEquals('Ibrahim', $page->getMetaVal('author'));
+        $this->assertEquals('', $page->getMetaVal('nonexistent'));
+    }
+    /**
+     * @test
+     */
+    public function testAddMetaOverride() {
+        $page = new WebPage();
+        $page->addMeta('description', 'first');
+        $page->addMeta('description', 'second', true);
+        $this->assertEquals('second', $page->getMetaVal('description'));
+    }
+    /**
+     * @test
+     */
+    public function testIncludeI18nLabels() {
+        $page = new WebPage();
+        $default = $page->includeI18nLables();
+        $this->assertIsBool($default);
+        $page->includeI18nLables(true);
+        $this->assertTrue($page->includeI18nLables());
+        $page->includeI18nLables(false);
+        $this->assertFalse($page->includeI18nLables());
+    }
+    /**
+     * @test
+     */
+    public function testIsThemeLoaded() {
+        $page = new WebPage();
+        $this->assertFalse($page->isThemeLoaded());
+    }
+    /**
+     * @test
+     */
+    public function testGetWritingDir() {
+        $page = new WebPage();
+        $page->setWritingDir('rtl');
+        $this->assertEquals('rtl', $page->getWritingDir());
+        $page->setWritingDir('ltr');
+        $this->assertEquals('ltr', $page->getWritingDir());
+    }
+    /**
+     * @test
+     */
+    public function testSetWritingDirInvalid() {
+        $page = new WebPage();
+        $page->setWritingDir('invalid');
+        // Should keep previous value
+        $this->assertContains($page->getWritingDir(), ['ltr', 'rtl']);
+    }
+    /**
+     * @test
+     */
+    public function testRemoveChild() {
+        $page = new WebPage();
+        $node = new \WebFiori\Ui\HTMLNode('p');
+        $node->setID('test-remove-node');
+        $page->insert($node);
+        $removed = $page->removeChild('test-remove-node');
+        $this->assertNotNull($removed);
+    }
+    /**
+     * @test
+     */
+    public function testRemoveChildByNode() {
+        $page = new WebPage();
+        $node = new \WebFiori\Ui\HTMLNode('p');
+        $node->setID('test-remove-node-2');
+        $page->insert($node);
+        $removed = $page->removeChild($node);
+        $this->assertNotNull($removed);
+    }
+    /**
+     * @test
+     */
+    public function testAddBeforeRender() {
+        $page = new WebPage();
+        $called = false;
+        $cb = $page->addBeforeRender(function () use (&$called) {
+            $called = true;
+        }, 5);
+        $this->assertNotNull($cb);
+        $this->assertNotNull($cb->getID());
+    }
+    /**
+     * @test
+     */
+    public function testRemoveBeforeRender() {
+        $page = new WebPage();
+        $cb = $page->addBeforeRender(function () {}, 0);
+        $id = $cb->getID();
+        $removed = $page->removeBeforeRender($id);
+        $this->assertNotNull($removed);
+        $this->assertNull($page->removeBeforeRender('non-existent-id'));
+    }
+    /**
+     * @test
+     */
+    public function testRenderReturnResult() {
+        $page = new WebPage();
+        $page->setTitle('Test Render');
+        $result = $page->render(false, true);
+        $this->assertInstanceOf(\WebFiori\Ui\HTMLDoc::class, $result);
+        $this->assertStringContainsString('Test Render', $result->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetParameterValue() {
+        $page = new WebPage();
+        $result = $page->getParameterValue('non-existent');
+        $this->assertNull($result);
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege() {
+        $page = new WebPage();
+        $this->assertFalse($page->hasPrivilege('some-privilege'));
+    }
+    /**
+     * @test
+     */
+    public function testGetActiveSession() {
+        $page = new WebPage();
+        $session = $page->getActiveSession();
+        // May be null if no session started
+        $this->assertTrue($session === null || is_object($session));
+    }
 }

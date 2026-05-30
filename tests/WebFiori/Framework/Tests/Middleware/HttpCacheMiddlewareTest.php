@@ -59,4 +59,43 @@ class HttpCacheMiddlewareTest extends TestCase {
         $this->assertEquals(600, $mw->getMaxAge());
         $this->assertTrue($mw->isPublic());
     }
+    /** @test */
+    public function test304WhenEtagMatches() {
+        $mw = new HttpCacheMiddleware();
+        $body = 'Hello World';
+        $etag = '"'.md5($body).'"';
+
+        $_SERVER['HTTP_IF_NONE_MATCH'] = $etag;
+        $request = Request::createFromGlobals();
+        $request->setRequestMethod('GET');
+        $response = new Response();
+        $response->write($body);
+
+        $mw->after($request, $response);
+
+        $this->assertEquals(304, $response->getCode());
+        unset($_SERVER['HTTP_IF_NONE_MATCH']);
+    }
+    /** @test */
+    public function testBeforeAndAfterSendDoNothing() {
+        $mw = new HttpCacheMiddleware();
+        $request = new Request();
+        $response = new Response();
+        $mw->before($request, $response);
+        $mw->afterSend($request, $response);
+        $this->assertEquals(200, $response->getCode());
+    }
+    /** @test */
+    public function testPrivateCacheControl() {
+        $mw = new HttpCacheMiddleware(['max-age' => 300, 'public' => false]);
+        $request = new Request();
+        $request->setRequestMethod('GET');
+        $response = new Response();
+        $response->write('private content');
+
+        $mw->after($request, $response);
+
+        $cc = $response->getHeader('Cache-Control');
+        $this->assertNotEmpty($cc);
+    }
 }

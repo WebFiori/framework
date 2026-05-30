@@ -11,9 +11,7 @@
  */
 namespace WebFiori\Framework;
 
-use Error;
 use Exception;
-use ReflectionClass;
 use WebFiori\Cli\Runner;
 use WebFiori\Error\Config\HandlerConfig;
 use WebFiori\Error\Handler;
@@ -35,6 +33,18 @@ use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
+use ReflectionMethod;
+use WebFiori\Cache\CacheFacade;
+use WebFiori\Container\Container;
+use WebFiori\Container\ContainerFacade;
+use WebFiori\Event\EventDispatcherFacade;
+use WebFiori\Log\FileLogger;
+use WebFiori\Log\Logger;
+use WebFiori\Log\LoggerFacade;
+use WebFiori\Log\LogLevel;
+use WebFiori\Queue\FileQueueStorage;
+use WebFiori\Queue\Queue;
+use WebFiori\Queue\QueueFacade;
 /**
  * The time at which the framework was booted in microseconds as a float.
  *
@@ -68,13 +78,6 @@ class App {
      *
      */
     const STATUS_NONE = 'NONE';
-    /**
-     * An instance of autoloader class.
-     *
-     * @var ClassLoader
-     *
-     * @since 1.0
-     */
     /**
      * A mutex lock to disallow class access during initialization state.
      *
@@ -125,13 +128,13 @@ class App {
     private function __construct() {
         // Initialize logger
         $logDir = APP_PATH.'Storage'.DS.'Logs';
-        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? \WebFiori\Log\LogLevel::DEBUG : \WebFiori\Log\LogLevel::WARNING;
-        \WebFiori\Log\LoggerFacade::setInstance(new \WebFiori\Log\FileLogger($logDir, $minLevel));
+        $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? LogLevel::DEBUG : LogLevel::WARNING;
+        LoggerFacade::setInstance(new FileLogger($logDir, $minLevel));
 
         // Initialize queue storage
         $queueDir = APP_PATH.'Storage'.DS.'Queue';
-        \WebFiori\Queue\QueueFacade::setInstance(
-            new \WebFiori\Queue\Queue(new \WebFiori\Queue\FileQueueStorage($queueDir))
+        QueueFacade::setInstance(
+            new Queue(new FileQueueStorage($queueDir))
         );
 
 
@@ -287,18 +290,18 @@ class App {
     /**
      * Returns the application DI container.
      *
-     * @return \WebFiori\Container\Container
+     * @return Container
      */
-    public static function container(): \WebFiori\Container\Container {
-        return \WebFiori\Container\ContainerFacade::getInstance();
+    public static function container(): Container {
+        return ContainerFacade::getInstance();
     }
     /**
      * Returns the application logger instance.
      *
-     * @return \WebFiori\Log\Logger
+     * @return Logger
      */
-    public static function log(): \WebFiori\Log\Logger {
-        return \WebFiori\Log\LoggerFacade::getInstance();
+    public static function log(): Logger {
+        return LoggerFacade::getInstance();
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -348,7 +351,6 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueStatusCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueRetryCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueWorkCommand',
-
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerDaemonCommand',
@@ -365,11 +367,6 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateResourceCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateMigrationCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateSeederCommand',
-
-
-
-
-
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommandNew',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RollbackMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
@@ -410,11 +407,11 @@ class App {
                 App::getRunner()->start();
             } else {
                 //route user request.
-                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
+                EventDispatcherFacade::dispatch(new Events\RequestReceived(self::getRequest()));
                 Router::route(self::getRequest()->getRequestedURI());
                 self::getResponse()->send();
                 $duration = (microtime(true) - MICRO_START) * 1000;
-                \WebFiori\Event\EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
+                EventDispatcherFacade::dispatch(new Events\ResponseSent(self::getRequest(), self::getResponse(), $duration));
             }
         }
     }
@@ -578,25 +575,25 @@ class App {
         // Auto-discover listeners from App/Listeners/
         self::autoRegister('Listeners', function ($instance) {
             if (method_exists($instance, 'handle')) {
-                $ref = new \ReflectionMethod($instance, 'handle');
+                $ref = new ReflectionMethod($instance, 'handle');
                 $params = $ref->getParameters();
 
                 if (count($params) > 0 && $params[0]->getType() !== null) {
                     $eventClass = $params[0]->getType()->getName();
 
                     if ($eventClass !== 'object') {
-                        \WebFiori\Event\EventDispatcherFacade::listen($eventClass, $instance);
+                        EventDispatcherFacade::listen($eventClass, $instance);
                     }
                 }
             }
         });
     }
     private function initContainer() {
-        $container = \WebFiori\Container\ContainerFacade::getInstance();
-        $container->instance(\WebFiori\Framework\Session\SessionManager::class, \WebFiori\Framework\Session\SessionsManager::getInstance());
-        $container->instance(\WebFiori\Framework\Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
-        $container->instance(\WebFiori\Framework\Router\Router::class, \WebFiori\Framework\Router\Router::getInstance());
-        $container->instance(\WebFiori\Framework\Scheduler\TasksManager::class, \WebFiori\Framework\Scheduler\TasksManager::get());
+        $container = ContainerFacade::getInstance();
+        $container->instance(Session\SessionManager::class, Session\SessionsManager::getInstance());
+        $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
+        $container->instance(Router::class, Router::getInstance());
+        $container->instance(TasksManager::class, TasksManager::get());
     }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
@@ -618,7 +615,7 @@ class App {
         // Register built-in checks
         Health\HealthCheck::register(new Health\Checks\StorageCheck());
 
-        if (\WebFiori\Cache\CacheFacade::isEnabled()) {
+        if (CacheFacade::isEnabled()) {
             Health\HealthCheck::register(new Health\Checks\CacheCheck());
         }
 

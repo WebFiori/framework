@@ -138,8 +138,6 @@
       <file>../WebFiori/Framework/Ui/StarterPage.php</file>
       <file>../WebFiori/Framework/Ui/WebPage.php</file>
 
-      <file>../WebFiori/Framework/Cli/CLITestCase.php</file>
-      <file>../WebFiori/Framework/Cli/CLIUtils.php</file>
       <file>../WebFiori/Framework/Cli/Helpers/ClassInfoReader.php</file>
       <file>../WebFiori/Framework/Cli/Commands/AddDbConnectionCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/AddLangCommand.php</file>
@@ -164,21 +162,6 @@
       <file>../WebFiori/Framework/Cli/Commands/VersionCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/WHelpCommand.php</file>
 
-      <file>../WebFiori/Framework/Writers/AttributeTableWriter.php</file>
-      <file>../WebFiori/Framework/Writers/ClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/CommandClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/DocblockBuilder.php</file>
-      <file>../WebFiori/Framework/Writers/DomainEntityWriter.php</file>
-      <file>../WebFiori/Framework/Writers/LangClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/MiddlewareClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/MigrationClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/RepositoryWriter.php</file>
-      <file>../WebFiori/Framework/Writers/RestServiceWriter.php</file>
-      <file>../WebFiori/Framework/Writers/SchedulerTaskClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/SeederClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/ServiceHolder.php</file>
-      <file>../WebFiori/Framework/Writers/ThemeClassWriter.php</file>
-      <file>../WebFiori/Framework/Writers/ThemeComponentWriter.php</file>
     </include>
   </source>
 </phpunit>

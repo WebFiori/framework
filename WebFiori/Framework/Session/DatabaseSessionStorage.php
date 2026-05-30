@@ -42,11 +42,7 @@ class DatabaseSessionStorage implements SessionStorage {
      */
     public function __construct($connection = 'sessions-connection') {
         try {
-            if ($connection instanceof ConnectionInfo) {
-                $this->dbController = new SessionDB($connection);
-            } else {
-                $this->dbController = new SessionDB($connection);
-            }
+            $this->dbController = new SessionDB($connection);
         } catch (DatabaseException $ex) {
             $connName = $connection instanceof ConnectionInfo ? $connection->getName() : $connection;
 

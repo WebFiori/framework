@@ -13,6 +13,7 @@ namespace WebFiori\Framework\Router;
 use Closure;
 use InvalidArgumentException;
 use WebFiori\Framework\Middleware\AbstractMiddleware;
+use WebFiori\Framework\Exceptions\RoutingException;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Http\RequestUri;
 use WebFiori\Http\Uri;
@@ -624,18 +625,26 @@ class RouterUri extends RequestUri {
      *
      * @return array Sorted array.
      *
-     * @throws \WebFiori\Framework\Exceptions\RoutingException If circular dependency detected.
+     * @throws RoutingException If circular dependency detected.
      */
     private function sortByDependencies(array $middlewareList): array {
         if (empty($middlewareList)) {
             return [];
         }
 
-        // Build name-to-middleware map
+        // Build name-to-middleware map (skip empty names)
         $byName = [];
 
         foreach ($middlewareList as $mw) {
-            $byName[$mw->getName()] = $mw;
+            $name = $mw->getName();
+
+            if ($name !== '') {
+                $byName[$name] = $mw;
+            }
+        }
+
+        if (empty($byName)) {
+            return $middlewareList;
         }
 
         // Build adjacency list (dependency graph)
@@ -699,11 +708,11 @@ class RouterUri extends RequestUri {
             });
         }
 
-        if (count($sorted) !== count($middlewareList)) {
+        if (count($sorted) !== count($byName)) {
             // Circular dependency detected — find the cycle
             $remaining = array_diff(array_keys($inDegree), array_map(fn ($m) => $m->getName(), $sorted));
 
-            throw new \WebFiori\Framework\Exceptions\RoutingException(
+            throw new RoutingException(
                 "Circular middleware dependency detected involving: '".implode("', '", $remaining)."'"
             );
         }

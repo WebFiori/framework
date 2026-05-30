@@ -19,8 +19,16 @@ class SessionsManagerTest extends TestCase {
 
     private function skipIfMssqlUnavailable(): void {
         try {
-            $dsn = 'sqlsrv:Server='.SQL_SERVER_HOST.',1433;Database='.SQL_SERVER_DB.';TrustServerCertificate=true';
-            new \PDO($dsn, SQL_SERVER_USER, SQL_SERVER_PASS);
+            $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+                'TrustServerCertificate' => 'true'
+            ]);
+            $conn->setName('sessions-connection');
+            App::getConfig()->addOrUpdateDBConnection($conn);
+            $storage = new DatabaseSessionStorage('sessions-connection');
+            $storage->getController()->removeTables();
+            $storage->getController()->createTables();
+            $storage->save('probe-test', 'probe');
+            $storage->remove('probe-test');
         } catch (\Throwable $e) {
             $this->markTestSkipped('MSSQL not available: '.$e->getMessage());
         }

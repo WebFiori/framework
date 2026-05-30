@@ -111,7 +111,7 @@ jobs:
   code-coverage:
     name: Coverage
     needs: test
-    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.1
+    uses: WebFiori/workflows/.github/workflows/coverage-codecov.yaml@v1.2.2
     with:
       php-version: '8.5'
       coverage-file: 'php-8.5-coverage.xml'
@@ -121,13 +121,13 @@ jobs:
   code-quality:
     name: Code Quality
     needs: test
-    uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@v1.2.1
+    uses: WebFiori/workflows/.github/workflows/quality-sonarcloud.yaml@v1.2.2
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   
   release-prod:
     name: Prepare Production Release Branch / Publish Release
     needs: [code-coverage, code-quality]
-    uses: WebFiori/workflows/.github/workflows/release-php.yaml@v1.2.1
+    uses: WebFiori/workflows/.github/workflows/release-php.yaml@v1.2.2
     with:
       branch: 'main'

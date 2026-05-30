@@ -7,6 +7,10 @@ use WebFiori\Framework\AccessManager;
 use WebFiori\Framework\Permission;
 use WebFiori\Framework\Role;
 use WebFiori\Framework\Storage\InMemoryAccessStorage;
+use WebFiori\Framework\Storage\FileAccessStorage;
+use WebFiori\Framework\Storage\DatabaseAccessStorage;
+use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\Database;
 use WebFiori\Framework\User;
 /**
  * A test class for testing the class 'WebFiori\Framework\Access'.
@@ -468,5 +472,170 @@ class AccessTest extends TestCase {
         $manager->reset();
         $this->assertEmpty($manager->getRoles());
         $this->assertEmpty($manager->getUserRoles(1));
+    }
+    /** @test */
+    public function testFileStorageSaveAndLoad() {
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_test_'.getmypid().'.json';
+        $storage = new FileAccessStorage($path);
+
+        $role = new Role('file-admin');
+        $role->addPermission('MANAGE_ALL');
+        $role->setDescription('File admin role');
+        $storage->saveRole($role);
+        $storage->assignRoleToUser(1, 'file-admin');
+
+        // Load fresh
+        $storage2 = new FileAccessStorage($path);
+        $roles = $storage2->loadRoles();
+        $this->assertCount(1, $roles);
+        $this->assertEquals('file-admin', $roles[0]->getName());
+        $this->assertEquals(['file-admin'], $storage2->loadUserRoles(1));
+
+        // Remove
+        $storage2->removeRoleFromUser(1, 'file-admin');
+        $this->assertEquals([], $storage2->loadUserRoles(1));
+        $storage2->removeRole('file-admin');
+        $this->assertCount(0, $storage2->loadRoles());
+
+        unlink($path);
+    }
+    /** @test */
+    public function testFileStorageInheritance() {
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_inh_'.getmypid().'.json';
+        $storage = new FileAccessStorage($path);
+
+        $viewer = new Role('viewer');
+        $viewer->addPermission('VIEW');
+        $storage->saveRole($viewer);
+
+        $editor = new Role('editor');
+        $editor->addPermission('EDIT');
+        $editor->inherits('viewer');
+        $storage->saveRole($editor);
+
+        $loaded = $storage->loadRoles();
+        $editorLoaded = null;
+        foreach ($loaded as $r) {
+            if ($r->getName() === 'editor') {
+                $editorLoaded = $r;
+            }
+        }
+        $this->assertNotNull($editorLoaded);
+        $this->assertEquals('viewer', $editorLoaded->getParentRoleName());
+
+        unlink($path);
+    }
+    /** @test */
+    public function testFileStorageEmptyFile() {
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_empty_'.getmypid().'.json';
+        $storage = new FileAccessStorage($path);
+        $this->assertCount(0, $storage->loadRoles());
+        $this->assertEquals([], $storage->loadUserRoles(99));
+    }
+    /** @test */
+    public function testDatabaseStorageSQLite() {
+        $dbPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_db_'.getmypid().'.db';
+        $conn = new ConnectionInfo('sqlite', '', '', $dbPath, '');
+        $db = new Database($conn);
+
+        try {
+            $storage = new DatabaseAccessStorage($db);
+            $db->createTables();
+
+            // Save role with permissions
+            $role = new Role('db-admin');
+            $role->addPermission('DB_MANAGE');
+            $role->addPermission('DB_READ');
+            $role->setDescription('Database admin');
+            $storage->saveRole($role);
+
+            // Assign to user
+            $storage->assignRoleToUser(42, 'db-admin');
+
+            // Load
+            $roles = $storage->loadRoles();
+            $this->assertCount(1, $roles);
+            $this->assertEquals('db-admin', $roles[0]->getName());
+
+            $userRoles = $storage->loadUserRoles(42);
+            $this->assertEquals(['db-admin'], $userRoles);
+
+            // Remove user role
+            $storage->removeRoleFromUser(42, 'db-admin');
+            $this->assertEquals([], $storage->loadUserRoles(42));
+
+            // Remove role
+            $storage->removeRole('db-admin');
+            $this->assertCount(0, $storage->loadRoles());
+        } finally {
+            if (file_exists($dbPath)) {
+                unlink($dbPath);
+            }
+        }
+    }
+    /** @test */
+    public function testDatabaseStorageWithInheritance() {
+        $dbPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_dbinh_'.getmypid().'.db';
+        $conn = new ConnectionInfo('sqlite', '', '', $dbPath, '');
+        $db = new Database($conn);
+
+        try {
+            $storage = new DatabaseAccessStorage($db);
+            $db->createTables();
+
+            $viewer = new Role('viewer');
+            $viewer->addPermission('VIEW');
+            $storage->saveRole($viewer);
+
+            $editor = new Role('editor');
+            $editor->addPermission('EDIT');
+            $editor->inherits('viewer');
+            $storage->saveRole($editor);
+
+            $roles = $storage->loadRoles();
+            $editorLoaded = null;
+            foreach ($roles as $r) {
+                if ($r->getName() === 'editor') {
+                    $editorLoaded = $r;
+                }
+            }
+            $this->assertNotNull($editorLoaded);
+            $this->assertEquals('viewer', $editorLoaded->getParentRoleName());
+        } finally {
+            if (file_exists($dbPath)) {
+                unlink($dbPath);
+            }
+        }
+    }
+    /** @test */
+    public function testFullFlowWithDatabaseStorage() {
+        $dbPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_access_flow_'.getmypid().'.db';
+        $conn = new ConnectionInfo('sqlite', '', '', $dbPath, '');
+        $db = new Database($conn);
+
+        try {
+            $storage = new DatabaseAccessStorage($db);
+            $db->createTables();
+
+            // Setup via AccessManager
+            $manager = new AccessManager($storage);
+            $manager->role('admin', ['*']);
+            $manager->role('editor', ['EDIT', 'VIEW'])->inherits('admin');
+            $manager->saveToStorage();
+
+            // Fresh manager loads from storage
+            $manager2 = new AccessManager($storage);
+            $manager2->loadFromStorage();
+            $manager2->assignRoleToUser(1, 'editor');
+            $storage->assignRoleToUser(1, 'editor');
+            $manager2->loadUserRolesFromStorage(1);
+
+            $this->assertTrue($manager2->can(1, 'EDIT'));
+            $this->assertTrue($manager2->can(1, 'VIEW'));
+        } finally {
+            if (file_exists($dbPath)) {
+                unlink($dbPath);
+            }
+        }
     }
 }

@@ -136,6 +136,8 @@ class App {
         QueueFacade::setInstance(
             new Queue(new FileQueueStorage($queueDir))
         );
+
+
         $this->checkAppDir();
         $this->setHandlers();
         Controller::get()->updateEnv();

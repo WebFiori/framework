@@ -4,6 +4,7 @@ namespace WebFiori\Framework\Test\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Middleware\MiddlewareRegistry;
+use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
@@ -111,5 +112,65 @@ class MiddlewareRegistryTest extends TestCase {
         $registry->register(new DummyMiddleware('x'));
         $registry->register(new DummyMiddleware('y'));
         $this->assertCount(2, $registry->getAll());
+    }
+    /** @test */
+    public function testMiddlewareManagerSetInstance() {
+        $registry = new MiddlewareRegistry();
+        MiddlewareManager::setInstance($registry);
+        $this->assertSame($registry, MiddlewareManager::getInstance());
+    }
+    /** @test */
+    public function testMiddlewareManagerReset() {
+        MiddlewareManager::register(new DummyMiddleware('reset-test'));
+        MiddlewareManager::reset();
+        $this->assertNull(MiddlewareManager::getMiddleware('reset-test'));
+    }
+    /** @test */
+    public function testCompareEqualPriority() {
+        $a = new DummyMiddleware('aaa');
+        $b = new DummyMiddleware('bbb');
+        $a->setPriority(10);
+        $b->setPriority(10);
+        $this->assertNotEquals(0, $a->compare($b));
+    }
+    /** @test */
+    public function testCompareDifferentPriority() {
+        $a = new DummyMiddleware('x');
+        $b = new DummyMiddleware('y');
+        $a->setPriority(5);
+        $b->setPriority(10);
+        $this->assertLessThan(0, $a->compare($b));
+    }
+    /** @test */
+    public function testSetNameInvalid() {
+        $mw = new DummyMiddleware('valid');
+        $this->assertFalse($mw->setName(''));
+        $this->assertEquals('valid', $mw->getName());
+    }
+    /** @test */
+    public function testGetDependenciesDefault() {
+        $mw = new DummyMiddleware('dep-test');
+        $this->assertEquals([], $mw->getDependencies());
+    }
+    /** @test */
+    public function testStartSessionMiddlewareGettersSetters() {
+        $mw = new \WebFiori\Framework\Middleware\StartSessionMiddleware();
+        $mw->setSessionName('custom-session');
+        $this->assertEquals('custom-session', $mw->getSessionName());
+        $mw->setSessionOptions(['duration' => 30]);
+        $this->assertEquals(['duration' => 30], $mw->getSessionOptions());
+        $this->assertNotNull($mw->getManager());
+    }
+    /** @test */
+    public function testStartSessionMiddlewareLifecycle() {
+        $mw = new \WebFiori\Framework\Middleware\StartSessionMiddleware();
+        $request = new \WebFiori\Http\Request();
+        $response = new \WebFiori\Http\Response();
+        $mw->before($request, $response);
+        $this->assertNotNull($mw->getManager()->getActiveSession());
+        $mw->after($request, $response);
+        $this->assertNotEmpty($response->getHeader('set-cookie'));
+        $mw->afterSend($request, $response);
+        $this->assertTrue(true);
     }
 }

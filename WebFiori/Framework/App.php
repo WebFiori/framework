@@ -11,9 +11,7 @@
  */
 namespace WebFiori\Framework;
 
-use Error;
 use Exception;
-use ReflectionClass;
 use WebFiori\Cli\Runner;
 use WebFiori\Error\Config\HandlerConfig;
 use WebFiori\Error\Handler;
@@ -35,6 +33,7 @@ use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
+use ReflectionMethod;
 use WebFiori\Cache\CacheFacade;
 use WebFiori\Container\Container;
 use WebFiori\Container\ContainerFacade;
@@ -79,13 +78,6 @@ class App {
      *
      */
     const STATUS_NONE = 'NONE';
-    /**
-     * An instance of autoloader class.
-     *
-     * @var ClassLoader
-     *
-     * @since 1.0
-     */
     /**
      * A mutex lock to disallow class access during initialization state.
      *
@@ -581,7 +573,7 @@ class App {
         // Auto-discover listeners from App/Listeners/
         self::autoRegister('Listeners', function ($instance) {
             if (method_exists($instance, 'handle')) {
-                $ref = new \ReflectionMethod($instance, 'handle');
+                $ref = new ReflectionMethod($instance, 'handle');
                 $params = $ref->getParameters();
 
                 if (count($params) > 0 && $params[0]->getType() !== null) {

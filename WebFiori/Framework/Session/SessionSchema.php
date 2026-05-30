@@ -29,19 +29,19 @@ class SessionSchema {
      */
     public static function createSessionsTable(string $dbType): Table {
         return TableFactory::create($dbType, 'sessions', [
-            's-id' => [
+            's_id' => [
                 'type' => 'varchar',
                 'size' => 128,
                 'primary' => true,
                 'is-unique' => true,
                 'comment' => 'The unique ID of the session.',
             ],
-            'started-at' => [
+            'started_at' => [
                 'type' => 'datetime',
                 'default' => 'now()',
                 'comment' => 'The date and time at which the session started.',
             ],
-            'last-used' => [
+            'last_used' => [
                 'type' => 'datetime',
                 'default' => 'now()',
                 'comment' => 'The date and time at which the user had activity during the session.',
@@ -58,13 +58,13 @@ class SessionSchema {
     public static function createSessionDataTable(string $dbType): Table {
         $sessionsTable = self::createSessionsTable($dbType);
         $table = TableFactory::create($dbType, 'session_data', [
-            's-id' => [
+            's_id' => [
                 'type' => 'varchar',
                 'size' => 128,
                 'primary' => true,
                 'comment' => 'The ID of the session. Taken from main sessions table.',
             ],
-            'chunk-number' => [
+            'chunk_number' => [
                 'type' => 'int',
                 'primary' => true,
                 'comment' => 'The number of data chunk.',
@@ -75,7 +75,7 @@ class SessionSchema {
                 'comment' => 'One data chunk of size 1000.',
             ],
         ]);
-        $table->addReference($sessionsTable, ['s-id'], 'session_data_fk', 'cascade', 'cascade');
+        $table->addReference($sessionsTable, ['s_id'], 'session_data_fk', 'cascade', 'cascade');
 
         return $table;
     }

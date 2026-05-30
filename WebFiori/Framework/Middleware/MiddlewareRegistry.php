@@ -11,7 +11,6 @@
  */
 namespace WebFiori\Framework\Middleware;
 
-use Exception;
 
 /**
  * Concrete class that holds registered middleware and groups.
@@ -71,7 +70,7 @@ class MiddlewareRegistry {
         if (gettype($middleware) == 'string') {
             try {
                 $middleware = new $middleware();
-            } catch (Exception $exc) {
+            } catch (\Throwable $exc) {
                 return false;
             }
         }

@@ -167,6 +167,7 @@ class App {
         $this->initRoutes();
         $this->initHealthCheck();
         $this->initScheduler();
+        $this->initContainer();
         self::getResponse()->beforeSend(function ()
         {
             register_shutdown_function(function()
@@ -280,6 +281,14 @@ class App {
      */
     public static function getResponse() : Response {
         return self::$Response;
+    }
+    /**
+     * Returns the application DI container.
+     *
+     * @return \WebFiori\Container\Container
+     */
+    public static function container(): \WebFiori\Container\Container {
+        return \WebFiori\Container\ContainerFacade::getInstance();
     }
     /**
      * Returns the application logger instance.
@@ -579,6 +588,13 @@ class App {
                 }
             }
         });
+    }
+    private function initContainer() {
+        $container = \WebFiori\Container\ContainerFacade::getInstance();
+        $container->instance(\WebFiori\Framework\Session\SessionManager::class, \WebFiori\Framework\Session\SessionsManager::getInstance());
+        $container->instance(\WebFiori\Framework\Middleware\MiddlewareRegistry::class, \WebFiori\Framework\Middleware\MiddlewareManager::getInstance());
+        $container->instance(\WebFiori\Framework\Router\Router::class, \WebFiori\Framework\Router\Router::getInstance());
+        $container->instance(\WebFiori\Framework\Scheduler\TasksManager::class, \WebFiori\Framework\Scheduler\TasksManager::get());
     }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)

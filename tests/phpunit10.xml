@@ -51,7 +51,6 @@
   <source>
     <include>
       <file>../WebFiori/Framework/Access.php</file>
-      <file>../WebFiori/Framework/App.php</file>
       <file>../WebFiori/Framework/DB.php</file>
       <file>../WebFiori/Framework/EmailMessage.php</file>
       <file>../WebFiori/Framework/ExtendedWebServicesManager.php</file>
@@ -63,9 +62,6 @@
       <file>../WebFiori/Framework/ThemeManager.php</file>
       <file>../WebFiori/Framework/User.php</file>
 
-      <file>../WebFiori/Framework/Autoload/ClassInfo.php</file>
-      <file>../WebFiori/Framework/Autoload/ClassLoader.php</file>
-      <file>../WebFiori/Framework/Autoload/ClassLoaderException.php</file>
 
       <file>../WebFiori/Framework/Config/ClassDriver.php</file>
       <file>../WebFiori/Framework/Config/ConfigurationDriver.php</file>
@@ -140,7 +136,6 @@
       <file>../WebFiori/Framework/Cli/Commands/QueueStatusCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/QueueRetryCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/QueueWorkCommand.php</file>
-      <file>../WebFiori/Framework/AppBootstrapper.php</file>
       <file>../WebFiori/Framework/ClassRegistrar.php</file>
 
       <file>../WebFiori/Framework/Ui/BeforeRenderCallback.php</file>

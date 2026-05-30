@@ -135,6 +135,11 @@
       <file>../WebFiori/Framework/Middleware/VerifyCsrfToken.php</file>
       <file>../WebFiori/Framework/Middleware/HttpCacheMiddleware.php</file>
       <file>../WebFiori/Framework/Middleware/CheckMaintenanceMode.php</file>
+      <file>../WebFiori/Framework/Cli/Commands/DownCommand.php</file>
+      <file>../WebFiori/Framework/Cli/Commands/UpCommand.php</file>
+      <file>../WebFiori/Framework/Cli/Commands/QueueStatusCommand.php</file>
+      <file>../WebFiori/Framework/Cli/Commands/QueueRetryCommand.php</file>
+      <file>../WebFiori/Framework/Cli/Commands/QueueWorkCommand.php</file>
       <file>../WebFiori/Framework/AppBootstrapper.php</file>
       <file>../WebFiori/Framework/ClassRegistrar.php</file>
 

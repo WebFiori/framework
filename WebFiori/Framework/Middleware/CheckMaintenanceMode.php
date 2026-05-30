@@ -72,8 +72,6 @@ class CheckMaintenanceMode extends AbstractMiddleware {
                 $response->write('<html><body><h1>Under Maintenance</h1><p>'.$message.'</p></body></html>');
             }
         }
-        $response->send();
-        exit;
     }
 
     public function after(Request $request, Response $response) {

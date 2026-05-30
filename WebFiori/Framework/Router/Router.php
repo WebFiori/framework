@@ -1410,6 +1410,12 @@ class Router {
 
             foreach ($route->getMiddleware() as $mw) {
                 $mw->before(App::getRequest(), App::getResponse());
+
+                if (App::getResponse()->getCode() >= 400) {
+                    App::getResponse()->send();
+
+                    return;
+                }
             }
 
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {

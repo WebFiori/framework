@@ -122,6 +122,21 @@
       <file>../WebFiori/Framework/Session/SessionStorage.php</file>
       <file>../WebFiori/Framework/Session/SessionUser.php</file>
       <file>../WebFiori/Framework/Session/SessionsManager.php</file>
+      <file>../WebFiori/Framework/Session/SessionManager.php</file>
+      <file>../WebFiori/Framework/Session/SessionSchema.php</file>
+      <file>../WebFiori/Framework/Health/HealthCheck.php</file>
+      <file>../WebFiori/Framework/Health/HealthCheckResult.php</file>
+      <file>../WebFiori/Framework/Health/HealthCheckService.php</file>
+      <file>../WebFiori/Framework/Health/Checks/StorageCheck.php</file>
+      <file>../WebFiori/Framework/Health/Checks/CacheCheck.php</file>
+      <file>../WebFiori/Framework/Middleware/MiddlewareRegistry.php</file>
+      <file>../WebFiori/Framework/Middleware/CorsMiddleware.php</file>
+      <file>../WebFiori/Framework/Middleware/RateLimitMiddleware.php</file>
+      <file>../WebFiori/Framework/Middleware/VerifyCsrfToken.php</file>
+      <file>../WebFiori/Framework/Middleware/HttpCacheMiddleware.php</file>
+      <file>../WebFiori/Framework/Middleware/CheckMaintenanceMode.php</file>
+      <file>../WebFiori/Framework/AppBootstrapper.php</file>
+      <file>../WebFiori/Framework/ClassRegistrar.php</file>
 
       <file>../WebFiori/Framework/Ui/BeforeRenderCallback.php</file>
       <file>../WebFiori/Framework/Ui/HTTPCodeView.php</file>

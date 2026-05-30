@@ -522,4 +522,48 @@ class RouterTest extends TestCase {
         $this->assertEquals("I'm doing something.", App::getResponse()->getBody());
     }
  
+    /** @test */
+    public function testBase() {
+        $base = Router::base();
+        $this->assertIsString($base);
+        $this->assertNotEmpty($base);
+    }
+    /** @test */
+    public function testRoutesAsRouterUri() {
+        $routes = Router::routesAsRouterUri();
+        $this->assertIsArray($routes);
+        $this->assertArrayHasKey('static', $routes);
+        $this->assertArrayHasKey('variable', $routes);
+    }
+    /** @test */
+    public function testSetOnNotFound() {
+        $called = false;
+        Router::setOnNotFound(function () use (&$called) {
+            $called = true;
+        });
+        Router::notFound();
+        $this->assertTrue($called);
+    }
+
+    /** @test */
+    public function testSetInstanceAndReset() {
+        $original = Router::getInstance();
+        Router::resetInstance();
+        $fresh = Router::getInstance();
+        $this->assertNotSame($original, $fresh);
+    }
+    /** @test */
+    public function testRemoveAll() {
+        Router::api(['path' => '/remove-all-test', 'route-to' => function() {}]);
+        $this->assertTrue(Router::routesCount() > 0);
+        Router::removeAll();
+        $this->assertEquals(0, Router::routesCount());
+    }
+    /** @test */
+    public function testRemoveRoute() {
+        Router::api(['path' => '/to-remove', 'route-to' => function() {}]);
+        $this->assertTrue(Router::hasRoute('/to-remove'));
+        Router::removeRoute('/to-remove');
+        $this->assertFalse(Router::hasRoute('/to-remove'));
+    }
 }

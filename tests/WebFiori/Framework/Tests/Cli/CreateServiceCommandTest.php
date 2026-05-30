@@ -144,4 +144,16 @@ class CreateServiceCommandTest extends CLITestCase {
         $this->assertTrue(class_exists('\\App\\Apis\\'.$className.'Service'));
         $this->removeClass('\\App\\Apis\\'.$className.'Service');
     }
+    /** @test */
+    public function testCreateServiceCustomDescription() {
+        $className = 'SvcCustomDesc'.time();
+
+        $output = $this->executeSingleCommand(new CreateServiceCommand(), [], [
+            $className,
+            "My custom description",
+            'n'
+        ]);
+
+        $this->assertEquals(0, $this->getExitCode());
+    }
 }

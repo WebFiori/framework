@@ -84,4 +84,11 @@ class MaintenanceCommandsTest extends CLITestCase {
         $output = implode('', $this->getOutput());
         $this->assertStringContainsString('removed', $output);
     }
+    /** @test */
+    public function testQueueRetryAll() {
+        $this->executeSingleCommand(new QueueRetryCommand(), ['--all' => '']);
+        $this->assertEquals(0, $this->getExitCode());
+        $output = implode('', $this->getOutput());
+        $this->assertStringContainsString('Retried', $output);
+    }
 }

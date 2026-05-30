@@ -594,6 +594,7 @@ class App {
         $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
         $container->instance(Router::class, Router::getInstance());
         $container->instance(TasksManager::class, TasksManager::get());
+        $container->instance(AccessManager::class, Access::getManager());
     }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)

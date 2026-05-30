@@ -137,6 +137,13 @@
       <file>../WebFiori/Framework/Cli/Commands/QueueRetryCommand.php</file>
       <file>../WebFiori/Framework/Cli/Commands/QueueWorkCommand.php</file>
       <file>../WebFiori/Framework/ClassRegistrar.php</file>
+      <file>../WebFiori/Framework/Permission.php</file>
+      <file>../WebFiori/Framework/Role.php</file>
+      <file>../WebFiori/Framework/AccessManager.php</file>
+      <file>../WebFiori/Framework/Storage/InMemoryAccessStorage.php</file>
+      <file>../WebFiori/Framework/Storage/FileAccessStorage.php</file>
+      <file>../WebFiori/Framework/Storage/DatabaseAccessStorage.php</file>
+      <file>../WebFiori/Framework/Middleware/AuthorizeMiddleware.php</file>
 
       <file>../WebFiori/Framework/Ui/BeforeRenderCallback.php</file>
       <file>../WebFiori/Framework/Ui/HTTPCodeView.php</file>

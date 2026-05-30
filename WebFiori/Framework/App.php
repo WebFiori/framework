@@ -35,6 +35,7 @@ use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
+use WebFiori\Cache\CacheFacade;
 use WebFiori\Container\Container;
 use WebFiori\Container\ContainerFacade;
 use WebFiori\Event\EventDispatcherFacade;
@@ -356,7 +357,6 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueStatusCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueRetryCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\QueueWorkCommand',
-
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerRunCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SchedulerDaemonCommand',
@@ -373,11 +373,6 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateResourceCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateMigrationCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\CreateSeederCommand',
-
-
-
-
-
                     '\\WebFiori\\Framework\\Cli\\Commands\\RunMigrationsCommandNew',
                     '\\WebFiori\\Framework\\Cli\\Commands\\RollbackMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\InitMigrationsCommand',
@@ -601,10 +596,10 @@ class App {
     }
     private function initContainer() {
         $container = ContainerFacade::getInstance();
-        $container->instance(\WebFiori\Framework\Session\SessionManager::class, \WebFiori\Framework\Session\SessionsManager::getInstance());
-        $container->instance(\WebFiori\Framework\Middleware\MiddlewareRegistry::class, \WebFiori\Framework\Middleware\MiddlewareManager::getInstance());
-        $container->instance(\WebFiori\Framework\Router\Router::class, \WebFiori\Framework\Router\Router::getInstance());
-        $container->instance(\WebFiori\Framework\Scheduler\TasksManager::class, \WebFiori\Framework\Scheduler\TasksManager::get());
+        $container->instance(Session\SessionManager::class, Session\SessionsManager::getInstance());
+        $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
+        $container->instance(Router::class, Router::getInstance());
+        $container->instance(TasksManager::class, TasksManager::get());
     }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
@@ -626,7 +621,7 @@ class App {
         // Register built-in checks
         Health\HealthCheck::register(new Health\Checks\StorageCheck());
 
-        if (\WebFiori\Cache\CacheFacade::isEnabled()) {
+        if (CacheFacade::isEnabled()) {
             Health\HealthCheck::register(new Health\Checks\CacheCheck());
         }
 

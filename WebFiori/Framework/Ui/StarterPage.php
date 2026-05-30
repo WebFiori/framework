@@ -10,6 +10,8 @@
  */
 namespace WebFiori\Framework\Ui;
 
+use WebFiori\Ui\HTMLNode;
+
 class StarterPage extends WebPage {
     public function __construct() {
         parent::__construct();
@@ -415,7 +417,7 @@ background: transparent !important
         ])->text($desc);
     }
 
-    private function createCard($link, $icon, $cardTitle, $paragraph, \WebFiori\Ui\HTMLNode $el) {
+    private function createCard($link, $icon, $cardTitle, $paragraph, HTMLNode $el) {
         $card = $el->addChild('v-card', [
             'hover',
             'link',

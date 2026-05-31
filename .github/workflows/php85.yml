@@ -127,6 +127,7 @@ jobs:
   
   release-prod:
     name: Prepare Production Release Branch / Publish Release
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [code-coverage, code-quality]
     uses: WebFiori/workflows/.github/workflows/release-php.yaml@v1.2.2
     with:

@@ -1,5 +1,68 @@
 # Changelog
 
+## [3.0.0-RC.5](https://github.com/WebFiori/framework/compare/v3.0.0-RC.4...v3.0.0-RC.5) (2026-05-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* Scheduler web UI and APIs removed. Use CLI commands (php webfiori scheduler) for task management instead.
+* WebFiori\Framework\Util class has been removed. All methods were either unused, duplicated by existing framework methods, or trivially inlineable.
+* Removed MySQLSessionsTable, MSSQLSessionsTable, MySQLSessionDataTable, and MSSQLSessionDataTable classes. Use
+* **session:** SessionStorage::gc() signature changed from gc() to gc(string $olderThan, int $maxCount = 0). Custom storage implementations must update their gc() method signature.
+
+### Features
+
+* add CORS middleware ([75d4048](https://github.com/WebFiori/framework/commit/75d404817084838521af79c4ca93f137b4e93402)), closes [#341](https://github.com/WebFiori/framework/issues/341)
+* add CSRF protection middleware ([9171c38](https://github.com/WebFiori/framework/commit/9171c38e1672651ea62682186e2a39cdea96b1b6)), closes [#333](https://github.com/WebFiori/framework/issues/333)
+* add dependency-based middleware ordering ([cc8c201](https://github.com/WebFiori/framework/commit/cc8c201772f76df16c0bae25a1758a9b81f824fa)), closes [#334](https://github.com/WebFiori/framework/issues/334)
+* add FileAccessStorage and DatabaseAccessStorage for RBAC ([cc55249](https://github.com/WebFiori/framework/commit/cc5524909beed03d9748d9dab8bb74bc1240de1c))
+* add health check endpoint with auto-discovery ([2b1701d](https://github.com/WebFiori/framework/commit/2b1701d3145e0d5f5a82b995555ab27298aeb7cd)), closes [#339](https://github.com/WebFiori/framework/issues/339)
+* add HTTP response caching middleware (ETag / Cache-Control) ([ae9b1ad](https://github.com/WebFiori/framework/commit/ae9b1ad6844562bdcd02722f046d328755772f75)), closes [#352](https://github.com/WebFiori/framework/issues/352)
+* add maintenance mode (down/up commands) ([9d5202c](https://github.com/WebFiori/framework/commit/9d5202c24cf493685dbda545ca5318da5ac012f9)), closes [#351](https://github.com/WebFiori/framework/issues/351)
+* add rate limiting middleware ([8db4e79](https://github.com/WebFiori/framework/commit/8db4e79873a7decba506d837a160e706b5b448c9)), closes [#335](https://github.com/WebFiori/framework/issues/335)
+* add RBAC/ABAC system with backward compatibility ([82b43ba](https://github.com/WebFiori/framework/commit/82b43ba4b8ee6b2a604fdaa7838b48f5215e69b3))
+* allow middleware instances in route definitions ([76a3dc6](https://github.com/WebFiori/framework/commit/76a3dc6a36447d339a3680a2144aea06f2d5b562)), closes [#340](https://github.com/WebFiori/framework/issues/340)
+* integrate event system into framework ([d1bed19](https://github.com/WebFiori/framework/commit/d1bed19a80d8942ca56f4811c817e2790cf073e7)), closes [#347](https://github.com/WebFiori/framework/issues/347)
+* integrate queue system into framework ([7eff48d](https://github.com/WebFiori/framework/commit/7eff48ddacdd26141b2920f0ddbfe477eb235d1f)), closes [#349](https://github.com/WebFiori/framework/issues/349)
+* integrate webfiori/container into framework ([2b07a02](https://github.com/WebFiori/framework/commit/2b07a027627a2ff8e46319b82407977c28923dbf)), closes [#345](https://github.com/WebFiori/framework/issues/345)
+* integrate webfiori/log into framework ([c596620](https://github.com/WebFiori/framework/commit/c5966208e29b542624471073f5dbf2fcf4a23205)), closes [#336](https://github.com/WebFiori/framework/issues/336)
+
+
+### Bug Fixes
+
+* **ci:** suppress abstract class warning and show skip reasons in CI ([50b1d88](https://github.com/WebFiori/framework/commit/50b1d887bdf283d8915cb851c0df9d04874e2e9a))
+* remove exit from middleware, add pipeline halt in Router ([b8845dd](https://github.com/WebFiori/framework/commit/b8845dd033e9bdab294ca4a86b2a8e37da88e689))
+* remove redundant conditional in DatabaseSessionStorage constructor ([04285de](https://github.com/WebFiori/framework/commit/04285def51f8b38eb559df776d424ad2042ad1a6))
+* **security:** replace broken session encryption with AES-256-GCM ([577a0e3](https://github.com/WebFiori/framework/commit/577a0e3d67b46938e118f31abaa6bbcfaf2b1ef3))
+* **session:** add probabilistic GC to prevent app hang with large session file counts ([a427bc8](https://github.com/WebFiori/framework/commit/a427bc89c79f08a43df950e473df67a3303fa14c))
+* **test:** remove deprecated setAccessible() calls for PHP 8.5 compat ([45a04bf](https://github.com/WebFiori/framework/commit/45a04bfa6f1c4ae2bf19e59f4e01ec56f3aae980))
+* **test:** replace PDO with framework Database class for connection checks ([0ba52b0](https://github.com/WebFiori/framework/commit/0ba52b0d2526cbe662fb8a33578fb99b370963a9))
+* **test:** resolve all baseline test failures ([6cb7f92](https://github.com/WebFiori/framework/commit/6cb7f92c51868c741fba9746aa5bb7ac1ebb88b4))
+* **test:** update HelpCommandTest for queue commands ([a138a26](https://github.com/WebFiori/framework/commit/a138a263faaaa7bbf0d5effac5b3556c754afad4))
+* **test:** use 127.0.0.1 instead of localhost for MySQL in CI ([231df17](https://github.com/WebFiori/framework/commit/231df1715234ce15697e1615ccfa5dd6b72f2e9b))
+* **test:** use MYSQL_PORT env var with default 3306 for CI compatibility ([56b9e3e](https://github.com/WebFiori/framework/commit/56b9e3e71cf73921b374563e50090755a9fb2655))
+* use underscores in session schema column keys for MSSQL compatibility ([4aced29](https://github.com/WebFiori/framework/commit/4aced29de6d7df73dafd8fd05c4e0b1b7367b8aa))
+
+
+### Miscellaneous Chores
+
+* add CLI command files to coverage source config ([ddbed79](https://github.com/WebFiori/framework/commit/ddbed7905e62f545184b677b91483e30f1683f78))
+* add RBAC classes to coverage source config ([c481144](https://github.com/WebFiori/framework/commit/c48114419865c37c28b426bbcfffa8eb14aac1e0))
+* exclude boot classes from coverage (App, AppBootstrapper, ClassLoader) ([02ecabc](https://github.com/WebFiori/framework/commit/02ecabc31b879204fa4473b1d68f6f584f74aadb))
+* exclude Writers and CLI test infrastructure from coverage ([29d7bc4](https://github.com/WebFiori/framework/commit/29d7bc4ec4151ef80758b623bd873dd1af08032d))
+* Merge pull request [#329](https://github.com/WebFiori/framework/issues/329) from WebFiori/dev ([74dd04e](https://github.com/WebFiori/framework/commit/74dd04eececd66ee8d203c3dc36eaba45ea6c7e6))
+* register AccessManager in DI container ([3ecb1f4](https://github.com/WebFiori/framework/commit/3ecb1f4de059f017bfc7562409886bf4da548ddc))
+* remove cov.xml and add to gitignore ([a7d3f1e](https://github.com/WebFiori/framework/commit/a7d3f1ed7c2201c65801eb7b2d6cc7a0bd60c6c5))
+* Updated Version Number ([5286ff7](https://github.com/WebFiori/framework/commit/5286ff7c74ce31faa736d4be3aee3099e3edf79a))
+* Updated Verstion ([3a45081](https://github.com/WebFiori/framework/commit/3a4508102b20fd13b15eda604fd990046943c1dd))
+
+
+### Code Refactoring
+
+* remove scheduler WebUI and WebServices from core ([c0a2df4](https://github.com/WebFiori/framework/commit/c0a2df4d6f987454c60f24cee6f3261484149985))
+* remove Util.php — inline remaining usages ([9a1c96a](https://github.com/WebFiori/framework/commit/9a1c96a7d5eac9f4846cddafe2b96319bc6a2757)), closes [#338](https://github.com/WebFiori/framework/issues/338)
+* unify database session schema for all 3 supported engines ([38ba2a6](https://github.com/WebFiori/framework/commit/38ba2a66d468533056b6c7a2d8ead77adc71ef70))
+
 ## [3.0.0-RC.4](https://github.com/WebFiori/framework/compare/v3.0.0-RC.3...v3.0.0-RC.4) (2026-05-13)
 
 

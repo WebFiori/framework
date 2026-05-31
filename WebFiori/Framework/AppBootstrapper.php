@@ -44,7 +44,7 @@ class AppBootstrapper {
      */
     public static function initFrameworkVersionInfo(): void {
         if (!defined('WF_VERSION')) {
-            define('WF_VERSION', '3.0.0-RC.4');
+            define('WF_VERSION', '3.0.0-RC.5');
         }
 
         if (!defined('WF_VERSION_TYPE')) {
@@ -52,7 +52,7 @@ class AppBootstrapper {
         }
 
         if (!defined('WF_RELEASE_DATE')) {
-            define('WF_RELEASE_DATE', '2026-05-13');
+            define('WF_RELEASE_DATE', '2026-05-31');
         }
     }
     /**

@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.0-RC.5](https://github.com/WebFiori/framework/compare/v3.0.0-RC.5...v3.0.0-RC.5) (2026-05-31)
+
+
+### Miscellaneous Chores
+
+* Updated Verstion ([aeea85e](https://github.com/WebFiori/framework/commit/aeea85e73c3118cbae77756b3899bfb1669d46d3))
+
+
+### Documentation
+
+* Updated README ([9131fcf](https://github.com/WebFiori/framework/commit/9131fcf59acfdada0867c9ef13bb7e380892bb5e))
+
 ## [3.0.0-RC.5](https://github.com/WebFiori/framework/compare/v3.0.0-RC.4...v3.0.0-RC.5) (2026-05-31)
 
 

@@ -24,7 +24,7 @@
 
 ## Overview
 
-WebFiori is a modular, object-oriented PHP framework designed for building secure web applications and APIs. It provides a complete toolkit — routing, middleware, authorization, database management, job queues, and more — while remaining lightweight (under 3 MB core) and free of heavy external dependencies.
+WebFiori is a modular, object-oriented PHP framework designed for building secure web applications and APIs. It provides a complete toolkit — routing, middleware, authorization, database management, job queues, and more — while remaining lightweight  and free of heavy external dependencies.
 
 ## Requirements
 
@@ -53,7 +53,6 @@ php -S localhost:8080 -t public
 ## Key Features
 
 ### Routing & HTTP
-- Attribute-based and configuration-based route definitions
 - Route groups, URI parameters, and middleware assignment
 - OpenAPI 3.1 specification generation from annotated controllers
 

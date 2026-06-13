@@ -22,6 +22,10 @@ class HealthCheck {
      */
     private static array $checks = [];
     /**
+     * @var array Callbacks to execute after runAll() completes.
+     */
+    private static array $afterAllCallbacks = [];
+    /**
      * Register a health check.
      *
      * Accepts either a HealthCheckInterface instance or a name + callable pair.
@@ -68,17 +72,24 @@ class HealthCheck {
             }
         }
 
-        return [
+        $aggregate = [
             'status' => $allOk ? 'ok' : 'fail',
             'timestamp' => date('c'),
             'checks' => $results,
         ];
+
+        foreach (self::$afterAllCallbacks as $cb) {
+            $cb($aggregate);
+        }
+
+        return $aggregate;
     }
     /**
      * Remove all registered checks.
      */
     public static function reset(): void {
         self::$checks = [];
+        self::$afterAllCallbacks = [];
     }
     /**
      * Returns the number of registered checks.
@@ -87,5 +98,25 @@ class HealthCheck {
      */
     public static function getCheckCount(): int {
         return count(self::$checks);
+    }
+    /**
+     * Returns all registered checks.
+     *
+     * @return array Associative array keyed by check name. Values are
+     * HealthCheckInterface instances or callables.
+     */
+    public static function getChecks(): array {
+        return self::$checks;
+    }
+    /**
+     * Register a callback to execute after all checks complete.
+     *
+     * The callback receives the aggregate result array with 'status',
+     * 'timestamp', and 'checks' keys.
+     *
+     * @param callable $callback A function that accepts the aggregate results array.
+     */
+    public static function afterAll(callable $callback): void {
+        self::$afterAllCallbacks[] = $callback;
     }
 }

@@ -567,4 +567,37 @@ class SessionsManagerTest extends TestCase {
     public function testGetSessionIDFromCookieNotSet() {
         $this->assertFalse(SessionsManager::getSessionIDFromCookie('nonexistent'));
     }
+
+    /**
+     * @test
+     * Verifies bug #389: When a session cookie exists but storage is empty,
+     * the framework should reuse the cookie ID instead of generating a new one.
+     */
+    public function testReuseCookieIdWhenStorageEmpty() {
+        SessionsManager::reset();
+        App::getRequest()->setRequestMethod('GET');
+
+        // Simulate: browser has a session cookie with ID 'old-session-id-abc'
+        $sessionName = 'wf-test-session';
+        $_GET[$sessionName] = 'old-session-id-abc';
+
+        // Storage is empty (no session data for this ID — simulates cleared storage)
+        // Start the session
+        SessionsManager::start($sessionName);
+
+        $active = SessionsManager::getActiveSession();
+        $this->assertNotNull($active);
+
+        // BUG: The session should reuse 'old-session-id-abc' from the cookie,
+        // not generate a brand new ID
+        $this->assertEquals(
+            'old-session-id-abc',
+            $active->getId(),
+            'Session ID should match the cookie value when storage is empty (bug #389)'
+        );
+
+        // Cleanup
+        SessionsManager::reset();
+        unset($_GET[$sessionName]);
+    }
 }

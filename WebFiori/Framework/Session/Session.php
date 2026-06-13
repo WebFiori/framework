@@ -668,8 +668,10 @@ class Session implements JsonI {
         if (!$this->isRunning()) {
             $sessionStr = SessionsManager::getStorage()->read($this->getId());
 
-            if ($this->getStatus() == SessionStatus::KILLED || $sessionStr === null || !$this->deserialize($sessionStr)) {
+            if ($this->getStatus() == SessionStatus::KILLED) {
                 $this->reGenerateID();
+                $this->initNewSessionVars();
+            } else if ($sessionStr === null || !$this->deserialize($sessionStr)) {
                 $this->initNewSessionVars();
             } else {
                 $this->checkIfExpired();

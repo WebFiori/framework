@@ -4,7 +4,6 @@ namespace WebFiori\Framework\Test\Middleware;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Middleware\StartSessionMiddleware;
 use WebFiori\Framework\Session\SessionsManager;
-use WebFiori\Framework\Session\SessionStatus;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
 
@@ -54,7 +53,7 @@ class StartSessionMiddlewareTest extends TestCase {
         $active = SessionsManager::getActiveSession();
         $this->assertNotNull($active);
         $this->assertEquals('wf-session', $active->getName());
-        $this->assertEquals(SessionStatus::NEW, $active->getStatus());
+        $this->assertTrue($active->isRunning());
     }
 
     /** @test */

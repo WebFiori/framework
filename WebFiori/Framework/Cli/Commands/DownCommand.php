@@ -13,10 +13,12 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Command;
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 
 /**
  * A command to put the application in maintenance mode.
  */
+#[Group('maintenance')]
 class DownCommand extends Command {
     public function __construct() {
         parent::__construct('down', [

@@ -10,12 +10,14 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Commands\HelpCommand;
 /**
  * Description of WHelpCommand
  *
  * @author Ibrahim
  */
+#[Group('other')]
 class WHelpCommand extends HelpCommand {
     public function exec() : int {
         $argV = $this->getOwner()->getArgsVector();

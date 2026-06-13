@@ -47,6 +47,7 @@ class HelpCommandTest extends CLITestCase {
             "    migrations:status:       Show migration status (applied and pending).\n",
             "    migrations:fresh:        Rollback all migrations and run them fresh.\n",
             "    migrations:skip:         Mark migrations as applied without executing them (baseline).\n",
+            "    migrations:step:         Interactively apply or skip migrations one at a time.\n",
             "  other:\n",
             "    help:                    Display CLI Help. To display help for specific command, use the argument \"--command\" with this command.\n",
             "    v:                       Display framework version info.\n",

@@ -11,7 +11,6 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
-use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Framework\Writers\MigrationClassWriter;
@@ -21,7 +20,6 @@ use WebFiori\Framework\Writers\MigrationClassWriter;
  *
  * @author Ibrahim
  */
-
 class CreateMigrationCommand extends Command {
     public function __construct() {
         parent::__construct('create:migration', [

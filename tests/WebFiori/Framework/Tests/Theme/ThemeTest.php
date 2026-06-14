@@ -155,14 +155,11 @@ class ThemeTest extends TestCase {
      * @test
      */
     public function testRegisterDuplicate() {
-        $themes = ThemeManager::getRegisteredThemes();
-        if (count($themes) > 0) {
-            $firstTheme = array_values($themes)[0];
-            $this->expectException(\WebFiori\Framework\Exceptions\NoSuchThemeException::class);
-            ThemeManager::register($firstTheme);
-        } else {
-            $this->markTestSkipped('No themes registered');
+        if (!ThemeManager::isThemeRegistered('New Super Theme')) {
+            ThemeManager::register(new NewFTestTheme());
         }
+        $this->expectException(\WebFiori\Framework\Exceptions\NoSuchThemeException::class);
+        ThemeManager::register(new NewFTestTheme());
     }
     /**
      * @test

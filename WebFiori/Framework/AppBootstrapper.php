@@ -44,15 +44,15 @@ class AppBootstrapper {
      */
     public static function initFrameworkVersionInfo(): void {
         if (!defined('WF_VERSION')) {
-            define('WF_VERSION', '3.0.0-RC.5');
+            define('WF_VERSION', '3.0.0');
         }
 
         if (!defined('WF_VERSION_TYPE')) {
-            define('WF_VERSION_TYPE', 'RC');
+            define('WF_VERSION_TYPE', 'Stable');
         }
 
         if (!defined('WF_RELEASE_DATE')) {
-            define('WF_RELEASE_DATE', '2026-05-31');
+            define('WF_RELEASE_DATE', '2026-06-14');
         }
     }
     /**

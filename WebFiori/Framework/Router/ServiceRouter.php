@@ -95,6 +95,80 @@ class ServiceRouter {
     }
 
     /**
+     * Register a dynamic namespace route that resolves services at request time.
+     *
+     * Usage:
+     * ```php
+     * ServiceRouter::dynamic('App\\Apis', '/apis/{controller}', [...options]);
+     * ```
+     *
+     * @param string $namespace Namespace to search for services.
+     * @param string $path Route path with {controller} parameter.
+     * @param array $routeOptions Shared route options (middleware, etc.).
+     * @param string|null $directory Optional directory override.
+     */
+    public static function dynamic(string $namespace, string $path, array $routeOptions = [], ?string $directory = null): void {
+        $options = array_merge($routeOptions, [
+            RouteOption::PATH => $path,
+            RouteOption::TO => function () use ($namespace, $directory) {
+                $controllerName = App::getRequest()->getParam('controller');
+
+                if ($controllerName === null) {
+                    $controllerName = $_GET['controller'] ?? null;
+                }
+
+                if ($controllerName === null) {
+                    App::getResponse()->setCode(404);
+                    App::getResponse()->write(json_encode([
+                        'message' => 'Controller parameter missing.',
+                        'type' => 'error'
+                    ]));
+
+                    return;
+                }
+
+                self::handle($controllerName, $namespace, $directory);
+            },
+        ]);
+
+        Router::api($options);
+    }
+
+    /**
+     * Handle a dynamic controller request.
+     *
+     * @param string $controllerName The controller name from the URL.
+     * @param string $namespace Namespace to search.
+     * @param string|null $directory Optional directory to scan.
+     */
+    public static function handle(string $controllerName, string $namespace, ?string $directory = null): void {
+        $dir = $directory ?? self::namespaceToPath($namespace);
+        $map = self::scanNamespace($namespace, $dir);
+
+        if (isset($map[$controllerName])) {
+            $entry = $map[$controllerName];
+
+            if ($entry['type'] === 'manager') {
+                $class = $entry['class'];
+                $manager = new $class();
+                $manager->process();
+            } else {
+                $class = $entry['class'];
+                $service = ContainerFacade::has($class)
+                    ? ContainerFacade::make($class)
+                    : new $class();
+                (new RequestProcessor())->process($service, App::getRequest());
+            }
+        } else {
+            App::getResponse()->setCode(404);
+            App::getResponse()->write(json_encode([
+                'message' => 'Service not found.',
+                'type' => 'error'
+            ]));
+        }
+    }
+
+    /**
      * Scan a namespace directory for routable classes.
      *
      * @param string $namespace The namespace to scan.

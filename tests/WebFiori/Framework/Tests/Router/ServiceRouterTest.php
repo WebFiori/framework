@@ -129,4 +129,19 @@ class ServiceRouterTest extends TestCase {
         ServiceRouter::reset();
         $this->assertEmpty(ServiceRouter::getDiscovered());
     }
+
+    /** @test */
+    public function testDynamicRegistersRoute() {
+        $routesBefore = Router::routesCount();
+        ServiceRouter::dynamic($this->namespace, '/dynamic/{controller}', [], $this->fixturesDir);
+        $this->assertGreaterThan($routesBefore, Router::routesCount());
+    }
+
+    /** @test */
+    public function testHandleReturns404ForUnknownService() {
+        $response = \WebFiori\Framework\App::getResponse();
+        $response->setCode(200);
+        ServiceRouter::handle('nonexistent', $this->namespace, $this->fixturesDir);
+        $this->assertEquals(404, $response->getCode());
+    }
 }

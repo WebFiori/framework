@@ -18,6 +18,7 @@ use WebFiori\Http\Annotations\RestController;
 use WebFiori\Http\RequestProcessor;
 use WebFiori\Http\WebService;
 use WebFiori\Http\WebServicesManager;
+use WebFiori\Json\CaseConverter;
 
 /**
  * Discovers and registers API routes from a namespace.
@@ -42,12 +43,13 @@ class ServiceRouter {
      * @param string $basePath URL prefix (e.g. '/apis').
      * @param array $routeOptions Shared route options applied to all routes.
      * @param string|null $directory Directory to scan. If null, derived from namespace relative to ROOT_PATH.
+     * @param bool $recursive If true, scan subdirectories. Subdirectory names become URL path segments.
      *
      * @return int Number of routes registered.
      */
-    public static function discover(string $namespace, string $basePath, array $routeOptions = [], ?string $directory = null): int {
+    public static function discover(string $namespace, string $basePath, array $routeOptions = [], ?string $directory = null, bool $recursive = false): int {
         $dir = $directory ?? self::namespaceToPath($namespace);
-        $map = self::scanNamespace($namespace, $dir);
+        $map = self::scanNamespace($namespace, $dir, '', $recursive);
         $count = 0;
         $basePath = rtrim($basePath, '/');
 
@@ -173,10 +175,12 @@ class ServiceRouter {
      *
      * @param string $namespace The namespace to scan.
      * @param string $dir The directory to scan.
+     * @param string $pathPrefix Relative path prefix for recursive scanning (kebab-cased).
+     * @param bool $recursive Whether to scan subdirectories.
      *
      * @return array Map of name => ['class' => FQCN, 'type' => 'service'|'manager']
      */
-    private static function scanNamespace(string $namespace, string $dir): array {
+    private static function scanNamespace(string $namespace, string $dir, string $pathPrefix = '', bool $recursive = false): array {
         $map = [];
 
         if (!is_dir($dir)) {
@@ -208,7 +212,17 @@ class ServiceRouter {
 
             if (!empty($attrs)) {
                 $attr = $attrs[0]->newInstance();
-                $name = !empty($attr->name) ? $attr->name : self::deriveNameFromClass($className);
+
+                if (!empty($attr->name)) {
+                    if (str_contains($attr->name, '/')) {
+                        continue; // Invalid: name must not contain slashes
+                    }
+
+                    $name = $attr->name;
+                } else {
+                    $name = $pathPrefix . self::deriveNameFromClass($className);
+                }
+
                 $map[$name] = ['class' => $fqcn, 'type' => 'service'];
 
                 continue;
@@ -216,7 +230,7 @@ class ServiceRouter {
 
             // Priority 2: WebServicesManager subclass
             if ($ref->isSubclassOf(WebServicesManager::class)) {
-                $name = self::deriveNameFromClass($className);
+                $name = $pathPrefix . self::deriveNameFromClass($className);
                 $map[$name] = ['class' => $fqcn, 'type' => 'manager'];
 
                 continue;
@@ -225,10 +239,26 @@ class ServiceRouter {
             // Priority 3: WebService subclass without attribute
             if ($ref->isSubclassOf(WebService::class)) {
                 $instance = new $fqcn();
-                $name = $instance->getName();
+                $svcName = $instance->getName();
 
-                if (!empty($name)) {
+                if (!empty($svcName)) {
+                    $name = $pathPrefix . $svcName;
                     $map[$name] = ['class' => $fqcn, 'type' => 'service'];
+                }
+            }
+        }
+
+        // Recursive: scan subdirectories
+        if ($recursive) {
+            $subdirs = glob($dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
+
+            if ($subdirs !== false) {
+                foreach ($subdirs as $subdir) {
+                    $subDirName = basename($subdir);
+                    $subNamespace = $namespace . '\\' . $subDirName;
+                    $subPrefix = $pathPrefix . CaseConverter::toKebabCase($subDirName, 'lower') . '/';
+                    $subMap = self::scanNamespace($subNamespace, $subdir, $subPrefix, true);
+                    $map = array_merge($map, $subMap);
                 }
             }
         }
@@ -244,13 +274,17 @@ class ServiceRouter {
     }
 
     /**
-     * Derive route name from class name.
-     * OrderService → orders, ProductManager → product
+     * Derive route name from class name using kebab-case.
+     * OrderService → order, UserProfileService → user-profile
      */
     private static function deriveNameFromClass(string $className): string {
         $name = preg_replace('/(Service|Manager|Controller)$/', '', $className);
 
-        return strtolower($name);
+        if (empty($name)) {
+            $name = $className;
+        }
+
+        return CaseConverter::toKebabCase($name, 'lower');
     }
 
     /**

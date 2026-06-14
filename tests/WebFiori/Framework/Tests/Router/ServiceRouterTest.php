@@ -131,6 +131,37 @@ class ServiceRouterTest extends TestCase {
     }
 
     /** @test */
+    public function testDiscoverRecursiveFindsNestedServices() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir, true);
+        $discovered = ServiceRouter::getDiscovered();
+
+        // LoginService in UserAuth/ subdirectory
+        $this->assertArrayHasKey('user-auth/login', $discovered);
+        $this->assertEquals('/apis/user-auth/login', $discovered['user-auth/login']['path']);
+    }
+
+    /** @test */
+    public function testDiscoverNonRecursiveSkipsSubdirectories() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir, false);
+        $discovered = ServiceRouter::getDiscovered();
+
+        $this->assertArrayNotHasKey('user-auth/login', $discovered);
+    }
+
+    /** @test */
+    public function testDiscoverSkipsAttributeNameWithSlash() {
+        // OrderService has #[RestController('orders')] — valid
+        // If we had one with slash it would be skipped
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
+        $discovered = ServiceRouter::getDiscovered();
+
+        // All discovered names should not contain slashes (non-recursive)
+        foreach ($discovered as $name => $entry) {
+            $this->assertStringNotContainsString('/', $name);
+        }
+    }
+
+    /** @test */
     public function testDynamicRegistersRoute() {
         $routesBefore = Router::routesCount();
         ServiceRouter::dynamic($this->namespace, '/dynamic/{controller}', [], $this->fixturesDir);

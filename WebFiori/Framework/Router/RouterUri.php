@@ -299,7 +299,8 @@ class RouterUri extends RequestUri {
      */
     public function getMiddleware() : array {
         if (count($this->assignedMiddlewareList) != count($this->sortedMiddleeareList)) {
-            $this->sortedMiddleeareList = $this->sortByDependencies($this->assignedMiddlewareList);
+            $resolved = $this->resolveDependencies($this->assignedMiddlewareList);
+            $this->sortedMiddleeareList = $this->sortByDependencies($resolved);
         }
 
         return $this->sortedMiddleeareList;
@@ -624,6 +625,43 @@ class RouterUri extends RequestUri {
      * @param array $middlewareList Array of AbstractMiddleware instances.
      *
      * @return array Sorted array.
+    /**
+     * Resolves transitive dependencies by pulling missing middleware from the registry.
+     *
+     * @param array $middlewareList The initially assigned middleware.
+     *
+     * @return array The expanded list including all transitive dependencies.
+     */
+    private function resolveDependencies(array $middlewareList): array {
+        $byName = [];
+
+        foreach ($middlewareList as $mw) {
+            $byName[$mw->getName()] = $mw;
+        }
+
+        $queue = $middlewareList;
+
+        while (!empty($queue)) {
+            $current = array_shift($queue);
+
+            foreach ($current->getDependencies() as $depName) {
+                if (isset($byName[$depName])) {
+                    continue;
+                }
+
+                $dep = MiddlewareManager::getMiddleware($depName);
+
+                if ($dep !== null) {
+                    $byName[$depName] = $dep;
+                    $queue[] = $dep;
+                }
+            }
+        }
+
+        return array_values($byName);
+    }
+    /**
+     * Sorts middleware using topological sort (Kahn's algorithm).
      *
      * @throws RoutingException If circular dependency detected.
      */

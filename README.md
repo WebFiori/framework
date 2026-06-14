@@ -26,6 +26,16 @@
 
 WebFiori is a modular, object-oriented PHP framework designed for building secure web applications and APIs. It provides a complete toolkit — routing, middleware, authorization, database management, job queues, and more — while remaining lightweight  and free of heavy external dependencies.
 
+## Motivation
+
+WebFiori is designed around two architectural decisions:
+
+1. **Self-contained ecosystem.** Each component (HTTP, database, cache, sessions, mail, queue, CLI, authorization) is an independent library with no external runtime dependencies. This eliminates transitive dependency conflicts and simplifies security auditing.
+
+2. **Interface-driven extensibility.** Storage backends for sessions, cache, queues, and authorization are defined by interfaces. Swap implementations without modifying application code.
+
+The framework provides the orchestration layer. The libraries can be used together as a full stack or independently in any PHP project.
+
 ## Requirements
 
 - PHP 8.1 or later

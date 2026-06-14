@@ -153,6 +153,10 @@ class AccessManager {
         $userId = is_object($user) && method_exists($user, 'getId') ? $user->getId() : $user;
         $roles = $this->getUserRoles($userId);
 
+        if (empty($roles) && is_object($user) && method_exists($user, 'getRoles')) {
+            $roles = $user->getRoles();
+        }
+
         $hasPermission = false;
 
         foreach ($roles as $roleName) {

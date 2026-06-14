@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2019 Ibrahim BinAlshikh
+ * Copyright (c) 2019-present WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -72,4 +72,8 @@ class RouteOption {
      * An option which is used to set an array of allowed values to route parameters.
      */
     const VALUES = 'vars-values';
+    /**
+     * An option to specify a namespace for dynamic service resolution.
+     */
+    const NS = 'namespace';
 }

@@ -3,7 +3,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2019 Ibrahim BinAlshikh
+ * Copyright (c) 2019-present WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -375,6 +375,9 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\FreshMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SkipMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\StepMigrationsCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\ServicesListCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RoutesCacheCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RoutesClearCommand',
                 ];
 
                 foreach ($commands as $c) {

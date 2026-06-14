@@ -86,6 +86,8 @@
 
       <file>../WebFiori/Framework/Router/RouteOption.php</file>
       <file>../WebFiori/Framework/Router/Router.php</file>
+      <file>../WebFiori/Framework/Router/ServiceRouter.php</file>
+      <file>../WebFiori/Framework/Router/RouteCache.php</file>
       <file>../WebFiori/Framework/Router/RouterUri.php</file>
 
       <file>../WebFiori/Framework/Scheduler/AbstractTask.php</file>
@@ -104,6 +106,7 @@
       <file>../WebFiori/Framework/Session/SessionUser.php</file>
       <file>../WebFiori/Framework/Session/SessionsManager.php</file>
       <file>../WebFiori/Framework/Session/SessionManager.php</file>
+      <file>../WebFiori/Framework/Session/CacheSessionStorage.php</file>
       <file>../WebFiori/Framework/Session/SessionSchema.php</file>
       <file>../WebFiori/Framework/Health/HealthCheck.php</file>
       <file>../WebFiori/Framework/Health/HealthCheckResult.php</file>

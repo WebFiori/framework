@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2022 Ibrahim BinAlshikh
+ * Copyright (c) 2022-present WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE

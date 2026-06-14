@@ -2,7 +2,7 @@
 /**
  * This file is licensed under MIT License.
  *
- * Copyright (c) 2019 Ibrahim BinAlshikh
+ * Copyright (c) 2019-present WebFiori Framework
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
@@ -525,7 +525,7 @@ abstract class Theme implements JsonI {
     /**
      * Sets the name of theme author.
      *
-     * @param string $author The name of theme author (such as 'Ibrahim BinAlshikh').
+     * @param string $author The name of theme author (such as '-present WebFiori Framework').
      *
      * @since 1.0
      */

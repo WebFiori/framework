@@ -104,6 +104,7 @@
       <file>../WebFiori/Framework/Session/SessionUser.php</file>
       <file>../WebFiori/Framework/Session/SessionsManager.php</file>
       <file>../WebFiori/Framework/Session/SessionManager.php</file>
+      <file>../WebFiori/Framework/Session/CacheSessionStorage.php</file>
       <file>../WebFiori/Framework/Session/SessionSchema.php</file>
       <file>../WebFiori/Framework/Health/HealthCheck.php</file>
       <file>../WebFiori/Framework/Health/HealthCheckResult.php</file>

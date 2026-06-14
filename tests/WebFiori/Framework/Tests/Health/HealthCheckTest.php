@@ -130,4 +130,62 @@ class HealthCheckTest extends TestCase {
         $this->assertEquals('fail', $arr['status']);
         $this->assertEquals('down', $arr['reason']);
     }
+
+    /** @test */
+    public function testGetChecksReturnsRegisteredChecks() {
+        HealthCheck::reset();
+        HealthCheck::register(new PassingCheck());
+        HealthCheck::register('custom', fn() => HealthCheckResult::ok());
+
+        $checks = HealthCheck::getChecks();
+        $this->assertCount(2, $checks);
+        $this->assertArrayHasKey('passing', $checks);
+        $this->assertArrayHasKey('custom', $checks);
+        $this->assertInstanceOf(HealthCheckInterface::class, $checks['passing']);
+        $this->assertIsCallable($checks['custom']);
+    }
+
+    /** @test */
+    public function testAfterAllCallbackReceivesAggregateResults() {
+        HealthCheck::reset();
+        HealthCheck::register(new PassingCheck());
+        HealthCheck::register(new FailingCheck());
+
+        $received = null;
+        HealthCheck::afterAll(function (array $results) use (&$received) {
+            $received = $results;
+        });
+
+        $result = HealthCheck::runAll();
+
+        $this->assertNotNull($received);
+        $this->assertEquals($result, $received);
+        $this->assertEquals('fail', $received['status']);
+        $this->assertArrayHasKey('passing', $received['checks']);
+        $this->assertArrayHasKey('failing', $received['checks']);
+    }
+
+    /** @test */
+    public function testAfterAllMultipleCallbacks() {
+        HealthCheck::reset();
+        HealthCheck::register(new PassingCheck());
+
+        $count = 0;
+        HealthCheck::afterAll(function () use (&$count) { $count++; });
+        HealthCheck::afterAll(function () use (&$count) { $count++; });
+
+        HealthCheck::runAll();
+        $this->assertEquals(2, $count);
+    }
+
+    /** @test */
+    public function testResetClearsAfterAllCallbacks() {
+        HealthCheck::reset();
+        $called = false;
+        HealthCheck::afterAll(function () use (&$called) { $called = true; });
+        HealthCheck::reset();
+        HealthCheck::register(new PassingCheck());
+        HealthCheck::runAll();
+        $this->assertFalse($called);
+    }
 }

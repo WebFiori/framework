@@ -24,7 +24,7 @@ class CacheMiddleware extends AbstractMiddleware {
         $this->setPriority(50);
         $this->addToGroups(['web']);
         $this->fromCache = false;
-        $this->cache = new Cache(new FileStorage());
+        $this->cache = new Cache(new FileStorage(sys_get_temp_dir().DS.'wf-cache'));
     }
     /**
      * Checks if the response is loaded from the cache or caching must be performed.
@@ -101,14 +101,15 @@ class CacheMiddleware extends AbstractMiddleware {
      * @return string
      */
     public function getKey() : string {
-        $key = Request::getUri()->getUri(true, true);
+        $request = \WebFiori\Framework\App::getRequest();
+        $key = $request->getUri()->getUri(true, true);
             
         //Following steps are used to make cached response unique per user.
         $session = SessionsManager::getActiveSession();
         if ($session !== null) {
             $key .= $session->getId();
         } 
-        $authHeader = Request::getAuthHeader();
+        $authHeader = $request->getAuthHeader();
         if ($authHeader !== null) {
             $key .= $authHeader->getScheme().$authHeader->getCredentials();
         }

@@ -385,6 +385,13 @@ class SessionManager {
 
         if (!$this->hasSession($sessionName)) {
             $options[SessionOption::NAME] = $sessionName;
+
+            $cookieId = $this->getSessionIDFromRequest($sessionName);
+
+            if ($cookieId !== false && !isset($options[SessionOption::SESSION_ID])) {
+                $options[SessionOption::SESSION_ID] = $cookieId;
+            }
+
             $s = new Session($options);
             $s->start();
             $this->sessionsArr[] = $s;

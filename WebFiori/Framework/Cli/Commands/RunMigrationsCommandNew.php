@@ -13,6 +13,7 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use Throwable;
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Schema\SchemaRunner;
@@ -24,6 +25,7 @@ use WebFiori\Framework\Cli\CLIUtils;
  *
  * @author Ibrahim
  */
+#[SingleInstance]
 class RunMigrationsCommandNew extends Command {
     private ?SchemaRunner $runner = null;
 

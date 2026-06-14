@@ -11,11 +11,13 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 
 /**
  * A command to bring the application out of maintenance mode.
  */
+#[Group('maintenance')]
 class UpCommand extends Command {
     public function __construct() {
         parent::__construct('up', [], 'Bring the application out of maintenance mode.');

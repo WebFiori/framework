@@ -11,6 +11,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
 use WebFiori\Framework\Scheduler\TasksManager;
@@ -30,6 +31,7 @@ use WebFiori\Framework\Scheduler\TasksManager;
  *
  * @author Ibrahim
  */
+#[SingleInstance]
 class SchedulerDaemonCommand extends Command {
     /**
      * Creates a new instance of the command.

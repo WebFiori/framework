@@ -374,6 +374,7 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\MigrationsStatusCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\FreshMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SkipMigrationsCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\StepMigrationsCommand',
                 ];
 
                 foreach ($commands as $c) {

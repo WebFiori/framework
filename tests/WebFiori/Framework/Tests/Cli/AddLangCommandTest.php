@@ -44,6 +44,7 @@ class AddLangCommandTest extends CLITestCase {
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR."\Langs\" for that language.\n"
         ], $output);
+        clearstatcache();
         $this->assertTrue(class_exists('\\App\\Langs\\Lang'.$langCode));
         $this->removeClass('\\App\\Langs\\Lang'.$langCode);
         Controller::getDriver()->initialize();

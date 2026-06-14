@@ -375,6 +375,9 @@ class App {
                     '\\WebFiori\\Framework\\Cli\\Commands\\FreshMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\SkipMigrationsCommand',
                     '\\WebFiori\\Framework\\Cli\\Commands\\StepMigrationsCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\ServicesListCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RoutesCacheCommand',
+                    '\\WebFiori\\Framework\\Cli\\Commands\\RoutesClearCommand',
                 ];
 
                 foreach ($commands as $c) {

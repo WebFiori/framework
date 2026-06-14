@@ -72,4 +72,8 @@ class RouteOption {
      * An option which is used to set an array of allowed values to route parameters.
      */
     const VALUES = 'vars-values';
+    /**
+     * An option to specify a namespace for dynamic service resolution.
+     */
+    const NS = 'namespace';
 }

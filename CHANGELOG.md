@@ -1,5 +1,36 @@
 # Changelog
 
+## [3.0.0](https://github.com/WebFiori/framework/compare/v3.0.0-RC.5...v3.0.0) (2026-06-14)
+
+
+### Features
+
+* **access:** Access::can() fallback to user getRoles() ([a041a41](https://github.com/WebFiori/framework/commit/a041a4133a0b828a0d55653955cbf84371eb30fb)), closes [#381](https://github.com/WebFiori/framework/issues/381)
+* add dynamic namespace routing and services:list command ([e2446f6](https://github.com/WebFiori/framework/commit/e2446f602fcd8c99e28e97b3d0cea2ab23cab663)), closes [#383](https://github.com/WebFiori/framework/issues/383) [#385](https://github.com/WebFiori/framework/issues/385)
+* add recursive scanning and kebab-case route derivation ([86f3507](https://github.com/WebFiori/framework/commit/86f3507cedf81a2a0265992aa8fb384780a87608))
+* add route caching for production performance ([8f978c5](https://github.com/WebFiori/framework/commit/8f978c565c0364c9ea3a7af99af1c305c2495fd5)), closes [#386](https://github.com/WebFiori/framework/issues/386)
+* add ServiceRouter::discover() for auto-registering API routes ([24f3fdd](https://github.com/WebFiori/framework/commit/24f3fdd610c8c12a00fd13e651171e9bada2fa1e)), closes [#382](https://github.com/WebFiori/framework/issues/382) [#384](https://github.com/WebFiori/framework/issues/384)
+* **health:** add getChecks() and afterAll() lifecycle hook ([149d510](https://github.com/WebFiori/framework/commit/149d5106182aa39c3eccbd8feb0967776c2feabe)), closes [#392](https://github.com/WebFiori/framework/issues/392) [#391](https://github.com/WebFiori/framework/issues/391)
+* **middleware:** auto-resolve transitive dependencies from registry ([35763a9](https://github.com/WebFiori/framework/commit/35763a9d8641fa233489bee0e162a8b527e79ab5)), closes [#380](https://github.com/WebFiori/framework/issues/380)
+* **migrations:** add migrations:step command for interactive execution ([390d9fb](https://github.com/WebFiori/framework/commit/390d9fb607f8bef39859faeb6fb516902b160bf2)), closes [#387](https://github.com/WebFiori/framework/issues/387)
+* **session:** add CacheSessionStorage driver ([2496203](https://github.com/WebFiori/framework/commit/2496203d6581aad33006f69017de383f347b446c)), closes [#337](https://github.com/WebFiori/framework/issues/337)
+
+
+### Bug Fixes
+
+* **middleware:** fix CacheMiddleware compatibility with http v6.0 ([ce6dcff](https://github.com/WebFiori/framework/commit/ce6dcffab486fc9f580057dd903d36ca36568734)), closes [#289](https://github.com/WebFiori/framework/issues/289)
+* **session:** reuse cookie ID when session storage is empty ([28f77b4](https://github.com/WebFiori/framework/commit/28f77b4feeefc3d44657347742966bbecd2458ae)), closes [#389](https://github.com/WebFiori/framework/issues/389) [#388](https://github.com/WebFiori/framework/issues/388)
+* **test:** add clearstatcache() before class_exists in AddLangCommandTest ([ba5502b](https://github.com/WebFiori/framework/commit/ba5502b97e3fe02c85e014bf36aa6b85f27e0c4a))
+* **test:** fix flaky StartSessionMiddleware test on PHP 8.1 ([369d756](https://github.com/WebFiori/framework/commit/369d756960fa3046ef5c7750c5d39d3b188cc9a6))
+* **test:** make testRegisterDuplicate self-contained ([b982bd6](https://github.com/WebFiori/framework/commit/b982bd64dfcf356cab2b573f7cb4dbf646c0c45d))
+* **test:** update HelpCommandTest for new routes and services commands ([806aaf5](https://github.com/WebFiori/framework/commit/806aaf52d64ffb31361054736f08a898a76952ab))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#400](https://github.com/WebFiori/framework/issues/400) from WebFiori/dev ([9ae069c](https://github.com/WebFiori/framework/commit/9ae069cba059590c21a825fe21870d83c04f7664))
+* Updated License Headers ([e33c04d](https://github.com/WebFiori/framework/commit/e33c04d8b62882499ea76e67082587156cd54948))
+
 ## [3.0.0-RC.5](https://github.com/WebFiori/framework/compare/v3.0.0-RC.5...v3.0.0-RC.5) (2026-05-31)
 
 

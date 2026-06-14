@@ -648,4 +648,36 @@ class AccessTest extends TestCase {
         $perm->setDescription('Updated');
         $this->assertEquals('Updated', $perm->getDescription());
     }
+
+    /** @test */
+    public function testCanFallsBackToUserGetRoles() {
+        $manager = new AccessManager();
+        $manager->role('customer', ['VIEW_ORDERS']);
+
+        $user = new class {
+            public function getId() { return 55; }
+            public function getRoles(): array { return ['customer']; }
+        };
+
+        // No assignRoleToUser() — should fallback to $user->getRoles()
+        $this->assertTrue($manager->can($user, 'VIEW_ORDERS'));
+        $this->assertFalse($manager->can($user, 'DELETE_ORDERS'));
+    }
+
+    /** @test */
+    public function testCanPrefersInternalMapOverGetRoles() {
+        $manager = new AccessManager();
+        $manager->role('admin', ['MANAGE']);
+        $manager->role('viewer', ['VIEW']);
+
+        $user = new class {
+            public function getId() { return 56; }
+            public function getRoles(): array { return ['viewer']; }
+        };
+
+        // Internal map assigned — getRoles() should NOT be used
+        $manager->assignRoleToUser(56, 'admin');
+        $this->assertTrue($manager->can($user, 'MANAGE'));
+        $this->assertFalse($manager->can($user, 'VIEW'));
+    }
 }

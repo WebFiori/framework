@@ -97,6 +97,15 @@ class ServiceRouter {
     }
 
     /**
+     * Set discovered services from cache.
+     *
+     * @param array $discovered The cached discovered map.
+     */
+    public static function setDiscovered(array $discovered): void {
+        self::$discovered = $discovered;
+    }
+
+    /**
      * Register a dynamic namespace route that resolves services at request time.
      *
      * Usage:

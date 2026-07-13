@@ -741,7 +741,7 @@ class Access {
             $valid = true;
 
             for ($x = 0 ; $x < $len ; $x++) {
-                $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != '-' && $id[$x] != ',';
+                $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != ',';
             }
 
             return $valid;

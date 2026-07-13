@@ -84,7 +84,7 @@ class ServiceRouterTest extends TestCase {
     public function testDiscoverReturnsCount() {
         $count = ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
 
-        $this->assertEquals(4, $count); // orders, product, legacy, users
+        $this->assertEquals(6, $count); // orders, product, legacy, users, auth/login, v2/users/profile
     }
 
     /** @test */
@@ -150,15 +150,17 @@ class ServiceRouterTest extends TestCase {
 
     /** @test */
     public function testDiscoverSkipsAttributeNameWithSlash() {
-        // OrderService has #[RestController('orders')] — valid
-        // If we had one with slash it would be skipped
+        // Services using 'name' property cannot have slashes.
+        // Services using 'path' property CAN have slashes.
         ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
         $discovered = ServiceRouter::getDiscovered();
 
-        // All discovered names should not contain slashes (non-recursive)
-        foreach ($discovered as $name => $entry) {
-            $this->assertStringNotContainsString('/', $name);
-        }
+        // OrderService uses name='orders' — no slash
+        $this->assertArrayHasKey('orders', $discovered);
+        $this->assertStringNotContainsString('/', 'orders');
+
+        // AuthLoginService uses path='auth/login' — slashes allowed via path
+        $this->assertArrayHasKey('auth/login', $discovered);
     }
 
     /** @test */
@@ -174,5 +176,67 @@ class ServiceRouterTest extends TestCase {
         $response->setCode(200);
         ServiceRouter::handle('nonexistent', $this->namespace, $this->fixturesDir);
         $this->assertEquals(404, $response->getCode());
+    }
+
+    /**
+     * @test
+     * Tests that #[RestController(path: 'auth/login')] uses the path property
+     * as the route key instead of the name.
+     * @see https://github.com/webfiori/framework/issues/398
+     */
+    public function testDiscoverUsesPathPropertyForRouting() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
+        $discovered = ServiceRouter::getDiscovered();
+
+        $this->assertArrayHasKey('auth/login', $discovered);
+        $this->assertEquals('/apis/auth/login', $discovered['auth/login']['path']);
+        $this->assertEquals('WebFiori\\Tests\\ServiceRouterFixtures\\AuthLoginService', $discovered['auth/login']['class']);
+        $this->assertEquals('service', $discovered['auth/login']['type']);
+    }
+
+    /**
+     * @test
+     * Tests that path property takes priority over name property.
+     * @see https://github.com/webfiori/framework/issues/398
+     */
+    public function testPathPropertyTakesPriorityOverName() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
+        $discovered = ServiceRouter::getDiscovered();
+
+        // AuthLoginService has name='login' and path='auth/login'
+        // It should be keyed by path, not name
+        $this->assertArrayHasKey('auth/login', $discovered);
+        $this->assertArrayNotHasKey('login', $discovered);
+    }
+
+    /**
+     * @test
+     * Tests that a multi-segment path property works without a name.
+     * @see https://github.com/webfiori/framework/issues/398
+     */
+    public function testMultiSegmentPathWithoutName() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
+        $discovered = ServiceRouter::getDiscovered();
+
+        $this->assertArrayHasKey('v2/users/profile', $discovered);
+        $this->assertEquals('/apis/v2/users/profile', $discovered['v2/users/profile']['path']);
+        $this->assertEquals('WebFiori\\Tests\\ServiceRouterFixtures\\UserProfileService', $discovered['v2/users/profile']['class']);
+    }
+
+    /**
+     * @test
+     * Tests that services without path property still work as before (fallback to name or derived).
+     * @see https://github.com/webfiori/framework/issues/398
+     */
+    public function testNoPathPropertyFallsBackToExistingBehavior() {
+        ServiceRouter::discover($this->namespace, '/apis', [], $this->fixturesDir);
+        $discovered = ServiceRouter::getDiscovered();
+
+        // OrderService has name='orders', no path
+        $this->assertArrayHasKey('orders', $discovered);
+        $this->assertEquals('/apis/orders', $discovered['orders']['path']);
+
+        // ProductService has no name, no path — derived from class name
+        $this->assertArrayHasKey('product', $discovered);
     }
 }

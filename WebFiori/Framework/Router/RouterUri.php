@@ -645,14 +645,16 @@ class RouterUri extends RequestUri {
             $current = array_shift($queue);
 
             foreach ($current->getDependencies() as $depName) {
-                if (isset($byName[$depName])) {
+                $resolvedName = $this->resolveDepToName($depName, $byName);
+
+                if ($resolvedName !== null && isset($byName[$resolvedName])) {
                     continue;
                 }
 
-                $dep = MiddlewareManager::getMiddleware($depName);
+                $dep = $this->lookupMiddleware($depName);
 
-                if ($dep !== null) {
-                    $byName[$depName] = $dep;
+                if ($dep !== null && !isset($byName[$dep->getName()])) {
+                    $byName[$dep->getName()] = $dep;
                     $queue[] = $dep;
                 }
             }
@@ -701,11 +703,13 @@ class RouterUri extends RequestUri {
             }
 
             foreach ($mw->getDependencies() as $dep) {
-                if (isset($byName[$dep])) {
-                    $graph[$dep][] = $name;
+                $resolvedDep = $this->resolveDepToName($dep, $byName);
 
-                    if (!isset($inDegree[$dep])) {
-                        $inDegree[$dep] = 0;
+                if ($resolvedDep !== null && isset($byName[$resolvedDep])) {
+                    $graph[$resolvedDep][] = $name;
+
+                    if (!isset($inDegree[$resolvedDep])) {
+                        $inDegree[$resolvedDep] = 0;
                     }
                     $inDegree[$name]++;
                 }
@@ -756,5 +760,58 @@ class RouterUri extends RequestUri {
         }
 
         return $sorted;
+    }
+    /**
+     * Resolves a dependency identifier to a middleware name.
+     *
+     * If the identifier is already a known name in the map, returns it directly.
+     * If it looks like a class name (class_exists), finds the registered middleware
+     * that is an instance of that class and returns its name.
+     *
+     * @param string $dep The dependency identifier (name or class).
+     * @param array $byName Map of name => AbstractMiddleware.
+     *
+     * @return string|null The resolved middleware name, or null if unresolvable.
+     */
+    private function resolveDepToName(string $dep, array $byName): ?string {
+        if (isset($byName[$dep])) {
+            return $dep;
+        }
+
+        if (class_exists($dep)) {
+            foreach ($byName as $mw) {
+                if ($mw instanceof $dep) {
+                    return $mw->getName();
+                }
+            }
+
+            $mw = MiddlewareManager::getInstance()->findByClass($dep);
+
+            if ($mw !== null) {
+                return $mw->getName();
+            }
+        }
+
+        return null;
+    }
+    /**
+     * Looks up a middleware by name or class from the registry.
+     *
+     * @param string $dep The dependency identifier (name or class).
+     *
+     * @return AbstractMiddleware|null
+     */
+    private function lookupMiddleware(string $dep): ?AbstractMiddleware {
+        $mw = MiddlewareManager::getMiddleware($dep);
+
+        if ($mw !== null) {
+            return $mw;
+        }
+
+        if (class_exists($dep)) {
+            return MiddlewareManager::getInstance()->findByClass($dep);
+        }
+
+        return null;
     }
 }

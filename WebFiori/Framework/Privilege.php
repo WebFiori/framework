@@ -96,7 +96,7 @@ class Privilege implements JsonI {
         for ($x = 0 ; $x < $len ; $x++) {
             $ch = $xid[$x];
 
-            if (!($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
+            if (!($ch == '_' || $ch == '.' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
                 return false;
             }
         }

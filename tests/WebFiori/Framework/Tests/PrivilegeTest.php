@@ -52,4 +52,74 @@ class PrivilegeTest extends TestCase {
         $j->setPropsStyle('camel');
         $this->assertEquals('{"privilegeId":"Valid_ID_55","name":"Valid Name"}',$j.'');
     }
+    /**
+     * @test
+     * Tests that a permission ID with dots is accepted and stored correctly.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testSetIDWithDots() {
+        $pr = new Privilege('orders.create', 'Create Orders');
+        $this->assertEquals('orders.create', $pr->getID());
+        $this->assertEquals('Create Orders', $pr->getName());
+    }
+    /**
+     * @test
+     * Tests that a permission ID with dashes is accepted and stored correctly.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testSetIDWithDashes() {
+        $pr = new Privilege('orders-create', 'Create Orders');
+        $this->assertEquals('orders-create', $pr->getID());
+        $this->assertEquals('Create Orders', $pr->getName());
+    }
+    /**
+     * @test
+     * Tests that a permission ID with dots and dashes combined is accepted.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testSetIDWithDotsAndDashes() {
+        $pr = new Privilege('app.orders-create', 'Create Orders');
+        $this->assertEquals('app.orders-create', $pr->getID());
+        $this->assertEquals('Create Orders', $pr->getName());
+    }
+    /**
+     * @test
+     * Tests that multiple permissions with dotted IDs are distinguishable
+     * and don't collapse to the same default ID.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testMultipleDottedIDsAreUnique() {
+        $pr1 = new Privilege('orders.create', 'Create Orders');
+        $pr2 = new Privilege('orders.view', 'View Orders');
+        $pr3 = new Privilege('orders.cancel', 'Cancel Orders');
+
+        $this->assertEquals('orders.create', $pr1->getID());
+        $this->assertEquals('orders.view', $pr2->getID());
+        $this->assertEquals('orders.cancel', $pr3->getID());
+
+        // Ensure they are all different
+        $this->assertNotEquals($pr1->getID(), $pr2->getID());
+        $this->assertNotEquals($pr2->getID(), $pr3->getID());
+        $this->assertNotEquals($pr1->getID(), $pr3->getID());
+    }
+    /**
+     * @test
+     * Tests that setID() with dots returns true indicating success.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testSetIDWithDotsReturnsTrue() {
+        $pr = new Privilege();
+        $this->assertTrue($pr->setID('orders.create'));
+        $this->assertEquals('orders.create', $pr->getID());
+    }
+    /**
+     * @test
+     * Tests that setID() with dashes returns true indicating success.
+     * @see https://github.com/webfiori/framework/issues/404
+     */
+    public function testSetIDWithDashesReturnsTrue() {
+        $pr = new Privilege();
+        $this->assertTrue($pr->setID('orders-create'));
+        $this->assertEquals('orders-create', $pr->getID());
+    }
 }

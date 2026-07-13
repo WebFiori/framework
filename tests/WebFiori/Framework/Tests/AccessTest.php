@@ -96,15 +96,15 @@ class AccessTest extends TestCase {
         $this->assertTrue(Access::hasGroup('USERS_Group'));
         $this->assertEquals(0, count(Access::privileges()));
         $this->assertFalse(Access::newPrivilege('not_exist', 'new_pr'));
-        $this->assertFalse(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new-pr'));
+        $this->assertTrue(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new-pr'));
         $this->assertFalse(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new,pr'));
         $this->assertFalse(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new;pr'));
         $this->assertFalse(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new pr'));
         $this->assertTrue(Access::newPrivilege('USERS_MANAGEMENT_GROUP', 'new_pr'));
         $this->assertTrue(Access::newPrivilege('USERS_Group', 'new_pr_2'));
-        $this->assertEquals(2, count(Access::privileges()));
+        $this->assertEquals(3, count(Access::privileges()));
         $this->assertEquals(1, count(Access::privileges('USERS_Group')));
-        $this->assertEquals(1, count(Access::privileges('USERS_MANAGEMENT_GROUP')));
+        $this->assertEquals(2, count(Access::privileges('USERS_MANAGEMENT_GROUP')));
         $this->assertEquals(0, count(Access::privileges('ADMINS_Group')));
         $this->assertTrue(Access::hasPrivilege('new_pr'));
         $this->assertFalse(Access::hasPrivilege('new_pr','USERS_Group'));

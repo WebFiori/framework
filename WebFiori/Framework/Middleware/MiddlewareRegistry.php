@@ -105,6 +105,22 @@ class MiddlewareRegistry {
         $this->middlewareList = [];
     }
     /**
+     * Finds a registered middleware by its class name.
+     *
+     * @param string $className The fully qualified class name.
+     *
+     * @return AbstractMiddleware|null The first registered middleware that is an instance of the given class, or null.
+     */
+    public function findByClass(string $className): ?AbstractMiddleware {
+        foreach ($this->middlewareList as $mw) {
+            if ($mw instanceof $className) {
+                return $mw;
+            }
+        }
+
+        return null;
+    }
+    /**
      * Returns all registered middleware.
      *
      * @return array

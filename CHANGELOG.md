@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.0.1](https://github.com/WebFiori/framework/compare/v3.0.0...v3.0.1) (2026-07-13)
+
+
+### Features
+
+* **Middleware:** support ::class syntax in getDependencies() ([c0c34b8](https://github.com/WebFiori/framework/commit/c0c34b805eb0000b277c8bbd9333662b51427f6f)), closes [#405](https://github.com/WebFiori/framework/issues/405)
+* **router:** support custom path in ServiceRouter via RestController path property ([4c2e048](https://github.com/WebFiori/framework/commit/4c2e048422332deeb6845d6d3a77bc95752de9b5)), closes [#398](https://github.com/WebFiori/framework/issues/398)
+
+
+### Bug Fixes
+
+* **Privilege:** allow dots and dashes in permission and group IDs ([c89fc6b](https://github.com/WebFiori/framework/commit/c89fc6b29dd593486161cf2e8bcd5dbb73eef735)), closes [#404](https://github.com/WebFiori/framework/issues/404)
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#406](https://github.com/WebFiori/framework/issues/406) from WebFiori/dev ([0cb8214](https://github.com/WebFiori/framework/commit/0cb8214034e1b05e3b6b8e58d53327e1ffb96824))
+
 ## [3.0.0](https://github.com/WebFiori/framework/compare/v3.0.0...v3.0.0) (2026-06-14)
 
 

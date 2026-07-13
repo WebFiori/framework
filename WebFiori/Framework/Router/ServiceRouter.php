@@ -222,7 +222,9 @@ class ServiceRouter {
             if (!empty($attrs)) {
                 $attr = $attrs[0]->newInstance();
 
-                if (!empty($attr->name)) {
+                if (!empty($attr->path)) {
+                    $name = $attr->path;
+                } else if (!empty($attr->name)) {
                     if (str_contains($attr->name, '/')) {
                         continue; // Invalid: name must not contain slashes
                     }

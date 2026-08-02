@@ -1,3 +1,11 @@
+* text=auto eol=lf
+*.php text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
 # Files and folders here will be not included when creating package
 /tests export-ignore
 /App export-ignore

@@ -573,19 +573,18 @@ class JsonDriver implements ConfigurationDriver {
         $decoded = $raw !== false ? json_decode($raw, true) : null;
 
         if (is_array($decoded) && isset($decoded['extends'])) {
-            // Resolve the inheritance tree and populate $this->json from the
-            // merged result. The original entry-point file is left unchanged on
-            // disk; resolution happens in-memory at boot.
+            // Resolve the full inheritance tree. The merged result is a plain
+            // PHP array; encode it back to JSON and parse with Json so the full
+            // nested Json object graph is built correctly.
             $inheritance = new JsonConfigInheritance();
             $merged = $inheritance->resolve($path);
 
-            // Preserve write-targets from the entry point for CLI commands.
-            $entryRaw = json_decode($raw, true);
-            $this->writeTargets = $entryRaw['write-targets'] ?? [];
+            // Preserve write-targets from the entry-point file.
+            $this->writeTargets = $decoded['write-targets'] ?? [];
 
-            // Rebuild the Json object from the merged array.
-            $this->json = Json::fromJsonFile($path);
-            $this->applyMergedData($merged);
+            // Build $this->json from the merged array via JSON round-trip so
+            // that all nested Json objects are created with the correct structure.
+            $this->json = Json::decode(json_encode($merged));
         } else {
             $this->json = Json::fromJsonFile($path);
             $this->writeTargets = is_array($decoded) ? ($decoded['write-targets'] ?? []) : [];
@@ -852,28 +851,6 @@ class JsonDriver implements ConfigurationDriver {
      *
      * @param array<string, mixed> $merged The fully merged config data.
      */
-    private function applyMergedData(array $merged): void {
-        $sections = [
-            'base-url', 'theme', 'home-page', 'primary-lang', 'name-separator',
-            'scheduler-password', 'env-vars', 'smtp-connections',
-            'database-connections', 'app-names', 'app-descriptions',
-            'version-info', 'titles',
-        ];
-
-        foreach ($sections as $section) {
-            if (!isset($merged[$section])) {
-                continue;
-            }
-
-            $value = $merged[$section];
-
-            if (is_array($value)) {
-                $this->json->add($section, new Json($value, 'none', 'same'));
-            } else {
-                $this->json->add($section, $value);
-            }
-        }
-    }
     private function getProp(Json $j, $name, string $connName, bool $requred = true) {
         $val = $j->get($name);
 

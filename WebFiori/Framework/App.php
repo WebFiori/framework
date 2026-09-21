@@ -12,14 +12,20 @@
 namespace WebFiori\Framework;
 
 use Exception;
+use ReflectionMethod;
+use WebFiori\Cache\CacheFacade;
 use WebFiori\Cli\Runner;
+use WebFiori\Container\Container;
+use WebFiori\Container\ContainerFacade;
 use WebFiori\Error\Config\HandlerConfig;
 use WebFiori\Error\Handler;
+use WebFiori\Event\EventDispatcherFacade;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
 use WebFiori\Framework\Autoload\ClassLoader;
 use WebFiori\Framework\Config\ConfigurationDriver;
 use WebFiori\Framework\Config\Controller;
+use WebFiori\Framework\Config\EnvResolutionStrategy;
 use WebFiori\Framework\Exceptions\InitializationException;
 use WebFiori\Framework\Handlers\APICallErrHandler;
 use WebFiori\Framework\Handlers\CLIErrHandler;
@@ -27,17 +33,11 @@ use WebFiori\Framework\Handlers\HTTPErrHandler;
 use WebFiori\Framework\Middleware\AbstractMiddleware;
 use WebFiori\Framework\Middleware\MiddlewareManager;
 use WebFiori\Framework\Middleware\StartSessionMiddleware;
-use WebFiori\Framework\Health;
 use WebFiori\Framework\Router\Router;
 use WebFiori\Framework\Router\RouterUri;
 use WebFiori\Framework\Scheduler\TasksManager;
 use WebFiori\Http\Request;
 use WebFiori\Http\Response;
-use ReflectionMethod;
-use WebFiori\Cache\CacheFacade;
-use WebFiori\Container\Container;
-use WebFiori\Container\ContainerFacade;
-use WebFiori\Event\EventDispatcherFacade;
 use WebFiori\Log\FileLogger;
 use WebFiori\Log\Logger;
 use WebFiori\Log\LoggerFacade;
@@ -227,6 +227,32 @@ class App {
         ClassRegistrar::register($folder, $regCallback, $suffix, $constructorParams, $otherParams);
     }
     /**
+     * Safe function caller with CLI/web-aware exception handling.
+     *
+     * @param callable $func The function to call.
+     *
+     * @return mixed
+     */
+    public static function call($func) {
+        try {
+            return call_user_func($func);
+        } catch (Exception $ex) {
+            if (self::getRunner()->isCLI()) {
+                printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
+            } else {
+                throw new InitializationException($ex->getMessage(), $ex->getCode(), $ex);
+            }
+        }
+    }
+    /**
+     * Returns the application DI container.
+     *
+     * @return Container
+     */
+    public static function container(): Container {
+        return ContainerFacade::getInstance();
+    }
+    /**
      * Returns a reference to an instance of 'ClassLoader'.
      *
      * @return ClassLoader A reference to an instance of 'ClassLoader'.
@@ -272,6 +298,16 @@ class App {
         return self::$ConfigDriver;
     }
     /**
+     * Returns the active environment variable resolution strategy.
+     *
+     * @return EnvResolutionStrategy
+     *
+     * @since 3.1.0
+     */
+    public static function getEnvResolutionStrategy(): EnvResolutionStrategy {
+        return Controller::getEnvResolutionStrategy();
+    }
+    /**
      * Returns the current request instance.
      *
      * @return Request
@@ -286,22 +322,6 @@ class App {
      */
     public static function getResponse() : Response {
         return self::$Response;
-    }
-    /**
-     * Returns the application DI container.
-     *
-     * @return Container
-     */
-    public static function container(): Container {
-        return ContainerFacade::getInstance();
-    }
-    /**
-     * Returns the application logger instance.
-     *
-     * @return Logger
-     */
-    public static function log(): Logger {
-        return LoggerFacade::getInstance();
     }
     /**
      * Returns an instance which represents the class that is used to run the
@@ -452,6 +472,14 @@ class App {
         self::$ClassStatus = self::STATUS_INITIATED;
     }
     /**
+     * Returns the application logger instance.
+     *
+     * @return Logger
+     */
+    public static function log(): Logger {
+        return LoggerFacade::getInstance();
+    }
+    /**
      * Sets the class that will be used as configuration driver.
      *
      * This method must be used before calling the method 'App::start()' in order
@@ -461,6 +489,31 @@ class App {
      */
     public static function setConfigDriver(string $clazz) {
         self::$ConfigDriver = $clazz;
+    }
+    /**
+     * Sets the strategy used to resolve application environment variable values
+     * at runtime.
+     *
+     * Must be called BEFORE App::init() to take effect. The strategy controls
+     * what happens when both a config-driver value and a system environment
+     * variable with the same name exist.
+     *
+     * ```php
+     * // Preserve pre-3.1 behavior (config file wins):
+     * App::setEnvResolutionStrategy(EnvResolutionStrategy::CONFIG_ONLY);
+     * App::init();
+     * ```
+     *
+     * The default is EnvResolutionStrategy::SYSTEM_FIRST, which means system
+     * environment variables override config file values.
+     *
+     * @param EnvResolutionStrategy $strategy The resolution strategy to apply.
+     *
+     * @since 3.1.0
+     * @see EnvResolutionStrategy
+     */
+    public static function setEnvResolutionStrategy(EnvResolutionStrategy $strategy): void {
+        Controller::setEnvResolutionStrategy($strategy);
     }
 
     /**
@@ -514,24 +567,6 @@ class App {
         return $arg instanceof $typeName;
     }
     /**
-     * Safe function caller with CLI/web-aware exception handling.
-     *
-     * @param callable $func The function to call.
-     * 
-     * @return mixed
-     */
-    public static function call($func) {
-        try {
-            return call_user_func($func);
-        } catch (Exception $ex) {
-            if (self::getRunner()->isCLI()) {
-                printf("WARNING: ".$ex->getMessage().' at '.$ex->getFile().':'.$ex->getLine()."\n");
-            } else {
-                throw new InitializationException($ex->getMessage(), $ex->getCode(), $ex);
-            }
-        }
-    }
-    /**
      * Validates and defines APP_DIR constant, checking for invalid characters.
      */
     private function checkAppDir() {
@@ -559,6 +594,33 @@ class App {
             define('APP_PATH', ROOT_PATH.DIRECTORY_SEPARATOR.APP_DIR.DIRECTORY_SEPARATOR);
         }
     }
+    private function initContainer() {
+        $container = ContainerFacade::getInstance();
+        $container->instance(Session\SessionManager::class, Session\SessionsManager::getInstance());
+        $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
+        $container->instance(Router::class, Router::getInstance());
+        $container->instance(TasksManager::class, TasksManager::get());
+        $container->instance(AccessManager::class, Access::getManager());
+    }
+    /**
+     * @throws FileException
+     */
+    private function initHealthCheck() {
+        // Register built-in checks
+        Health\HealthCheck::register(new Health\Checks\StorageCheck());
+
+        if (CacheFacade::isEnabled()) {
+            Health\HealthCheck::register(new Health\Checks\CacheCheck());
+        }
+
+        // Auto-discover from App/Health/
+        self::autoRegister('Health', function ($instance)
+        {
+            if ($instance instanceof Health\HealthCheckInterface) {
+                Health\HealthCheck::register($instance);
+            }
+        });
+    }
 
     /**
      * Checks if framework standard libraries are loaded or not.
@@ -577,7 +639,8 @@ class App {
      */
     private function initListeners() {
         // Auto-discover listeners from App/Listeners/
-        self::autoRegister('Listeners', function ($instance) {
+        self::autoRegister('Listeners', function ($instance)
+        {
             if (method_exists($instance, 'handle')) {
                 $ref = new ReflectionMethod($instance, 'handle');
                 $params = $ref->getParameters();
@@ -592,14 +655,6 @@ class App {
             }
         });
     }
-    private function initContainer() {
-        $container = ContainerFacade::getInstance();
-        $container->instance(Session\SessionManager::class, Session\SessionsManager::getInstance());
-        $container->instance(Middleware\MiddlewareRegistry::class, MiddlewareManager::getInstance());
-        $container->instance(Router::class, Router::getInstance());
-        $container->instance(TasksManager::class, TasksManager::get());
-        $container->instance(AccessManager::class, Access::getManager());
-    }
     private function initMiddleware() {
         App::autoRegister('Middleware', function(AbstractMiddleware $inst)
         {
@@ -612,24 +667,6 @@ class App {
         MiddlewareManager::register(new StartSessionMiddleware());
         MiddlewareManager::register(new Middleware\CheckMaintenanceMode());
         self::call(APP_DIR.'\Ini\Middleware::initialize');
-    }
-    /**
-     * @throws FileException
-     */
-    private function initHealthCheck() {
-        // Register built-in checks
-        Health\HealthCheck::register(new Health\Checks\StorageCheck());
-
-        if (CacheFacade::isEnabled()) {
-            Health\HealthCheck::register(new Health\Checks\CacheCheck());
-        }
-
-        // Auto-discover from App/Health/
-        self::autoRegister('Health', function ($instance) {
-            if ($instance instanceof Health\HealthCheckInterface) {
-                Health\HealthCheck::register($instance);
-            }
-        });
     }
     private function initRoutes() {
         $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];

@@ -7,6 +7,7 @@ use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Framework\Session\DatabaseSessionStorage;
+use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Framework\Session\SessionStatus;
 
@@ -16,35 +17,20 @@ use WebFiori\Framework\Session\SessionStatus;
  * @author Ibrahim
  */
 class SessionsManagerTest extends TestCase {
-
-    private function skipIfMssqlUnavailable(): void {
-        try {
-            $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
-                'TrustServerCertificate' => 'true'
-            ]);
-            $conn->setName('sessions-connection');
-            App::getConfig()->addOrUpdateDBConnection($conn);
-            $storage = new DatabaseSessionStorage('sessions-connection');
-            $storage->getController()->removeTables();
-            $storage->getController()->createTables();
-            $storage->save('probe-test', 'probe');
-            $storage->remove('probe-test');
-        } catch (\Throwable $e) {
-            $this->markTestSkipped('MSSQL not available: '.$e->getMessage());
-        }
-    }
     /**
      * @test
      */
     public function test00() {
         SessionsManager::reset();
+        InMemorySessionStorage::reset();
+        SessionsManager::setStorage(new InMemorySessionStorage());
         $this->assertEquals(0, count(SessionsManager::getSessions()));
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertNull(SessionsManager::get('xyz'));
         $this->assertFalse(SessionsManager::remove('xyz'));
         $this->assertFalse(SessionsManager::set('xyz','hello'));
         $this->assertNull(SessionsManager::pull('xyz'));
-        
+
         $this->assertFalse(SessionsManager::hasCookie());
         SessionsManager::start('hello');
         $this->assertFalse(SessionsManager::hasCookie());
@@ -155,13 +141,48 @@ class SessionsManagerTest extends TestCase {
     /**
      * @test
      */
+    public function testCloseDb00() {
+        $this->skipIfMssqlUnavailable();
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('sessions-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables();
+        $sto->getController()->clear();
+        SessionsManager::setStorage($sto);
+        SessionsManager::pauseAll();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertNotNull(SessionsManager::getActiveSession());
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertEquals(SessionStatus::RESUMED, SessionsManager::getActiveSession()->getStatus());
+        $oldId = SessionsManager::getActiveSession()->getId();
+        $newId = SessionsManager::newId();
+        $this->assertNotEquals($oldId, $newId);
+        $this->assertNotEquals($oldId, SessionsManager::getActiveSession()->getId());
+        $this->assertEquals($newId, SessionsManager::getActiveSession()->getId());
+    }
+    /** @test */
+    public function testCloseNoSession() {
+        SessionsManager::reset();
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
+    /**
+     * @test
+     */
     public function testCookiesHeaders() {
         SessionsManager::reset();
         SessionsManager::start('hello');
         $sessions = SessionsManager::getSessions();
         $this->assertEquals([
             'hello='.$sessions[0]->getId().'; expires='.$sessions[0]->getCookie()->getLifetime().'; path=/; Secure; HttpOnly; SameSite=Lax'
-            ], SessionsManager::getCookiesHeaders());
+        ], SessionsManager::getCookiesHeaders());
     }
     /**
      * @test
@@ -300,56 +321,6 @@ class SessionsManagerTest extends TestCase {
     /**
      * @test
      */
-    public function testDropDbTables00() {
-        $this->skipIfMssqlUnavailable();
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
-        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
-            'TrustServerCertificate' => 'true'
-        ]);
-        $conn->setName('sessions-connection');
-        App::getConfig()->addOrUpdateDBConnection($conn);
-        SessionsManager::reset();
-        $sto = new DatabaseSessionStorage();
-        $sto->dropTables();
-        SessionsManager::setStorage($sto);
-        SessionsManager::start('hello');
-    }
-    /**
-     * @test
-     */
-    public function testGetSessionIDFromRequest() {
-        unset($_POST["my-s"]);
-        $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
-        App::getRequest()->setRequestMethod('GET');
-        $_GET['my-s'] = 'super';
-        $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
-
-        $_POST['my-s'] = 'xyz';
-        App::getRequest()->setRequestMethod('POST');
-        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
-    }
-    /**
-     * @test
-     */
-    public function testInitSessionsDb() {
-        $this->skipIfMssqlUnavailable();
-        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
-            'TrustServerCertificate' => 'true'
-        ]);
-        $conn->setName('sessions-connection');
-        App::getConfig()->addOrUpdateDBConnection($conn);
-        SessionsManager::reset();
-        $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables();
-        $sto->getController()->clear();
-        $sto->getController()->table('session_data')->selectCount()->execute();
-        $sto->getController()->table('sessions')->selectCount()->execute();
-        $this->assertTrue(true);
-    }
-    /**
-     * @test
-     */
     public function testDbSessions00() {
         $this->skipIfMssqlUnavailable();
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
@@ -363,10 +334,10 @@ class SessionsManagerTest extends TestCase {
         $sto->getController()->clear();
         SessionsManager::setStorage($sto);
         SessionsManager::start('hello-x', [
-            
+
         ]);
         $activeSesstion = SessionsManager::getActiveSession();
-        
+
         $this->assertFalse($activeSesstion->isRefresh());
         $this->assertTrue($activeSesstion->isRunning());
 
@@ -451,11 +422,19 @@ class SessionsManagerTest extends TestCase {
         $this->assertNull(SessionsManager::get('super-var'));
         SessionsManager::validateStorage();
     }
+    /** @test */
+    public function testDestroyNoSession() {
+        SessionsManager::reset();
+        SessionsManager::destroy();
+        $this->assertNull(SessionsManager::getActiveSession());
+    }
     /**
      * @test
      */
-    public function testCloseDb00() {
+    public function testDropDbTables00() {
         $this->skipIfMssqlUnavailable();
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -463,70 +442,9 @@ class SessionsManagerTest extends TestCase {
         App::getConfig()->addOrUpdateDBConnection($conn);
         SessionsManager::reset();
         $sto = new DatabaseSessionStorage();
-        $sto->getController()->createTables();
-        $sto->getController()->clear();
+        $sto->dropTables();
         SessionsManager::setStorage($sto);
-        SessionsManager::pauseAll();
-        $this->assertNull(SessionsManager::getActiveSession());
-        SessionsManager::start('xyz');
-        $this->assertNotNull(SessionsManager::getActiveSession());
-        SessionsManager::close();
-        $this->assertNull(SessionsManager::getActiveSession());
-        SessionsManager::start('xyz');
-        $this->assertEquals(SessionStatus::RESUMED, SessionsManager::getActiveSession()->getStatus());
-        $oldId = SessionsManager::getActiveSession()->getId();
-        $newId = SessionsManager::newId();
-        $this->assertNotEquals($oldId, $newId);
-        $this->assertNotEquals($oldId, SessionsManager::getActiveSession()->getId());
-        $this->assertEquals($newId, SessionsManager::getActiveSession()->getId());
-    }
-    /** @test */
-    public function testSetManager() {
-        $manager = new \WebFiori\Framework\Session\SessionManager(new \WebFiori\Framework\Session\DefaultSessionStorage());
-        SessionsManager::setManager($manager);
-        $this->assertSame($manager, SessionsManager::getInstance());
-    }
-    /** @test */
-    public function testCloseNoSession() {
-        SessionsManager::reset();
-        SessionsManager::close();
-        $this->assertNull(SessionsManager::getActiveSession());
-    }
-    /** @test */
-    public function testDestroyNoSession() {
-        SessionsManager::reset();
-        SessionsManager::destroy();
-        $this->assertNull(SessionsManager::getActiveSession());
-    }
-    /** @test */
-    public function testGetNoSession() {
-        SessionsManager::reset();
-        $this->assertNull(SessionsManager::get('anything'));
-    }
-    /** @test */
-    public function testSetNoSession() {
-        SessionsManager::reset();
-        $this->assertFalse(SessionsManager::set('k', 'v'));
-    }
-    /** @test */
-    public function testPullNoSession() {
-        SessionsManager::reset();
-        $this->assertNull(SessionsManager::pull('k'));
-    }
-    /** @test */
-    public function testRemoveNoSession() {
-        SessionsManager::reset();
-        $this->assertFalse(SessionsManager::remove('k'));
-    }
-    /** @test */
-    public function testHasCookieNoSession() {
-        SessionsManager::reset();
-        $this->assertFalse(SessionsManager::hasCookie());
-    }
-    /** @test */
-    public function testNewIdNoSession() {
-        SessionsManager::reset();
-        $this->assertNull(SessionsManager::newId());
+        SessionsManager::start('hello');
     }
     /** @test */
     public function testFacadeClose() {
@@ -543,14 +461,6 @@ class SessionsManagerTest extends TestCase {
         $this->assertNull(SessionsManager::getActiveSession());
     }
     /** @test */
-    public function testFacadePull() {
-        SessionsManager::reset();
-        SessionsManager::start('pull-test');
-        SessionsManager::set('pk', 'pv');
-        $this->assertEquals('pv', SessionsManager::pull('pk'));
-        $this->assertNull(SessionsManager::get('pk'));
-    }
-    /** @test */
     public function testFacadeNewId() {
         SessionsManager::reset();
         SessionsManager::start('newid-test');
@@ -564,8 +474,73 @@ class SessionsManagerTest extends TestCase {
         $this->assertNull(SessionsManager::getActiveSession());
     }
     /** @test */
+    public function testFacadePull() {
+        SessionsManager::reset();
+        SessionsManager::start('pull-test');
+        SessionsManager::set('pk', 'pv');
+        $this->assertEquals('pv', SessionsManager::pull('pk'));
+        $this->assertNull(SessionsManager::get('pk'));
+    }
+    /** @test */
+    public function testGetNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::get('anything'));
+    }
+    /** @test */
     public function testGetSessionIDFromCookieNotSet() {
         $this->assertFalse(SessionsManager::getSessionIDFromCookie('nonexistent'));
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionIDFromRequest() {
+        unset($_POST["my-s"]);
+        $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
+        App::getRequest()->setRequestMethod('GET');
+        $_GET['my-s'] = 'super';
+        $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
+
+        $_POST['my-s'] = 'xyz';
+        App::getRequest()->setRequestMethod('POST');
+        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
+    }
+    /** @test */
+    public function testHasCookieNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::hasCookie());
+    }
+    /**
+     * @test
+     */
+    public function testInitSessionsDb() {
+        $this->skipIfMssqlUnavailable();
+        $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+            'TrustServerCertificate' => 'true'
+        ]);
+        $conn->setName('sessions-connection');
+        App::getConfig()->addOrUpdateDBConnection($conn);
+        SessionsManager::reset();
+        $sto = new DatabaseSessionStorage();
+        $sto->getController()->createTables();
+        $sto->getController()->clear();
+        $sto->getController()->table('session_data')->selectCount()->execute();
+        $sto->getController()->table('sessions')->selectCount()->execute();
+        $this->assertTrue(true);
+    }
+    /** @test */
+    public function testNewIdNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::newId());
+    }
+    /** @test */
+    public function testPullNoSession() {
+        SessionsManager::reset();
+        $this->assertNull(SessionsManager::pull('k'));
+    }
+    /** @test */
+    public function testRemoveNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::remove('k'));
     }
 
     /**
@@ -599,5 +574,33 @@ class SessionsManagerTest extends TestCase {
         // Cleanup
         SessionsManager::reset();
         unset($_GET[$sessionName]);
+    }
+    /** @test */
+    public function testSetManager() {
+        $manager = new \WebFiori\Framework\Session\SessionManager(new \WebFiori\Framework\Session\DefaultSessionStorage());
+        SessionsManager::setManager($manager);
+        $this->assertSame($manager, SessionsManager::getInstance());
+    }
+    /** @test */
+    public function testSetNoSession() {
+        SessionsManager::reset();
+        $this->assertFalse(SessionsManager::set('k', 'v'));
+    }
+
+    private function skipIfMssqlUnavailable(): void {
+        try {
+            $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
+                'TrustServerCertificate' => 'true'
+            ]);
+            $conn->setName('sessions-connection');
+            App::getConfig()->addOrUpdateDBConnection($conn);
+            $storage = new DatabaseSessionStorage('sessions-connection');
+            $storage->getController()->removeTables();
+            $storage->getController()->createTables();
+            $storage->write('probe-test', 'k', 'probe', null, \WebFiori\Framework\Session\ConflictStrategy::LAST_WRITE_WINS);
+            $storage->destroy('probe-test');
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('MSSQL not available: '.$e->getMessage());
+        }
     }
 }

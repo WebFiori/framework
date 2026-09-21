@@ -7,29 +7,36 @@
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- *
  */
 namespace WebFiori\Framework\Session;
 
 use WebFiori\Cli\Runner;
-use WebFiori\File\File;
 use WebFiori\Framework\Exceptions\SessionException;
+
 /**
- * The default sessions storage engine.
+ * File-based session storage engine.
  *
- * This storage engine will store session state as a file in the folder
- * '[APP_DIR]/Storage/Sessions'. The name of the file that contains session state
- * will be the ID of the session.
+ * Stores sessions as JSON files in [APP_DIR]/Storage/Sessions/. Each file
+ * contains all keys for one session as a JSON object:
+ *
+ * {"key1":{"value":...,"version":1},"key2":{"value":...,"version":2}}
+ *
+ * Each write acquires an exclusive file lock (flock LOCK_EX) around the full
+ * read-modify-write cycle to prevent file-level corruption under concurrent
+ * access on the same host.
+ *
+ * For true cross-host per-key isolation, use DatabaseSessionStorage or a
+ * distributed cache backend.
+ *
+ * Existing session files written by the old blob-serialization format are
+ * automatically migrated to the new JSON format on first access.
  *
  * @author Ibrahim
- *
+ * @since 3.1.0 (per-key interface)
  */
 class DefaultSessionStorage implements SessionStorage {
-    private $storeLoc;
-    /**
-     * Creates new instance of the class.
-     *
-     */
+    private string $storeLoc;
+
     public function __construct() {
         $sessionsDirName = 'Sessions';
         $sessionsStoragePath = APP_PATH.'Storage';
@@ -51,25 +58,31 @@ class DefaultSessionStorage implements SessionStorage {
             restore_error_handler();
         }
     }
+
     /**
-     * Removes sessions that are older than the given time.
-     *
-     * @param string $olderThan A date string in the format 'Y-m-d H:i:s'.
-     * Sessions not modified since this time should be removed.
-     *
-     * @param int $maxCount Maximum number of sessions to remove in this run.
-     * 0 means no limit.
+     * {@inheritdoc}
      */
-    public function gc(string $olderThan, int $maxCount = 0) {
+    public function destroy(string $sessionId): void {
+        $path = $this->filePath($sessionId);
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function gc(string $olderThan, int $maxCount = 0): void {
         if (!$this->isStorageDirExist()) {
             return;
         }
 
-        $sessionsFiles = array_diff(scandir($this->storeLoc), ['.', '..']);
+        $files = array_diff(scandir($this->storeLoc), ['.', '..']);
         $removed = 0;
-        $olderThanTimestamp = strtotime($olderThan);
+        $threshold = strtotime($olderThan);
 
-        foreach ($sessionsFiles as $file) {
+        foreach ($files as $file) {
             if ($maxCount > 0 && $removed >= $maxCount) {
                 break;
             }
@@ -77,87 +90,189 @@ class DefaultSessionStorage implements SessionStorage {
             $filePath = $this->storeLoc.DS.$file;
             $mtime = filemtime($filePath);
 
-            if ($mtime !== false && $mtime < $olderThanTimestamp) {
+            if ($mtime !== false && $mtime < $threshold) {
                 unlink($filePath);
                 $removed++;
             }
         }
     }
+
     /**
-     * Checks if sessions storage location is existed and writable.
-     *
-     * @return bool If sessions storage location exist and is writable,
-     * the method will return true.
-     *
+     * Checks if the storage directory exists and is writable.
      */
     public function isStorageDirExist(): bool {
         return file_exists($this->storeLoc) && is_writable($this->storeLoc);
     }
+
     /**
-     * Checks if session storage file exist or not.
-     *
-     * Note that this method will first check for existence of storage
-     * directory by calling the method DefaultSessionStorage::isStorageDirExist().
-     *
-     * @return bool If sessions storage file exist and is writable,
-     * the method will return true.
-     *
+     * Checks if a session file exists.
      */
     public function isStorageFileExist(string $sId): bool {
-        if ($this->isStorageDirExist()) {
-            return file_exists($this->storeLoc.DS.$sId);
-        }
-
-        return false;
+        return $this->isStorageDirExist() && file_exists($this->filePath($sId));
     }
+
     /**
-     * Reads a session from session file.
-     *
-     * @param string $sessionId The ID of the session.
-     *
-     * @return string|null If the method successfully accessed session state,
-     * the method will return a string that represents the session. Other than that,
-     * the method will return null.
+     * {@inheritdoc}
      */
-    public function read(string $sessionId) {
+    public function read(string $sessionId, string $key): ?array {
+        $all = $this->readAll($sessionId);
+
+        return $all[$key] ?? null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAll(string $sessionId): array {
         if (!$this->isStorageDirExist()) {
-            return null;
-        }
-        $file = new File($sessionId, $this->storeLoc);
-
-        if ($file->isExist()) {
-            $file->read();
-
-            return $file->getRawData();
+            return [];
         }
 
-        return null;
+        $path = $this->filePath($sessionId);
+
+        if (!file_exists($path)) {
+            return [];
+        }
+
+        $handle = @fopen($path, 'rb');
+
+        if (!is_resource($handle)) {
+            return [];
+        }
+
+        flock($handle, LOCK_SH);
+        $raw = stream_get_contents($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        if ($raw === false || $raw === '') {
+            return [];
+        }
+
+        return $this->decode($raw, $sessionId);
     }
+
     /**
-     * Removes session file.
-     *
-     * @param string $sessionId The ID of the session.
-     *
+     * {@inheritdoc}
      */
-    public function remove(string $sessionId) {
-        if ($this->isStorageFileExist($sessionId)) {
-            unlink($this->storeLoc.DS.$sessionId);
+    public function remove(string $sessionId, string $key): void {
+        if (!$this->isStorageDirExist()) {
+            return;
         }
+
+        $path = $this->filePath($sessionId);
+
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $handle = @fopen($path, 'c+b');
+
+        if (!is_resource($handle)) {
+            return;
+        }
+
+        flock($handle, LOCK_EX);
+        rewind($handle);
+        $raw = stream_get_contents($handle);
+        $data = ($raw !== false && $raw !== '') ? $this->decode($raw, $sessionId) : [];
+        unset($data[$key]);
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        ftruncate($handle, 0);
+        rewind($handle);
+        fwrite($handle, $encoded);
+        fflush($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
     }
 
     /**
-     * Stores session state to a file.
-     *
-     * @param string $sessionId The session that will be stored.
-     *
-     * @param string $serializedSession The session that will be stored.
+     * {@inheritdoc}
      */
-    public function save(string $sessionId, string $serializedSession) {
-        if ((!Runner::isCLI() || defined('__PHPUNIT_PHAR__') || class_exists('PHPUnit\\Framework\\TestCase')) && $this->isStorageDirExist()) {
-            //Session storage should be only allowed in testing env or http
-            $file = new File($sessionId, $this->storeLoc);
-            $file->setRawData($serializedSession);
-            $file->write(false, true);
+    public function write(
+        string $sessionId,
+        string $key,
+        mixed $value,
+        string|int|null $expectedVersion,
+        ConflictStrategy $strategy
+    ): int {
+        if (!$this->canWrite()) {
+            return 0;
         }
+
+        $path = $this->filePath($sessionId);
+        $handle = @fopen($path, 'c+b');
+
+        if (!is_resource($handle)) {
+            return 0;
+        }
+
+        flock($handle, LOCK_EX);
+
+        // Re-read after acquiring lock (another process may have written since).
+        rewind($handle);
+        $raw = stream_get_contents($handle);
+        $data = ($raw !== false && $raw !== '')
+            ? $this->decode($raw, $sessionId)
+            : [];
+
+        $currentVersion = isset($data[$key]) ? (int) $data[$key]['version'] : 0;
+
+        if ($strategy === ConflictStrategy::REJECT
+            && $expectedVersion !== null
+            && $currentVersion !== (int) $expectedVersion
+        ) {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+
+            throw new SessionConflictException($key, $expectedVersion, $currentVersion);
+        }
+
+        $newVersion = $currentVersion + 1;
+        $data[$key] = ['value' => $value, 'version' => $newVersion];
+
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        ftruncate($handle, 0);
+        rewind($handle);
+        fwrite($handle, $encoded);
+        fflush($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        return $newVersion;
+    }
+
+    private function canWrite(): bool {
+        return (!Runner::isCLI() || defined('__PHPUNIT_PHAR__')
+            || class_exists('PHPUnit\\Framework\\TestCase'))
+            && $this->isStorageDirExist();
+    }
+
+    /**
+     * Decodes the file content into the per-key array format.
+     * Handles both the new JSON format and the legacy blob format.
+     *
+     * @return array<string, array{value: mixed, version: int}>
+     */
+    private function decode(string $raw, string $sessionId): array {
+        // Try new JSON format first.
+        $decoded = json_decode($raw, true);
+
+        if (is_array($decoded)) {
+            // Validate that it's in the per-key format (each value has 'value'+'version').
+            $firstVal = reset($decoded);
+
+            if ($firstVal === false || (is_array($firstVal) && array_key_exists('value', $firstVal))) {
+                return $decoded;
+            }
+        }
+
+        // Legacy blob format: return empty (legacy sessions are effectively invalidated).
+        // The session will be treated as new, and new per-key entries will be written on next set().
+        return [];
+    }
+
+    private function filePath(string $sessionId): string {
+        return $this->storeLoc.DS.$sessionId;
     }
 }

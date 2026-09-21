@@ -7,7 +7,6 @@
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- *
  */
 namespace WebFiori\Framework\Session;
 
@@ -18,32 +17,23 @@ use WebFiori\Cache\Storage;
 /**
  * A session storage implementation backed by the cache library.
  *
- * This allows sessions to be stored using any cache backend (Redis, file, etc.)
- * by delegating to the cache Storage interface.
+ * Stores each session key as a separate cache entry:
+ * - Per-key entry: "wf_session:{session_id}:{key}" => ['value'=>...,'version'=>int]
+ * - Key index:     "wf_session:{session_id}:_keys" => [key1, key2, ...]
+ *
+ * The key index is used to support readAll() and destroy(). Note that
+ * cache backends without atomic read-modify-write may have a small race
+ * window when updating the index; for strict per-key conflict detection
+ * prefer DatabaseSessionStorage.
  *
  * @author Ibrahim
+ * @since 3.1.0 (per-key interface)
  */
 class CacheSessionStorage implements SessionStorage {
-    /**
-     * @var Storage The cache storage backend.
-     */
-    private Storage $storage;
-    /**
-     * @var string Prefix for session cache keys.
-     */
     private string $prefix;
-    /**
-     * @var int Session TTL in seconds.
-     */
+    private Storage $storage;
     private int $ttl;
 
-    /**
-     * Creates new instance.
-     *
-     * @param Storage $cacheStorage The cache storage backend to use.
-     * @param string $prefix Key prefix to namespace session entries.
-     * @param int $ttl Time-to-live for session entries in seconds. Default: 7200 (2 hours).
-     */
     public function __construct(Storage $cacheStorage, string $prefix = 'wf_session:', int $ttl = 7200) {
         $this->storage = $cacheStorage;
         $this->prefix = $prefix;
@@ -51,55 +41,45 @@ class CacheSessionStorage implements SessionStorage {
     }
 
     /**
-     * Returns the cache storage backend.
-     *
-     * @return Storage
+     * {@inheritdoc}
      */
-    public function getStorage(): Storage {
-        return $this->storage;
+    public function destroy(string $sessionId): void {
+        $keys = $this->readIndex($sessionId);
+
+        foreach ($keys as $key) {
+            $this->storage->delete($this->keyFor($sessionId, $key));
+        }
+
+        $this->storage->delete($this->indexKey($sessionId));
     }
 
     /**
-     * Returns the key prefix.
-     *
-     * @return string
+     * {@inheritdoc}
      */
+    public function gc(string $olderThan, int $maxCount = 0): void {
+        $this->storage->purgeExpired();
+    }
+
     public function getPrefix(): string {
         return $this->prefix;
     }
 
-    /**
-     * Returns the TTL in seconds.
-     *
-     * @return int
-     */
+    public function getStorage(): Storage {
+        return $this->storage;
+    }
+
     public function getTTL(): int {
         return $this->ttl;
     }
 
     /**
-     * Sets the TTL for session entries.
-     *
-     * @param int $ttl Time-to-live in seconds.
+     * {@inheritdoc}
      */
-    public function setTTL(int $ttl): void {
-        $this->ttl = $ttl;
-    }
+    public function read(string $sessionId, string $key): ?array {
+        $cacheKey = $this->keyFor($sessionId, $key);
+        $data = $this->storage->read($cacheKey, null);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function gc(string $olderThan, int $maxCount = 0) {
-        $this->storage->purgeExpired();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function read(string $sessionId) {
-        $data = $this->storage->read($this->prefix . $sessionId, null);
-
-        if ($data === null) {
+        if (!is_array($data) || !array_key_exists('value', $data)) {
             return null;
         }
 
@@ -107,17 +87,103 @@ class CacheSessionStorage implements SessionStorage {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function remove(string $sessionId) {
-        $this->storage->delete($this->prefix . $sessionId);
+    public function readAll(string $sessionId): array {
+        $keys = $this->readIndex($sessionId);
+        $result = [];
+
+        foreach ($keys as $key) {
+            $entry = $this->read($sessionId, $key);
+
+            if ($entry !== null) {
+                $result[$key] = $entry;
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function save(string $sessionId, string $serializedSession) {
-        $item = new Item($this->prefix . $sessionId, $serializedSession, $this->ttl);
+    public function remove(string $sessionId, string $key): void {
+        $this->storage->delete($this->keyFor($sessionId, $key));
+        $this->removeFromIndex($sessionId, $key);
+    }
+
+    public function setTTL(int $ttl): void {
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write(
+        string $sessionId,
+        string $key,
+        mixed $value,
+        string|int|null $expectedVersion,
+        ConflictStrategy $strategy
+    ): int {
+        $current = $this->read($sessionId, $key);
+        $currentVersion = $current !== null ? (int) $current['version'] : 0;
+
+        if ($strategy === ConflictStrategy::REJECT
+            && $expectedVersion !== null
+            && $currentVersion !== (int) $expectedVersion
+        ) {
+            throw new SessionConflictException($key, $expectedVersion, $currentVersion);
+        }
+
+        $newVersion = $currentVersion + 1;
+        $entry = ['value' => $value, 'version' => $newVersion];
+        $cacheKey = $this->keyFor($sessionId, $key);
+
+        $item = new Item($cacheKey, $entry, $this->ttl);
+        $secConfig = new SecurityConfig();
+        $secConfig->setEncryptionEnabled(false);
+        $item->setSecurityConfig($secConfig);
+        $this->storage->store($item);
+
+        // Update the key index.
+        $this->addToIndex($sessionId, $key);
+
+        return $newVersion;
+    }
+
+    private function addToIndex(string $sessionId, string $key): void {
+        $keys = $this->readIndex($sessionId);
+
+        if (!in_array($key, $keys, true)) {
+            $keys[] = $key;
+            $item = new Item($this->indexKey($sessionId), $keys, $this->ttl);
+            $secConfig = new SecurityConfig();
+            $secConfig->setEncryptionEnabled(false);
+            $item->setSecurityConfig($secConfig);
+            $this->storage->store($item);
+        }
+    }
+
+    private function indexKey(string $sessionId): string {
+        return $this->prefix.$sessionId.':_keys';
+    }
+
+    private function keyFor(string $sessionId, string $key): string {
+        return $this->prefix.$sessionId.':'.$key;
+    }
+
+    /** @return string[] */
+    private function readIndex(string $sessionId): array {
+        $idx = $this->storage->read($this->indexKey($sessionId), null);
+
+        return is_array($idx) ? $idx : [];
+    }
+
+    private function removeFromIndex(string $sessionId, string $key): void {
+        $keys = $this->readIndex($sessionId);
+        $keys = array_values(array_filter($keys, fn ($k) => $k !== $key));
+        $item = new Item($this->indexKey($sessionId), $keys, $this->ttl);
         $secConfig = new SecurityConfig();
         $secConfig->setEncryptionEnabled(false);
         $item->setSecurityConfig($secConfig);

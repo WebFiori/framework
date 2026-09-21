@@ -13,7 +13,6 @@ namespace WebFiori\Framework\Session;
 
 use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
-
 /**
  * A class which is used to manage user sessions.
  *
@@ -29,7 +28,7 @@ class SessionManager {
     /**
      * @var int
      */
-    private int $gcProbability = 1;
+    private int $gcBatchSize = 100;
     /**
      * @var int
      */
@@ -37,7 +36,7 @@ class SessionManager {
     /**
      * @var int
      */
-    private int $gcBatchSize = 100;
+    private int $gcProbability = 1;
     /**
      * @var array
      */
@@ -130,6 +129,30 @@ class SessionManager {
         return $retVal;
     }
     /**
+     * Returns the maximum number of sessions to remove per GC run.
+     *
+     * @return int
+     */
+    public function getGCBatchSize(): int {
+        return $this->gcBatchSize;
+    }
+    /**
+     * Returns the GC probability divisor.
+     *
+     * @return int
+     */
+    public function getGCDivisor(): int {
+        return $this->gcDivisor;
+    }
+    /**
+     * Returns the GC probability numerator.
+     *
+     * @return int
+     */
+    public function getGCProbability(): int {
+        return $this->gcProbability;
+    }
+    /**
      * Returns a date string that represents the GC threshold time.
      *
      * @return string A date string in the format 'Y-m-d H:i:s'.
@@ -146,55 +169,6 @@ class SessionManager {
         }
 
         return date('Y-m-d H:i:s', $olderThan);
-    }
-    /**
-     * Sets the GC probability and divisor.
-     *
-     * @param int $probability The numerator. Must be >= 0.
-     * @param int $divisor The denominator. Must be >= 0. Set to 0 to disable GC.
-     */
-    public function setGCProbability(int $probability, int $divisor): void {
-        if ($probability >= 0) {
-            $this->gcProbability = $probability;
-        }
-
-        if ($divisor >= 0) {
-            $this->gcDivisor = $divisor;
-        }
-    }
-    /**
-     * Returns the GC probability numerator.
-     *
-     * @return int
-     */
-    public function getGCProbability(): int {
-        return $this->gcProbability;
-    }
-    /**
-     * Returns the GC probability divisor.
-     *
-     * @return int
-     */
-    public function getGCDivisor(): int {
-        return $this->gcDivisor;
-    }
-    /**
-     * Sets the maximum number of sessions to remove per GC run.
-     *
-     * @param int $size Maximum number. 0 means no limit.
-     */
-    public function setGCBatchSize(int $size): void {
-        if ($size >= 0) {
-            $this->gcBatchSize = $size;
-        }
-    }
-    /**
-     * Returns the maximum number of sessions to remove per GC run.
-     *
-     * @return int
-     */
-    public function getGCBatchSize(): int {
-        return $this->gcBatchSize;
     }
     /**
      * Returns the ID of a session from a cookie given its name.
@@ -365,6 +339,31 @@ class SessionManager {
         return false;
     }
     /**
+     * Sets the maximum number of sessions to remove per GC run.
+     *
+     * @param int $size Maximum number. 0 means no limit.
+     */
+    public function setGCBatchSize(int $size): void {
+        if ($size >= 0) {
+            $this->gcBatchSize = $size;
+        }
+    }
+    /**
+     * Sets the GC probability and divisor.
+     *
+     * @param int $probability The numerator. Must be >= 0.
+     * @param int $divisor The denominator. Must be >= 0. Set to 0 to disable GC.
+     */
+    public function setGCProbability(int $probability, int $divisor): void {
+        if ($probability >= 0) {
+            $this->gcProbability = $probability;
+        }
+
+        if ($divisor >= 0) {
+            $this->gcDivisor = $divisor;
+        }
+    }
+    /**
      * Sets sessions storage engine.
      *
      * @param SessionStorage $storage The new session storage.
@@ -380,7 +379,7 @@ class SessionManager {
      *
      * @throws SessionException
      */
-    public function start(string $sessionName, array $options = []): void {
+    public function start(string $sessionName, array $options = [], ReadStrategy $readStrategy = ReadStrategy::REALTIME, ConflictStrategy $conflictStrategy = ConflictStrategy::LAST_WRITE_WINS): void {
         $this->pauseSessions();
 
         if (!$this->hasSession($sessionName)) {
@@ -393,11 +392,15 @@ class SessionManager {
             }
 
             $s = new Session($options);
+            $s->setReadStrategy($readStrategy);
+            $s->setConflictStrategy($conflictStrategy);
             $s->start();
             $this->sessionsArr[] = $s;
         } else {
             foreach ($this->sessionsArr as $sessionObj) {
                 if ($sessionObj->getName() == $sessionName) {
+                    $sessionObj->setReadStrategy($readStrategy);
+                    $sessionObj->setConflictStrategy($conflictStrategy);
                     $sessionObj->start();
                 }
             }
@@ -405,35 +408,21 @@ class SessionManager {
     }
     /**
      * Validate the current status of the storage.
+     * With per-key storage, writes are already persisted as they happen.
+     * This method now only handles KILLED sessions (destroy) and GC.
      */
     public function validateStorage(): void {
         foreach ($this->sessionsArr as $session) {
             $status = $session->getStatus();
 
-            if ($status == SessionStatus::NEW ||
-                $status == SessionStatus::PAUSED ||
-                $status == SessionStatus::RESUMED) {
-                $this->sessionStorage->save($session->getId(), $session->serialize());
-            } else if ($status == SessionStatus::KILLED) {
-                $this->sessionStorage->remove($session->getId());
+            if ($status == SessionStatus::KILLED) {
+                $this->sessionStorage->destroy($session->getId());
             }
         }
 
         if ($this->shouldRunGC()) {
             $this->sessionStorage->gc($this->getGCTime(), $this->gcBatchSize);
         }
-    }
-
-    private function shouldRunGC(): bool {
-        if ($this->gcDivisor <= 0) {
-            return false;
-        }
-
-        if ($this->gcProbability <= 0) {
-            return false;
-        }
-
-        return random_int(1, $this->gcDivisor) <= $this->gcProbability;
     }
 
     private function checkAndLoadFromCookie(string $sName): bool {
@@ -472,5 +461,17 @@ class SessionManager {
         foreach ($this->sessionsArr as $session) {
             $session->close();
         }
+    }
+
+    private function shouldRunGC(): bool {
+        if ($this->gcDivisor <= 0) {
+            return false;
+        }
+
+        if ($this->gcProbability <= 0) {
+            return false;
+        }
+
+        return random_int(1, $this->gcDivisor) <= $this->gcProbability;
     }
 }

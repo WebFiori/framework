@@ -7,7 +7,6 @@
  *
  * For more information on the license, please visit:
  * https://github.com/WebFiori/.github/blob/main/LICENSE
- *
  */
 namespace WebFiori\Framework\Session;
 
@@ -16,29 +15,24 @@ use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\Exceptions\SessionException;
 
 /**
- * A session storage engine which uses database to store session state.
+ * A session storage engine which uses a database to store session state.
+ *
+ * Stores each session key as an individual row in the 'session_kv_data' table,
+ * enabling real-time per-key reads and optimistic concurrency control.
+ *
+ * Run SessionSchemaMigration::run($db) once during deployment to create the
+ * required 'session_kv_data' table (the old 'session_data' chunked blob table
+ * is kept for backward compatibility but is no longer used by this class).
  *
  * @author Ibrahim
- *
- * @version 2.0
- *
- * @since 2.1.0
+ * @since 2.1.0 (original), 3.1.0 (per-key interface)
  */
 class DatabaseSessionStorage implements SessionStorage {
-    /**
-     *
-     * @var SessionDB
-     */
-    private $dbController;
+    private SessionDB $dbController;
 
     /**
-     * Creates new instance of the class.
-     *
-     * @param string|ConnectionInfo $connection The name of the database connection to use,
-     * or a ConnectionInfo object directly.
-     *
+     * @param string|ConnectionInfo $connection The connection name or info object.
      * @throws SessionException
-     * @since 1.0
      */
     public function __construct($connection = 'sessions-connection') {
         try {
@@ -53,72 +47,66 @@ class DatabaseSessionStorage implements SessionStorage {
             }
         }
     }
+
     /**
-     * Drop the Tables which are used to store session information.
-     *
-     * The method will drop two Tables, the table 'session_data' and the
-     * table 'sessions'.
+     * {@inheritdoc}
      */
-    public function dropTables() {
-        $this->getController()->table('session_data')->drop()->execute();
-        $this->getController()->table('sessions')->drop()->execute();
-    }
-    /**
-     * Removes sessions that are older than the given time.
-     *
-     * @param string $olderThan A date string in the format 'Y-m-d H:i:s'.
-     * Sessions not modified since this time should be removed.
-     *
-     * @param int $maxCount Maximum number of sessions to remove in this run.
-     * 0 means no limit.
-     */
-    public function gc(string $olderThan, int $maxCount = 0) {
-        $this->dbController->gc($olderThan, $maxCount);
-    }
-    /**
-     * Returns the instance at which the storage is using to send queries to
-     * database and read sessions.
-     *
-     * @return SessionDB An instance of the class SessionDB.
-     */
-    public function getController() : SessionDB {
-        return $this->dbController;
-    }
-    /**
-     * Reads session state.
-     *
-     * @param string $sessionId The unique identifier of the session.
-     *
-     * @return string|null The method will return a string that represents the
-     * session if it was found. If no session was found which has the given ID, the method
-     * will return null.
-     *
-     * @since 1.0
-     */
-    public function read(string $sessionId) {
-        return $this->dbController->getSession($sessionId);
-    }
-    /**
-     * Stops a session and remove its state from the database.
-     *
-     * @param string $sessionId The unique identifier of the session.
-     *
-     * @since 1.0
-     */
-    public function remove(string $sessionId) {
+    public function destroy(string $sessionId): void {
         $this->dbController->removeSession($sessionId);
     }
+
     /**
-     * Store session state.
-     *
-     * @param string $sessionId The ID of the session that will be stored.
-     *
-     * @param string $serializedSession A string that represents the session in
-     * serialized form.
-     *
-     * @since 1.0
+     * Drops all session tables (sessions, session_data, session_kv_data).
      */
-    public function save(string $sessionId, string $serializedSession) {
-        $this->dbController->saveSession($sessionId, $serializedSession);
+    public function dropTables(): void {
+        $this->dbController->dropAllTables();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function gc(string $olderThan, int $maxCount = 0): void {
+        $this->dbController->gc($olderThan, $maxCount);
+    }
+
+    /**
+     * Returns the underlying SessionDB controller.
+     */
+    public function getController(): SessionDB {
+        return $this->dbController;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function read(string $sessionId, string $key): ?array {
+        return $this->dbController->getSessionKey($sessionId, $key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readAll(string $sessionId): array {
+        return $this->dbController->getSessionKeys($sessionId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove(string $sessionId, string $key): void {
+        $this->dbController->removeSessionKey($sessionId, $key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write(
+        string $sessionId,
+        string $key,
+        mixed $value,
+        string|int|null $expectedVersion,
+        ConflictStrategy $strategy
+    ): int {
+        return $this->dbController->writeSessionKey($sessionId, $key, $value, $expectedVersion, $strategy);
     }
 }

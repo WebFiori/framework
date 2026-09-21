@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -10,6 +11,7 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Writers\LangClassWriter;
@@ -20,6 +22,7 @@ use WebFiori\Framework\Writers\LangClassWriter;
  * @author Ibrahim
  *
  */
+#[Group('setup')]
 class AddLangCommand extends Command {
     public function __construct() {
         parent::__construct('add:lang', [], 'Add a website language.');

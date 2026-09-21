@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Framework\Writers\MiddlewareClassWriter;
@@ -21,6 +23,7 @@ use WebFiori\Framework\Writers\MiddlewareClassWriter;
  * @author Ibrahim
  *
  */
+#[Group('create')]
 class CreateMiddlewareCommand extends Command {
     public function __construct() {
         parent::__construct('create:middleware', [
@@ -30,23 +33,47 @@ class CreateMiddlewareCommand extends Command {
             new Argument('--groups', 'Comma-separated list of groups to add the middleware to.', true)
         ], 'Create a new middleware class.');
     }
-    private function getPriority() : int {
-        $priority = $this->getArgValue('--priority');
-        
-        if ($priority === null) {
-            $validator = new InputValidator(function($input) {
-                return is_numeric($input);
-            }, 'Priority must be a number.');
-            
-            $priority = (int)$this->getInput('Enter middleware priority:', 0, $validator);
-        } else {
-            if (!is_numeric($priority)) {
-                $this->error('Priority must be a number.');
-                return -1;
-            }
-            $priority = (int)$priority;
+    /**
+     * Execute the command.
+     *
+     * @return int
+     */
+    public function exec() : int {
+        $className = $this->getArgValue('--class-name');
+
+        if ($className !== null && strlen($className) == 0) {
+            $this->error('--class-name cannot be empty string.');
+            $className = null;
         }
-        return $priority;
+
+        if ($className === null) {
+            $validator = new InputValidator(function($input)
+            {
+                return !empty(trim($input));
+            }, 'Class name cannot be empty.');
+
+            $className = trim($this->getInput('Enter middleware class name:', null, $validator));
+        }
+
+
+
+        $middlewareName = $this->getMDName($className);
+        $priority = $this->getPriority();
+
+        if ($priority === -1) {
+            return -1;
+        }
+
+        $groups = $this->getGroups();
+
+
+        $writer = new MiddlewareClassWriter($middlewareName, $priority, $groups);
+        $writer->setClassName($className);
+        $writer->writeClass();
+
+        $this->success('Middleware class created at: '.$writer->getAbsolutePath());
+
+        return 0;
     }
     public function getGroups() : array {
         $groupsArg = $this->getArgValue('--groups');
@@ -61,6 +88,7 @@ class CreateMiddlewareCommand extends Command {
             if ($this->confirm('Add middleware to groups?', false)) {
                 while (true) {
                     $group = $this->getInput('Enter group name (leave empty to finish):');
+
                     if (empty(trim($group))) {
                         break;
                     }
@@ -68,57 +96,42 @@ class CreateMiddlewareCommand extends Command {
                 }
             }
         }
+
         return $groups;
     }
     private function getMDName(string $className) : string {
         $middlewareName = $this->getArgValue('--name');
-        
+
         if ($middlewareName === null) {
-            $validator = new InputValidator(function($input) {
+            $validator = new InputValidator(function($input)
+            {
                 return !empty(trim($input));
             }, 'Middleware name cannot be empty.');
-            
+
             $middlewareName = $this->getInput('Enter middleware name:', $className, $validator);
         }
+
         return $middlewareName;
     }
-    /**
-     * Execute the command.
-     *
-     * @return int
-     */
-    public function exec() : int {
-        $className = $this->getArgValue('--class-name');
-        if ($className !== null && strlen($className) == 0) {
-            $this->error('--class-name cannot be empty string.');
-            $className = null;
-        }
-        if ($className === null) {
-            $validator = new InputValidator(function($input) {
-                return !empty(trim($input));
-            }, 'Class name cannot be empty.');
-            
-            $className = trim($this->getInput('Enter middleware class name:', null, $validator));
-        }
-        
+    private function getPriority() : int {
+        $priority = $this->getArgValue('--priority');
 
-        
-        $middlewareName = $this->getMDName($className);
-        $priority = $this->getPriority();
-        
-        if ($priority === -1) {
-            return -1;
+        if ($priority === null) {
+            $validator = new InputValidator(function($input)
+            {
+                return is_numeric($input);
+            }, 'Priority must be a number.');
+
+            $priority = (int)$this->getInput('Enter middleware priority:', 0, $validator);
+        } else {
+            if (!is_numeric($priority)) {
+                $this->error('Priority must be a number.');
+
+                return -1;
+            }
+            $priority = (int)$priority;
         }
-        
-        $groups = $this->getGroups();
-        
 
-        $writer = new MiddlewareClassWriter($middlewareName, $priority, $groups);
-        $writer->setClassName($className);
-        $writer->writeClass();
-
-        $this->success('Middleware class created at: '.$writer->getAbsolutePath());
-        
-        return 0;
+        return $priority;
     }
 }

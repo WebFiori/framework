@@ -13,6 +13,7 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cache\Cache;
 use WebFiori\Cache\FileStorage;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Router\RouteCache;
 
@@ -21,6 +22,7 @@ use WebFiori\Framework\Router\RouteCache;
  *
  * @author Ibrahim
  */
+#[Group('routes')]
 class RoutesClearCommand extends Command {
     public function __construct() {
         parent::__construct('routes:clear', [], 'Clear the route cache.');
@@ -35,7 +37,7 @@ class RoutesClearCommand extends Command {
     }
 
     private function createRouteCache(): RouteCache {
-        $storagePath = APP_PATH . 'Storage';
+        $storagePath = APP_PATH.'Storage';
 
         return new RouteCache(new Cache(new FileStorage($storagePath)), true);
     }

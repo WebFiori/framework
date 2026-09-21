@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,11 +12,12 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
+use WebFiori\Framework\App;
 use WebFiori\Mail\Exceptions\SMTPException;
 use WebFiori\Mail\SMTPAccount;
 use WebFiori\Mail\SMTPServer;
-use WebFiori\Framework\App;
 
 /**
  * A command which is used to add an SMTP account.
@@ -23,6 +25,7 @@ use WebFiori\Framework\App;
  * @author Ibrahim
  *
  */
+#[Group('setup')]
 class AddSmtpConnectionCommand extends Command {
     public function __construct() {
         parent::__construct('add:smtp-connection', [

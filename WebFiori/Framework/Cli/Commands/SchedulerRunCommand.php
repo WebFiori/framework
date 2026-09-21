@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
@@ -25,8 +27,8 @@ use WebFiori\Framework\Scheduler\TasksManager;
  * @author Ibrahim
  */
 #[SingleInstance]
+#[Group('scheduler')]
 class SchedulerRunCommand extends Command {
-
     public function __construct() {
         parent::__construct('scheduler:run', [
             new Argument('--show-log', 'If set, execution log will be shown after execution is completed.', true),
@@ -45,6 +47,7 @@ class SchedulerRunCommand extends Command {
 
         if ($count == 0) {
             $this->info('There are no scheduled tasks.');
+
             return 0;
         }
 
@@ -53,32 +56,36 @@ class SchedulerRunCommand extends Command {
 
         if ($result == 'INV_PASS') {
             $this->error('Provided password is incorrect.');
+
             return -1;
         }
 
         $this->printResult($result);
+
         return 0;
     }
 
     private function printResult(array $result): void {
-        $this->println('Total number of tasks: ' . $result['total-tasks']);
-        $this->println('Executed Tasks: ' . $result['executed-count']);
+        $this->println('Total number of tasks: '.$result['total-tasks']);
+        $this->println('Executed Tasks: '.$result['executed-count']);
 
         $this->println('Successfully finished tasks:');
+
         if (count($result['successfully-completed']) == 0) {
             $this->println('    <NONE>');
         } else {
             foreach ($result['successfully-completed'] as $taskName) {
-                $this->println('    ' . $taskName);
+                $this->println('    '.$taskName);
             }
         }
 
         $this->println('Failed tasks:');
+
         if (count($result['failed']) == 0) {
             $this->println('    <NONE>');
         } else {
             foreach ($result['failed'] as $taskName) {
-                $this->println('    ' . $taskName);
+                $this->println('    '.$taskName);
             }
         }
     }

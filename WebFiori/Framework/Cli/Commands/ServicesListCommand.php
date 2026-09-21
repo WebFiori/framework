@@ -11,6 +11,7 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Router\ServiceRouter;
 
@@ -19,6 +20,7 @@ use WebFiori\Framework\Router\ServiceRouter;
  *
  * @author Ibrahim
  */
+#[Group('services')]
 class ServicesListCommand extends Command {
     public function __construct() {
         parent::__construct('services:list', [], 'List all auto-discovered API services.');
@@ -48,7 +50,7 @@ class ServicesListCommand extends Command {
         }
 
         $this->println('');
-        $this->info('Total: ' . count($discovered) . ' service(s).');
+        $this->info('Total: '.count($discovered).' service(s).');
 
         return 0;
     }

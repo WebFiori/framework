@@ -123,5 +123,11 @@ class MSSQLSessionStorageTest extends TestCase {
             $this->storage->getController()->removeTables();
         } catch (\Throwable $e) {
         }
+        // Remove the connection from app config so other tests that expect
+        // 'sessions-connection' to be absent are not affected by this class.
+        try {
+            App::getConfig()->removeDBConnection('test-sessions-conn');
+        } catch (\Throwable $e) {
+        }
     }
 }

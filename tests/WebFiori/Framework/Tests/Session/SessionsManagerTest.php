@@ -191,6 +191,11 @@ class SessionsManagerTest extends TestCase {
         $this->expectException(SessionException::class);
         $this->expectExceptionMessage("Connection 'sessions-connection' was not found in application configuration.");
         SessionsManager::reset();
+        // Ensure the connection is absent regardless of test ordering.
+        try {
+            App::getConfig()->removeDBConnection('sessions-connection');
+        } catch (\Throwable $e) {
+        }
         SessionsManager::setStorage(new DatabaseSessionStorage());
     }
     /**

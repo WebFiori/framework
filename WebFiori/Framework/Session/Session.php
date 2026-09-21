@@ -282,7 +282,7 @@ class Session implements JsonI {
             case ReadStrategy::REALTIME:
                 $entry = SessionsManager::getStorage()->read($this->getId(), $key);
 
-                return $entry !== null ? $entry['value'] : null;
+                return $entry !== null ? $this->decryptValue($entry['value']) : null;
 
             case ReadStrategy::SNAPSHOT_WITH_MISS:
                 if (array_key_exists($key, $this->localSnapshot)) {
@@ -291,9 +291,10 @@ class Session implements JsonI {
                 $entry = SessionsManager::getStorage()->read($this->getId(), $key);
 
                 if ($entry !== null) {
-                    $this->localSnapshot[$key] = $entry['value'];
+                    $decrypted = $this->decryptValue($entry['value']);
+                    $this->localSnapshot[$key] = $decrypted;
 
-                    return $entry['value'];
+                    return $decrypted;
                 }
 
                 return null;
@@ -498,7 +499,7 @@ class Session implements JsonI {
 
         foreach ($all as $k => $entry) {
             if ($k !== '_meta') {
-                $result[$k] = $entry['value'];
+                $result[$k] = $this->decryptValue($entry['value']);
             }
         }
 
@@ -599,7 +600,7 @@ class Session implements JsonI {
 
         foreach ($all as $k => $entry) {
             if ($k !== '_meta') {
-                $this->localSnapshot[$k] = $entry['value'];
+                $this->localSnapshot[$k] = $this->decryptValue($entry['value']);
             }
         }
     }
@@ -703,7 +704,7 @@ class Session implements JsonI {
             $expectedVersion = $current !== null ? $current['version'] : null;
         }
 
-        SessionsManager::getStorage()->write($this->getId(), $key, $val, $expectedVersion, $strategy);
+        SessionsManager::getStorage()->write($this->getId(), $key, $this->encryptValue($val), $expectedVersion, $strategy);
 
         // Update local snapshot for non-REALTIME strategies.
         if ($this->readStrategy !== ReadStrategy::REALTIME) {
@@ -838,9 +839,10 @@ class Session implements JsonI {
 
                     foreach ($all as $k => $entry) {
                         if ($k !== '_meta') {
-                            $this->localSnapshot[$k] = $entry['value'];
+                            $decrypted = $this->decryptValue($entry['value']);
+                            $this->localSnapshot[$k] = $decrypted;
                             // Keep legacy array in sync.
-                            $this->sessionVariables[$k] = $entry['value'];
+                            $this->sessionVariables[$k] = $decrypted;
                         }
                     }
                 }
@@ -951,6 +953,78 @@ class Session implements JsonI {
         $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
         return $plaintext !== false ? $plaintext : null;
+    }
+    /**
+     * Decrypts a session value that was encrypted by encryptValue().
+     *
+     * Returns the original $stored value unchanged when it is not in the
+     * expected encrypted format or when decryption fails (wrong key, corrupted
+     * data). This makes the method safe to call on legacy plaintext values.
+     *
+     * @param mixed $stored The stored (potentially encrypted) value.
+     *
+     * @return mixed The decrypted value, or $stored on failure.
+     */
+    private function decryptValue(mixed $stored): mixed {
+        if (!is_string($stored) || !str_starts_with($stored, 'ENC:')) {
+            return $stored;
+        }
+
+        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
+
+        if ($sessionKey === null || $sessionKey === '') {
+            return $stored;
+        }
+
+        $raw = base64_decode(substr($stored, 4), true);
+
+        if ($raw === false || strlen($raw) < 29) {
+            return $stored;
+        }
+
+        $key = hash('sha256', $sessionKey.$this->getId(), true);
+        $iv = substr($raw, 0, 12);
+        $tag = substr($raw, 12, 16);
+        $ciphertext = substr($raw, 28);
+
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        if ($plaintext === false) {
+            return $stored;
+        }
+
+        $decoded = json_decode($plaintext, true);
+
+        return json_last_error() === JSON_ERROR_NONE ? $decoded : $plaintext;
+    }
+    /**
+     * Encrypts a session value using AES-256-GCM when SESSION_KEY is defined.
+     *
+     * The value is JSON-encoded before encryption to handle any PHP type.
+     * Key derivation: SHA-256(SESSION_KEY + sessionId) — each session has a
+     * unique key, matching the scheme used for old whole-blob encryption.
+     *
+     * Returns the value unchanged when SESSION_KEY is not set.
+     *
+     * @param mixed $value The value to encrypt.
+     *
+     * @return mixed The encrypted base64 string prefixed with 'ENC:', or the
+     *               original value if SESSION_KEY is not set.
+     */
+    private function encryptValue(mixed $value): mixed {
+        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
+
+        if ($sessionKey === null || $sessionKey === '') {
+            return $value;
+        }
+
+        $plaintext = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $key = hash('sha256', $sessionKey.$this->getId(), true);
+        $iv = random_bytes(12);
+        $tag = '';
+        $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+        return 'ENC:'.base64_encode($iv.$tag.$ciphertext);
     }
     /**
      *
@@ -1100,13 +1174,15 @@ class Session implements JsonI {
         for ($i = 0; $i < $maxRetries; $i++) {
             $current = SessionsManager::getStorage()->read($this->getId(), $key);
             $currentVersion = $current !== null ? $current['version'] : null;
-            $newVal = $callback($current !== null ? $current['value'] : null);
+            // Decrypt the current value so the callback works with plaintext.
+            $currentDecrypted = $current !== null ? $this->decryptValue($current['value']) : null;
+            $newVal = $callback($currentDecrypted);
 
             try {
                 SessionsManager::getStorage()->write(
                     $this->getId(),
                     $key,
-                    $newVal,
+                    $this->encryptValue($newVal),
                     $currentVersion,
                     ConflictStrategy::REJECT
                 );

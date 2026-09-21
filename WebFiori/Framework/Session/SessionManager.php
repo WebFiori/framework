@@ -12,8 +12,7 @@
 namespace WebFiori\Framework\Session;
 
 use WebFiori\Framework\App;
-use WebFiori\Framework\Exceptions\SessionException;
-/**
+use WebFiori\Framework\Exceptions\SessionException;/**
  * A class which is used to manage user sessions.
  *
  * This is the concrete implementation. For static access, use SessionsManager facade.

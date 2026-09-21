@@ -131,6 +131,12 @@ class App {
         $minLevel = (defined('WF_VERBOSE') && WF_VERBOSE === true) ? LogLevel::DEBUG : LogLevel::WARNING;
         LoggerFacade::setInstance(new FileLogger($logDir, $minLevel));
 
+        // Bridge the error-handler log callback to the framework logger so that
+        // all webfiori/err diagnostics (loop protection, handler failures,
+        // secureLog() calls) are written to the same log channel as the rest
+        // of the application. The callback signature matches LoggerFacade::log().
+        Handler::setDefaultLogCallback([LoggerFacade::class, 'log']);
+
         // Initialize queue storage
         $queueDir = APP_PATH.'Storage'.DS.'Queue';
         QueueFacade::setInstance(

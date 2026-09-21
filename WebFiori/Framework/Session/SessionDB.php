@@ -14,7 +14,6 @@ namespace WebFiori\Framework\Session;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\DB;
-
 /**
  * A class which includes all database related operations to add, update,
  * and delete sessions from a database.
@@ -39,6 +38,34 @@ class SessionDB extends DB {
         $dbType = $this->getConnectionInfo()->getDatabaseType();
         $this->addTable(SessionSchema::createSessionsTable($dbType));
         $this->addTable(SessionSchema::createSessionDataTable($dbType));
+
+        // Register the per-key table if it exists in the database.
+        // The table is created by SessionSchemaMigration::run().
+        try {
+            $this->addTable(SessionSchema::createSessionKvDataTable($dbType));
+        } catch (\Throwable $e) {
+            // Table registration may fail if schema is not yet migrated; that
+            // is acceptable — per-key operations will fail gracefully at use time.
+        }
+    }
+    /**
+     * Creates all session tables (sessions, session_data, session_kv_data).
+     * Called during test setup or initial deployment.
+     */
+    public function createTables(): void {
+        // Use the parent DB class createTables() which creates all registered tables.
+        parent::createTables();
+    }
+    /**
+     * Drops all session-related tables.
+     */
+    public function dropAllTables(): void {
+        try {
+            $this->table('session_kv_data')->drop()->execute();
+        } catch (\Throwable $e) {
+        }
+        $this->table('session_data')->drop()->execute();
+        $this->table('sessions')->drop()->execute();
     }
     /**
      * Clears the sessions which are older than the given date.
@@ -114,6 +141,57 @@ class SessionDB extends DB {
 
         return null;
     }
+    /**
+     * Reads a single key from session_kv_data.
+     *
+     * @return array{value: mixed, version: int}|null
+     */
+    public function getSessionKey(string $sId, string $key): ?array {
+        $resultSet = $this->table('session_kv_data')
+            ->select(['svalue', 'version'])
+            ->where('s-id', $sId)
+            ->andWhere('skey', $key)
+            ->execute();
+
+        if ($resultSet->getRowsCount() === 0) {
+            return null;
+        }
+
+        $row = $resultSet->getRows()[0];
+
+        return [
+            'value' => json_decode($row['svalue'] ?? $row['s_value'] ?? 'null', true),
+            'version' => (int) ($row['version'] ?? 1),
+        ];
+    }
+    /**
+     * Reads all keys for a session from session_kv_data.
+     *
+     * @return array<string, array{value: mixed, version: int}>
+     */
+    public function getSessionKeys(string $sId): array {
+        $resultSet = $this->table('session_kv_data')
+            ->select(['skey', 'svalue', 'version'])
+            ->where('s-id', $sId)
+            ->execute();
+
+        $result = [];
+
+        foreach ($resultSet->getRows() as $row) {
+            $k = $row['skey'] ?? $row['s_key'] ?? null;
+
+            if ($k === null) {
+                continue;
+            }
+
+            $result[$k] = [
+                'value' => json_decode($row['svalue'] ?? $row['s_value'] ?? 'null', true),
+                'version' => (int) ($row['version'] ?? 1),
+            ];
+        }
+
+        return $result;
+    }
 
     /**
      * Returns an array that holds the IDs of sessions which are older than
@@ -155,15 +233,31 @@ class SessionDB extends DB {
 
     /**
      * Removes a session from the database given its ID.
+     * Removes both the chunked blob data (session_data) and per-key data (session_kv_data).
      *
      * @param string $sId The ID of the session.
-     *
      * @throws DatabaseException
-     * @since 1.0
      */
     public function removeSession(string $sId) {
         $this->table('session_data')->delete()->where('s-id', $sId)->execute();
+
+        try {
+            $this->table('session_kv_data')->delete()->where('s-id', $sId)->execute();
+        } catch (\Throwable $e) {
+            // session_kv_data may not exist yet; ignore.
+        }
+
         $this->table('sessions')->delete()->where('s-id', $sId)->execute();
+    }
+    /**
+     * Removes a single key from session_kv_data.
+     */
+    public function removeSessionKey(string $sId, string $key): void {
+        $this->table('session_kv_data')
+            ->delete()
+            ->where('s-id', $sId)
+            ->andWhere('skey', $key)
+            ->execute();
     }
     /**
      * Removes database Tables which are used to store session information.
@@ -171,6 +265,11 @@ class SessionDB extends DB {
     public function removeTables() {
         $this->transaction(function (DB $db)
         {
+            try {
+                $db->table('session_kv_data')->drop()->execute();
+            } catch (DatabaseException $ex) {
+            }
+
             try {
                 $db->table('session_data')->drop()->execute();
                 $db->table('sessions')->drop()->execute();
@@ -205,6 +304,63 @@ class SessionDB extends DB {
             ])->execute();
         }
         $this->storeChunks($sId, base64_encode($session));
+    }
+    /**
+     * Writes a single key to session_kv_data with conflict detection.
+     *
+     * @throws SessionConflictException when strategy is REJECT and version mismatch.
+     * @return int The new version number.
+     */
+    public function writeSessionKey(
+        string $sId,
+        string $key,
+        mixed $value,
+        string|int|null $expectedVersion,
+        ConflictStrategy $strategy
+    ): int {
+        // Ensure the session row exists.
+        if (!$this->isSessionExist($sId)) {
+            $this->table('sessions')->insert([
+                's-id' => $sId,
+                'last-used' => date('Y-m-d H:i:s'),
+                'started-at' => date('Y-m-d H:i:s'),
+            ])->execute();
+        } else {
+            $this->table('sessions')->update([
+                'last-used' => date('Y-m-d H:i:s'),
+            ])->where('s-id', $sId)->execute();
+        }
+
+        $existing = $this->getSessionKey($sId, $key);
+        $currentVersion = $existing !== null ? $existing['version'] : 0;
+
+        if ($strategy === ConflictStrategy::REJECT
+            && $expectedVersion !== null
+            && $currentVersion !== (int) $expectedVersion
+        ) {
+            throw new SessionConflictException($key, $expectedVersion, $currentVersion);
+        }
+
+        $newVersion = $currentVersion + 1;
+        $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        if ($existing === null) {
+            $this->table('session_kv_data')->insert([
+                's-id' => $sId,
+                'skey' => $key,
+                'svalue' => $encoded,
+                'version' => $newVersion,
+                'updated-at' => date('Y-m-d H:i:s'),
+            ])->execute();
+        } else {
+            $this->table('session_kv_data')->update([
+                'svalue' => $encoded,
+                'version' => $newVersion,
+                'updated-at' => date('Y-m-d H:i:s'),
+            ])->where('s-id', $sId)->andWhere('skey', $key)->execute();
+        }
+
+        return $newVersion;
     }
     /**
      * Split session data into smaller chunks.

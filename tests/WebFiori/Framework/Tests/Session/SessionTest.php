@@ -5,21 +5,16 @@ use PHPUnit\Framework\TestCase;
 use WebFiori\File\File;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
+use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\Session;
-use WebFiori\Framework\Session\SessionStatus;
 use WebFiori\Framework\Session\SessionsManager;
-use WebFiori\Framework\Session\DefaultSessionStorage;
+use WebFiori\Framework\Session\SessionStatus;
 /**
  * Description of SessionTest
  *
  * @author Eng.Ibrahim
  */
 class SessionTest extends TestCase {
-
-    protected function setUp(): void {
-        SessionsManager::setStorage(new DefaultSessionStorage());
-    }
-
     /**
      * @test
      */
@@ -29,9 +24,10 @@ class SessionTest extends TestCase {
         $session = new Session(['name' => 'new']);
         $session->start();
         $session->set('hello','world');
+        // With per-key storage, the write is already persisted (no blob file).
+        // Verify the key is readable from storage before close.
+        $this->assertEquals('world', $session->get('hello'));
         $session->close();
-        $filePath = ROOT_PATH.DS.'App'.DS.'Storage'.DS.'Sessions'.DS.$session->getId();
-        $this->assertTrue(File::isFileExist($filePath));
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0,$session->getStartedAt());
         $this->assertEquals(0,$session->getResumedAt());
@@ -174,7 +170,7 @@ class SessionTest extends TestCase {
         $sessionId = $s->getId();
         $s->close();
         sleep(7);
-        
+
         // Create new session with same ID to simulate cookie persistence
         $s2 = new Session(['name' => 'session','duration' => 0.1, 'session-id' => $sessionId]);
         $s2->start();
@@ -342,5 +338,10 @@ class SessionTest extends TestCase {
                 .'"status":"new",'
                 .'"user":null,'
                 .'"vars":{}}',$j.'');
+    }
+
+    protected function setUp(): void {
+        InMemorySessionStorage::reset();
+        SessionsManager::setStorage(new InMemorySessionStorage());
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -10,13 +11,12 @@
  */
 namespace WebFiori\Framework\Session;
 
+use WebFiori\Framework\App;
 use WebFiori\Framework\Exceptions\SessionException;
 use WebFiori\Http\HttpCookie;
 use WebFiori\Http\Request;
-use WebFiori\Framework\App;
 use WebFiori\Json\Json;
-use WebFiori\Json\JsonI;
-/**
+use WebFiori\Json\JsonI;/**
  * A class that represents a session.
  *
  * @author Ibrahim
@@ -31,6 +31,13 @@ class Session implements JsonI {
      *
      */
     const DEFAULT_SESSION_DURATION = 120;
+
+    /**
+     * Conflict strategy controlling how set() handles concurrent modifications.
+     *
+     * @var ConflictStrategy
+     */
+    private ConflictStrategy $conflictStrategy;
     /**
      * The IP address of the user who is using the session.
      *
@@ -62,6 +69,13 @@ class Session implements JsonI {
      *
      */
     private $lifeTime;
+
+    /**
+     * Local in-memory snapshot used by SNAPSHOT_WITH_MISS and MANUAL_SYNC strategies.
+     *
+     * @var array<string, mixed>
+     */
+    private array $localSnapshot = [];
     /**
      * Number of seconds passed since the session was started.
      *
@@ -76,6 +90,13 @@ class Session implements JsonI {
      *
      */
     private static $randFunc;
+
+    /**
+     * Read strategy controlling how get() fetches values.
+     *
+     * @var ReadStrategy
+     */
+    private ReadStrategy $readStrategy;
     /**
      * The timestamp at which the session was resumed at as Unix timestamp.
      *
@@ -171,6 +192,8 @@ class Session implements JsonI {
             $this->getCookie()->setIsSecure(true);
         }
         $this->getCookie()->setIsHttpOnly(true);
+        $this->readStrategy = ReadStrategy::REALTIME;
+        $this->conflictStrategy = ConflictStrategy::LAST_WRITE_WINS;
     }
     /**
      * Returns a JSON string that represents the session.
@@ -184,12 +207,14 @@ class Session implements JsonI {
     /**
      * Store session state and pause the session.
      *
-     * Note that session state will be stored only if it is running.
+     * In the new per-key session system, writes are already persisted as they
+     * happen. close() updates session metadata and marks the session as paused.
      *
      */
     public function close() {
         if ($this->isRunning()) {
-            SessionsManager::getStorage()->save($this->getId(), $this->serialize());
+            // Persist updated metadata (lifetime, lang, refresh flag).
+            $this->persistMeta();
             $this->sessionStatus = SessionStatus::PAUSED;
             SessionsManager::pauseAll();
         }
@@ -247,13 +272,45 @@ class Session implements JsonI {
      *
      */
     public function get(string $varName) {
-        if ($this->isRunning()) {
-            $trimmed = trim($varName);
-
-            if (isset($this->sessionVariables[$trimmed])) {
-                return $this->sessionVariables[$trimmed];
-            }
+        if (!$this->isRunning()) {
+            return null;
         }
+
+        $key = trim($varName);
+
+        switch ($this->readStrategy) {
+            case ReadStrategy::REALTIME:
+                $entry = SessionsManager::getStorage()->read($this->getId(), $key);
+
+                return $entry !== null ? $entry['value'] : null;
+
+            case ReadStrategy::SNAPSHOT_WITH_MISS:
+                if (array_key_exists($key, $this->localSnapshot)) {
+                    return $this->localSnapshot[$key];
+                }
+                $entry = SessionsManager::getStorage()->read($this->getId(), $key);
+
+                if ($entry !== null) {
+                    $this->localSnapshot[$key] = $entry['value'];
+
+                    return $entry['value'];
+                }
+
+                return null;
+
+            case ReadStrategy::MANUAL_SYNC:
+                return $this->localSnapshot[$key] ?? null;
+        }
+
+        return null;
+    }
+    /**
+     * Returns the current conflict strategy.
+     *
+     * @return ConflictStrategy
+     */
+    public function getConflictStrategy(): ConflictStrategy {
+        return $this->conflictStrategy;
     }
     /**
      * Returns the cookie which is associated with the cookie.
@@ -342,6 +399,14 @@ class Session implements JsonI {
     public function getPassedTime() : int {
         return $this->passedTime;
     }
+    /**
+     * Returns the current read strategy.
+     *
+     * @return ReadStrategy
+     */
+    public function getReadStrategy(): ReadStrategy {
+        return $this->readStrategy;
+    }
 
     /**
      * Returns number of seconds remaining before the session timeout.
@@ -424,7 +489,20 @@ class Session implements JsonI {
      *
      */
     public function getVars() : array {
-        return $this->sessionVariables;
+        if (!$this->isRunning()) {
+            return [];
+        }
+
+        $all = SessionsManager::getStorage()->readAll($this->getId());
+        $result = [];
+
+        foreach ($all as $k => $entry) {
+            if ($k !== '_meta') {
+                $result[$k] = $entry['value'];
+            }
+        }
+
+        return $result;
     }
     /**
      * Checks if the session has a given value or not.
@@ -438,13 +516,11 @@ class Session implements JsonI {
      *
      */
     public function has(string $varName) : bool {
-        if ($this->isRunning()) {
-            $trimmed = trim($varName);
-
-            return isset($this->sessionVariables[$trimmed]);
+        if (!$this->isRunning()) {
+            return false;
         }
 
-        return false;
+        return SessionsManager::getStorage()->read($this->getId(), trim($varName)) !== null;
     }
     /**
      * Checks if the session cookie is persistent or not.
@@ -487,8 +563,9 @@ class Session implements JsonI {
 
 
     public function kill() {
-        SessionsManager::getStorage()->remove($this->getId());
+        SessionsManager::getStorage()->destroy($this->getId());
         $this->sessionStatus = SessionStatus::KILLED;
+        $this->localSnapshot = [];
         $this->sessionCookie->kill();
     }
     /**
@@ -507,6 +584,23 @@ class Session implements JsonI {
             $this->remove($varName);
 
             return $varVal;
+        }
+    }
+    /**
+     * Reloads all session keys from storage into the local snapshot.
+     *
+     * Only relevant when using ReadStrategy::MANUAL_SYNC. Call this at
+     * explicit sync boundaries (e.g. at the start of each SSE event loop
+     * iteration) to pick up writes from other processes.
+     */
+    public function refresh(): void {
+        $all = SessionsManager::getStorage()->readAll($this->getId());
+        $this->localSnapshot = [];
+
+        foreach ($all as $k => $entry) {
+            if ($k !== '_meta') {
+                $this->localSnapshot[$k] = $entry['value'];
+            }
         }
     }
     /**
@@ -531,14 +625,18 @@ class Session implements JsonI {
      *
      */
     public function remove(string $varName) : bool {
-        if ($this->isRunning()) {
-            $trimmed = trim($varName);
+        if (!$this->isRunning()) {
+            return false;
+        }
 
-            if (isset($this->sessionVariables[$trimmed])) {
-                unset($this->sessionVariables[$trimmed]);
+        $key = trim($varName);
+        $exists = SessionsManager::getStorage()->read($this->getId(), $key) !== null;
 
-                return true;
-            }
+        if ($exists) {
+            SessionsManager::getStorage()->remove($this->getId(), $key);
+            unset($this->localSnapshot[$key]);
+
+            return true;
         }
 
         return false;
@@ -580,18 +678,50 @@ class Session implements JsonI {
      * not, the method will return false.
      *
      */
-    public function set(string $name, $val) : bool {
-        if ($this->isRunning()) {
-            $trimmed = trim($name);
-
-            if (strlen($trimmed) > 0) {
-                $this->sessionVariables[$trimmed] = $val;
-
-                return true;
-            }
+    public function set(string $name, $val, ?ConflictStrategy $strategyOverride = null, ?callable $conflictCallback = null) : bool {
+        if (!$this->isRunning()) {
+            return false;
         }
 
-        return false;
+        $key = trim($name);
+
+        if (strlen($key) === 0) {
+            return false;
+        }
+
+        $strategy = $strategyOverride ?? $this->conflictStrategy;
+
+        if ($strategy === ConflictStrategy::RETRY_WITH_CALLBACK && $conflictCallback !== null) {
+            return $this->writeWithRetry($key, $val, $conflictCallback);
+        }
+
+        // For REJECT, pass the current version so the storage can detect conflicts.
+        $expectedVersion = null;
+
+        if ($strategy === ConflictStrategy::REJECT) {
+            $current = SessionsManager::getStorage()->read($this->getId(), $key);
+            $expectedVersion = $current !== null ? $current['version'] : null;
+        }
+
+        SessionsManager::getStorage()->write($this->getId(), $key, $val, $expectedVersion, $strategy);
+
+        // Update local snapshot for non-REALTIME strategies.
+        if ($this->readStrategy !== ReadStrategy::REALTIME) {
+            $this->localSnapshot[$key] = $val;
+        }
+
+        // Keep legacy sessionVariables in sync for serialize() backward compat.
+        $this->sessionVariables[$key] = $val;
+
+        return true;
+    }
+    /**
+     * Sets the conflict resolution strategy for this session.
+     *
+     * @param ConflictStrategy $strategy The conflict strategy to use.
+     */
+    public function setConflictStrategy(ConflictStrategy $strategy): void {
+        $this->conflictStrategy = $strategy;
     }
     /**
      * Sets session duration.
@@ -631,6 +761,14 @@ class Session implements JsonI {
         $this->isRef = $bool === true;
     }
     /**
+     * Sets the read strategy for this session.
+     *
+     * @param ReadStrategy $strategy The read strategy to use.
+     */
+    public function setReadStrategy(ReadStrategy $strategy): void {
+        $this->readStrategy = $strategy;
+    }
+    /**
      * Sets the value of the property 'SameSite' of session cookie.
      *
      * @param string $val It can be one of the following values, 'Lax', 'Strict'
@@ -666,14 +804,47 @@ class Session implements JsonI {
      */
     public function start() {
         if (!$this->isRunning()) {
-            $sessionStr = SessionsManager::getStorage()->read($this->getId());
-
             if ($this->getStatus() == SessionStatus::KILLED) {
                 $this->reGenerateID();
                 $this->initNewSessionVars();
-            } else if ($sessionStr === null || !$this->deserialize($sessionStr)) {
+
+                return;
+            }
+
+            $metaEntry = SessionsManager::getStorage()->read($this->getId(), '_meta');
+
+            if ($metaEntry === null) {
                 $this->initNewSessionVars();
             } else {
+                $meta = $metaEntry['value'];
+
+                if (!is_array($meta)) {
+                    $this->initNewSessionVars();
+
+                    return;
+                }
+
+                $this->startedAt = $meta['startedAt'] ?? time();
+                $this->lifeTime = $meta['lifeTime'] ?? self::DEFAULT_SESSION_DURATION / 60;
+                $this->isRef = $meta['isRef'] ?? false;
+                $this->langCode = $meta['langCode'] ?? '';
+                $this->resumedAt = time();
+                $this->sessionStatus = SessionStatus::RESUMED;
+                $this->passedTime = $this->resumedAt - $this->startedAt;
+
+                // Populate local snapshot for non-REALTIME strategies.
+                if ($this->readStrategy !== ReadStrategy::REALTIME) {
+                    $all = SessionsManager::getStorage()->readAll($this->getId());
+
+                    foreach ($all as $k => $entry) {
+                        if ($k !== '_meta') {
+                            $this->localSnapshot[$k] = $entry['value'];
+                            // Keep legacy array in sync.
+                            $this->sessionVariables[$k] = $entry['value'];
+                        }
+                    }
+                }
+
                 $this->checkIfExpired();
             }
         }
@@ -703,27 +874,32 @@ class Session implements JsonI {
 
         return $json;
     }
-    private function decryptSession(string $encoded): ?string {
-        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
-
-        if ($sessionKey === null || $sessionKey === '') {
-            return null;
+    private function checkIfExpired() {
+        if ($this->getRemainingTime() < 0) {
+            SessionsManager::getStorage()->destroy($this->getId());
+            $this->sessionStatus = SessionStatus::EXPIRED;
+            $this->sessionCookie->kill();
+        } else if ($this->isRefresh()) {
+            $this->sessionCookie->setExpires($this->getDuration());
         }
+    }
+    private function cloneHelper(Session $session) {
+        $this->startedAt = $session->startedAt;
+        $this->sessionCookie = $session->sessionCookie;
+        $this->sessionVariables = $session->sessionVariables;
+        $this->isRef = $session->isRef;
+        $this->resumedAt = time();
+        $this->lifeTime = $session->lifeTime;
+        $this->sessionUser = $session->sessionUser;
 
-        $raw = base64_decode($encoded, true);
+        $langCodeR = $this->getLangFromRequest();
 
-        if ($raw === false || strlen($raw) < 29) {
-            return null;
+        if ($langCodeR) {
+            $this->langCode = $this->getLangCode(true);
+        } else {
+            $this->langCode = $session->langCode;
         }
-
-        $iv = substr($raw, 0, 12);
-        $tag = substr($raw, 12, 16);
-        $ciphertext = substr($raw, 28);
-
-        $key = hash('sha256', $sessionKey.$this->getId(), true);
-        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-        return $plaintext !== false ? $plaintext : null;
+        $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
     }
     private function decryptLegacy(string $serialized): ?string {
         $split = explode('_', $serialized, 2);
@@ -754,56 +930,27 @@ class Session implements JsonI {
         // Try as unencrypted legacy (no openssl or decryption produced invalid data)
         return $data;
     }
-    private function restoreFromPlaintext(string $plaintext): bool {
-        set_error_handler(function ($errNo, $errStr)
-        {
-            throw new SessionException($errStr, $errNo);
-        });
+    private function decryptSession(string $encoded): ?string {
+        $sessionKey = defined('SESSION_KEY') ? SESSION_KEY : null;
 
-        try {
-            $sessionObj = unserialize(base64_decode($plaintext));
-            restore_error_handler();
-        } catch (SessionException $ex) {
-            restore_error_handler();
-
-            return false;
+        if ($sessionKey === null || $sessionKey === '') {
+            return null;
         }
 
-        if ($sessionObj instanceof Session) {
-            $this->sessionStatus = SessionStatus::RESUMED;
-            $this->cloneHelper($sessionObj);
+        $raw = base64_decode($encoded, true);
 
-            return true;
+        if ($raw === false || strlen($raw) < 29) {
+            return null;
         }
 
-        return false;
-    }
-    private function checkIfExpired() {
-        if ($this->getRemainingTime() < 0) {
-            SessionsManager::getStorage()->remove($this->getId());
-            $this->sessionStatus = SessionStatus::EXPIRED;
-            $this->sessionCookie->kill();
-        } else if ($this->isRefresh()) {
-            $this->sessionCookie->setExpires($this->getDuration());
-        }
-    }
-    private function cloneHelper(Session $session) {
-        $this->startedAt = $session->startedAt;
-        $this->sessionCookie = $session->sessionCookie;
-        $this->sessionVariables = $session->sessionVariables;
-        $this->isRef = $session->isRef;
-        $this->resumedAt = time();
-        $this->lifeTime = $session->lifeTime;
-        $this->sessionUser = $session->sessionUser;
+        $iv = substr($raw, 0, 12);
+        $tag = substr($raw, 12, 16);
+        $ciphertext = substr($raw, 28);
 
-        $langCodeR = $this->getLangFromRequest();
+        $key = hash('sha256', $sessionKey.$this->getId(), true);
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
-        if ($langCodeR) {
-            $this->langCode = $this->getLangCode(true);
-        } else {
-            $this->langCode = $session->langCode;
-        }
-        $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
+        return $plaintext !== false ? $plaintext : null;
     }
     /**
      *
@@ -879,11 +1026,53 @@ class Session implements JsonI {
     }
     private function initNewSessionVars() {
         $this->sessionVariables = [];
+        $this->localSnapshot = [];
         $this->resumedAt = time();
         $this->startedAt = time();
-
         $this->sessionStatus = SessionStatus::NEW;
         $this->initLang();
+        $this->persistMeta();
+    }
+    /**
+     * Persists session metadata to the _meta key in storage.
+     */
+    private function persistMeta(): void {
+        SessionsManager::getStorage()->write(
+            $this->getId(),
+            '_meta',
+            [
+                'startedAt' => $this->startedAt,
+                'lifeTime' => $this->lifeTime,
+                'isRef' => $this->isRef,
+                'langCode' => $this->langCode,
+            ],
+            null,
+            ConflictStrategy::LAST_WRITE_WINS
+        );
+    }
+    private function restoreFromPlaintext(string $plaintext): bool {
+        set_error_handler(function ($errNo, $errStr)
+        {
+            throw new SessionException($errStr, $errNo);
+        });
+
+        try {
+            $sessionObj = unserialize(base64_decode($plaintext));
+            restore_error_handler();
+        } catch (SessionException $ex) {
+            restore_error_handler();
+
+            return false;
+        }
+
+        if ($sessionObj instanceof Session) {
+            $this->sessionStatus = SessionStatus::RESUMED;
+            $this->cloneHelper($sessionObj);
+
+            return true;
+        }
+
+        return false;
     }
     private function setNameHelper($name): bool {
         $trimmed = trim($name);
@@ -902,5 +1091,39 @@ class Session implements JsonI {
         $this->getCookie()->setName($trimmed);
 
         return true;
+    }
+    /**
+     * Writes a key using RETRY_WITH_CALLBACK: re-reads current value and calls
+     * the callback to compute the new value, retrying up to 5 times.
+     */
+    private function writeWithRetry(string $key, mixed $initialVal, callable $callback, int $maxRetries = 5): bool {
+        for ($i = 0; $i < $maxRetries; $i++) {
+            $current = SessionsManager::getStorage()->read($this->getId(), $key);
+            $currentVersion = $current !== null ? $current['version'] : null;
+            $newVal = $callback($current !== null ? $current['value'] : null);
+
+            try {
+                SessionsManager::getStorage()->write(
+                    $this->getId(),
+                    $key,
+                    $newVal,
+                    $currentVersion,
+                    ConflictStrategy::REJECT
+                );
+
+                if ($this->readStrategy !== ReadStrategy::REALTIME) {
+                    $this->localSnapshot[$key] = $newVal;
+                }
+
+                $this->sessionVariables[$key] = $newVal;
+
+                return true;
+            } catch (SessionConflictException $e) {
+                // Another process modified the key; retry.
+                continue;
+            }
+        }
+
+        return false;
     }
 }

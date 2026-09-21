@@ -2,7 +2,9 @@
 namespace WebFiori\Framework\Test\Session;
 
 use PHPUnit\Framework\TestCase;
+use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\DefaultSessionStorage;
+use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Framework\Session\SessionStorage;
 
@@ -287,22 +289,34 @@ class GCTest extends TestCase {
  */
 class SpySessionStorage implements SessionStorage {
     public array $gcCalls = [];
-    public array $savedSessions = [];
+    private InMemorySessionStorage $delegate;
 
-    public function gc(string $olderThan, int $maxCount = 0) {
+    public function __construct() {
+        $this->delegate = new InMemorySessionStorage();
+    }
+
+    public function destroy(string $sessionId): void {
+        $this->delegate->destroy($sessionId);
+    }
+
+    public function gc(string $olderThan, int $maxCount = 0): void {
         $this->gcCalls[] = ['olderThan' => $olderThan, 'maxCount' => $maxCount];
     }
 
-    public function read(string $sessionId) {
-        return $this->savedSessions[$sessionId] ?? null;
+    public function read(string $sessionId, string $key): ?array {
+        return $this->delegate->read($sessionId, $key);
     }
 
-    public function remove(string $sessionId) {
-        unset($this->savedSessions[$sessionId]);
+    public function readAll(string $sessionId): array {
+        return $this->delegate->readAll($sessionId);
     }
 
-    public function save(string $sessionId, string $serializedSession) {
-        $this->savedSessions[$sessionId] = $serializedSession;
+    public function remove(string $sessionId, string $key): void {
+        $this->delegate->remove($sessionId, $key);
+    }
+
+    public function write(string $sessionId, string $key, mixed $value, string|int|null $expectedVersion, ConflictStrategy $strategy): string|int {
+        return $this->delegate->write($sessionId, $key, $value, $expectedVersion, $strategy);
     }
 }
 
@@ -310,17 +324,23 @@ class SpySessionStorage implements SessionStorage {
  * A no-op storage for testing that the framework works with drivers that don't do GC.
  */
 class NoopSessionStorage implements SessionStorage {
-    public function gc(string $olderThan, int $maxCount = 0) {
-        // No-op: e.g., Redis with TTL handles expiry natively
+    public function destroy(string $sessionId): void {
+    }
+    public function gc(string $olderThan, int $maxCount = 0): void {
     }
 
-    public function read(string $sessionId) {
+    public function read(string $sessionId, string $key): ?array {
         return null;
     }
 
-    public function remove(string $sessionId) {
+    public function readAll(string $sessionId): array {
+        return [];
     }
 
-    public function save(string $sessionId, string $serializedSession) {
+    public function remove(string $sessionId, string $key): void {
+    }
+
+    public function write(string $sessionId, string $key, mixed $value, string|int|null $expectedVersion, ConflictStrategy $strategy): string|int {
+        return 1;
     }
 }

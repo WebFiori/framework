@@ -23,7 +23,7 @@
         "ext-fileinfo": "*",
         "ext-openssl": "*",
         "webfiori/cache": "v3.0.*",
-        "webfiori/http": "v6.0.*",
+        "webfiori/http": "v6.2.*",
         "webfiori/file": "v2.1.*",
         "webfiori/jsonx": "v5.0.*",
         "webfiori/ui": "v4.0.*",
@@ -31,10 +31,10 @@
         "webfiori/database": "v2.2.*",
         "webfiori/cli": "v2.2.*",
         "webfiori/mailer": "v2.2.*",
-        "webfiori/err": "v2.0.*",
+        "webfiori/err": "v2.1.*",
         "webfiori/log": "v1.0.*",
         "webfiori/event": "v1.0.*",
-        "webfiori/queue": "v1.0.*",
+        "webfiori/queue": "v1.2.*",
         "webfiori/container": "v1.0.*"
     },
     "scripts": {

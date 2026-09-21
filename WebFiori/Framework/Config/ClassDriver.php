@@ -2,11 +2,11 @@
 namespace WebFiori\Framework\Config;
 
 use WebFiori\Database\ConnectionInfo;
-use WebFiori\Mail\SMTPAccount;
 use WebFiori\File\exceptions\FileException;
 use WebFiori\File\File;
 use WebFiori\Framework\Writers\LangClassWriter;
 use WebFiori\Http\Uri;
+use WebFiori\Mail\SMTPAccount;
 
 /**
  * A configuration driver which is used to store configuration on PHP class.
@@ -207,22 +207,23 @@ class ClassDriver implements ConfigurationDriver {
      */
     public function getDBConnections(): array {
         $connections = $this->configVars['database-connections'];
-        
+
         foreach ($connections as $name => $connObj) {
             if ($connObj instanceof ConnectionInfo) {
                 $connObj->setHost(Controller::resolveEnvValue($connObj->getHost()));
                 $connObj->setUsername(Controller::resolveEnvValue($connObj->getUsername()));
                 $connObj->setPassword(Controller::resolveEnvValue($connObj->getPassword()));
                 $connObj->setDBName(Controller::resolveEnvValue($connObj->getDBName()));
-                
+
                 $extras = $connObj->getExtars();
+
                 foreach ($extras as $key => $value) {
                     $extras[$key] = Controller::resolveEnvValue($value);
                 }
                 $connObj->setExtras($extras);
             }
         }
-        
+
         return $connections;
     }
 
@@ -253,7 +254,7 @@ class ClassDriver implements ConfigurationDriver {
      */
     public function getEnvVars(): array {
         $vars = $this->configVars['env-vars'];
-        
+
         foreach ($vars as $name => $varData) {
             if (is_array($varData) && isset($varData['value'])) {
                 $vars[$name]['value'] = Controller::resolveEnvValue($varData['value']);
@@ -261,7 +262,7 @@ class ClassDriver implements ConfigurationDriver {
                 $vars[$name] = Controller::resolveEnvValue($varData);
             }
         }
-        
+
         return $vars;
     }
     /**
@@ -337,7 +338,7 @@ class ClassDriver implements ConfigurationDriver {
      */
     public function getSMTPConnections(): array {
         $connections = $this->configVars['smtp-connections'];
-        
+
         foreach ($connections as $name => $smtpObj) {
             if ($smtpObj instanceof SMTPAccount) {
                 $smtpObj->setServerAddress(Controller::resolveEnvValue($smtpObj->getServerAddress()));
@@ -349,7 +350,7 @@ class ClassDriver implements ConfigurationDriver {
                 $smtpObj->setAccessToken(Controller::resolveEnvValue($smtpObj->getAccessToken()));
             }
         }
-        
+
         return $connections;
     }
 
@@ -378,6 +379,23 @@ class ClassDriver implements ConfigurationDriver {
 
     public function getTitleSeparator() : string {
         return $this->configVars['site']['title-sep'];
+    }
+    /**
+     * Removes all configuration variables.
+     */
+    /**
+     * Returns the path to the generated PHP configuration class file.
+     * This is where CLI write operations persist for the ClassDriver.
+     *
+     * @param string $section Not used — ClassDriver writes all sections to the
+     *        same compiled class file.
+     *
+     * @return string Absolute path to the configuration class file.
+     *
+     * @since 3.1.0
+     */
+    public function getWriteTarget(string $section): string {
+        return APP_PATH.'Config'.DIRECTORY_SEPARATOR.'AppConfig.php';
     }
     /**
      * Initialize configuration driver.
@@ -435,9 +453,6 @@ class ClassDriver implements ConfigurationDriver {
             ];
         }
     }
-    /**
-     * Removes all configuration variables.
-     */
     public function remove() {
         $f = new File(self::CONFIG_FILE_PATH);
         $f->remove();

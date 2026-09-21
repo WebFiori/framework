@@ -2,11 +2,11 @@
 namespace WebFiori\Framework\Config;
 
 use WebFiori\Database\ConnectionInfo;
-use WebFiori\Mail\SMTPAccount;
 use WebFiori\File\File;
 use WebFiori\Framework\Exceptions\InitializationException;
 use WebFiori\Http\Uri;
 use WebFiori\Json\Json;
+use WebFiori\Mail\SMTPAccount;
 
 /**
  * Application configuration driver which is used to read and write application
@@ -19,18 +19,19 @@ use WebFiori\Json\Json;
  * @author Ibrahim
  */
 class JsonDriver implements ConfigurationDriver {
-    
-    /**
-     * Returns the path to JSON configuration files.
-     */
-    public static function getConfigPath(): string {
-        return APP_PATH.'Config'.DIRECTORY_SEPARATOR;
-    }
     /**
      * The name of JSON configuration file.
      */
     private static $configFileName = 'app-config';
     private $json;
+    /**
+     * Write targets loaded from the entry-point config's "write-targets" key.
+     * Maps section name to absolute file path. CLI commands write to the
+     * target file instead of the entry point when a target is configured.
+     *
+     * @var array<string, string>
+     */
+    private array $writeTargets = [];
     /**
      * Creates new instance of the class.
      */
@@ -215,6 +216,13 @@ class JsonDriver implements ConfigurationDriver {
     }
 
     /**
+     * Returns the path to JSON configuration files.
+     */
+    public static function getConfigPath(): string {
+        return APP_PATH.'Config'.DIRECTORY_SEPARATOR;
+    }
+
+    /**
      * Returns database connection information given connection name.
      *
      * Note: Connection properties that use the 'env:' prefix in configuration
@@ -275,9 +283,8 @@ class JsonDriver implements ConfigurationDriver {
 
             if ($extrasObj !== null) {
                 $extrasArr = [];
-                if ($extrasObj instanceof Json) {
-                    
 
+                if ($extrasObj instanceof Json) {
                     foreach ($extrasObj->getProperties() as $prop) {
                         $extrasArr[$prop->getName()] = $prop->getValue();
                     }
@@ -318,10 +325,10 @@ class JsonDriver implements ConfigurationDriver {
     /**
      * Returns an array that holds the information of defined application environment
      * variables.
-     * 
+     *
      * Note: Environment variable values that use the 'env:' prefix in configuration
      * will be automatically resolved to their system environment variable values.
-     * 
+     *
      * @return array The returned array will be associative. The key will represent
      * the name of the variable and its value is a sub-associative array with
      * two indices, 'description' and 'value'. The description index is a text that describes
@@ -334,7 +341,7 @@ class JsonDriver implements ConfigurationDriver {
         foreach ($vars->getPropsNames() as $name) {
             $value = '';
             $desc = null;
-            $val =  $this->json->get('env-vars')->get($name);
+            $val = $this->json->get('env-vars')->get($name);
 
             if (gettype($val) == 'object') {
                 $value = $val->get('value');
@@ -519,6 +526,33 @@ class JsonDriver implements ConfigurationDriver {
         return $this->json->get('name-separator');
     }
     /**
+     * Returns the file path that CLI write operations should target for a
+     * given config section.
+     *
+     * Returns the configured write-target path if one is set for the section,
+     * otherwise returns the entry-point config file path.
+     *
+     * @param string $section The config section key (e.g. 'database-connections').
+     *
+     * @return string Absolute file path.
+     *
+     * @since 3.1.0
+     */
+    public function getWriteTarget(string $section): string {
+        if (isset($this->writeTargets[$section])) {
+            $target = $this->writeTargets[$section];
+
+            // Resolve relative to the config directory.
+            if (!str_starts_with($target, '/') && !preg_match('/^[A-Z]:\\\\/i', $target)) {
+                return self::getConfigPath().$target;
+            }
+
+            return $target;
+        }
+
+        return self::getConfigPath().self::getConfigFileName().'.json';
+    }
+    /**
      * Creates application configuration file.
      *
      * This method will attempt to create a JSON configuration file in the folder
@@ -533,7 +567,29 @@ class JsonDriver implements ConfigurationDriver {
         if (!file_exists($path) || $reCreate) {
             $this->writeJson();
         }
-        $this->json = Json::fromJsonFile($path);
+
+        // Check if the config file uses inheritance (extends key).
+        $raw = file_get_contents($path);
+        $decoded = $raw !== false ? json_decode($raw, true) : null;
+
+        if (is_array($decoded) && isset($decoded['extends'])) {
+            // Resolve the inheritance tree and populate $this->json from the
+            // merged result. The original entry-point file is left unchanged on
+            // disk; resolution happens in-memory at boot.
+            $inheritance = new JsonConfigInheritance();
+            $merged = $inheritance->resolve($path);
+
+            // Preserve write-targets from the entry point for CLI commands.
+            $entryRaw = json_decode($raw, true);
+            $this->writeTargets = $entryRaw['write-targets'] ?? [];
+
+            // Rebuild the Json object from the merged array.
+            $this->json = Json::fromJsonFile($path);
+            $this->applyMergedData($merged);
+        } else {
+            $this->json = Json::fromJsonFile($path);
+            $this->writeTargets = is_array($decoded) ? ($decoded['write-targets'] ?? []) : [];
+        }
     }
     /**
      * Deletes configuration file.
@@ -788,6 +844,35 @@ class JsonDriver implements ConfigurationDriver {
     }
     public function toJSON() : Json {
         return $this->json;
+    }
+    /**
+     * Applies a merged config data array into $this->json, overriding the
+     * values that were loaded from the entry-point file. Used after
+     * inheritance resolution to populate the driver with the full merged state.
+     *
+     * @param array<string, mixed> $merged The fully merged config data.
+     */
+    private function applyMergedData(array $merged): void {
+        $sections = [
+            'base-url', 'theme', 'home-page', 'primary-lang', 'name-separator',
+            'scheduler-password', 'env-vars', 'smtp-connections',
+            'database-connections', 'app-names', 'app-descriptions',
+            'version-info', 'titles',
+        ];
+
+        foreach ($sections as $section) {
+            if (!isset($merged[$section])) {
+                continue;
+            }
+
+            $value = $merged[$section];
+
+            if (is_array($value)) {
+                $this->json->add($section, new Json($value, 'none', 'same'));
+            } else {
+                $this->json->add($section, $value);
+            }
+        }
     }
     private function getProp(Json $j, $name, string $connName, bool $requred = true) {
         $val = $j->get($name);

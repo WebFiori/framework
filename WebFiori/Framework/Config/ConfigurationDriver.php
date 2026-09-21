@@ -252,6 +252,21 @@ interface ConfigurationDriver {
      */
     public function getTitleSeparator() : string;
     /**
+     * Returns the storage location that CLI write operations should target for
+     * a given configuration section.
+     *
+     * For file-based drivers this is a file path; for DB-backed drivers it
+     * could be a table name; for future drivers whatever is appropriate.
+     * Returns the default storage location when no specific target is set.
+     *
+     * @param string $section The config section key (e.g. 'database-connections').
+     *
+     * @return string The write target identifier for the section.
+     *
+     * @since 3.1.0
+     */
+    public function getWriteTarget(string $section): string;
+    /**
      * Initialize configuration driver.
      *
      * This method should be used to create application configuration and

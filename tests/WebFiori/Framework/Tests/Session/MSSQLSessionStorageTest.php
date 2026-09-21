@@ -53,12 +53,14 @@ class MSSQLSessionStorageTest extends TestCase {
     public function testLargeSessionDataChunked() {
         $largeData = str_repeat('A', 3000);
         $this->storage->write('large-session', 'k', $largeData, null, ConflictStrategy::LAST_WRITE_WINS);
-        $this->assertGreaterThan(1, $this->storage->getController()->getChunksCount('large-session'));
-        $this->assertEquals($largeData, $this->storage->read('large-session', 'k')['value']);
+        // Per-key storage handles large values without chunking.
+        $entry = $this->storage->read('large-session', 'k');
+        $this->assertNotNull($entry);
+        $this->assertEquals($largeData, $entry['value']);
     }
     /** @test */
     public function testReadNonExistent() {
-        $this->assertNull($this->storage->read('non-existent-id', 'k')['value']);
+        $this->assertNull($this->storage->read('non-existent-id', 'k'));
     }
     /** @test */
     public function testReadSession() {
@@ -84,10 +86,9 @@ class MSSQLSessionStorageTest extends TestCase {
     /** @test */
     public function testSessionDataShrinks() {
         $this->storage->write('shrink-session', 'k', str_repeat('B', 3000), null, ConflictStrategy::LAST_WRITE_WINS);
-        $initialChunks = $this->storage->getController()->getChunksCount('shrink-session');
         $this->storage->write('shrink-session', 'k', str_repeat('C', 100), null, ConflictStrategy::LAST_WRITE_WINS);
-        $this->assertLessThan($initialChunks, $this->storage->getController()->getChunksCount('shrink-session'));
-        $this->assertEquals(str_repeat('C', 100), $this->storage->read('shrink-session', 'k')['value']);
+        $entry = $this->storage->read('shrink-session', 'k');
+        $this->assertEquals(str_repeat('C', 100), $entry['value']);
     }
     /** @test */
     public function testUpdateSession() {

@@ -199,7 +199,7 @@ class SessionsManagerTest extends TestCase {
     public function testDatabaseSession01() {
         $this->skipIfMssqlUnavailable();
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_kv_data'.");
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -434,7 +434,7 @@ class SessionsManagerTest extends TestCase {
     public function testDropDbTables00() {
         $this->skipIfMssqlUnavailable();
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_data'.");
+        $this->expectExceptionMessage("208 - [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'session_kv_data'.");
         $conn = new ConnectionInfo('mssql', SQL_SERVER_USER, SQL_SERVER_PASS, SQL_SERVER_DB, SQL_SERVER_HOST, 1433, [
             'TrustServerCertificate' => 'true'
         ]);
@@ -525,6 +525,7 @@ class SessionsManagerTest extends TestCase {
         $sto->getController()->clear();
         $sto->getController()->table('session_data')->selectCount()->execute();
         $sto->getController()->table('sessions')->selectCount()->execute();
+        $sto->getController()->table('session_kv_data')->selectCount()->execute();
         $this->assertTrue(true);
     }
     /** @test */

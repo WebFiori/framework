@@ -11,6 +11,7 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Queue\QueueFacade;
@@ -19,6 +20,7 @@ use WebFiori\Queue\QueueFacade;
  * CLI command to process queue jobs continuously.
  */
 #[SingleInstance]
+#[Group('queue')]
 class QueueWorkCommand extends Command {
     public function __construct() {
         parent::__construct('queue:work', [], 'Process queue jobs continuously.');

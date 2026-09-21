@@ -11,12 +11,14 @@
  */
 namespace WebFiori\Framework\Cli\Commands;
 
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Queue\QueueFacade;
 
 /**
  * CLI command to show queue status.
  */
+#[Group('queue')]
 class QueueStatusCommand extends Command {
     public function __construct() {
         parent::__construct('queue:status', [], 'Show pending and failed job counts.');

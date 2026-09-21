@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
@@ -32,6 +34,7 @@ use WebFiori\Framework\Scheduler\TasksManager;
  * @author Ibrahim
  */
 #[SingleInstance]
+#[Group('scheduler')]
 class SchedulerDaemonCommand extends Command {
     /**
      * Creates a new instance of the command.
@@ -66,6 +69,7 @@ class SchedulerDaemonCommand extends Command {
 
         if ($count == 0) {
             $this->info('There are no scheduled tasks.');
+
             return -1;
         }
 
@@ -74,6 +78,7 @@ class SchedulerDaemonCommand extends Command {
 
         if ($maxMinutes <= 0) {
             $this->error('--max-minutes must be a positive integer.');
+
             return -1;
         }
 
@@ -86,15 +91,16 @@ class SchedulerDaemonCommand extends Command {
         $this->println('---');
 
         while ((time() - $startTime) < $maxSeconds) {
-            $this->println('[' . date('Y-m-d H:i:s') . '] Running scheduler check...');
+            $this->println('['.date('Y-m-d H:i:s').'] Running scheduler check...');
             $result = TasksManager::run($pass, null, false, $this);
 
             if ($result == 'INV_PASS') {
                 $this->error('Provided password is incorrect.');
+
                 return -1;
             }
 
-            $this->println('Executed: ' . $result['executed-count'] . '/' . $result['total-tasks'] . ' tasks.');
+            $this->println('Executed: '.$result['executed-count'].'/'.$result['total-tasks'].' tasks.');
 
             $remaining = $maxSeconds - (time() - $startTime);
 
@@ -109,7 +115,8 @@ class SchedulerDaemonCommand extends Command {
         }
 
         $this->println('---');
-        $this->success('Daemon stopped after ' . $maxMinutes . ' minute(s).');
+        $this->success('Daemon stopped after '.$maxMinutes.' minute(s).');
+
         return 0;
     }
 }

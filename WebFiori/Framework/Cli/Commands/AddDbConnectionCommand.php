@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\DatabaseException;
@@ -23,6 +25,7 @@ use WebFiori\Framework\DB;
  * @author Ibrahim
  *
  */
+#[Group('setup')]
 class AddDbConnectionCommand extends Command {
     public function __construct() {
         parent::__construct('add:db-connection', [

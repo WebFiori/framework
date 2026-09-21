@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Framework\Scheduler\TaskArgument;
@@ -22,6 +24,7 @@ use WebFiori\Framework\Writers\SchedulerTaskClassWriter;
  * @author Ibrahim
  *
  */
+#[Group('create')]
 class CreateTaskCommand extends Command {
     public function __construct() {
         parent::__construct('create:task', [
@@ -31,83 +34,6 @@ class CreateTaskCommand extends Command {
             new Argument('--args', 'JSON string of task arguments. Format: [{"name":"arg1","description":"desc","default":"val"}]', true)
         ], 'Create a new scheduler task class.');
     }
-    private function getTaskName(string $className) : string {
-        $taskName = $this->getArgValue('--name');
-        
-        if ($taskName === null) {
-            $validator = new InputValidator(function($input) {
-                return !empty(trim($input));
-            }, 'Task name cannot be empty.');
-            
-            $taskName = $this->getInput('Enter task name:', $className, $validator);
-        }
-        return $taskName;
-    }
-    private function getTaskDescription() : string {
-        $description = $this->getArgValue('--description');
-        
-        if ($description === null) {
-            $validator = new InputValidator(function($input) {
-                return !empty(trim($input));
-            }, 'Task description cannot be empty.');
-            
-            $description = $this->getInput('Enter task description:', 'No Description', $validator);
-        }
-        return $description;
-    }
-    private function getTaskArguments() : array {
-        $args = [];
-        $argsJson = $this->getArgValue('--args');
-        
-        if ($argsJson !== null) {
-            // Parse JSON arguments
-            $argsData = json_decode($argsJson, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->error('Invalid JSON format for --args parameter.');
-                return $args;
-            }
-            
-            if (is_array($argsData)) {
-                foreach ($argsData as $argData) {
-                    if (isset($argData['name'])) {
-                        $taskArg = new TaskArgument(
-                            $argData['name'],
-                            $argData['description'] ?? 'No description'
-                        );
-                        
-                        if (isset($argData['default'])) {
-                            $taskArg->setDefault($argData['default']);
-                        }
-                        
-                        $args[] = $taskArg;
-                    }
-                }
-            }
-        } elseif ($this->getArgValue('--class-name') === null) {
-            // Only prompt if running interactively (no --class-name provided)
-            if ($this->confirm('Add execution arguments to the task?', false)) {
-                while (true) {
-                    $argName = $this->getInput('Enter argument name (leave empty to finish):');
-                    if (empty(trim($argName))) {
-                        break;
-                    }
-                    
-                    $argDesc = $this->getInput('Enter argument description:', 'No description');
-                    $argDefault = $this->getInput('Enter default value (leave empty for none):');
-                    
-                    $taskArg = new TaskArgument(trim($argName), trim($argDesc));
-                    if (!empty(trim($argDefault))) {
-                        $taskArg->setDefault(trim($argDefault));
-                    }
-                    
-                    $args[] = $taskArg;
-                }
-            }
-        }
-        
-        return $args;
-    }
     /**
      * Execute the command.
      *
@@ -115,19 +41,21 @@ class CreateTaskCommand extends Command {
      */
     public function exec() : int {
         $className = $this->getArgValue('--class-name');
-        
+
         if ($className === null) {
-            $validator = new InputValidator(function($input) {
+            $validator = new InputValidator(function($input)
+            {
                 return !empty(trim($input));
             }, 'Class name cannot be empty.');
-            
+
             $className = $this->getInput('Enter task class name:', null, $validator);
         }
-        
+
         $className = trim($className);
-        
+
         if (empty($className)) {
             $this->error('Class name cannot be empty.');
+
             return -1;
         }
 
@@ -139,7 +67,91 @@ class CreateTaskCommand extends Command {
         $writer->writeClass();
 
         $this->success('Task class created at: '.$writer->getAbsolutePath());
-        
+
         return 0;
+    }
+    private function getTaskArguments() : array {
+        $args = [];
+        $argsJson = $this->getArgValue('--args');
+
+        if ($argsJson !== null) {
+            // Parse JSON arguments
+            $argsData = json_decode($argsJson, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $this->error('Invalid JSON format for --args parameter.');
+
+                return $args;
+            }
+
+            if (is_array($argsData)) {
+                foreach ($argsData as $argData) {
+                    if (isset($argData['name'])) {
+                        $taskArg = new TaskArgument(
+                            $argData['name'],
+                            $argData['description'] ?? 'No description'
+                        );
+
+                        if (isset($argData['default'])) {
+                            $taskArg->setDefault($argData['default']);
+                        }
+
+                        $args[] = $taskArg;
+                    }
+                }
+            }
+        } elseif ($this->getArgValue('--class-name') === null) {
+            // Only prompt if running interactively (no --class-name provided)
+            if ($this->confirm('Add execution arguments to the task?', false)) {
+                while (true) {
+                    $argName = $this->getInput('Enter argument name (leave empty to finish):');
+
+                    if (empty(trim($argName))) {
+                        break;
+                    }
+
+                    $argDesc = $this->getInput('Enter argument description:', 'No description');
+                    $argDefault = $this->getInput('Enter default value (leave empty for none):');
+
+                    $taskArg = new TaskArgument(trim($argName), trim($argDesc));
+
+                    if (!empty(trim($argDefault))) {
+                        $taskArg->setDefault(trim($argDefault));
+                    }
+
+                    $args[] = $taskArg;
+                }
+            }
+        }
+
+        return $args;
+    }
+    private function getTaskDescription() : string {
+        $description = $this->getArgValue('--description');
+
+        if ($description === null) {
+            $validator = new InputValidator(function($input)
+            {
+                return !empty(trim($input));
+            }, 'Task description cannot be empty.');
+
+            $description = $this->getInput('Enter task description:', 'No Description', $validator);
+        }
+
+        return $description;
+    }
+    private function getTaskName(string $className) : string {
+        $taskName = $this->getArgValue('--name');
+
+        if ($taskName === null) {
+            $validator = new InputValidator(function($input)
+            {
+                return !empty(trim($input));
+            }, 'Task name cannot be empty.');
+
+            $taskName = $this->getInput('Enter task name:', $className, $validator);
+        }
+
+        return $taskName;
     }
 }

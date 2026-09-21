@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Cli\InputValidator;
 use WebFiori\Framework\Writers\RestServiceWriter;
@@ -23,6 +25,7 @@ use WebFiori\Http\RequestMethod;
  * @author Ibrahim
  *
  */
+#[Group('create')]
 class CreateServiceCommand extends Command {
     public function __construct() {
         parent::__construct('create:service', [
@@ -31,84 +34,6 @@ class CreateServiceCommand extends Command {
             new Argument('--methods', 'JSON string of service methods. Format: [{"http":"GET","name":"getUser","params":[{"name":"id","type":"INT","description":"User ID"}],"return":"array"}]', true)
         ], 'Create a new REST service class.');
     }
-    private function getServiceDescription() : string {
-        $description = $this->getArgValue('--description');
-        
-        if ($description === null) {
-            $validator = new InputValidator(function($input) {
-                return !empty(trim($input));
-            }, 'Service description cannot be empty.');
-            
-            $description = $this->getInput('Enter service description:', 'REST API Service', $validator);
-        }
-        return $description;
-    }
-    private function getServiceMethods() : array {
-        $methods = [];
-        $methodsJson = $this->getArgValue('--methods');
-        
-        if ($methodsJson !== null) {
-            $methodsData = json_decode($methodsJson, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->error('Invalid JSON format for --methods parameter.');
-                return $methods;
-            }
-            
-            if (is_array($methodsData)) {
-                $methods = $methodsData;
-            }
-        } elseif ($this->getArgValue('--class-name') === null) {
-            if ($this->confirm('Add methods to the service?', false)) {
-                while (true) {
-                    $methodName = $this->getInput('Enter method name (leave empty to finish):');
-                    if (empty(trim($methodName))) {
-                        break;
-                    }
-                    
-                    $httpMethod = $this->select('Select HTTP method:', RequestMethod::getAll());
-                    $returnType = $this->getInput('Enter return type:', 'array');
-                    
-                    $params = [];
-                    if ($this->confirm('Add parameters to this method?', false)) {
-                        while (true) {
-                            $paramName = $this->getInput('Enter parameter name (leave empty to finish):');
-                            if (empty(trim($paramName))) {
-                                break;
-                            }
-                            
-                            $paramType = $this->select('Select parameter type:', ParamType::getTypes());
-                            $paramDesc = $this->getInput('Enter parameter description:', '');
-                            
-                            $param = [
-                                'name' => trim($paramName),
-                                'type' => $paramType,
-                                'description' => trim($paramDesc)
-                            ];
-                            
-                            if (in_array($paramType, [ParamType::INT, ParamType::DOUBLE])) {
-                                if ($this->confirm('Add min/max constraints?', false)) {
-                                    $param['min'] = (int)$this->getInput('Enter minimum value:');
-                                    $param['max'] = (int)$this->getInput('Enter maximum value:');
-                                }
-                            }
-                            
-                            $params[] = $param;
-                        }
-                    }
-                    
-                    $methods[] = [
-                        'http' => $httpMethod,
-                        'name' => trim($methodName),
-                        'params' => $params,
-                        'return' => trim($returnType)
-                    ];
-                }
-            }
-        }
-        
-        return $methods;
-    }
     /**
      * Execute the command.
      *
@@ -116,19 +41,21 @@ class CreateServiceCommand extends Command {
      */
     public function exec() : int {
         $className = $this->getArgValue('--class-name');
-        
+
         if ($className === null) {
-            $validator = new InputValidator(function($input) {
+            $validator = new InputValidator(function($input)
+            {
                 return !empty(trim($input));
             }, 'Class name cannot be empty.');
-            
+
             $className = $this->getInput('Enter service class name:', null, $validator);
         }
-        
+
         $className = trim($className);
-        
+
         if (empty($className)) {
             $this->error('Class name cannot be empty.');
+
             return -1;
         }
 
@@ -138,7 +65,7 @@ class CreateServiceCommand extends Command {
         $writer = new RestServiceWriter();
         $writer->setClassName($className);
         $writer->setDescription($description);
-        
+
         foreach ($methods as $method) {
             $writer->addMethod(
                 $method['http'],
@@ -147,11 +74,95 @@ class CreateServiceCommand extends Command {
                 $method['return'] ?? 'array'
             );
         }
-        
+
         $writer->writeClass();
 
         $this->success('Service class created at: '.$writer->getAbsolutePath());
-        
+
         return 0;
+    }
+    private function getServiceDescription() : string {
+        $description = $this->getArgValue('--description');
+
+        if ($description === null) {
+            $validator = new InputValidator(function($input)
+            {
+                return !empty(trim($input));
+            }, 'Service description cannot be empty.');
+
+            $description = $this->getInput('Enter service description:', 'REST API Service', $validator);
+        }
+
+        return $description;
+    }
+    private function getServiceMethods() : array {
+        $methods = [];
+        $methodsJson = $this->getArgValue('--methods');
+
+        if ($methodsJson !== null) {
+            $methodsData = json_decode($methodsJson, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $this->error('Invalid JSON format for --methods parameter.');
+
+                return $methods;
+            }
+
+            if (is_array($methodsData)) {
+                $methods = $methodsData;
+            }
+        } elseif ($this->getArgValue('--class-name') === null) {
+            if ($this->confirm('Add methods to the service?', false)) {
+                while (true) {
+                    $methodName = $this->getInput('Enter method name (leave empty to finish):');
+
+                    if (empty(trim($methodName))) {
+                        break;
+                    }
+
+                    $httpMethod = $this->select('Select HTTP method:', RequestMethod::getAll());
+                    $returnType = $this->getInput('Enter return type:', 'array');
+
+                    $params = [];
+
+                    if ($this->confirm('Add parameters to this method?', false)) {
+                        while (true) {
+                            $paramName = $this->getInput('Enter parameter name (leave empty to finish):');
+
+                            if (empty(trim($paramName))) {
+                                break;
+                            }
+
+                            $paramType = $this->select('Select parameter type:', ParamType::getTypes());
+                            $paramDesc = $this->getInput('Enter parameter description:', '');
+
+                            $param = [
+                                'name' => trim($paramName),
+                                'type' => $paramType,
+                                'description' => trim($paramDesc)
+                            ];
+
+                            if (in_array($paramType, [ParamType::INT, ParamType::DOUBLE])) {
+                                if ($this->confirm('Add min/max constraints?', false)) {
+                                    $param['min'] = (int)$this->getInput('Enter minimum value:');
+                                    $param['max'] = (int)$this->getInput('Enter maximum value:');
+                                }
+                            }
+
+                            $params[] = $param;
+                        }
+                    }
+
+                    $methods[] = [
+                        'http' => $httpMethod,
+                        'name' => trim($methodName),
+                        'params' => $params,
+                        'return' => trim($returnType)
+                    ];
+                }
+            }
+        }
+
+        return $methods;
     }
 }

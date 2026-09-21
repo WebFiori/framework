@@ -12,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Queue\QueueFacade;
@@ -20,6 +21,7 @@ use WebFiori\Queue\QueueFacade;
  * CLI command to retry failed jobs or flush them.
  */
 #[SingleInstance]
+#[Group('queue')]
 class QueueRetryCommand extends Command {
     public function __construct() {
         parent::__construct('queue:retry', [

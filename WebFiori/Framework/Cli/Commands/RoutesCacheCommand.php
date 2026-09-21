@@ -13,15 +13,16 @@ namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cache\Cache;
 use WebFiori\Cache\FileStorage;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Router\RouteCache;
-use WebFiori\Framework\Router\Router;
 
 /**
  * CLI command to build the route cache.
  *
  * @author Ibrahim
  */
+#[Group('routes')]
 class RoutesCacheCommand extends Command {
     public function __construct() {
         parent::__construct('routes:cache', [], 'Build the route cache for production.');
@@ -37,7 +38,7 @@ class RoutesCacheCommand extends Command {
     }
 
     private function createRouteCache(): RouteCache {
-        $storagePath = APP_PATH . 'Storage';
+        $storagePath = APP_PATH.'Storage';
 
         if (!is_dir($storagePath)) {
             mkdir($storagePath, 0755, true);

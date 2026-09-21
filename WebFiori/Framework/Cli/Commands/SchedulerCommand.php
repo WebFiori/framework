@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is licensed under MIT License.
  *
@@ -11,6 +12,7 @@
 namespace WebFiori\Framework\Cli\Commands;
 
 use WebFiori\Cli\Argument;
+use WebFiori\Cli\Attributes\Group;
 use WebFiori\Cli\Attributes\SingleInstance;
 use WebFiori\Cli\Command;
 use WebFiori\Framework\Cli\CLIUtils;
@@ -24,6 +26,7 @@ use WebFiori\Framework\Scheduler\TasksManager;
  * @version 1.0
  */
 #[SingleInstance]
+#[Group('scheduler')]
 class SchedulerCommand extends Command {
     /**
      * Creates new instance of the class.
@@ -67,6 +70,7 @@ class SchedulerCommand extends Command {
     public function exec() : int {
         $retVal = -1;
         $count = count(TasksManager::getTasks());
+
         if ($count == 0) {
             $this->info("There are no scheduled tasks.");
             $retVal = 0;

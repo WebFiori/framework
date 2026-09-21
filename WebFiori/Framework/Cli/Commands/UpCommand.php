@@ -17,7 +17,7 @@ use WebFiori\Cli\Command;
 /**
  * A command to bring the application out of maintenance mode.
  */
-#[Group('maintenance')]
+#[Group('app')]
 class UpCommand extends Command {
     public function __construct() {
         parent::__construct('up', [], 'Bring the application out of maintenance mode.');

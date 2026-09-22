@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.1.0](https://github.com/WebFiori/framework/compare/v3.0.1...v3.1.0) (2026-09-22)
+
+
+### Features
+
+* **cli:** add #[Group] and #[SingleInstance] attributes to all framework commands ([b97da67](https://github.com/WebFiori/framework/commit/b97da67ff109797fe971c88c3acf92bc82232a85))
+* **config:** add EnvResolutionStrategy for runtime env var priority ([4746dc6](https://github.com/WebFiori/framework/commit/4746dc6f4b6c8443402102db0d8b6863cef013ff)), closes [#408](https://github.com/WebFiori/framework/issues/408)
+* **config:** add extends composition to JsonDriver (ADR-0053) ([5308207](https://github.com/WebFiori/framework/commit/5308207ba1da7707c04c26584ea75683ff0cb395))
+* **logging:** bridge err handler log callback to LoggerFacade at boot ([5d51264](https://github.com/WebFiori/framework/commit/5d5126467d02a320befe81c065814c6fe19a8a39))
+* **queue:** bridge QueueWorkCommand::setOnError to centralized error handler ([58d3874](https://github.com/WebFiori/framework/commit/58d3874c072d566c65bf52bfec1705a094cd774b))
+* **queue:** show pending job details in queue:status using getPending() ([beac28e](https://github.com/WebFiori/framework/commit/beac28efbfe5dc3fb36a6be118877aa48c2c8c5a))
+* **session:** real-time per-key session system with conflict resolution ([e20eb51](https://github.com/WebFiori/framework/commit/e20eb510eacd102f25c59142a0cccba89526df70)), closes [#410](https://github.com/WebFiori/framework/issues/410)
+
+
+### Bug Fixes
+
+* **config:** add end-to-end integration tests for JsonDriver extends and fix initialize() ([cafe387](https://github.com/WebFiori/framework/commit/cafe387bc6fa2ecf31270604d81eda49ab52e16c))
+* **session:** restore encryption-at-rest — encrypt in Session, not storage layer ([d3fd28e](https://github.com/WebFiori/framework/commit/d3fd28e8815461afb8645a488b57dc69b0fa48e8))
+* **tests:** correct MSSQL session test regressions from per-key storage migration ([8566e75](https://github.com/WebFiori/framework/commit/8566e753f6bfdcb8a5c031b57dfc74a0edd75a92))
+* **tests:** fix test isolation — remove sessions-connection after MSSQL tests ([b05cfed](https://github.com/WebFiori/framework/commit/b05cfedb8b1b2bc48e8f980fa238c89eeaa99eba))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump http, err, and queue to latest minor releases ([a279859](https://github.com/WebFiori/framework/commit/a279859fcc9a4c0fa948e94b8a3a911b5823dddd))
+* normalize line endings to LF ([554a09b](https://github.com/WebFiori/framework/commit/554a09b3dcd7f92406a1014030351dbd0506ff92))
+
 ## [3.0.1](https://github.com/WebFiori/framework/compare/v3.0.0...v3.0.1) (2026-07-13)
 
 

@@ -9,6 +9,7 @@ use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\Session;
 use WebFiori\Framework\Session\SessionsManager;
 use WebFiori\Framework\Session\SessionStatus;
+use WebFiori\Framework\User;
 /**
  * Description of SessionTest
  *
@@ -338,6 +339,123 @@ class SessionTest extends TestCase {
                 .'"status":"new",'
                 .'"user":null,'
                 .'"vars":{}}',$j.'');
+    }
+
+    /**
+     * @test
+     *
+     * The session user set via Session::setUser() must be persisted to storage
+     * and survive a close() + resume round-trip, including any user info that
+     * is modified before the session is closed.
+     *
+     * NOTE: This asserts the DESIRED behavior. In the current per-key session
+     * system the user is only kept in memory (Session::$sessionUser) and is not
+     * written by persistMeta(), so this test will FAIL until user persistence
+     * is implemented (persist the user on write/close and restore it in
+     * start()).
+     */
+    public function testUserIsPersistedAcrossResume() {
+        // Storage is configured by setUp() to use InMemorySessionStorage.
+
+        // First instance: set a user with some info, then modify that info.
+        $s1 = new Session(['name' => 'user-persist-test']);
+        $s1->start();
+        $sid = $s1->getId();
+
+        $user = new User('jane.doe', 'secret', 'jane@example.com');
+        $user->setID(42);
+        $user->setDisplayName('Jane Doe');
+        $s1->setUser($user);
+        $s1->set('cart', ['apple', 'orange']);
+
+        // Change the user's info after it was attached to the session.
+        $s1->getUser()->setEmail('jane.doe@work.example.com');
+        $s1->getUser()->setDisplayName('Jane D.');
+
+        // Sanity: within the same instance the user and its info are available.
+        $this->assertNotNull($s1->getUser());
+        $this->assertEquals(42, $s1->getUser()->getId());
+        $this->assertEquals('jane.doe', $s1->getUser()->getUserName());
+        $this->assertEquals('jane.doe@work.example.com', $s1->getUser()->getEmail());
+        $this->assertEquals('Jane D.', $s1->getUser()->getDisplayName());
+
+        $s1->close();
+
+        // Second instance with the same session ID (a resumed request).
+        $s2 = new Session(['name' => 'user-persist-test', 'session-id' => $sid]);
+        $s2->start();
+
+        // A normal session variable survives the round-trip.
+        $this->assertSame(['apple', 'orange'], $s2->get('cart'));
+
+        // The user must survive the round-trip too...
+        $this->assertNotNull(
+            $s2->getUser(),
+            'Session user should be persisted and restored across resume.'
+        );
+
+        // ...along with all of its (including modified) info.
+        $this->assertEquals(42, $s2->getUser()->getId());
+        $this->assertEquals('jane.doe', $s2->getUser()->getUserName());
+        $this->assertEquals('jane.doe@work.example.com', $s2->getUser()->getEmail());
+        $this->assertEquals('Jane D.', $s2->getUser()->getDisplayName());
+    }
+
+    /**
+     * @test
+     *
+     * Mutating a reserved key (set/remove/pull) must throw a SessionException.
+     */
+    public function testReservedKeysRejectMutation() {
+        $session = new Session(['name' => 'reserved-test']);
+        $session->start();
+
+        foreach (Session::RESERVED_KEYS as $reserved) {
+            $threwOnSet = false;
+
+            try {
+                $session->set($reserved, 'x');
+            } catch (SessionException $ex) {
+                $threwOnSet = true;
+                $this->assertStringContainsString($reserved, $ex->getMessage());
+            }
+            $this->assertTrue($threwOnSet, "set('$reserved') should throw a SessionException.");
+
+            $threwOnRemove = false;
+
+            try {
+                $session->remove($reserved);
+            } catch (SessionException $ex) {
+                $threwOnRemove = true;
+            }
+            $this->assertTrue($threwOnRemove, "remove('$reserved') should throw a SessionException.");
+
+            $threwOnPull = false;
+
+            try {
+                $session->pull($reserved);
+            } catch (SessionException $ex) {
+                $threwOnPull = true;
+            }
+            $this->assertTrue($threwOnPull, "pull('$reserved') should throw a SessionException.");
+        }
+    }
+
+    /**
+     * @test
+     *
+     * Reading a reserved key via get()/has() is allowed (read-only is safe).
+     */
+    public function testReservedKeysAllowRead() {
+        $session = new Session(['name' => 'reserved-read-test']);
+        $session->start();
+
+        foreach (Session::RESERVED_KEYS as $reserved) {
+            // Should not throw; get() returns whatever is stored (or null),
+            // has() returns a bool. We only assert no exception is raised.
+            $session->get($reserved);
+            $this->assertIsBool($session->has($reserved));
+        }
     }
 
     protected function setUp(): void {

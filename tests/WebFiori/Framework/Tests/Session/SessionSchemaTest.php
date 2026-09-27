@@ -57,4 +57,56 @@ class SessionSchemaTest extends TestCase {
         $this->assertNotNull($table->getColByKey('chunk-number'));
         $this->assertNotNull($table->getColByKey('data'));
     }
+    /**
+     * @test
+     *
+     * On MSSQL the per-key value column must be NVARCHAR(MAX) (size -1), not
+     * the auto-mapped nvarchar(4000) which would cap a key value at 4000 chars.
+     */
+    public function testKvDataSvalueIsNvarcharMaxOnMSSQL() {
+        $table = SessionSchema::createSessionKvDataTable('mssql');
+        $col = $table->getColByKey('svalue');
+        $this->assertNotNull($col);
+        $this->assertEquals('nvarchar', $col->getDatatype());
+        $this->assertEquals(-1, $col->getSize());
+    }
+    /**
+     * @test
+     *
+     * MySQL keeps mediumtext (~16 MB) for the per-key value column.
+     */
+    public function testKvDataSvalueIsMediumTextOnMySQL() {
+        $table = SessionSchema::createSessionKvDataTable('mysql');
+        $col = $table->getColByKey('svalue');
+        $this->assertNotNull($col);
+        $this->assertEquals('mediumtext', $col->getDatatype());
+    }
+    /**
+     * @test
+     *
+     * The per-key table's session-ID foreign key must match the referenced
+     * sessions primary key type/size on every engine.
+     */
+    public function testKvDataSessionIdMatchesSessionsPk() {
+        foreach (['mysql', 'mssql', 'sqlite'] as $dbType) {
+            $sessions = SessionSchema::createSessionsTable($dbType);
+            $kv = SessionSchema::createSessionKvDataTable($dbType);
+
+            $pk = $sessions->getColByKey('s-id');
+            $fk = $kv->getColByKey('s-id');
+
+            $this->assertNotNull($pk, "$dbType: sessions.s_id missing");
+            $this->assertNotNull($fk, "$dbType: session_kv_data.s_id missing");
+            $this->assertEquals(
+                $pk->getDatatype(),
+                $fk->getDatatype(),
+                "$dbType: s_id type mismatch between sessions and session_kv_data"
+            );
+            $this->assertEquals(
+                $pk->getSize(),
+                $fk->getSize(),
+                "$dbType: s_id size mismatch between sessions and session_kv_data"
+            );
+        }
+    }
 }

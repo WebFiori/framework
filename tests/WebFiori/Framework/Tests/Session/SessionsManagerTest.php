@@ -581,6 +581,67 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::reset();
         unset($_GET[$sessionName]);
     }
+
+    /**
+     * @test
+     *
+     * Regression test for issue #425.
+     *
+     * When a session is resumed from its cookie/request ID via
+     * SessionManager::checkAndLoadFromCookie(), it must be constructed with the
+     * requested session name — not a hard-coded 'x'. Otherwise the resumed
+     * session's cookie name becomes 'x', getName() returns 'x', and any emitted
+     * Set-Cookie header uses the wrong name, so the browser's real session
+     * cookie (and a regenerated ID on login) is never updated.
+     *
+     * This asserts the DESIRED behavior, so it FAILS against current code until
+     * #425 is fixed.
+     */
+    public function testResumedSessionKeepsRequestedName() {
+        $sessionName = 'wf-session';
+        $store = new InMemorySessionStorage();
+
+        // Request 1: create and persist a session under its real name.
+        SessionsManager::reset();
+        InMemorySessionStorage::reset();
+        SessionsManager::setStorage($store);
+        App::getRequest()->setRequestMethod('GET');
+        SessionsManager::start($sessionName);
+        SessionsManager::set('k', 'v');
+        $sid = SessionsManager::getActiveSession()->getId();
+        SessionsManager::close();
+
+        // Request 2 (fresh manager): the browser sends the session ID.
+        SessionsManager::reset();
+        SessionsManager::setStorage($store);
+        App::getRequest()->setRequestMethod('GET');
+        $_GET[$sessionName] = $sid;
+
+        // hasSession() -> checkAndLoadFromCookie() resumes the session.
+        SessionsManager::start($sessionName);
+        $active = SessionsManager::getActiveSession();
+
+        $this->assertNotNull($active);
+        $this->assertEquals(SessionStatus::RESUMED, $active->getStatus());
+        $this->assertEquals(
+            $sessionName,
+            $active->getName(),
+            'Issue #425: resumed session must keep its requested name, not "x".'
+        );
+
+        // The emitted cookie header must use the real session name.
+        $headers = SessionsManager::getCookiesHeaders();
+        $this->assertNotEmpty($headers);
+        $this->assertStringStartsWith(
+            $sessionName.'=',
+            $headers[0],
+            'Issue #425: Set-Cookie must use the real session name, not "x".'
+        );
+
+        // Cleanup
+        SessionsManager::reset();
+        unset($_GET[$sessionName]);
+    }
     /** @test */
     public function testSetManager() {
         $manager = new \WebFiori\Framework\Session\SessionManager(new \WebFiori\Framework\Session\DefaultSessionStorage());

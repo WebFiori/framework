@@ -64,6 +64,24 @@ class SessionSchema {
      */
     public static function createSessionKvDataTable(string $dbType): Table {
         $sessionsTable = self::createSessionsTable($dbType);
+
+        // On SQL Server, an unsized/auto-mapped text column resolves to
+        // nvarchar(4000), which caps a single session key's value at 4000
+        // characters. Declare it as nvarchar with size -1 so it renders as
+        // NVARCHAR(MAX) (~2 GB). MySQL uses mediumtext (~16 MB) and SQLite
+        // uses an unbounded text column.
+        if ($dbType === 'mssql') {
+            $svalue = [
+                'type' => 'nvarchar',
+                'size' => -1,
+                'comment' => 'The JSON-encoded session value.',
+            ];
+        } else {
+            $svalue = [
+                'type' => 'mediumtext',
+                'comment' => 'The JSON-encoded session value.',
+            ];
+        }
         $table = TableFactory::create($dbType, 'session_kv_data', [
             's_id' => [
                 'type' => 'varchar',
@@ -77,10 +95,7 @@ class SessionSchema {
                 'primary' => true,
                 'comment' => 'The session key name.',
             ],
-            'svalue' => [
-                'type' => 'mediumtext',
-                'comment' => 'The JSON-encoded session value.',
-            ],
+            'svalue' => $svalue,
             'version' => [
                 'type' => 'int',
                 'default' => 1,

@@ -404,6 +404,77 @@ class SessionTest extends TestCase {
     /**
      * @test
      *
+     * Regression test for issue #422.
+     *
+     * reGenerateID() only changes the session cookie value; it does not
+     * migrate the existing per-key rows (application keys, '_meta', '_user')
+     * to the new session ID. The session-fixation login flow regenerates the
+     * ID and then attaches the user WITHOUT closing the session before the
+     * request ends (the start-session middleware's afterSend() only calls
+     * validateStorage()):
+     *
+     *   $session->set('csrf', 'abc'); // app data under the OLD id
+     *   $session->reGenerateID();      // new id (cookie only)
+     *   $session->setUser($user);      // writes _user under the NEW id
+     *
+     * As a result, the new ID ends up with only '_user' (written eagerly by
+     * setUser()) while '_meta', the user's companion state and all previously
+     * stored application keys remain orphaned under the OLD id. On the next
+     * request start() reads '_meta' for the new id, finds null, treats it as a
+     * brand-new session and loses everything.
+     *
+     * The whole session state must be carried across a reGenerateID(). This
+     * test asserts the DESIRED behavior, so it FAILS against current code until
+     * #422 is fixed.
+     */
+    public function testSessionStateSurvivesRegenerateIdWithoutClose() {
+        // Request 1: anonymous session with some application data, then login.
+        $s1 = new Session(['name' => 'regen-test']);
+        $s1->start();                          // writes _meta under the old id
+        $s1->set('csrf', 'abc123');            // custom app key (old id)
+        $s1->set('cart', ['apple', 'orange']); // another custom key (old id)
+        $s1->set('lang_pref', 'ar');           // another custom key (old id)
+
+        $s1->reGenerateID();                   // new id (cookie value only)
+        $newId = $s1->getId();
+
+        $user = new User('jane.doe', 'secret', 'jane@example.com');
+        $user->setID(7);
+        $s1->setUser($user);                   // writes _user under the NEW id
+        // NOTE: intentionally NO close() before the "request" ends.
+
+        // Request 2: resume the NEW id (as the next request would).
+        $s2 = new Session(['name' => 'regen-test', 'session-id' => $newId]);
+        $s2->start();
+
+        // The user must survive.
+        $this->assertNotNull(
+            $s2->getUser(),
+            'Issue #422: user set after reGenerateID() must survive resume.'
+        );
+        $this->assertEquals(7, $s2->getUser()->getId());
+        $this->assertEquals('jane.doe', $s2->getUser()->getUserName());
+
+        // ALL custom application keys must survive the ID regeneration too.
+        $this->assertSame('abc123', $s2->get('csrf'),
+            'Issue #422: custom key "csrf" must survive reGenerateID().');
+        $this->assertSame(['apple', 'orange'], $s2->get('cart'),
+            'Issue #422: custom key "cart" must survive reGenerateID().');
+        $this->assertSame('ar', $s2->get('lang_pref'),
+            'Issue #422: custom key "lang_pref" must survive reGenerateID().');
+
+        // And they must be readable via getVars() (which excludes reserved keys).
+        $vars = $s2->getVars();
+        $this->assertArrayHasKey('csrf', $vars);
+        $this->assertArrayHasKey('cart', $vars);
+        $this->assertArrayHasKey('lang_pref', $vars);
+        $this->assertArrayNotHasKey('_user', $vars);
+        $this->assertArrayNotHasKey('_meta', $vars);
+    }
+
+    /**
+     * @test
+     *
      * Mutating a reserved key (set/remove/pull) must throw a SessionException.
      */
     public function testReservedKeysRejectMutation() {

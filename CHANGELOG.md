@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.3](https://github.com/WebFiori/framework/compare/v3.1.2...v3.1.3) (2026-09-27)
+
+
+### Bug Fixes
+
+* **session:** resume session with its real name, not hard-coded 'x' ([8e09554](https://github.com/WebFiori/framework/commit/8e09554bba87ff565238495f77682ea54eb4a2b5))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#426](https://github.com/WebFiori/framework/issues/426) from WebFiori/dev ([1751e54](https://github.com/WebFiori/framework/commit/1751e54714d634e9fd258995222b842c5a2d9061))
+
 ## [3.1.2](https://github.com/WebFiori/framework/compare/v3.1.1...v3.1.2) (2026-09-27)
 
 

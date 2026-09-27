@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/WebFiori/framework/compare/v3.1.0...v3.1.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* **session:** persist user in reserved _user key and guard reserved keys ([ea4946e](https://github.com/WebFiori/framework/commit/ea4946ed2bd21506e6049c7b77db7a5be684a6b2))
+
 ## [3.1.0](https://github.com/WebFiori/framework/compare/v3.0.1...v3.1.0) (2026-09-22)
 
 

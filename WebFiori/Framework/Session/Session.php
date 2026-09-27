@@ -622,13 +622,51 @@ class Session implements JsonI {
     /**
      * Re-create session ID.
      *
+     * All existing per-key state (application keys, the reserved '_meta' and
+     * '_user' keys) is migrated from the old session ID to the new one, so a
+     * session-fixation ID regeneration during a request never orphans data.
+     * Values are re-encrypted under the new ID when SESSION_KEY is defined,
+     * because the encryption key is derived from the session ID.
+     *
      * @return string The new ID of the session.
      *
      */
     public function reGenerateID() : string {
-        $this->getCookie()->setValue($this->generateSessionID($this->getName()));
+        $oldId = $this->getId();
 
-        return $this->getCookie()->getValue();
+        // Snapshot everything stored under the old ID, decrypting values with
+        // the OLD id (decryptValue()/getId() still returns the old id here).
+        // '_meta' is stored as a plain array (not encrypted), so copy it as-is.
+        $storage = SessionsManager::getStorage();
+        $migrated = [];
+
+        foreach ($storage->readAll($oldId) as $key => $entry) {
+            if ($key === '_meta') {
+                $migrated[$key] = $entry['value'];
+            } else {
+                $migrated[$key] = $this->decryptValue($entry['value']);
+            }
+        }
+
+        // Switch to the new ID (cookie value). From here getId() is the new ID.
+        $this->getCookie()->setValue($this->generateSessionID($this->getName()));
+        $newId = $this->getCookie()->getValue();
+
+        // Re-write every key under the new ID, re-encrypting with the new ID.
+        foreach ($migrated as $key => $value) {
+            if ($key === '_meta') {
+                $storage->write($newId, '_meta', $value, null, ConflictStrategy::LAST_WRITE_WINS);
+            } else {
+                $storage->write($newId, $key, $this->encryptValue($value), null, ConflictStrategy::LAST_WRITE_WINS);
+            }
+        }
+
+        // Drop the old session's rows so no orphaned/duplicate state remains.
+        if ($oldId !== $newId) {
+            $storage->destroy($oldId);
+        }
+
+        return $newId;
     }
     /**
      * Removes the value of a session variable.

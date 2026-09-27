@@ -33,6 +33,18 @@ class Session implements JsonI {
     const DEFAULT_SESSION_DURATION = 120;
 
     /**
+     * Storage keys that are reserved for internal session use.
+     *
+     * These keys hold internal session state (metadata and the session user)
+     * and must never be written or read through the public variable API
+     * (set(), get(), has(), remove(), pull()). Attempting to use one of them
+     * as a session variable name results in a SessionException.
+     *
+     * @var array
+     */
+    const RESERVED_KEYS = ['_meta', '_user'];
+
+    /**
      * Conflict strategy controlling how set() handles concurrent modifications.
      *
      * @var ConflictStrategy
@@ -215,6 +227,8 @@ class Session implements JsonI {
         if ($this->isRunning()) {
             // Persist updated metadata (lifetime, lang, refresh flag).
             $this->persistMeta();
+            // Persist the session user (if any) so it survives resume.
+            $this->persistUser();
             $this->sessionStatus = SessionStatus::PAUSED;
             SessionsManager::pauseAll();
         }
@@ -498,7 +512,7 @@ class Session implements JsonI {
         $result = [];
 
         foreach ($all as $k => $entry) {
-            if ($k !== '_meta') {
+            if (!in_array($k, self::RESERVED_KEYS, true)) {
                 $result[$k] = $this->decryptValue($entry['value']);
             }
         }
@@ -581,6 +595,7 @@ class Session implements JsonI {
      */
     public function pull(string $varName) {
         if ($this->isRunning()) {
+            $this->assertNotReserved(trim($varName));
             $varVal = $this->get($varName);
             $this->remove($varName);
 
@@ -599,7 +614,7 @@ class Session implements JsonI {
         $this->localSnapshot = [];
 
         foreach ($all as $k => $entry) {
-            if ($k !== '_meta') {
+            if (!in_array($k, self::RESERVED_KEYS, true)) {
                 $this->localSnapshot[$k] = $this->decryptValue($entry['value']);
             }
         }
@@ -631,6 +646,7 @@ class Session implements JsonI {
         }
 
         $key = trim($varName);
+        $this->assertNotReserved($key);
         $exists = SessionsManager::getStorage()->read($this->getId(), $key) !== null;
 
         if ($exists) {
@@ -689,6 +705,8 @@ class Session implements JsonI {
         if (strlen($key) === 0) {
             return false;
         }
+
+        $this->assertNotReserved($key);
 
         $strategy = $strategyOverride ?? $this->conflictStrategy;
 
@@ -790,6 +808,7 @@ class Session implements JsonI {
     public function setUser(SessionUser $userObj) {
         if ($this->isRunning()) {
             $this->sessionUser = $userObj;
+            $this->persistUser();
         }
     }
 
@@ -833,12 +852,15 @@ class Session implements JsonI {
                 $this->sessionStatus = SessionStatus::RESUMED;
                 $this->passedTime = $this->resumedAt - $this->startedAt;
 
+                // Restore the session user (if one was persisted).
+                $this->restoreUser();
+
                 // Populate local snapshot for non-REALTIME strategies.
                 if ($this->readStrategy !== ReadStrategy::REALTIME) {
                     $all = SessionsManager::getStorage()->readAll($this->getId());
 
                     foreach ($all as $k => $entry) {
-                        if ($k !== '_meta') {
+                        if (!in_array($k, self::RESERVED_KEYS, true)) {
                             $decrypted = $this->decryptValue($entry['value']);
                             $this->localSnapshot[$k] = $decrypted;
                             // Keep legacy array in sync.
@@ -953,6 +975,22 @@ class Session implements JsonI {
         $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
         return $plaintext !== false ? $plaintext : null;
+    }
+    /**
+     * Throws a SessionException if the given key is reserved for internal use.
+     *
+     * Reserved keys (see Session::RESERVED_KEYS) hold internal session state
+     * and must not be mutated through the public variable API. Reading is
+     * allowed; writing, removing or pulling a reserved key is rejected.
+     *
+     * @param string $key The (already trimmed) key being written.
+     *
+     * @throws SessionException If the key is reserved.
+     */
+    private function assertNotReserved(string $key): void {
+        if (in_array($key, self::RESERVED_KEYS, true)) {
+            throw new SessionException("The session key '$key' is reserved for internal use and cannot be modified.");
+        }
     }
     /**
      * Decrypts a session value that was encrypted by encryptValue().
@@ -1123,6 +1161,48 @@ class Session implements JsonI {
             null,
             ConflictStrategy::LAST_WRITE_WINS
         );
+    }
+    /**
+     * Persists the current session user to the reserved '_user' key.
+     *
+     * The user (an object implementing SessionUser) is serialized and stored
+     * like any other value, so it is encrypted at rest when SESSION_KEY is
+     * defined. When no user is set, any previously stored user is removed.
+     */
+    private function persistUser(): void {
+        if ($this->sessionUser === null) {
+            SessionsManager::getStorage()->remove($this->getId(), '_user');
+
+            return;
+        }
+        SessionsManager::getStorage()->write(
+            $this->getId(),
+            '_user',
+            $this->encryptValue(serialize($this->sessionUser)),
+            null,
+            ConflictStrategy::LAST_WRITE_WINS
+        );
+    }
+    /**
+     * Restores the session user from the reserved '_user' key, if present.
+     */
+    private function restoreUser(): void {
+        $entry = SessionsManager::getStorage()->read($this->getId(), '_user');
+
+        if ($entry === null) {
+            $this->sessionUser = null;
+
+            return;
+        }
+        $decrypted = $this->decryptValue($entry['value']);
+
+        if (is_string($decrypted)) {
+            $restored = @unserialize($decrypted);
+
+            $this->sessionUser = $restored instanceof SessionUser ? $restored : null;
+        } else {
+            $this->sessionUser = null;
+        }
     }
     private function restoreFromPlaintext(string $plaintext): bool {
         set_error_handler(function ($errNo, $errStr)

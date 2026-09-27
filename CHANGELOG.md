@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.2](https://github.com/WebFiori/framework/compare/v3.1.1...v3.1.2) (2026-09-27)
+
+
+### Bug Fixes
+
+* **session:** migrate all per-key state on reGenerateID() ([971c662](https://github.com/WebFiori/framework/commit/971c6627877d3955e76fb9c9c38dc0f33e25e144))
+
+
+### Miscellaneous Chores
+
+* Merge pull request [#423](https://github.com/WebFiori/framework/issues/423) from WebFiori/dev ([19f9b5a](https://github.com/WebFiori/framework/commit/19f9b5a18de0edf7ea18db8e2dac325238e27148))
+
 ## [3.1.1](https://github.com/WebFiori/framework/compare/v3.1.0...v3.1.1) (2026-09-27)
 
 

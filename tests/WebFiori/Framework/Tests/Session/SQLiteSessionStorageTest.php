@@ -3,11 +3,14 @@ namespace WebFiori\Framework\Test\Session;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\DatabaseSessionStorage;
+use WebFiori\Framework\Session\SessionDB;
 
 class SQLiteSessionStorageTest extends TestCase {
     protected DatabaseSessionStorage $storage;
+    private ConnectionInfo $connection;
     /** @test */
     public function testConcurrentSessions() {
         $this->storage->write('session-a', 'k', 'data-a', null, ConflictStrategy::LAST_WRITE_WINS);
@@ -16,6 +19,50 @@ class SQLiteSessionStorageTest extends TestCase {
         $this->assertEquals('data-a', $this->storage->read('session-a', 'k')['value']);
         $this->assertEquals('data-b', $this->storage->read('session-b', 'k')['value']);
         $this->assertEquals('data-c', $this->storage->read('session-c', 'k')['value']);
+    }
+    /**
+     * Regression test for bug #428 on SQLite: non-atomic check-then-insert race
+     * in SessionDB. The 'sessions' table enforces a PRIMARY KEY on s-id for all
+     * engines, so a duplicate concurrent INSERT raises a UNIQUE constraint
+     * violation (SQLite error 19).
+     *
+     * Note: SQLite serialises writers with a database-level lock, so this
+     * natural race is far less likely than on a client/server database. The
+     * test reproduces it deterministically with a stale-read SessionDB double
+     * (its first isSessionExist() returns a stale "false"), forcing SessionDB's
+     * create branch to run against an already-existing row. This exercises the
+     * SQLite branch of the duplicate-key handling.
+     *
+     * Asserts the EXPECTED (correct) behavior: first-write session creation
+     * must be idempotent / race-safe, so the collision must be swallowed and
+     * NOT raise. FAILS on the pre-fix code (error 19) and PASSES with the fix.
+     *
+     * @test
+     */
+    public function testConcurrentCreateIsRaceSafe() {
+        $sId = 'race-session-'.uniqid();
+
+        // Request A wins the race and creates the session row first.
+        $requestA = new SessionDB($this->connection);
+        $requestA->writeSessionKey($sId, 'k', 'value-a', null, ConflictStrategy::LAST_WRITE_WINS);
+
+        // Request B has a STALE existence view and proceeds to the create
+        // branch for a row that already exists — the losing request.
+        $requestB = new StaleSQLiteSessionDB($this->connection);
+
+        try {
+            $requestB->writeSessionKey($sId, 'k2', 'value-b', null, ConflictStrategy::LAST_WRITE_WINS);
+        } catch (DatabaseException $e) {
+            $this->fail(
+                'Bug #428: concurrent session creation raised a duplicate-key error '.
+                '('.$e->getCode().' - '.$e->getMessage().'). '.
+                'First-write session creation should be idempotent / race-safe.'
+            );
+        }
+
+        $this->assertTrue($this->storage->getController()->isSessionExist($sId));
+        $this->assertEquals('value-a', $this->storage->read($sId, 'k')['value']);
+        $this->assertEquals('value-b', $this->storage->read($sId, 'k2')['value']);
     }
     /** @test */
     public function testGCEmptyTable() {
@@ -100,6 +147,7 @@ class SQLiteSessionStorageTest extends TestCase {
         $dbPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'wf_session_test_'.getmypid().'.db';
         $conn = new ConnectionInfo('sqlite', '', '', $dbPath, '');
         $conn->setName('test-sessions-conn');
+        $this->connection = $conn;
 
         $this->storage = new DatabaseSessionStorage($conn);
         $this->storage->getController()->removeTables();
@@ -116,5 +164,25 @@ class SQLiteSessionStorageTest extends TestCase {
         if (file_exists($dbPath)) {
             unlink($dbPath);
         }
+    }
+}
+
+/**
+ * Test double for the bug #428 race on SQLite: its first isSessionExist() check
+ * returns a stale "false", forcing SessionDB's create branch to run against a
+ * row another request already inserted. Subsequent checks delegate to the real
+ * implementation.
+ */
+class StaleSQLiteSessionDB extends SessionDB {
+    private bool $staleReadConsumed = false;
+
+    public function isSessionExist(string $sId): bool {
+        if (!$this->staleReadConsumed) {
+            $this->staleReadConsumed = true;
+
+            return false;
+        }
+
+        return parent::isSessionExist($sId);
     }
 }

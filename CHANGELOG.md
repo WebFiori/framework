@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.4](https://github.com/WebFiori/framework/compare/v3.1.3...v3.1.4) (2026-11-09)
+
+
+### Bug Fixes
+
+* **session:** make DatabaseSessionStorage row creation race-safe ([#428](https://github.com/WebFiori/framework/issues/428)) ([3785626](https://github.com/WebFiori/framework/commit/3785626bf1bb3390fc53e073ae3cb9bd932493e9))
+
 ## [3.1.3](https://github.com/WebFiori/framework/compare/v3.1.2...v3.1.3) (2026-09-27)
 
 

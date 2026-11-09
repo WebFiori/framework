@@ -291,18 +291,7 @@ class SessionDB extends DB {
      * @since 1.0
      */
     public function saveSession(string $sId, string $session) {
-        if ($this->isSessionExist($sId)) {
-            $this->table('sessions')->update([
-                'last-used' => date('Y-m-d H:i:s')
-            ])->where('s-id', $sId)
-                ->execute();
-        } else {
-            $this->table('sessions')->insert([
-                's-id' => $sId,
-                'last-used' => date('Y-m-d H:i:s'),
-                'started-at' => date('Y-m-d H:i:s'),
-            ])->execute();
-        }
+        $this->ensureSessionRow($sId);
         $this->storeChunks($sId, base64_encode($session));
     }
     /**
@@ -318,18 +307,9 @@ class SessionDB extends DB {
         string|int|null $expectedVersion,
         ConflictStrategy $strategy
     ): int {
-        // Ensure the session row exists.
-        if (!$this->isSessionExist($sId)) {
-            $this->table('sessions')->insert([
-                's-id' => $sId,
-                'last-used' => date('Y-m-d H:i:s'),
-                'started-at' => date('Y-m-d H:i:s'),
-            ])->execute();
-        } else {
-            $this->table('sessions')->update([
-                'last-used' => date('Y-m-d H:i:s'),
-            ])->where('s-id', $sId)->execute();
-        }
+        // Ensure the session row exists (race-safe: a concurrent first-write
+        // for the same session id will not raise a duplicate-key error).
+        $this->ensureSessionRow($sId);
 
         $existing = $this->getSessionKey($sId, $key);
         $currentVersion = $existing !== null ? $existing['version'] : 0;
@@ -345,13 +325,27 @@ class SessionDB extends DB {
         $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         if ($existing === null) {
-            $this->table('session_kv_data')->insert([
-                's-id' => $sId,
-                'skey' => $key,
-                'svalue' => $encoded,
-                'version' => $newVersion,
-                'updated-at' => date('Y-m-d H:i:s'),
-            ])->execute();
+            try {
+                $this->table('session_kv_data')->insert([
+                    's-id' => $sId,
+                    'skey' => $key,
+                    'svalue' => $encoded,
+                    'version' => $newVersion,
+                    'updated-at' => date('Y-m-d H:i:s'),
+                ])->execute();
+            } catch (DatabaseException $ex) {
+                // A concurrent request inserted the same (s-id, skey) row
+                // between our read and insert. Fall through to an update.
+                if (!$this->isDuplicateKeyError($ex)) {
+                    throw $ex;
+                }
+                $this->clear();
+                $this->table('session_kv_data')->update([
+                    'svalue' => $encoded,
+                    'version' => $newVersion,
+                    'updated-at' => date('Y-m-d H:i:s'),
+                ])->where('s-id', $sId)->andWhere('skey', $key)->execute();
+            }
         } else {
             $this->table('session_kv_data')->update([
                 'svalue' => $encoded,
@@ -361,6 +355,73 @@ class SessionDB extends DB {
         }
 
         return $newVersion;
+    }
+    /**
+     * Ensures that the 'sessions' row for the given id exists, race-safely.
+     *
+     * The create is idempotent: if a concurrent request inserts the same
+     * session id between the existence check and the insert, the resulting
+     * duplicate-key error (SQL Server 2627/2601, MySQL 1062, SQLite 19/23000)
+     * is caught and treated as "already exists", falling through to an update
+     * of the 'last-used' timestamp. This resolves the PK_sessions race
+     * described in issue #428.
+     *
+     * @param string $sId The ID of the session.
+     *
+     * @throws DatabaseException If a non-duplicate-key database error occurs.
+     */
+    private function ensureSessionRow(string $sId): void {
+        if ($this->isSessionExist($sId)) {
+            $this->table('sessions')->update([
+                'last-used' => date('Y-m-d H:i:s'),
+            ])->where('s-id', $sId)->execute();
+
+            return;
+        }
+
+        try {
+            $this->table('sessions')->insert([
+                's-id' => $sId,
+                'last-used' => date('Y-m-d H:i:s'),
+                'started-at' => date('Y-m-d H:i:s'),
+            ])->execute();
+        } catch (DatabaseException $ex) {
+            // A concurrent request created the row between the check and the
+            // insert. Treat a duplicate-key error as success and update instead.
+            if (!$this->isDuplicateKeyError($ex)) {
+                throw $ex;
+            }
+            $this->clear();
+            $this->table('sessions')->update([
+                'last-used' => date('Y-m-d H:i:s'),
+            ])->where('s-id', $sId)->execute();
+        }
+    }
+    /**
+     * Checks whether a database exception represents a duplicate/primary-key
+     * constraint violation across the supported database engines.
+     *
+     * Error codes:
+     * - SQL Server: 2627 (PK violation), 2601 (unique index violation)
+     * - MySQL:      1062 (duplicate entry)
+     * - SQLite:     19 (SQLITE_CONSTRAINT), 23000 (SQLSTATE)
+     *
+     * @param DatabaseException $ex
+     *
+     * @return bool True if the exception is a duplicate-key violation.
+     */
+    private function isDuplicateKeyError(DatabaseException $ex): bool {
+        if (in_array((int) $ex->getCode(), [2627, 2601, 1062, 19], true)) {
+            return true;
+        }
+
+        // Fallback for drivers that surface a SQLSTATE string or wrap the
+        // message without a numeric code (e.g. SQLite via PDO).
+        $msg = $ex->getMessage();
+
+        return stripos($msg, 'duplicate') !== false
+            || stripos($msg, 'PRIMARY KEY') !== false
+            || stripos($msg, 'UNIQUE constraint') !== false;
     }
     /**
      * Split session data into smaller chunks.

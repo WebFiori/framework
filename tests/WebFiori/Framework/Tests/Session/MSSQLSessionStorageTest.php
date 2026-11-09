@@ -3,9 +3,11 @@ namespace WebFiori\Framework\Test\Session;
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
+use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\DatabaseSessionStorage;
+use WebFiori\Framework\Session\SessionDB;
 
 class MSSQLSessionStorageTest extends TestCase {
     protected DatabaseSessionStorage $storage;
@@ -17,6 +19,53 @@ class MSSQLSessionStorageTest extends TestCase {
         $this->assertEquals('data-a', $this->storage->read('session-a', 'k')['value']);
         $this->assertEquals('data-b', $this->storage->read('session-b', 'k')['value']);
         $this->assertEquals('data-c', $this->storage->read('session-c', 'k')['value']);
+    }
+    /**
+     * Regression test for bug #428: non-atomic check-then-insert race in
+     * SessionDB. Two concurrent requests carrying the same new session id both
+     * pass isSessionExist() and both reach the INSERT, causing a PRIMARY KEY
+     * (PK_sessions) violation — SQL Server error 2627.
+     *
+     * The race is reproduced deterministically with a SessionDB whose existence
+     * check is stale: it reports "no row" on first look even though another
+     * concurrent request has already created the row. This drives SessionDB's
+     * own create branch ("if (!isSessionExist()) INSERT") straight into the
+     * duplicate INSERT — exactly the losing-request scenario from the issue.
+     *
+     * Asserts the EXPECTED (correct) behavior: first-write session creation
+     * must be idempotent / race-safe, so the collision must be swallowed and
+     * NOT raise. This FAILS while the bug is present (the create throws 2627)
+     * and PASSES once SessionDB catches the duplicate-key and falls through to
+     * an update.
+     *
+     * @test
+     */
+    public function testConcurrentCreateIsRaceSafe() {
+        $sId = 'race-session-'.uniqid();
+
+        // Request A wins the race and creates the session row first.
+        $requestA = new SessionDB('test-sessions-conn');
+        $requestA->writeSessionKey($sId, 'k', 'value-a', null, ConflictStrategy::LAST_WRITE_WINS);
+
+        // Request B has a STALE existence view: its isSessionExist() returned
+        // false before A inserted, so B still believes the row is absent and
+        // proceeds to the create branch. This is the losing request in the race.
+        $requestB = new StaleSessionDB('test-sessions-conn');
+
+        try {
+            $requestB->writeSessionKey($sId, 'k2', 'value-b', null, ConflictStrategy::LAST_WRITE_WINS);
+        } catch (DatabaseException $e) {
+            $this->fail(
+                'Bug #428: concurrent session creation raised a duplicate-key error '.
+                '('.$e->getCode().' - '.$e->getMessage().'). '.
+                'First-write session creation should be idempotent / race-safe.'
+            );
+        }
+
+        // Both concurrent first-writes must survive under the single session row.
+        $this->assertTrue($this->storage->getController()->isSessionExist($sId));
+        $this->assertEquals('value-a', $this->storage->read($sId, 'k')['value']);
+        $this->assertEquals('value-b', $this->storage->read($sId, 'k2')['value']);
     }
     /** @test */
     public function testGCEmptyTable() {
@@ -129,5 +178,27 @@ class MSSQLSessionStorageTest extends TestCase {
             App::getConfig()->removeDBConnection('test-sessions-conn');
         } catch (\Throwable $e) {
         }
+    }
+}
+
+/**
+ * Test double that simulates a losing request in the bug #428 race: its very
+ * first isSessionExist() check returns a STALE "false" (as if read before a
+ * concurrent request inserted the row), forcing SessionDB's create branch to
+ * run against an already-existing row. All subsequent checks delegate to the
+ * real implementation.
+ */
+class StaleSessionDB extends SessionDB {
+    private bool $staleReadConsumed = false;
+
+    public function isSessionExist(string $sId): bool {
+        if (!$this->staleReadConsumed) {
+            $this->staleReadConsumed = true;
+
+            // Pretend the row does not exist yet (stale read).
+            return false;
+        }
+
+        return parent::isSessionExist($sId);
     }
 }

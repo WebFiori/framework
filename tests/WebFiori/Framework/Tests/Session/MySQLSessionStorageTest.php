@@ -4,9 +4,11 @@ namespace WebFiori\Framework\Test\Session;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Database\ConnectionInfo;
 use WebFiori\Database\Database;
+use WebFiori\Database\DatabaseException;
 use WebFiori\Framework\App;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\DatabaseSessionStorage;
+use WebFiori\Framework\Session\SessionDB;
 
 class MySQLSessionStorageTest extends TestCase {
     protected DatabaseSessionStorage $storage;
@@ -19,6 +21,51 @@ class MySQLSessionStorageTest extends TestCase {
         $this->assertEquals('data-a', $this->storage->read('session-a', 'k')['value']);
         $this->assertEquals('data-b', $this->storage->read('session-b', 'k')['value']);
         $this->assertEquals('data-c', $this->storage->read('session-c', 'k')['value']);
+    }
+
+    /**
+     * Regression test for bug #428 on MySQL: non-atomic check-then-insert race
+     * in SessionDB. Two concurrent requests carrying the same new session id
+     * both pass isSessionExist() and both reach the INSERT, causing a duplicate
+     * PRIMARY KEY error on the 'sessions' table — MySQL error 1062.
+     *
+     * The race is reproduced deterministically with a SessionDB whose existence
+     * check is stale: it reports "no row" on first look even though another
+     * concurrent request has already created the row, driving SessionDB's own
+     * create branch straight into the duplicate INSERT.
+     *
+     * Asserts the EXPECTED (correct) behavior: first-write session creation
+     * must be idempotent / race-safe, so the collision must be swallowed and
+     * NOT raise. FAILS while the bug is present (the create throws 1062) and
+     * PASSES once SessionDB catches the duplicate-key and falls through to an
+     * update. Confirms the fix covers MySQL as well as MSSQL.
+     *
+     * @test
+     */
+    public function testConcurrentCreateIsRaceSafe() {
+        $sId = 'race-session-'.uniqid();
+
+        // Request A wins the race and creates the session row first.
+        $requestA = new SessionDB('test-sessions-conn');
+        $requestA->writeSessionKey($sId, 'k', 'value-a', null, ConflictStrategy::LAST_WRITE_WINS);
+
+        // Request B has a STALE existence view and proceeds to the create
+        // branch for a row that already exists — the losing request.
+        $requestB = new StaleMySQLSessionDB('test-sessions-conn');
+
+        try {
+            $requestB->writeSessionKey($sId, 'k2', 'value-b', null, ConflictStrategy::LAST_WRITE_WINS);
+        } catch (DatabaseException $e) {
+            $this->fail(
+                'Bug #428: concurrent session creation raised a duplicate-key error '.
+                '('.$e->getCode().' - '.$e->getMessage().'). '.
+                'First-write session creation should be idempotent / race-safe.'
+            );
+        }
+
+        $this->assertTrue($this->storage->getController()->isSessionExist($sId));
+        $this->assertEquals('value-a', $this->storage->read($sId, 'k')['value']);
+        $this->assertEquals('value-b', $this->storage->read($sId, 'k2')['value']);
     }
 
     /** @test */
@@ -124,5 +171,25 @@ class MySQLSessionStorageTest extends TestCase {
             $this->storage->getController()->removeTables();
         } catch (\Throwable $e) {
         }
+    }
+}
+
+/**
+ * Test double for the bug #428 race on MySQL: its first isSessionExist() check
+ * returns a stale "false", forcing SessionDB's create branch to run against a
+ * row another request already inserted. Subsequent checks delegate to the real
+ * implementation.
+ */
+class StaleMySQLSessionDB extends SessionDB {
+    private bool $staleReadConsumed = false;
+
+    public function isSessionExist(string $sId): bool {
+        if (!$this->staleReadConsumed) {
+            $this->staleReadConsumed = true;
+
+            return false;
+        }
+
+        return parent::isSessionExist($sId);
     }
 }

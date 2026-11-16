@@ -33,6 +33,13 @@ class Session implements JsonI {
     const DEFAULT_SESSION_DURATION = 120;
 
     /**
+     * Minimum drift, in seconds, before the stored expiry of a resumed session
+     * is rewritten. Avoids a storage write on every request of a session that
+     * has refresh enabled.
+     */
+    private const EXPIRY_REFRESH_INTERVAL = 60;
+
+    /**
      * Storage keys that are reserved for internal session use.
      *
      * These keys hold internal session state (metadata and the session user)
@@ -801,6 +808,10 @@ class Session implements JsonI {
             $this->sessionCookie->setExpires($asFloat);
             $this->checkIfExpired();
 
+            if ($this->isRunning()) {
+                $this->persistMeta();
+            }
+
             return true;
         }
 
@@ -816,6 +827,10 @@ class Session implements JsonI {
      */
     public function setIsRefresh(bool $bool) {
         $this->isRef = $bool === true;
+
+        if ($this->isRunning()) {
+            $this->persistMeta();
+        }
     }
     /**
      * Sets the read strategy for this session.
@@ -883,7 +898,7 @@ class Session implements JsonI {
                 }
 
                 $this->startedAt = $meta['startedAt'] ?? time();
-                $this->lifeTime = $meta['lifeTime'] ?? self::DEFAULT_SESSION_DURATION / 60;
+                $this->lifeTime = $meta['lifeTime'] ?? self::DEFAULT_SESSION_DURATION;
                 $this->isRef = $meta['isRef'] ?? false;
                 $this->langCode = $meta['langCode'] ?? '';
                 $this->resumedAt = time();
@@ -908,6 +923,10 @@ class Session implements JsonI {
                 }
 
                 $this->checkIfExpired();
+
+                if ($this->sessionStatus === SessionStatus::RESUMED) {
+                    $this->refreshExpiry();
+                }
             }
         }
     }
@@ -1199,6 +1218,57 @@ class Session implements JsonI {
             null,
             ConflictStrategy::LAST_WRITE_WINS
         );
+        $this->syncExpiry();
+    }
+    /**
+     * Returns the time at which the session expires, as a Unix timestamp.
+     *
+     * Sessions with refresh enabled expire one full duration after now. Other
+     * sessions expire one full duration after they started.
+     *
+     * @return int|null Null if the session is not persistent (no lifetime).
+     */
+    private function computeExpiry(): ?int {
+        if (!$this->isPersistent()) {
+            return null;
+        }
+
+        return ($this->isRefresh() ? time() : $this->startedAt) + $this->getDuration();
+    }
+    /**
+     * Records the expiry time in storage, if the storage supports it.
+     */
+    private function syncExpiry(): void {
+        $storage = SessionsManager::getStorage();
+
+        if ($storage instanceof ExpiringSessionStorage) {
+            $storage->setExpiry($this->getId(), $this->computeExpiry());
+        }
+    }
+    /**
+     * Updates the stored expiry of a resumed session.
+     *
+     * The write happens when no expiry is recorded yet (session created
+     * before expiry tracking existed) or when the recorded value drifts from
+     * the computed one by more than EXPIRY_REFRESH_INTERVAL seconds, which only
+     * happens for sessions with refresh enabled.
+     */
+    private function refreshExpiry(): void {
+        $storage = SessionsManager::getStorage();
+
+        if (!$storage instanceof ExpiringSessionStorage) {
+            return;
+        }
+        $target = $this->computeExpiry();
+        $current = $storage->getExpiry($this->getId());
+
+        if ($target === null) {
+            if ($current !== null) {
+                $storage->setExpiry($this->getId(), null);
+            }
+        } else if ($current === null || abs($target - $current) > self::EXPIRY_REFRESH_INTERVAL) {
+            $storage->setExpiry($this->getId(), $target);
+        }
     }
     /**
      * Persists the current session user to the reserved '_user' key.

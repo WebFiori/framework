@@ -34,7 +34,8 @@ use WebFiori\Framework\Exceptions\SessionException;
  * @author Ibrahim
  * @since 3.1.0 (per-key interface)
  */
-class DefaultSessionStorage implements SessionStorage {
+class DefaultSessionStorage implements ExpiringSessionStorage {
+    private const EXPIRY_SUFFIX = '.exp';
     private string $storeLoc;
 
     public function __construct() {
@@ -68,6 +69,47 @@ class DefaultSessionStorage implements SessionStorage {
         if (file_exists($path)) {
             unlink($path);
         }
+        $expiryPath = $this->expiryPath($sessionId);
+
+        if (file_exists($expiryPath)) {
+            unlink($expiryPath);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The expiry is kept in a sidecar file next to the session file, because
+     * the modification time of the session file changes on every write.
+     */
+    public function getExpiry(string $sessionId): ?int {
+        $path = $this->expiryPath($sessionId);
+
+        if (!file_exists($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+
+        return $raw !== false && ctype_digit(trim($raw)) ? (int) trim($raw) : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if (!$this->canWrite()) {
+            return;
+        }
+        $path = $this->expiryPath($sessionId);
+
+        if ($expiresAt === null) {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            return;
+        }
+        file_put_contents($path, (string) $expiresAt, LOCK_EX);
     }
 
     /**
@@ -81,17 +123,35 @@ class DefaultSessionStorage implements SessionStorage {
         $files = array_diff(scandir($this->storeLoc), ['.', '..']);
         $removed = 0;
         $threshold = strtotime($olderThan);
+        $now = time();
 
         foreach ($files as $file) {
+            $filePath = $this->storeLoc.DS.$file;
+
+            if (substr($file, -strlen(self::EXPIRY_SUFFIX)) === self::EXPIRY_SUFFIX) {
+                // Remove expiry files whose session file is gone.
+                if (!file_exists(substr($filePath, 0, -strlen(self::EXPIRY_SUFFIX))) && file_exists($filePath)) {
+                    unlink($filePath);
+                }
+
+                continue;
+            }
+
             if ($maxCount > 0 && $removed >= $maxCount) {
                 break;
             }
 
-            $filePath = $this->storeLoc.DS.$file;
-            $mtime = filemtime($filePath);
+            $expiry = $this->getExpiry($file);
 
-            if ($mtime !== false && $mtime < $threshold) {
-                unlink($filePath);
+            if ($expiry !== null) {
+                $expired = $expiry <= $now;
+            } else {
+                $mtime = filemtime($filePath);
+                $expired = $mtime !== false && $mtime < $threshold;
+            }
+
+            if ($expired) {
+                $this->destroy($file);
                 $removed++;
             }
         }
@@ -270,6 +330,10 @@ class DefaultSessionStorage implements SessionStorage {
         // Legacy blob format: return empty (legacy sessions are effectively invalidated).
         // The session will be treated as new, and new per-key entries will be written on next set().
         return [];
+    }
+
+    private function expiryPath(string $sessionId): string {
+        return $this->filePath($sessionId).self::EXPIRY_SUFFIX;
     }
 
     private function filePath(string $sessionId): string {

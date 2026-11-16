@@ -137,6 +137,11 @@ class SessionSchema {
                 'default' => 'now()',
                 'comment' => 'The date and time at which the user had activity during the session.',
             ],
+            'expires_at' => [
+                'type' => 'datetime',
+                'is-null' => true,
+                'comment' => 'The date and time at which the session expires. Null if not recorded.',
+            ],
         ]);
     }
 }

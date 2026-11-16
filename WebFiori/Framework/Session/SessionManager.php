@@ -152,22 +152,31 @@ class SessionManager {
         return $this->gcProbability;
     }
     /**
-     * Returns a date string that represents the GC threshold time.
+     * Returns a date string that represents the GC idle threshold.
+     *
+     * Sessions that have no recorded expiry (see {@see ExpiringSessionStorage})
+     * are removed when they were last used at or before this time.
+     *
+     * The threshold is the current time minus an idle period. The period is
+     * 4 hours by default and can be changed with the 'SESSION_GC' environment
+     * variable or constant, whose value is a DURATION IN SECONDS (for example
+     * 604800 for one week). Versions before 3.2.0 read the value as an
+     * absolute Unix timestamp, which could not express a useful setting.
      *
      * @return string A date string in the format 'Y-m-d H:i:s'.
      */
     public function getGCTime(): string {
-        $olderThan = time() - (Session::DEFAULT_SESSION_DURATION * 60 * 2);
+        $idleSeconds = Session::DEFAULT_SESSION_DURATION * 60 * 2;
         $fromEnv = getenv('SESSION_GC') !== false ? intval(getenv('SESSION_GC')) : 0;
         $fromConst = defined('SESSION_GC') && intval(SESSION_GC) > 0 ? intval(SESSION_GC) : 0;
 
-        if ($fromEnv != 0) {
-            $olderThan = $fromEnv;
-        } else if ($fromConst != 0) {
-            $olderThan = $fromConst;
+        if ($fromEnv > 0) {
+            $idleSeconds = $fromEnv;
+        } else if ($fromConst > 0) {
+            $idleSeconds = $fromConst;
         }
 
-        return date('Y-m-d H:i:s', $olderThan);
+        return date('Y-m-d H:i:s', time() - $idleSeconds);
     }
     /**
      * Returns the ID of a session from a cookie given its name.

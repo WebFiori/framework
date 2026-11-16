@@ -31,6 +31,10 @@ use WebFiori\Database\DatabaseException;
  *    if it does not exist.
  * 3. Adds a 'version' column to 'session_kv_data' if it is missing.
  * 4. Adds an 'updated_at' column to 'session_kv_data' if it is missing.
+ * 5. Adds a nullable 'expires_at' column (and an index on it) to 'sessions'
+ *    if it is missing. Garbage collection uses it to remove sessions by their
+ *    own expiry time (see {@see ExpiringSessionStorage}). Until the migration
+ *    is run, garbage collection falls back to the idle-time threshold.
  *
  * The legacy 'session_data' table (chunked blob) is NOT modified or removed;
  * existing sessions stored in the blob format will be treated as new sessions
@@ -52,22 +56,14 @@ class SessionSchemaMigration {
         $db = new SessionDB($connection);
         $dbType = strtolower($db->getConnectionInfo()->getDatabaseType());
 
-        // Create sessions table if not exists.
-        try {
-            $db->table('sessions')->createIfNotExists()->execute();
-        } catch (DatabaseException $e) {
-            // Table may already exist; continue.
-        }
-
-        // Create session_kv_data table if not exists.
-        try {
-            $db->table('session_kv_data')->createIfNotExists()->execute();
-        } catch (DatabaseException $e) {
-            // May fail if CREATE IF NOT EXISTS is not supported; try plain CREATE.
+        // Create the tables if they do not exist. createTable() fails when a
+        // table already exists, which is the expected case on re-runs.
+        foreach (['sessions', 'session_kv_data'] as $tableName) {
             try {
-                $db->table('session_kv_data')->create()->execute();
-            } catch (DatabaseException $innerEx) {
-                // Table already exists — run column-level migrations.
+                $db->table($tableName)->createTable()->execute();
+            } catch (DatabaseException $e) {
+                // Table already exists; continue with column-level migrations.
+                $db->clear();
             }
         }
 
@@ -77,6 +73,10 @@ class SessionSchemaMigration {
         // Add 'updated_at' column if missing.
         $updatedAtType = ($dbType === 'mssql') ? 'DATETIME DEFAULT GETDATE()' : 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP';
         static::addColumnIfMissing($db, $dbType, 'session_kv_data', 'updated_at', $updatedAtType);
+
+        // Add 'expires_at' column and its index to 'sessions' if missing.
+        static::addColumnIfMissing($db, $dbType, 'sessions', 'expires_at', 'DATETIME NULL');
+        $db->createExpiryIndex();
     }
 
     private static function addColumnIfMissing(
@@ -87,9 +87,12 @@ class SessionSchemaMigration {
         string $definition
     ): void {
         try {
-            $db->query("ALTER TABLE $table ADD COLUMN $column $definition")->execute();
+            // SQL Server does not accept the COLUMN keyword in ADD.
+            $keyword = $dbType === 'mssql' ? 'ADD' : 'ADD COLUMN';
+            $db->raw("ALTER TABLE $table $keyword $column $definition")->execute();
         } catch (DatabaseException $e) {
             // Column likely already exists — ignore.
+            $db->clear();
         }
     }
 }

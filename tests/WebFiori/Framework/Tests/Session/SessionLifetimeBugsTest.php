@@ -3,6 +3,7 @@ namespace WebFiori\Framework\Test\Session;
 
 require_once __DIR__.'/SessionDriversTrait.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\InMemorySessionStorage;
@@ -25,8 +26,8 @@ class SessionLifetimeBugsTest extends TestCase {
      * StartSessionMiddleware::afterSend() only calls validateStorage().
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testIssue431DurationAndRefreshArePersisted(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::reset();
@@ -56,8 +57,8 @@ class SessionLifetimeBugsTest extends TestCase {
      * expired.
      *
      * @test
-     * @dataProvider timestampStorageProvider
      */
+    #[DataProvider('timestampStorageProvider')]
     public function testIssue432GcRespectsPerSessionLifetime(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -95,8 +96,8 @@ class SessionLifetimeBugsTest extends TestCase {
      * checks the expiry that GC actually uses.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testIssue433ResumeExtendsExpiryOfRefreshSession(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -156,8 +157,8 @@ class SessionLifetimeBugsTest extends TestCase {
      * back to the default duration (120 minutes), not 2 minutes.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testIssue435MissingLifeTimeFallsBackToDefault(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::reset();

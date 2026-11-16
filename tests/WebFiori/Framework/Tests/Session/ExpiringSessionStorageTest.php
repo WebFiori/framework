@@ -3,6 +3,7 @@ namespace WebFiori\Framework\Test\Session;
 
 require_once __DIR__.'/SessionDriversTrait.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\ExpiringSessionStorage;
@@ -19,16 +20,16 @@ use WebFiori\Framework\Session\SessionSchemaMigration;
 class ExpiringSessionStorageTest extends TestCase {
     /**
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testBuiltInDriversAreExpiring(string $driver) {
         $this->assertInstanceOf(ExpiringSessionStorage::class, $this->createStorage($driver));
     }
 
     /**
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testDestroyClearsExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         $this->write($storage, 'destroy-me');
@@ -41,8 +42,8 @@ class ExpiringSessionStorageTest extends TestCase {
 
     /**
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testExpiryRoundTrip(string $driver) {
         $storage = $this->createStorage($driver);
         $this->write($storage, 'round-trip');
@@ -64,8 +65,8 @@ class ExpiringSessionStorageTest extends TestCase {
      * expiry or the data.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testExpirySurvivesLaterWrites(string $driver) {
         $storage = $this->createStorage($driver);
         $this->write($storage, 'later-writes');
@@ -84,8 +85,8 @@ class ExpiringSessionStorageTest extends TestCase {
      * non-persistent lifetime) keep being removed by the idle threshold.
      *
      * @test
-     * @dataProvider timestampStorageProvider
      */
+    #[DataProvider('timestampStorageProvider')]
     public function testGcFallsBackToIdleThresholdWithoutExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         $this->write($storage, 'idle');
@@ -100,8 +101,8 @@ class ExpiringSessionStorageTest extends TestCase {
 
     /**
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testGcRespectsMaxCount(string $driver) {
         if ($driver === 'cache') {
             $this->markTestSkipped('The cache driver delegates expiry to cache TTLs; gc() has no count to limit.');
@@ -128,8 +129,8 @@ class ExpiringSessionStorageTest extends TestCase {
      * whatever the idle threshold says.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testGcUsesRecordedExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         $this->write($storage, 'expired');
@@ -151,8 +152,8 @@ class ExpiringSessionStorageTest extends TestCase {
      * must add the column.
      *
      * @test
-     * @dataProvider databaseStorageProvider
      */
+    #[DataProvider('databaseStorageProvider')]
     public function testUnmigratedDatabaseDegradesAndMigrationAddsColumn(string $driver) {
         $storage = $this->createStorage($driver);
 

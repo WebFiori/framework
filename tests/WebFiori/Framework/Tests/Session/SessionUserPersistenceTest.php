@@ -3,6 +3,7 @@ namespace WebFiori\Framework\Test\Session;
 
 require_once __DIR__.'/SessionDriversTrait.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\Session;
@@ -23,8 +24,8 @@ class SessionUserPersistenceTest extends TestCase {
      * '_user' key right after setUser(), without any close() call.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testSetUserWritesToStorage(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -46,8 +47,8 @@ class SessionUserPersistenceTest extends TestCase {
      * it on resume, including user info modified after setUser().
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testUserIsRestoredOnResume(string $driver) {
         SessionsManager::setStorage($this->createStorage($driver));
 

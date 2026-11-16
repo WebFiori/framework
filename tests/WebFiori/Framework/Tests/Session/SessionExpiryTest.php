@@ -3,6 +3,7 @@ namespace WebFiori\Framework\Test\Session;
 
 require_once __DIR__.'/SessionDriversTrait.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Session\ConflictStrategy;
 use WebFiori\Framework\Session\InMemorySessionStorage;
@@ -24,8 +25,8 @@ class SessionExpiryTest extends TestCase {
      * of metadata, not after it started.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testNewRefreshSessionExpiresOneDurationFromNow(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -40,8 +41,8 @@ class SessionExpiryTest extends TestCase {
      * A session without refresh expires one duration after it started.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testNewSessionExpiresOneDurationAfterStart(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -57,8 +58,8 @@ class SessionExpiryTest extends TestCase {
      * recorded and it stays subject to the idle threshold.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testNonPersistentSessionHasNoExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -76,8 +77,8 @@ class SessionExpiryTest extends TestCase {
      * A session without refresh keeps its original expiry when resumed.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testResumeKeepsExpiryOfNonRefreshSession(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -98,8 +99,8 @@ class SessionExpiryTest extends TestCase {
      * expiry. Resuming it records one.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testResumeRecordsMissingExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -121,8 +122,8 @@ class SessionExpiryTest extends TestCase {
      * request.
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testResumeRefreshesExpiryOnlyWhenDriftExceedsOneMinute(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);
@@ -149,8 +150,8 @@ class SessionExpiryTest extends TestCase {
      * recorded expiry (issue #431).
      *
      * @test
-     * @dataProvider storageProvider
      */
+    #[DataProvider('storageProvider')]
     public function testSetDurationAndRefreshUpdateRecordedExpiry(string $driver) {
         $storage = $this->createStorage($driver);
         SessionsManager::setStorage($storage);

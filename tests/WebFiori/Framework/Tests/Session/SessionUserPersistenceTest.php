@@ -18,7 +18,28 @@ use WebFiori\Framework\User;
  * service is not reachable.
  */
 class SessionUserPersistenceTest extends TestCase {
-    use SessionDriversTrait;
+    /**
+     * The user must be readable straight from storage under the reserved
+     * '_user' key right after setUser(), without any close() call.
+     *
+     * @test
+     * @dataProvider storageProvider
+     */
+    public function testSetUserWritesToStorage(string $driver) {
+        $storage = $this->createStorage($driver);
+        SessionsManager::setStorage($storage);
+
+        $s = new Session(['name' => 'user-write-'.$driver]);
+        $s->start();
+        $this->assertNull($storage->read($s->getId(), '_user'));
+
+        $s->setUser(new User('john', 'pass', 'john@example.com'));
+
+        $this->assertNotNull(
+            $storage->read($s->getId(), '_user'),
+            "Issue #418: setUser() did not write '_user' to storage ($driver)."
+        );
+    }
 
     /**
      * Issue #418: setUser() must persist the user, and start() must restore
@@ -55,29 +76,7 @@ class SessionUserPersistenceTest extends TestCase {
         $this->assertEquals('jane@example.com', $s2->getUser()->getEmail());
         $this->assertEquals('Jane Doe', $s2->getUser()->getDisplayName());
     }
-
-    /**
-     * The user must be readable straight from storage under the reserved
-     * '_user' key right after setUser(), without any close() call.
-     *
-     * @test
-     * @dataProvider storageProvider
-     */
-    public function testSetUserWritesToStorage(string $driver) {
-        $storage = $this->createStorage($driver);
-        SessionsManager::setStorage($storage);
-
-        $s = new Session(['name' => 'user-write-'.$driver]);
-        $s->start();
-        $this->assertNull($storage->read($s->getId(), '_user'));
-
-        $s->setUser(new User('john', 'pass', 'john@example.com'));
-
-        $this->assertNotNull(
-            $storage->read($s->getId(), '_user'),
-            "Issue #418: setUser() did not write '_user' to storage ($driver)."
-        );
-    }
+    use SessionDriversTrait;
 
     protected function setUp(): void {
         parent::setUp();

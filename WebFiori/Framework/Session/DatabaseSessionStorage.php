@@ -51,20 +51,6 @@ class DatabaseSessionStorage implements ExpiringSessionStorage {
     /**
      * {@inheritdoc}
      */
-    public function getExpiry(string $sessionId): ?int {
-        return $this->dbController->getExpiry($sessionId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExpiry(string $sessionId, ?int $expiresAt): void {
-        $this->dbController->setExpiry($sessionId, $expiresAt);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function destroy(string $sessionId): void {
         $this->dbController->removeSession($sessionId);
     }
@@ -93,6 +79,13 @@ class DatabaseSessionStorage implements ExpiringSessionStorage {
     /**
      * {@inheritdoc}
      */
+    public function getExpiry(string $sessionId): ?int {
+        return $this->dbController->getExpiry($sessionId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(string $sessionId, string $key): ?array {
         return $this->dbController->getSessionKey($sessionId, $key);
     }
@@ -109,6 +102,13 @@ class DatabaseSessionStorage implements ExpiringSessionStorage {
      */
     public function remove(string $sessionId, string $key): void {
         $this->dbController->removeSessionKey($sessionId, $key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        $this->dbController->setExpiry($sessionId, $expiresAt);
     }
 
     /**

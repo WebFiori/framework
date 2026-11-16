@@ -30,18 +30,17 @@ namespace WebFiori\Framework\Session;
  */
 class InMemorySessionStorage implements ExpiringSessionStorage {
     /**
-     * Shared in-process store keyed by [session_id][key] => [value, version].
-     *
-     * @var array<string, array<string, array{value: mixed, version: int}>>
-     */
-    private static array $store = [];
-
-    /**
      * Recorded expiry times keyed by session id.
      *
      * @var array<string, int>
      */
     private static array $expiry = [];
+    /**
+     * Shared in-process store keyed by [session_id][key] => [value, version].
+     *
+     * @var array<string, array<string, array{value: mixed, version: int}>>
+     */
+    private static array $store = [];
 
     /**
      * Destroys an entire session, removing all its keys.
@@ -79,17 +78,6 @@ class InMemorySessionStorage implements ExpiringSessionStorage {
      */
     public function getExpiry(string $sessionId): ?int {
         return self::$expiry[$sessionId] ?? null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExpiry(string $sessionId, ?int $expiresAt): void {
-        if ($expiresAt === null) {
-            unset(self::$expiry[$sessionId]);
-        } else {
-            self::$expiry[$sessionId] = $expiresAt;
-        }
     }
 
     /**
@@ -133,6 +121,17 @@ class InMemorySessionStorage implements ExpiringSessionStorage {
     public static function reset(): void {
         self::$store = [];
         self::$expiry = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if ($expiresAt === null) {
+            unset(self::$expiry[$sessionId]);
+        } else {
+            self::$expiry[$sessionId] = $expiresAt;
+        }
     }
 
     /**

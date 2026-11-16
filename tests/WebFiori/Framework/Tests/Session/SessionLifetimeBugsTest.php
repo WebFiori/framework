@@ -19,7 +19,70 @@ use WebFiori\Framework\Session\SessionStatus;
  * service is not reachable.
  */
 class SessionLifetimeBugsTest extends TestCase {
-    use SessionDriversTrait;
+    /**
+     * Issue #431: setDuration() and setIsRefresh() on a running session must
+     * reach storage without an explicit close(), as in a normal request where
+     * StartSessionMiddleware::afterSend() only calls validateStorage().
+     *
+     * @test
+     * @dataProvider storageProvider
+     */
+    public function testIssue431DurationAndRefreshArePersisted(string $driver) {
+        $storage = $this->createStorage($driver);
+        SessionsManager::reset();
+        SessionsManager::setStorage($storage);
+        $name = 'i431-'.$driver;
+
+        SessionsManager::start($name);
+        $s = SessionsManager::getActiveSession();
+        $sid = $s->getId();
+        $s->setDuration(10080);
+        $s->setIsRefresh(true);
+        SessionsManager::validateStorage();
+
+        $meta = $storage->read($sid, '_meta')['value'];
+        $this->assertEquals(10080, $meta['lifeTime'], "Issue #431: lifeTime was not persisted ($driver).");
+        $this->assertTrue($meta['isRef'], "Issue #431: isRef was not persisted ($driver).");
+
+        $next = new Session(['name' => $name, 'session-id' => $sid]);
+        $next->start();
+        $this->assertEquals(604800, $next->getDuration(), "Issue #431: resumed session lost its duration ($driver).");
+        $this->assertTrue($next->isRefresh(), "Issue #431: resumed session lost its refresh flag ($driver).");
+    }
+
+    /**
+     * Issue #432: GC must not delete a session that is idle for longer than
+     * the default threshold (4 hours) but whose own lifetime (7 days) has not
+     * expired.
+     *
+     * @test
+     * @dataProvider timestampStorageProvider
+     */
+    public function testIssue432GcRespectsPerSessionLifetime(string $driver) {
+        $storage = $this->createStorage($driver);
+        SessionsManager::setStorage($storage);
+
+        $s = new Session(['name' => 'i432-'.$driver, 'duration' => 10080, 'refresh' => true]);
+        $s->start();
+        $s->set('k', 'v');
+        $sid = $s->getId();
+        $s->close();
+
+        $this->ageSession($storage, $sid, 5 * 3600);
+
+        $resumed = new Session(['name' => 'i432-'.$driver, 'session-id' => $sid]);
+        $resumed->start();
+        $this->assertGreaterThan(0, $resumed->getRemainingTime(), 'Precondition: session lifetime has not expired.');
+
+        // Age it again: resuming may legitimately update the last-use time (#433).
+        $this->ageSession($storage, $sid, 5 * 3600);
+        $storage->gc(SessionsManager::getGCTime());
+
+        $this->assertTrue(
+            $this->sessionExistsInStorage($storage, $sid),
+            "Issue #432: GC deleted a session whose 7 day lifetime has not expired ($driver)."
+        );
+    }
 
     /**
      * Issue #433: an active session with refresh enabled must not be treated
@@ -58,71 +121,6 @@ class SessionLifetimeBugsTest extends TestCase {
             $storage->getExpiry($sid),
             "Issue #433: resuming an active refresh session did not extend its expiry ($driver)."
         );
-    }
-
-    /**
-     * Issue #432: GC must not delete a session that is idle for longer than
-     * the default threshold (4 hours) but whose own lifetime (7 days) has not
-     * expired.
-     *
-     * @test
-     * @dataProvider timestampStorageProvider
-     */
-    public function testIssue432GcRespectsPerSessionLifetime(string $driver) {
-        $storage = $this->createStorage($driver);
-        SessionsManager::setStorage($storage);
-
-        $s = new Session(['name' => 'i432-'.$driver, 'duration' => 10080, 'refresh' => true]);
-        $s->start();
-        $s->set('k', 'v');
-        $sid = $s->getId();
-        $s->close();
-
-        $this->ageSession($storage, $sid, 5 * 3600);
-
-        $resumed = new Session(['name' => 'i432-'.$driver, 'session-id' => $sid]);
-        $resumed->start();
-        $this->assertGreaterThan(0, $resumed->getRemainingTime(), 'Precondition: session lifetime has not expired.');
-
-        // Age it again: resuming may legitimately update the last-use time (#433).
-        $this->ageSession($storage, $sid, 5 * 3600);
-        $storage->gc(SessionsManager::getGCTime());
-
-        $this->assertTrue(
-            $this->sessionExistsInStorage($storage, $sid),
-            "Issue #432: GC deleted a session whose 7 day lifetime has not expired ($driver)."
-        );
-    }
-
-    /**
-     * Issue #431: setDuration() and setIsRefresh() on a running session must
-     * reach storage without an explicit close(), as in a normal request where
-     * StartSessionMiddleware::afterSend() only calls validateStorage().
-     *
-     * @test
-     * @dataProvider storageProvider
-     */
-    public function testIssue431DurationAndRefreshArePersisted(string $driver) {
-        $storage = $this->createStorage($driver);
-        SessionsManager::reset();
-        SessionsManager::setStorage($storage);
-        $name = 'i431-'.$driver;
-
-        SessionsManager::start($name);
-        $s = SessionsManager::getActiveSession();
-        $sid = $s->getId();
-        $s->setDuration(10080);
-        $s->setIsRefresh(true);
-        SessionsManager::validateStorage();
-
-        $meta = $storage->read($sid, '_meta')['value'];
-        $this->assertEquals(10080, $meta['lifeTime'], "Issue #431: lifeTime was not persisted ($driver).");
-        $this->assertTrue($meta['isRef'], "Issue #431: isRef was not persisted ($driver).");
-
-        $next = new Session(['name' => $name, 'session-id' => $sid]);
-        $next->start();
-        $this->assertEquals(604800, $next->getDuration(), "Issue #431: resumed session lost its duration ($driver).");
-        $this->assertTrue($next->isRefresh(), "Issue #431: resumed session lost its refresh flag ($driver).");
     }
 
     /**
@@ -185,6 +183,7 @@ class SessionLifetimeBugsTest extends TestCase {
             "Issue #435: missing lifeTime fell back to {$r->getDuration()} seconds ($driver)."
         );
     }
+    use SessionDriversTrait;
 
     protected function setUp(): void {
         parent::setUp();

@@ -33,10 +33,18 @@ final class SessionDriversAvailability {
  */
 trait SessionDriversTrait {
     private string $cacheDir = '';
-    private ?DatabaseSessionStorage $dbStorage = null;
     /** @var string|ConnectionInfo|null Connection used by the last database driver created. */
     private $dbConnection = null;
+    private ?DatabaseSessionStorage $dbStorage = null;
     private string $sqlitePath = '';
+
+    public static function databaseStorageProvider(): array {
+        return [
+            'sqlite' => ['sqlite'],
+            'mysql' => ['mysql'],
+            'mssql' => ['mssql'],
+        ];
+    }
 
     public static function storageProvider(): array {
         return [
@@ -62,14 +70,6 @@ trait SessionDriversTrait {
         ];
     }
 
-    public static function databaseStorageProvider(): array {
-        return [
-            'sqlite' => ['sqlite'],
-            'mysql' => ['mysql'],
-            'mssql' => ['mssql'],
-        ];
-    }
-
     /**
      * Moves the last-use time of a session into the past.
      */
@@ -86,35 +86,6 @@ trait SessionDriversTrait {
         $storage->getController()->table('sessions')
             ->update(['last-used' => date('Y-m-d H:i:s', $time)])
             ->where('s-id', $sessionId)->execute();
-    }
-
-    /**
-     * Returns the last-use time of a session as a Unix timestamp.
-     */
-    private function lastUsed(SessionStorage $storage, string $sessionId): int {
-        if ($storage instanceof DefaultSessionStorage) {
-            $m = new \ReflectionMethod($storage, 'filePath');
-            $m->setAccessible(true);
-            clearstatcache();
-
-            return filemtime($m->invoke($storage, $sessionId));
-        }
-        $rows = $storage->getController()->table('sessions')->select()
-            ->where('s-id', $sessionId)->execute()->getRows();
-
-        return strtotime($rows[0]['last-used'] ?? $rows[0]['last_used']);
-    }
-
-    private function sessionExistsInStorage(SessionStorage $storage, string $sessionId): bool {
-        if ($storage instanceof DefaultSessionStorage) {
-            return $storage->isStorageFileExist($sessionId);
-        }
-
-        if ($storage instanceof DatabaseSessionStorage) {
-            return $storage->getController()->isSessionExist($sessionId);
-        }
-
-        return $storage->readAll($sessionId) !== [];
     }
 
     private function cleanupDrivers(): void {
@@ -204,5 +175,34 @@ trait SessionDriversTrait {
                 );
         }
         $this->fail("Unknown driver '$driver'.");
+    }
+
+    /**
+     * Returns the last-use time of a session as a Unix timestamp.
+     */
+    private function lastUsed(SessionStorage $storage, string $sessionId): int {
+        if ($storage instanceof DefaultSessionStorage) {
+            $m = new \ReflectionMethod($storage, 'filePath');
+            $m->setAccessible(true);
+            clearstatcache();
+
+            return filemtime($m->invoke($storage, $sessionId));
+        }
+        $rows = $storage->getController()->table('sessions')->select()
+            ->where('s-id', $sessionId)->execute()->getRows();
+
+        return strtotime($rows[0]['last-used'] ?? $rows[0]['last_used']);
+    }
+
+    private function sessionExistsInStorage(SessionStorage $storage, string $sessionId): bool {
+        if ($storage instanceof DefaultSessionStorage) {
+            return $storage->isStorageFileExist($sessionId);
+        }
+
+        if ($storage instanceof DatabaseSessionStorage) {
+            return $storage->getController()->isSessionExist($sessionId);
+        }
+
+        return $storage->readAll($sessionId) !== [];
     }
 }

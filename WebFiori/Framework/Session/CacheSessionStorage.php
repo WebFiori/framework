@@ -57,49 +57,17 @@ class CacheSessionStorage implements ExpiringSessionStorage {
     /**
      * {@inheritdoc}
      */
+    public function gc(string $olderThan, int $maxCount = 0): void {
+        $this->storage->purgeExpired();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExpiry(string $sessionId): ?int {
         $value = $this->storage->read($this->expiryKey($sessionId), null);
 
         return is_int($value) ? $value : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * The expiry is enforced through the cache TTL: every entry of the session
-     * is stored again with a TTL equal to the remaining lifetime, and later
-     * writes use the same TTL. Clearing the expiry leaves existing entries
-     * with the TTL they already have.
-     */
-    public function setExpiry(string $sessionId, ?int $expiresAt): void {
-        if ($expiresAt === null) {
-            $this->storage->delete($this->expiryKey($sessionId));
-
-            return;
-        }
-        $ttl = max(1, $expiresAt - time());
-        $this->storeItem($this->expiryKey($sessionId), $expiresAt, $ttl);
-
-        $keys = $this->readIndex($sessionId);
-
-        foreach ($keys as $key) {
-            $entry = $this->read($sessionId, $key);
-
-            if ($entry !== null) {
-                $this->storeItem($this->keyFor($sessionId, $key), $entry, $ttl);
-            }
-        }
-
-        if ($keys !== []) {
-            $this->storeItem($this->indexKey($sessionId), $keys, $ttl);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function gc(string $olderThan, int $maxCount = 0): void {
-        $this->storage->purgeExpired();
     }
 
     public function getPrefix(): string {
@@ -152,6 +120,38 @@ class CacheSessionStorage implements ExpiringSessionStorage {
     public function remove(string $sessionId, string $key): void {
         $this->storage->delete($this->keyFor($sessionId, $key));
         $this->removeFromIndex($sessionId, $key);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The expiry is enforced through the cache TTL: every entry of the session
+     * is stored again with a TTL equal to the remaining lifetime, and later
+     * writes use the same TTL. Clearing the expiry leaves existing entries
+     * with the TTL they already have.
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if ($expiresAt === null) {
+            $this->storage->delete($this->expiryKey($sessionId));
+
+            return;
+        }
+        $ttl = max(1, $expiresAt - time());
+        $this->storeItem($this->expiryKey($sessionId), $expiresAt, $ttl);
+
+        $keys = $this->readIndex($sessionId);
+
+        foreach ($keys as $key) {
+            $entry = $this->read($sessionId, $key);
+
+            if ($entry !== null) {
+                $this->storeItem($this->keyFor($sessionId, $key), $entry, $ttl);
+            }
+        }
+
+        if ($keys !== []) {
+            $this->storeItem($this->indexKey($sessionId), $keys, $ttl);
+        }
     }
 
     public function setTTL(int $ttl): void {

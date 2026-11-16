@@ -78,42 +78,6 @@ class DefaultSessionStorage implements ExpiringSessionStorage {
 
     /**
      * {@inheritdoc}
-     *
-     * The expiry is kept in a sidecar file next to the session file, because
-     * the modification time of the session file changes on every write.
-     */
-    public function getExpiry(string $sessionId): ?int {
-        $path = $this->expiryPath($sessionId);
-
-        if (!file_exists($path)) {
-            return null;
-        }
-        $raw = @file_get_contents($path);
-
-        return $raw !== false && ctype_digit(trim($raw)) ? (int) trim($raw) : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExpiry(string $sessionId, ?int $expiresAt): void {
-        if (!$this->canWrite()) {
-            return;
-        }
-        $path = $this->expiryPath($sessionId);
-
-        if ($expiresAt === null) {
-            if (file_exists($path)) {
-                unlink($path);
-            }
-
-            return;
-        }
-        file_put_contents($path, (string) $expiresAt, LOCK_EX);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function gc(string $olderThan, int $maxCount = 0): void {
         if (!$this->isStorageDirExist()) {
@@ -155,6 +119,23 @@ class DefaultSessionStorage implements ExpiringSessionStorage {
                 $removed++;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * The expiry is kept in a sidecar file next to the session file, because
+     * the modification time of the session file changes on every write.
+     */
+    public function getExpiry(string $sessionId): ?int {
+        $path = $this->expiryPath($sessionId);
+
+        if (!file_exists($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+
+        return $raw !== false && ctype_digit(trim($raw)) ? (int) trim($raw) : null;
     }
 
     /**
@@ -244,6 +225,25 @@ class DefaultSessionStorage implements ExpiringSessionStorage {
         fflush($handle);
         flock($handle, LOCK_UN);
         fclose($handle);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if (!$this->canWrite()) {
+            return;
+        }
+        $path = $this->expiryPath($sessionId);
+
+        if ($expiresAt === null) {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            return;
+        }
+        file_put_contents($path, (string) $expiresAt, LOCK_EX);
     }
 
     /**

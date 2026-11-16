@@ -19,53 +19,6 @@ use WebFiori\Framework\Session\SessionStorage;
  * service is not reachable.
  */
 class SessionExpiryTest extends TestCase {
-    use SessionDriversTrait;
-
-    /**
-     * A session whose storage does not implement ExpiringSessionStorage must
-     * keep working: nothing calls the expiry methods.
-     *
-     * @test
-     */
-    public function testStorageWithoutExpirySupportStillWorks() {
-        $inner = new InMemorySessionStorage();
-        $plain = new class($inner) implements SessionStorage {
-            public function __construct(private SessionStorage $inner) {
-            }
-            public function destroy(string $sessionId): void {
-                $this->inner->destroy($sessionId);
-            }
-            public function gc(string $olderThan, int $maxCount = 0): void {
-                $this->inner->gc($olderThan, $maxCount);
-            }
-            public function read(string $sessionId, string $key): ?array {
-                return $this->inner->read($sessionId, $key);
-            }
-            public function readAll(string $sessionId): array {
-                return $this->inner->readAll($sessionId);
-            }
-            public function remove(string $sessionId, string $key): void {
-                $this->inner->remove($sessionId, $key);
-            }
-            public function write(string $sessionId, string $key, mixed $value, string|int|null $expectedVersion, ConflictStrategy $strategy): string|int {
-                return $this->inner->write($sessionId, $key, $value, $expectedVersion, $strategy);
-            }
-        };
-        SessionsManager::setStorage($plain);
-
-        $s = new Session(['name' => 'plain-storage', 'duration' => 60, 'refresh' => true]);
-        $s->start();
-        $s->set('k', 'v');
-        $s->setDuration(120);
-        $s->close();
-
-        $r = new Session(['name' => 'plain-storage', 'session-id' => $s->getId()]);
-        $r->start();
-        $this->assertEquals(SessionStatus::RESUMED, $r->getStatus());
-        $this->assertEquals('v', $r->get('k'));
-        $this->assertEquals(7200, $r->getDuration());
-    }
-
     /**
      * A session with refresh expires one full duration after its latest write
      * of metadata, not after it started.
@@ -120,6 +73,27 @@ class SessionExpiryTest extends TestCase {
     }
 
     /**
+     * A session without refresh keeps its original expiry when resumed.
+     *
+     * @test
+     * @dataProvider storageProvider
+     */
+    public function testResumeKeepsExpiryOfNonRefreshSession(string $driver) {
+        $storage = $this->createStorage($driver);
+        SessionsManager::setStorage($storage);
+        $name = 'exp-keep-'.$driver;
+
+        $s = new Session(['name' => $name, 'duration' => 30]);
+        $s->start();
+        $sid = $s->getId();
+        $before = $storage->getExpiry($sid);
+
+        (new Session(['name' => $name, 'session-id' => $sid]))->start();
+
+        $this->assertSame($before, $storage->getExpiry($sid));
+    }
+
+    /**
      * A session created before expiry tracking existed has no recorded
      * expiry. Resuming it records one.
      *
@@ -171,27 +145,6 @@ class SessionExpiryTest extends TestCase {
     }
 
     /**
-     * A session without refresh keeps its original expiry when resumed.
-     *
-     * @test
-     * @dataProvider storageProvider
-     */
-    public function testResumeKeepsExpiryOfNonRefreshSession(string $driver) {
-        $storage = $this->createStorage($driver);
-        SessionsManager::setStorage($storage);
-        $name = 'exp-keep-'.$driver;
-
-        $s = new Session(['name' => $name, 'duration' => 30]);
-        $s->start();
-        $sid = $s->getId();
-        $before = $storage->getExpiry($sid);
-
-        (new Session(['name' => $name, 'session-id' => $sid]))->start();
-
-        $this->assertSame($before, $storage->getExpiry($sid));
-    }
-
-    /**
      * setDuration() and setIsRefresh() on a running session update the
      * recorded expiry (issue #431).
      *
@@ -212,6 +165,53 @@ class SessionExpiryTest extends TestCase {
         $s->setIsRefresh(true);
         $this->assertEqualsWithDelta(time() + 3600, $storage->getExpiry($sid), 5);
     }
+
+    /**
+     * A session whose storage does not implement ExpiringSessionStorage must
+     * keep working: nothing calls the expiry methods.
+     *
+     * @test
+     */
+    public function testStorageWithoutExpirySupportStillWorks() {
+        $inner = new InMemorySessionStorage();
+        $plain = new class($inner) implements SessionStorage
+        {
+            public function __construct(private SessionStorage $inner) {
+            }
+            public function destroy(string $sessionId): void {
+                $this->inner->destroy($sessionId);
+            }
+            public function gc(string $olderThan, int $maxCount = 0): void {
+                $this->inner->gc($olderThan, $maxCount);
+            }
+            public function read(string $sessionId, string $key): ?array {
+                return $this->inner->read($sessionId, $key);
+            }
+            public function readAll(string $sessionId): array {
+                return $this->inner->readAll($sessionId);
+            }
+            public function remove(string $sessionId, string $key): void {
+                $this->inner->remove($sessionId, $key);
+            }
+            public function write(string $sessionId, string $key, mixed $value, string|int|null $expectedVersion, ConflictStrategy $strategy): string|int {
+                return $this->inner->write($sessionId, $key, $value, $expectedVersion, $strategy);
+            }
+        };
+        SessionsManager::setStorage($plain);
+
+        $s = new Session(['name' => 'plain-storage', 'duration' => 60, 'refresh' => true]);
+        $s->start();
+        $s->set('k', 'v');
+        $s->setDuration(120);
+        $s->close();
+
+        $r = new Session(['name' => 'plain-storage', 'session-id' => $s->getId()]);
+        $r->start();
+        $this->assertEquals(SessionStatus::RESUMED, $r->getStatus());
+        $this->assertEquals('v', $r->get('k'));
+        $this->assertEquals(7200, $r->getDuration());
+    }
+    use SessionDriversTrait;
 
     protected function setUp(): void {
         parent::setUp();

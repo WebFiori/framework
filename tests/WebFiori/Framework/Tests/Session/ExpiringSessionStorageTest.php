@@ -5,8 +5,6 @@ require_once __DIR__.'/SessionDriversTrait.php';
 
 use PHPUnit\Framework\TestCase;
 use WebFiori\Framework\Session\ConflictStrategy;
-use WebFiori\Framework\Session\DatabaseSessionStorage;
-use WebFiori\Framework\Session\DefaultSessionStorage;
 use WebFiori\Framework\Session\ExpiringSessionStorage;
 use WebFiori\Framework\Session\InMemorySessionStorage;
 use WebFiori\Framework\Session\SessionSchemaMigration;
@@ -19,8 +17,6 @@ use WebFiori\Framework\Session\SessionSchemaMigration;
  * service is not reachable.
  */
 class ExpiringSessionStorageTest extends TestCase {
-    use SessionDriversTrait;
-
     /**
      * @test
      * @dataProvider storageProvider
@@ -84,28 +80,6 @@ class ExpiringSessionStorageTest extends TestCase {
     }
 
     /**
-     * Sessions that have an expiry are removed by gc() only once it passed,
-     * whatever the idle threshold says.
-     *
-     * @test
-     * @dataProvider storageProvider
-     */
-    public function testGcUsesRecordedExpiry(string $driver) {
-        $storage = $this->createStorage($driver);
-        $this->write($storage, 'expired');
-        $this->write($storage, 'alive');
-        $this->expireSession($driver, $storage, 'expired');
-        $storage->setExpiry('alive', time() + 3600);
-
-        // An idle threshold in the far future would delete every session
-        // that has no expiry. 'alive' has one, so it must stay.
-        $storage->gc(date('Y-m-d H:i:s', time() + 86400));
-
-        $this->assertFalse($this->sessionExistsInStorage($storage, 'expired'), 'Expired session should be removed.');
-        $this->assertTrue($this->sessionExistsInStorage($storage, 'alive'), 'Unexpired session should be kept.');
-    }
-
-    /**
      * Sessions without a recorded expiry (created before upgrade, or with a
      * non-persistent lifetime) keep being removed by the idle threshold.
      *
@@ -150,6 +124,28 @@ class ExpiringSessionStorageTest extends TestCase {
     }
 
     /**
+     * Sessions that have an expiry are removed by gc() only once it passed,
+     * whatever the idle threshold says.
+     *
+     * @test
+     * @dataProvider storageProvider
+     */
+    public function testGcUsesRecordedExpiry(string $driver) {
+        $storage = $this->createStorage($driver);
+        $this->write($storage, 'expired');
+        $this->write($storage, 'alive');
+        $this->expireSession($driver, $storage, 'expired');
+        $storage->setExpiry('alive', time() + 3600);
+
+        // An idle threshold in the far future would delete every session
+        // that has no expiry. 'alive' has one, so it must stay.
+        $storage->gc(date('Y-m-d H:i:s', time() + 86400));
+
+        $this->assertFalse($this->sessionExistsInStorage($storage, 'expired'), 'Expired session should be removed.');
+        $this->assertTrue($this->sessionExistsInStorage($storage, 'alive'), 'Unexpired session should be kept.');
+    }
+
+    /**
      * A database whose 'sessions' table has no 'expires_at' column yet (not
      * migrated) must keep working with idle-threshold GC, and the migration
      * must add the column.
@@ -190,16 +186,6 @@ class ExpiringSessionStorageTest extends TestCase {
         $this->assertSame($at, $storage->getExpiry('old-fresh'));
     }
 
-    protected function setUp(): void {
-        parent::setUp();
-        InMemorySessionStorage::reset();
-    }
-
-    protected function tearDown(): void {
-        $this->cleanupDrivers();
-        parent::tearDown();
-    }
-
     /**
      * Makes a session's recorded expiry a time in the past. The cache driver
      * enforces expiry through TTLs, so the test waits for the 1 second TTL to
@@ -215,5 +201,16 @@ class ExpiringSessionStorageTest extends TestCase {
 
     private function write(ExpiringSessionStorage $storage, string $sessionId): void {
         $storage->write($sessionId, 'k', 'v', null, ConflictStrategy::LAST_WRITE_WINS);
+    }
+    use SessionDriversTrait;
+
+    protected function setUp(): void {
+        parent::setUp();
+        InMemorySessionStorage::reset();
+    }
+
+    protected function tearDown(): void {
+        $this->cleanupDrivers();
+        parent::tearDown();
     }
 }

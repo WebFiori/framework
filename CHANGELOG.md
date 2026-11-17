@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/WebFiori/framework/compare/v3.1.4...v3.2.0) (2026-11-17)
+
+
+### Features
+
+* **session:** record session expiry in storage via ExpiringSessionStorage ([2711f4e](https://github.com/WebFiori/framework/commit/2711f4e2cf511e47d27724905368188c6a5a6a6f)), closes [#431](https://github.com/WebFiori/framework/issues/431) [#432](https://github.com/WebFiori/framework/issues/432) [#433](https://github.com/WebFiori/framework/issues/433) [#434](https://github.com/WebFiori/framework/issues/434) [#435](https://github.com/WebFiori/framework/issues/435)
+
 ## [3.1.4](https://github.com/WebFiori/framework/compare/v3.1.3...v3.1.4) (2026-11-09)
 
 

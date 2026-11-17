@@ -26,6 +26,7 @@ class SessionLifetimeBugsTest extends TestCase {
      * StartSessionMiddleware::afterSend() only calls validateStorage().
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testIssue431DurationAndRefreshArePersisted(string $driver) {
@@ -57,6 +58,7 @@ class SessionLifetimeBugsTest extends TestCase {
      * expired.
      *
      * @test
+     * @dataProvider timestampStorageProvider
      */
     #[DataProvider('timestampStorageProvider')]
     public function testIssue432GcRespectsPerSessionLifetime(string $driver) {
@@ -96,6 +98,7 @@ class SessionLifetimeBugsTest extends TestCase {
      * checks the expiry that GC actually uses.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testIssue433ResumeExtendsExpiryOfRefreshSession(string $driver) {
@@ -157,6 +160,7 @@ class SessionLifetimeBugsTest extends TestCase {
      * back to the default duration (120 minutes), not 2 minutes.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testIssue435MissingLifeTimeFallsBackToDefault(string $driver) {

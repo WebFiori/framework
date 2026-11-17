@@ -20,6 +20,7 @@ use WebFiori\Framework\Session\SessionSchemaMigration;
 class ExpiringSessionStorageTest extends TestCase {
     /**
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testBuiltInDriversAreExpiring(string $driver) {
@@ -28,6 +29,7 @@ class ExpiringSessionStorageTest extends TestCase {
 
     /**
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testDestroyClearsExpiry(string $driver) {
@@ -42,6 +44,7 @@ class ExpiringSessionStorageTest extends TestCase {
 
     /**
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testExpiryRoundTrip(string $driver) {
@@ -65,6 +68,7 @@ class ExpiringSessionStorageTest extends TestCase {
      * expiry or the data.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testExpirySurvivesLaterWrites(string $driver) {
@@ -85,6 +89,7 @@ class ExpiringSessionStorageTest extends TestCase {
      * non-persistent lifetime) keep being removed by the idle threshold.
      *
      * @test
+     * @dataProvider timestampStorageProvider
      */
     #[DataProvider('timestampStorageProvider')]
     public function testGcFallsBackToIdleThresholdWithoutExpiry(string $driver) {
@@ -101,6 +106,7 @@ class ExpiringSessionStorageTest extends TestCase {
 
     /**
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testGcRespectsMaxCount(string $driver) {
@@ -129,6 +135,7 @@ class ExpiringSessionStorageTest extends TestCase {
      * whatever the idle threshold says.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testGcUsesRecordedExpiry(string $driver) {
@@ -152,6 +159,7 @@ class ExpiringSessionStorageTest extends TestCase {
      * must add the column.
      *
      * @test
+     * @dataProvider databaseStorageProvider
      */
     #[DataProvider('databaseStorageProvider')]
     public function testUnmigratedDatabaseDegradesAndMigrationAddsColumn(string $driver) {

@@ -25,6 +25,7 @@ class SessionExpiryTest extends TestCase {
      * of metadata, not after it started.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testNewRefreshSessionExpiresOneDurationFromNow(string $driver) {
@@ -41,6 +42,7 @@ class SessionExpiryTest extends TestCase {
      * A session without refresh expires one duration after it started.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testNewSessionExpiresOneDurationAfterStart(string $driver) {
@@ -58,6 +60,7 @@ class SessionExpiryTest extends TestCase {
      * recorded and it stays subject to the idle threshold.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testNonPersistentSessionHasNoExpiry(string $driver) {
@@ -77,6 +80,7 @@ class SessionExpiryTest extends TestCase {
      * A session without refresh keeps its original expiry when resumed.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testResumeKeepsExpiryOfNonRefreshSession(string $driver) {
@@ -99,6 +103,7 @@ class SessionExpiryTest extends TestCase {
      * expiry. Resuming it records one.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testResumeRecordsMissingExpiry(string $driver) {
@@ -122,6 +127,7 @@ class SessionExpiryTest extends TestCase {
      * request.
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testResumeRefreshesExpiryOnlyWhenDriftExceedsOneMinute(string $driver) {
@@ -150,6 +156,7 @@ class SessionExpiryTest extends TestCase {
      * recorded expiry (issue #431).
      *
      * @test
+     * @dataProvider storageProvider
      */
     #[DataProvider('storageProvider')]
     public function testSetDurationAndRefreshUpdateRecordedExpiry(string $driver) {

@@ -45,6 +45,13 @@ class Session implements JsonI {
     const RESERVED_KEYS = ['_meta', '_user'];
 
     /**
+     * Minimum drift, in seconds, before the stored expiry of a resumed session
+     * is rewritten. Avoids a storage write on every request of a session that
+     * has refresh enabled.
+     */
+    private const EXPIRY_REFRESH_INTERVAL = 60;
+
+    /**
      * Conflict strategy controlling how set() handles concurrent modifications.
      *
      * @var ConflictStrategy
@@ -801,6 +808,10 @@ class Session implements JsonI {
             $this->sessionCookie->setExpires($asFloat);
             $this->checkIfExpired();
 
+            if ($this->isRunning()) {
+                $this->persistMeta();
+            }
+
             return true;
         }
 
@@ -816,6 +827,10 @@ class Session implements JsonI {
      */
     public function setIsRefresh(bool $bool) {
         $this->isRef = $bool === true;
+
+        if ($this->isRunning()) {
+            $this->persistMeta();
+        }
     }
     /**
      * Sets the read strategy for this session.
@@ -883,7 +898,7 @@ class Session implements JsonI {
                 }
 
                 $this->startedAt = $meta['startedAt'] ?? time();
-                $this->lifeTime = $meta['lifeTime'] ?? self::DEFAULT_SESSION_DURATION / 60;
+                $this->lifeTime = $meta['lifeTime'] ?? self::DEFAULT_SESSION_DURATION;
                 $this->isRef = $meta['isRef'] ?? false;
                 $this->langCode = $meta['langCode'] ?? '';
                 $this->resumedAt = time();
@@ -908,6 +923,10 @@ class Session implements JsonI {
                 }
 
                 $this->checkIfExpired();
+
+                if ($this->sessionStatus === SessionStatus::RESUMED) {
+                    $this->refreshExpiry();
+                }
             }
         }
     }
@@ -936,6 +955,22 @@ class Session implements JsonI {
 
         return $json;
     }
+    /**
+     * Throws a SessionException if the given key is reserved for internal use.
+     *
+     * Reserved keys (see Session::RESERVED_KEYS) hold internal session state
+     * and must not be mutated through the public variable API. Reading is
+     * allowed; writing, removing or pulling a reserved key is rejected.
+     *
+     * @param string $key The (already trimmed) key being written.
+     *
+     * @throws SessionException If the key is reserved.
+     */
+    private function assertNotReserved(string $key): void {
+        if (in_array($key, self::RESERVED_KEYS, true)) {
+            throw new SessionException("The session key '$key' is reserved for internal use and cannot be modified.");
+        }
+    }
     private function checkIfExpired() {
         if ($this->getRemainingTime() < 0) {
             SessionsManager::getStorage()->destroy($this->getId());
@@ -962,6 +997,21 @@ class Session implements JsonI {
             $this->langCode = $session->langCode;
         }
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
+    }
+    /**
+     * Returns the time at which the session expires, as a Unix timestamp.
+     *
+     * Sessions with refresh enabled expire one full duration after now. Other
+     * sessions expire one full duration after they started.
+     *
+     * @return int|null Null if the session is not persistent (no lifetime).
+     */
+    private function computeExpiry(): ?int {
+        if (!$this->isPersistent()) {
+            return null;
+        }
+
+        return ($this->isRefresh() ? time() : $this->startedAt) + $this->getDuration();
     }
     private function decryptLegacy(string $serialized): ?string {
         $split = explode('_', $serialized, 2);
@@ -1013,22 +1063,6 @@ class Session implements JsonI {
         $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
 
         return $plaintext !== false ? $plaintext : null;
-    }
-    /**
-     * Throws a SessionException if the given key is reserved for internal use.
-     *
-     * Reserved keys (see Session::RESERVED_KEYS) hold internal session state
-     * and must not be mutated through the public variable API. Reading is
-     * allowed; writing, removing or pulling a reserved key is rejected.
-     *
-     * @param string $key The (already trimmed) key being written.
-     *
-     * @throws SessionException If the key is reserved.
-     */
-    private function assertNotReserved(string $key): void {
-        if (in_array($key, self::RESERVED_KEYS, true)) {
-            throw new SessionException("The session key '$key' is reserved for internal use and cannot be modified.");
-        }
     }
     /**
      * Decrypts a session value that was encrypted by encryptValue().
@@ -1199,6 +1233,7 @@ class Session implements JsonI {
             null,
             ConflictStrategy::LAST_WRITE_WINS
         );
+        $this->syncExpiry();
     }
     /**
      * Persists the current session user to the reserved '_user' key.
@@ -1222,24 +1257,28 @@ class Session implements JsonI {
         );
     }
     /**
-     * Restores the session user from the reserved '_user' key, if present.
+     * Updates the stored expiry of a resumed session.
+     *
+     * The write happens when no expiry is recorded yet (session created
+     * before expiry tracking existed) or when the recorded value drifts from
+     * the computed one by more than EXPIRY_REFRESH_INTERVAL seconds, which only
+     * happens for sessions with refresh enabled.
      */
-    private function restoreUser(): void {
-        $entry = SessionsManager::getStorage()->read($this->getId(), '_user');
+    private function refreshExpiry(): void {
+        $storage = SessionsManager::getStorage();
 
-        if ($entry === null) {
-            $this->sessionUser = null;
-
+        if (!$storage instanceof ExpiringSessionStorage) {
             return;
         }
-        $decrypted = $this->decryptValue($entry['value']);
+        $target = $this->computeExpiry();
+        $current = $storage->getExpiry($this->getId());
 
-        if (is_string($decrypted)) {
-            $restored = @unserialize($decrypted);
-
-            $this->sessionUser = $restored instanceof SessionUser ? $restored : null;
-        } else {
-            $this->sessionUser = null;
+        if ($target === null) {
+            if ($current !== null) {
+                $storage->setExpiry($this->getId(), null);
+            }
+        } else if ($current === null || abs($target - $current) > self::EXPIRY_REFRESH_INTERVAL) {
+            $storage->setExpiry($this->getId(), $target);
         }
     }
     private function restoreFromPlaintext(string $plaintext): bool {
@@ -1266,6 +1305,27 @@ class Session implements JsonI {
 
         return false;
     }
+    /**
+     * Restores the session user from the reserved '_user' key, if present.
+     */
+    private function restoreUser(): void {
+        $entry = SessionsManager::getStorage()->read($this->getId(), '_user');
+
+        if ($entry === null) {
+            $this->sessionUser = null;
+
+            return;
+        }
+        $decrypted = $this->decryptValue($entry['value']);
+
+        if (is_string($decrypted)) {
+            $restored = @unserialize($decrypted);
+
+            $this->sessionUser = $restored instanceof SessionUser ? $restored : null;
+        } else {
+            $this->sessionUser = null;
+        }
+    }
     private function setNameHelper($name): bool {
         $trimmed = trim($name);
 
@@ -1283,6 +1343,16 @@ class Session implements JsonI {
         $this->getCookie()->setName($trimmed);
 
         return true;
+    }
+    /**
+     * Records the expiry time in storage, if the storage supports it.
+     */
+    private function syncExpiry(): void {
+        $storage = SessionsManager::getStorage();
+
+        if ($storage instanceof ExpiringSessionStorage) {
+            $storage->setExpiry($this->getId(), $this->computeExpiry());
+        }
     }
     /**
      * Writes a key using RETRY_WITH_CALLBACK: re-reads current value and calls

@@ -29,7 +29,7 @@ use WebFiori\Cache\Storage;
  * @author Ibrahim
  * @since 3.1.0 (per-key interface)
  */
-class CacheSessionStorage implements SessionStorage {
+class CacheSessionStorage implements ExpiringSessionStorage {
     private string $prefix;
     private Storage $storage;
     private int $ttl;
@@ -51,6 +51,7 @@ class CacheSessionStorage implements SessionStorage {
         }
 
         $this->storage->delete($this->indexKey($sessionId));
+        $this->storage->delete($this->expiryKey($sessionId));
     }
 
     /**
@@ -58,6 +59,15 @@ class CacheSessionStorage implements SessionStorage {
      */
     public function gc(string $olderThan, int $maxCount = 0): void {
         $this->storage->purgeExpired();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExpiry(string $sessionId): ?int {
+        $value = $this->storage->read($this->expiryKey($sessionId), null);
+
+        return is_int($value) ? $value : null;
     }
 
     public function getPrefix(): string {
@@ -112,6 +122,38 @@ class CacheSessionStorage implements SessionStorage {
         $this->removeFromIndex($sessionId, $key);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * The expiry is enforced through the cache TTL: every entry of the session
+     * is stored again with a TTL equal to the remaining lifetime, and later
+     * writes use the same TTL. Clearing the expiry leaves existing entries
+     * with the TTL they already have.
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if ($expiresAt === null) {
+            $this->storage->delete($this->expiryKey($sessionId));
+
+            return;
+        }
+        $ttl = max(1, $expiresAt - time());
+        $this->storeItem($this->expiryKey($sessionId), $expiresAt, $ttl);
+
+        $keys = $this->readIndex($sessionId);
+
+        foreach ($keys as $key) {
+            $entry = $this->read($sessionId, $key);
+
+            if ($entry !== null) {
+                $this->storeItem($this->keyFor($sessionId, $key), $entry, $ttl);
+            }
+        }
+
+        if ($keys !== []) {
+            $this->storeItem($this->indexKey($sessionId), $keys, $ttl);
+        }
+    }
+
     public function setTTL(int $ttl): void {
         $this->ttl = $ttl;
     }
@@ -140,29 +182,26 @@ class CacheSessionStorage implements SessionStorage {
         $entry = ['value' => $value, 'version' => $newVersion];
         $cacheKey = $this->keyFor($sessionId, $key);
 
-        $item = new Item($cacheKey, $entry, $this->ttl);
-        $secConfig = new SecurityConfig();
-        $secConfig->setEncryptionEnabled(false);
-        $item->setSecurityConfig($secConfig);
-        $this->storage->store($item);
+        $ttl = $this->ttlFor($sessionId);
+        $this->storeItem($cacheKey, $entry, $ttl);
 
         // Update the key index.
-        $this->addToIndex($sessionId, $key);
+        $this->addToIndex($sessionId, $key, $ttl);
 
         return $newVersion;
     }
 
-    private function addToIndex(string $sessionId, string $key): void {
+    private function addToIndex(string $sessionId, string $key, int $ttl): void {
         $keys = $this->readIndex($sessionId);
 
         if (!in_array($key, $keys, true)) {
             $keys[] = $key;
-            $item = new Item($this->indexKey($sessionId), $keys, $this->ttl);
-            $secConfig = new SecurityConfig();
-            $secConfig->setEncryptionEnabled(false);
-            $item->setSecurityConfig($secConfig);
-            $this->storage->store($item);
+            $this->storeItem($this->indexKey($sessionId), $keys, $ttl);
         }
+    }
+
+    private function expiryKey(string $sessionId): string {
+        return $this->prefix.$sessionId.':_expires';
     }
 
     private function indexKey(string $sessionId): string {
@@ -183,10 +222,24 @@ class CacheSessionStorage implements SessionStorage {
     private function removeFromIndex(string $sessionId, string $key): void {
         $keys = $this->readIndex($sessionId);
         $keys = array_values(array_filter($keys, fn ($k) => $k !== $key));
-        $item = new Item($this->indexKey($sessionId), $keys, $this->ttl);
+        $this->storeItem($this->indexKey($sessionId), $keys, $this->ttlFor($sessionId));
+    }
+
+    private function storeItem(string $cacheKey, mixed $data, int $ttl): void {
+        $item = new Item($cacheKey, $data, $ttl);
         $secConfig = new SecurityConfig();
         $secConfig->setEncryptionEnabled(false);
         $item->setSecurityConfig($secConfig);
         $this->storage->store($item);
+    }
+
+    /**
+     * TTL for new entries of a session: the remaining lifetime if an expiry
+     * is recorded, the configured default otherwise.
+     */
+    private function ttlFor(string $sessionId): int {
+        $expiry = $this->getExpiry($sessionId);
+
+        return $expiry === null ? $this->ttl : max(1, $expiry - time());
     }
 }

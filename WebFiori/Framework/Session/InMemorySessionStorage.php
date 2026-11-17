@@ -28,7 +28,13 @@ namespace WebFiori\Framework\Session;
  *
  * @since 3.1.0
  */
-class InMemorySessionStorage implements SessionStorage {
+class InMemorySessionStorage implements ExpiringSessionStorage {
+    /**
+     * Recorded expiry times keyed by session id.
+     *
+     * @var array<string, int>
+     */
+    private static array $expiry = [];
     /**
      * Shared in-process store keyed by [session_id][key] => [value, version].
      *
@@ -42,14 +48,36 @@ class InMemorySessionStorage implements SessionStorage {
      * @param string $sessionId The session identifier.
      */
     public function destroy(string $sessionId): void {
-        unset(self::$store[$sessionId]);
+        unset(self::$store[$sessionId], self::$expiry[$sessionId]);
     }
 
     /**
-     * No-op for in-memory storage (no TTL tracking).
+     * Removes sessions whose recorded expiry has passed.
+     *
+     * In-memory storage does not track idle time, so sessions without a
+     * recorded expiry are never removed.
      */
     public function gc(string $olderThan, int $maxCount = 0): void {
-        // In-memory storage has no concept of expiry; GC is a no-op.
+        $now = time();
+        $removed = 0;
+
+        foreach (self::$expiry as $sessionId => $expiresAt) {
+            if ($maxCount > 0 && $removed >= $maxCount) {
+                break;
+            }
+
+            if ($expiresAt <= $now) {
+                $this->destroy($sessionId);
+                $removed++;
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExpiry(string $sessionId): ?int {
+        return self::$expiry[$sessionId] ?? null;
     }
 
     /**
@@ -92,6 +120,18 @@ class InMemorySessionStorage implements SessionStorage {
      */
     public static function reset(): void {
         self::$store = [];
+        self::$expiry = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        if ($expiresAt === null) {
+            unset(self::$expiry[$sessionId]);
+        } else {
+            self::$expiry[$sessionId] = $expiresAt;
+        }
     }
 
     /**

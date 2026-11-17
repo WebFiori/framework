@@ -49,12 +49,25 @@ class SessionDB extends DB {
         }
     }
     /**
+     * Creates the index on 'sessions.expires_at' that makes expiry-based
+     * garbage collection a range scan. Safe to call more than once.
+     */
+    public function createExpiryIndex(): void {
+        try {
+            $this->raw('CREATE INDEX idx_sessions_expires_at ON sessions (expires_at)')->execute();
+        } catch (\Throwable $e) {
+            // Index already exists, or the column has not been migrated yet.
+        }
+        $this->clear();
+    }
+    /**
      * Creates all session tables (sessions, session_data, session_kv_data).
      * Called during test setup or initial deployment.
      */
     public function createTables(): void {
         // Use the parent DB class createTables() which creates all registered tables.
         parent::createTables();
+        $this->createExpiryIndex();
     }
     /**
      * Drops all session-related tables.
@@ -68,7 +81,11 @@ class SessionDB extends DB {
         $this->table('sessions')->drop()->execute();
     }
     /**
-     * Clears the sessions which are older than the given date.
+     * Removes expired sessions.
+     *
+     * A session with a recorded expiry is removed once that expiry has passed.
+     * A session without one is removed when its last use is at or before
+     * $olderThan.
      *
      * @param string $olderThan A date-time string in the format 'YYYY-MM-DD HH:MM:SS'.
      * @param int $maxCount Maximum number of sessions to remove. 0 means no limit.
@@ -77,7 +94,7 @@ class SessionDB extends DB {
      * @since 2.0
      */
     public function gc(string $olderThan, int $maxCount = 0) {
-        $ids = $this->getSessionsIDs($olderThan);
+        $ids = $this->getExpiredSessionsIDs(date('Y-m-d H:i:s'), $olderThan);
 
         if ($maxCount > 0) {
             $ids = array_slice($ids, 0, $maxCount);
@@ -111,6 +128,68 @@ class SessionDB extends DB {
         }
 
         return 0;
+    }
+    /**
+     * Returns the IDs of sessions that should be garbage-collected.
+     *
+     * @param string $now The current time as 'YYYY-MM-DD HH:MM:SS'. Sessions
+     * whose recorded expiry is at or before this time are returned.
+     * @param string $idleOlderThan Sessions with NO recorded expiry are
+     * returned if their last use is at or before this time.
+     *
+     * @return array
+     *
+     * @throws DatabaseException
+     */
+    public function getExpiredSessionsIDs(string $now, string $idleOlderThan): array {
+        $mapId = function ($record)
+        {
+            return $record['s-id'] ?? $record['s_id'] ?? null;
+        };
+
+        try {
+            $expired = $this->table('sessions')->select()
+                ->where('expires-at', $now, '<=')->execute()->map($mapId)->toArray();
+            $legacy = $this->table('sessions')->select()
+                ->where('last-used', $idleOlderThan, '<=')->whereNull('expires-at')
+                ->execute()->map($mapId)->toArray();
+        } catch (DatabaseException $e) {
+            // The 'expires_at' column does not exist yet (schema not migrated):
+            // behave as before and use the idle threshold for every session.
+            $this->clear();
+
+            return $this->getSessionsIDs($idleOlderThan);
+        }
+
+        return array_values(array_unique(array_merge($expired, $legacy)));
+    }
+
+    /**
+     * Returns the recorded expiry time of a session.
+     *
+     * @param string $sId The ID of the session.
+     *
+     * @return int|null A Unix timestamp, or null if no expiry is recorded, the
+     * session does not exist, or the 'expires_at' column has not been migrated.
+     */
+    public function getExpiry(string $sId): ?int {
+        try {
+            $rows = $this->table('sessions')->select()->where('s-id', $sId)->execute()->getRows();
+        } catch (DatabaseException $e) {
+            return null;
+        }
+
+        if (count($rows) === 0) {
+            return null;
+        }
+        $value = $rows[0]['expires-at'] ?? $rows[0]['expires_at'] ?? null;
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+        $time = strtotime((string) $value);
+
+        return $time === false ? null : $time;
     }
 
     /**
@@ -192,7 +271,6 @@ class SessionDB extends DB {
 
         return $result;
     }
-
     /**
      * Returns an array that holds the IDs of sessions which are older than
      * specific date and time.
@@ -293,6 +371,24 @@ class SessionDB extends DB {
     public function saveSession(string $sId, string $session) {
         $this->ensureSessionRow($sId);
         $this->storeChunks($sId, base64_encode($session));
+    }
+    /**
+     * Records the time at which a session expires.
+     *
+     * Does nothing if the session row does not exist or the 'expires_at'
+     * column has not been migrated.
+     *
+     * @param string $sId The ID of the session.
+     * @param int|null $expiresAt A Unix timestamp, or null to clear.
+     */
+    public function setExpiry(string $sId, ?int $expiresAt): void {
+        try {
+            $this->table('sessions')->update([
+                'expires-at' => $expiresAt === null ? null : date('Y-m-d H:i:s', $expiresAt),
+            ])->where('s-id', $sId)->execute();
+        } catch (DatabaseException $e) {
+            $this->clear();
+        }
     }
     /**
      * Writes a single key to session_kv_data with conflict detection.
@@ -398,6 +494,25 @@ class SessionDB extends DB {
         }
     }
     /**
+     * Split session data into smaller chunks.
+     *
+     * @param string $data
+     * @return array
+     */
+    private function getChunks(string $data) : array {
+        $retVal = [];
+        $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
+        $dataLen = strlen($data);
+        $index = 0;
+
+        while ($index < $dataLen) {
+            $retVal[] = substr($data, $index, $chunkSize);
+            $index += $chunkSize;
+        }
+
+        return $retVal;
+    }
+    /**
      * Checks whether a database exception represents a duplicate/primary-key
      * constraint violation across the supported database engines.
      *
@@ -422,25 +537,6 @@ class SessionDB extends DB {
         return stripos($msg, 'duplicate') !== false
             || stripos($msg, 'PRIMARY KEY') !== false
             || stripos($msg, 'UNIQUE constraint') !== false;
-    }
-    /**
-     * Split session data into smaller chunks.
-     *
-     * @param string $data
-     * @return array
-     */
-    private function getChunks(string $data) : array {
-        $retVal = [];
-        $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
-        $dataLen = strlen($data);
-        $index = 0;
-
-        while ($index < $dataLen) {
-            $retVal[] = substr($data, $index, $chunkSize);
-            $index += $chunkSize;
-        }
-
-        return $retVal;
     }
 
     /**

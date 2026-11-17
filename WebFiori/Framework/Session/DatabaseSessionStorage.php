@@ -27,7 +27,7 @@ use WebFiori\Framework\Exceptions\SessionException;
  * @author Ibrahim
  * @since 2.1.0 (original), 3.1.0 (per-key interface)
  */
-class DatabaseSessionStorage implements SessionStorage {
+class DatabaseSessionStorage implements ExpiringSessionStorage {
     private SessionDB $dbController;
 
     /**
@@ -79,6 +79,13 @@ class DatabaseSessionStorage implements SessionStorage {
     /**
      * {@inheritdoc}
      */
+    public function getExpiry(string $sessionId): ?int {
+        return $this->dbController->getExpiry($sessionId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(string $sessionId, string $key): ?array {
         return $this->dbController->getSessionKey($sessionId, $key);
     }
@@ -95,6 +102,13 @@ class DatabaseSessionStorage implements SessionStorage {
      */
     public function remove(string $sessionId, string $key): void {
         $this->dbController->removeSessionKey($sessionId, $key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExpiry(string $sessionId, ?int $expiresAt): void {
+        $this->dbController->setExpiry($sessionId, $expiresAt);
     }
 
     /**
